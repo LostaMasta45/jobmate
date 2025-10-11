@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Get Extension ID</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .extension-id {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+        .code {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Cara Cek Extension ID</h1>
+    
+    <div class="info">
+        <h3>Cara 1: Dari chrome://extensions/</h3>
+        <ol>
+            <li>Buka: <code>chrome://extensions/</code></li>
+            <li>Aktifkan <strong>"Developer mode"</strong> (kanan atas)</li>
+            <li>Lihat di card extension <strong>"MCP Chrome Test Extension"</strong></li>
+            <li>Extension ID ada di bawah nama extension (format: <code>abcdefghijklmnopqrstuvwxyz123456</code>)</li>
+        </ol>
+    </div>
+
+    <div class="info">
+        <h3>Cara 2: Dari folder</h3>
+        <p>Extension ID di-generate dari path folder. Copy Extension ID dari chrome://extensions/ (cara 1 lebih mudah)</p>
+    </div>
+
+    <div class="info">
+        <h3>Setelah dapat Extension ID:</h3>
+        <p>Jalankan command berikut di terminal (ganti <code>YOUR_EXTENSION_ID</code> dengan ID yang sebenarnya):</p>
+        <div class="code">cd C:\Users\user\Music\JOBMATE
+notepad "C:\Users\user\AppData\Roaming\Google\Chrome\NativeMessagingHosts\com.chromemcp.nativehost.json"</div>
+        <p>Edit file tersebut, tambahkan extension ID Anda ke <code>allowed_origins</code>:</p>
+        <div class="code">{
+  "name": "com.chromemcp.nativehost",
+  "description": "Node.js Host for Browser Bridge Extension",
+  "path": "C:\\Users\\user\\AppData\\Roaming\\npm\\node_modules\\mcp-chrome-bridge\\dist\\run_host.bat",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://hbdgbgagpkpjffpklnamcljpakneikee/",
+    "chrome-extension://YOUR_EXTENSION_ID/"
+  ]
+}</div>
+    </div>
+
+    <hr>
+    <h2>📋 Copy Extension ID Anda di sini:</h2>
+    <div class="extension-id" contenteditable="true">
+        Paste extension ID Anda di sini...
+    </div>
+
+</body>
+</html>

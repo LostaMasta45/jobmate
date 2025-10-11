@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test MCP Chrome Bridge</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .error {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .info {
+            color: #2196F3;
+            font-weight: bold;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 MCP Chrome Bridge Test</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Penting:</strong> Pastikan Chrome extension MCP sudah terinstall dengan ID: <code>hbdgbgagpkpjffpklnamcljpakneikee</code>
+        </div>
+
+        <div class="test-section">
+            <h3>1. Test Extension Detection</h3>
+            <button onclick="testExtension()">Check Extension</button>
+            <div id="ext-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Test Native Messaging Connection</h3>
+            <button onclick="testNativeMessaging()">Test Connection</button>
+            <div id="native-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Send Test Message</h3>
+            <button onclick="sendTestMessage()">Send Message</button>
+            <div id="message-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Test MCP Protocol</h3>
+            <button onclick="testMCPProtocol()">Test MCP</button>
+            <div id="mcp-result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const EXTENSION_ID = 'hbdgbgagpkpjffpklnamcljpakneikee';
+        const NATIVE_HOST = 'com.chromemcp.nativehost';
+
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            element.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function clearLog(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        async function testExtension() {
+            clearLog('ext-result');
+            log('ext-result', '🔍 Checking for Chrome extension...', 'info');
+            
+            try {
+                // Test if chrome.runtime is available
+                if (typeof chrome === 'undefined' || !chrome.runtime) {
+                    log('ext-result', '❌ Chrome runtime API not available', 'error');
+                    log('ext-result', 'Pastikan file ini dibuka sebagai Chrome Extension atau menggunakan extension', 'error');
+                    return;
+                }
+
+                log('ext-result', '✅ Chrome runtime API available', 'success');
+                log('ext-result', `Extension ID yang dicari: ${EXTENSION_ID}`, 'info');
+                
+            } catch (error) {
+                log('ext-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testNativeMessaging() {
+            clearLog('native-result');
+            log('native-result', '🔌 Testing Native Messaging connection...', 'info');
+            
+            try {
+                if (typeof chrome === 'undefined' || !chrome.runtime || !chrome.runtime.connectNative) {
+                    log('native-result', '❌ Native Messaging API tidak tersedia', 'error');
+                    log('native-result', 'Test ini harus dijalankan dari Chrome Extension', 'error');
+                    log('native-result', '\nCara test yang benar:', 'info');
+                    log('native-result', '1. Buka Chrome DevTools (F12)', 'info');
+                    log('native-result', '2. Paste kode berikut di Console:', 'info');
+                    log('native-result', `\nconst port = chrome.runtime.connectNative('${NATIVE_HOST}');\nport.onMessage.addListener(msg => console.log('Received:', msg));\nport.postMessage({type: 'ping'});`, 'info');
+                    return;
+                }
+
+                const port = chrome.runtime.connectNative(NATIVE_HOST);
+                
+                port.onMessage.addListener((message) => {
+                    log('native-result', `✅ Received message: ${JSON.stringify(message, null, 2)}`, 'success');
+                });
+
+                port.onDisconnect.addListener(() => {
+                    if (chrome.runtime.lastError) {
+                        log('native-result', `❌ Disconnected with error: ${chrome.runtime.lastError.message}`, 'error');
+                    } else {
+                        log('native-result', '✅ Connection closed gracefully', 'success');
+                    }
+                });
+
+                log('native-result', '✅ Native Messaging port created successfully', 'success');
+                
+            } catch (error) {
+                log('native-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function sendTestMessage() {
+            clearLog('message-result');
+            log('message-result', '📤 Sending test message...', 'info');
+            
+            log('message-result', '\n⚠️ Untuk mengirim pesan, jalankan kode berikut di Chrome DevTools Console:', 'info');
+            log('message-result', '\nconst port = chrome.runtime.connectNative("com.chromemcp.nativehost");', 'info');
+            log('message-result', 'port.onMessage.addListener(msg => console.log("Received:", msg));', 'info');
+            log('message-result', 'port.postMessage({type: "test", payload: {message: "Hello from browser!"}});', 'info');
+        }
+
+        async function testMCPProtocol() {
+            clearLog('mcp-result');
+            log('mcp-result', '🔧 Testing MCP Protocol...', 'info');
+            
+            log('mcp-result', '\n📋 Untuk test MCP Protocol, jalankan di Chrome DevTools Console:', 'info');
+            log('mcp-result', '\nconst port = chrome.runtime.connectNative("com.chromemcp.nativehost");', 'info');
+            log('mcp-result', 'port.onMessage.addListener(msg => console.log("MCP Response:", msg));', 'info');
+            log('mcp-result', 'port.postMessage({', 'info');
+            log('mcp-result', '  jsonrpc: "2.0",', 'info');
+            log('mcp-result', '  method: "initialize",', 'info');
+            log('mcp-result', '  params: {', 'info');
+            log('mcp-result', '    protocolVersion: "1.0.0",', 'info');
+            log('mcp-result', '    capabilities: {}', 'info');
+            log('mcp-result', '  },', 'info');
+            log('mcp-result', '  id: 1', 'info');
+            log('mcp-result', '});', 'info');
+            
+            log('mcp-result', '\n✅ Jika Native Messaging Host terdaftar dengan benar, Anda akan menerima response', 'success');
+        }
+
+        // Auto-run extension test on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testExtension();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
