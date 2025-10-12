@@ -70,5 +70,6 @@ export async function getProfile() {
     .eq("id", user.id)
     .single();
 
-  return profile;
+  // Add email from auth.user to profile
+  return profile ? { ...profile, email: user.email } : null;
 }

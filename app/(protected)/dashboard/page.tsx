@@ -1,51 +1,47 @@
 import { AppShell } from "@/components/layout/AppShell";
-import { PageHeader } from "@/components/layout/PageHeader";
 import { getProfile } from "@/lib/supabase/server";
-import {
-  getDashboardStats,
-  getPipelineSnapshot,
-  getUpcoming,
-  getRecentApplications,
-  getResumeHealth,
-} from "@/actions/dashboard";
-import { DashboardStats } from "@/components/dashboard/DashboardStats";
-import { PipelineSnapshot } from "@/components/dashboard/PipelineSnapshot";
-import { UpcomingList } from "@/components/dashboard/UpcomingList";
-import { RecentApplicationsTable } from "@/components/dashboard/RecentApplicationsTable";
-import { ResumeHealth } from "@/components/dashboard/ResumeHealth";
+import { getStats, getPipeline, getRecent, getAlerts } from "@/actions/dashboard/index";
+import { StatCards } from "@/components/dashboard/StatCards";
+import { PipelineMini } from "@/components/dashboard/PipelineMini";
+import { RecentTable } from "@/components/dashboard/RecentTable";
+import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
 import { ToolsGrid } from "@/components/dashboard/ToolsGrid";
+import { WelcomeHero } from "@/components/dashboard/WelcomeHero";
 
 export default async function DashboardPage() {
   const profile = await getProfile();
-  const stats = await getDashboardStats();
-  const pipeline = await getPipelineSnapshot();
-  const upcoming = await getUpcoming();
-  const recentApplications = await getRecentApplications();
-  const resumeHealth = await getResumeHealth();
+  
+  const [stats, pipeline, recent, alerts] = await Promise.all([
+    getStats(),
+    getPipeline(),
+    getRecent(5),
+    getAlerts(),
+  ]);
 
   const isAdmin = profile?.role === 'admin';
+  const userName = profile?.full_name || profile?.name || "User";
+  const userEmail = profile?.email || "";
 
   return (
     <AppShell isAdmin={isAdmin}>
-      <PageHeader
-        title={`Halo, ${profile?.name || "Demo User"} 👋`}
-        description="Ringkasan progres lamaran dan alat bantu karier"
+      <WelcomeHero 
+        userName={userName}
+        userEmail={userEmail}
+        avatarUrl={profile?.avatar_url}
+        totalApplications={stats?.total || 0}
       />
 
-      <div className="space-y-5 sm:space-y-6">
-        <DashboardStats stats={stats} />
+      <div className="space-y-6">
+        <StatCards data={stats} />
 
-        <div className="grid gap-4 sm:gap-5 lg:gap-6 lg:grid-cols-2">
-          <PipelineSnapshot data={pipeline} />
-          <UpcomingList items={upcoming} />
-        </div>
-
-        <div className="grid gap-4 sm:gap-5 lg:gap-6 lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <RecentApplicationsTable applications={recentApplications} />
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-6">
+            <PipelineMini data={pipeline} />
+            <RecentTable rows={recent} />
           </div>
-          <div className="lg:col-span-5">
-            <ResumeHealth data={resumeHealth} />
+          
+          <div className="space-y-6">
+            {alerts.length > 0 && <AlertsPanel items={alerts} />}
           </div>
         </div>
 

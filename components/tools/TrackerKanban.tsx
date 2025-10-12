@@ -22,7 +22,6 @@ import {
   rectIntersection,
   pointerWithin,
 } from "@dnd-kit/core";
-import { createPortal } from "react-dom";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -258,9 +257,8 @@ export function TrackerKanban({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 3, // More sensitive, easier to drag
+        distance: 8, // Sedikit lebih jauh agar tidak terlalu sensitif
         tolerance: 5,
-        delay: 0,
       },
     })
   );
@@ -303,7 +301,6 @@ export function TrackerKanban({
 
     // Find the target status
     let targetStatus: string | undefined;
-    let droppedOnCard = false;
     
     // Log for debugging
     if (process.env.NODE_ENV === 'development') {
@@ -331,12 +328,11 @@ export function TrackerKanban({
         console.log('✅ Dropped on column area:', targetStatus);
       }
     }
-    // 3. Check if dropped on a card
+    // 3. Check if dropped on a card - inherit the card's status
     else {
       const overApp = optimisticApps.find((app) => app.id === over.id);
       if (overApp) {
         targetStatus = overApp.status;
-        droppedOnCard = true;
         if (process.env.NODE_ENV === 'development') {
           console.log('✅ Dropped on card in column:', targetStatus);
         }
@@ -350,14 +346,7 @@ export function TrackerKanban({
       return;
     }
 
-    // If dropped on a card in the same column, ignore silently
-    if (droppedOnCard && targetStatus === activeApp.status) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('ℹ️ Dropped on card in same column, ignoring');
-      }
-      return;
-    }
-
+    // Only skip update if status is the same (regardless of how it was dropped)
     if (targetStatus === activeApp.status) {
       if (process.env.NODE_ENV === 'development') {
         console.log('ℹ️ Same status, no update needed');
@@ -412,51 +401,7 @@ export function TrackerKanban({
 
   const activeApplication = optimisticApps.find((app) => app.id === activeId);
 
-  // Render DragOverlay in portal at document.body level
-  const renderDragOverlay = () => {
-    if (!mounted || typeof window === 'undefined') return null;
-
-    return createPortal(
-      <DragOverlay 
-        dropAnimation={{
-          duration: 200,
-          easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
-        }}
-        style={{
-          zIndex: 9999,
-        }}
-      >
-        {activeApplication ? (
-          <div style={{ width: '240px', maxWidth: '240px' }}>
-            <Card className="cursor-grabbing shadow-2xl border-2 border-primary bg-background">
-              <CardContent className="p-3">
-                <div className="flex items-start gap-2">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm mb-0.5 truncate text-primary">
-                      {activeApplication.company}
-                    </h4>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {activeApplication.position}
-                    </p>
-                  </div>
-                  <div className={`w-2 h-2 rounded-full ${STATUSES.find(s => s.key === activeApplication.status)?.color} shrink-0 mt-1`} />
-                </div>
-                <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                  <Calendar className="h-3 w-3" />
-                  <span className="truncate">
-                    {format(new Date(activeApplication.apply_date), "dd MMM yyyy")}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        ) : null}
-      </DragOverlay>,
-      document.body
-    );
-  };
-
-  // Collision detection that prioritizes columns over cards
+  // Collision detection that STRONGLY prioritizes columns over cards
   const customCollisionDetection = (args: any) => {
     const { active, droppableContainers, pointerCoordinates } = args;
     
@@ -464,31 +409,56 @@ export function TrackerKanban({
       return closestCenter(args);
     }
     
-    // Get all collisions
-    const allCollisions = pointerWithin(args);
+    // Step 1: Check if pointer is within any column using pointerWithin
+    // This is the most accurate for detecting the column user intends
+    const pointerCollisions = pointerWithin(args);
     
-    // Filter to get only columns (skip cards and skip the dragging card itself)
-    const columnCollisions = allCollisions.filter((collision: any) => {
-      // Skip the card being dragged
-      if (collision.id === active?.id) {
-        return false;
-      }
+    // Filter to get ONLY columns from pointer collisions
+    const columnFromPointer = pointerCollisions.filter((collision: any) => {
+      if (collision.id === active?.id) return false;
       
-      // Get the container data
       const container = droppableContainers.get(collision.id);
       const data = container?.data?.current;
       
-      // Only include columns
-      return data?.type === 'column';
+      return data?.type === 'column' || STATUSES.some(s => s.key === collision.id);
     });
     
-    // If we found columns, return them (prioritize columns!)
+    // If pointer is clearly within a column, use that!
+    if (columnFromPointer.length > 0) {
+      return columnFromPointer;
+    }
+    
+    // Step 2: If no column from pointer, use rectIntersection as fallback
+    const intersections = rectIntersection(args);
+    
+    const columnCollisions = [];
+    const cardCollisions = [];
+    
+    for (const collision of intersections) {
+      if (collision.id === active?.id) continue;
+      
+      const container = droppableContainers.get(collision.id);
+      const data = container?.data?.current;
+      
+      if (data?.type === 'column' || STATUSES.some(s => s.key === collision.id)) {
+        columnCollisions.push(collision);
+      } else {
+        cardCollisions.push(collision);
+      }
+    }
+    
+    // Prioritize columns from rectIntersection
     if (columnCollisions.length > 0) {
       return columnCollisions;
     }
     
-    // Otherwise return all collisions (might be cards)
-    return allCollisions.length > 0 ? allCollisions : closestCenter(args);
+    // Only use cards as last resort
+    if (cardCollisions.length > 0) {
+      return cardCollisions;
+    }
+    
+    // Final fallback
+    return closestCenter(args);
   };
 
   return (
@@ -575,10 +545,41 @@ export function TrackerKanban({
           );
         })}
       </div>
+
+      {/* DragOverlay must be inside DndContext */}
+      <DragOverlay 
+        dropAnimation={{
+          duration: 200,
+          easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+        }}
+      >
+        {activeApplication && mounted ? (
+          <div style={{ width: '240px', maxWidth: '240px' }}>
+            <Card className="cursor-grabbing shadow-2xl border-2 border-primary bg-background opacity-90">
+              <CardContent className="p-3">
+                <div className="flex items-start gap-2">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm mb-0.5 truncate text-primary">
+                      {activeApplication.company}
+                    </h4>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {activeApplication.position}
+                    </p>
+                  </div>
+                  <div className={`w-2 h-2 rounded-full ${STATUSES.find(s => s.key === activeApplication.status)?.color} shrink-0 mt-1`} />
+                </div>
+                <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                  <Calendar className="h-3 w-3" />
+                  <span className="truncate">
+                    {format(new Date(activeApplication.apply_date), "dd MMM yyyy")}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        ) : null}
+      </DragOverlay>
       </DndContext>
-      
-      {/* Render DragOverlay in portal */}
-      {renderDragOverlay()}
     </>
   );
 }

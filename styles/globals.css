@@ -78,4 +78,27 @@
     background-color: hsl(var(--muted-foreground));
     border-radius: 4px;
   }
+
+  /* Kanban Board CSS - prevent transform issues for drag and drop */
+  .jobmate-board-safe {
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    will-change: auto !important;
+  }
+
+  /* Grid background pattern */
+  .bg-grid-white\/5 {
+    background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px
+    );
+    background-size: 20px 20px;
+  }
 }

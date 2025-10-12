@@ -280,9 +280,23 @@ export async function createJobApplication(data: {
 
   if (!user) throw new Error("Unauthorized");
 
+  // Get max order_index for this status to append at the end
+  const { data: maxOrderData } = await supabase
+    .from("applications")
+    .select("order_index")
+    .eq("user_id", user.id)
+    .eq("status", data.status)
+    .order("order_index", { ascending: false })
+    .limit(1);
+
+  const nextOrderIndex = maxOrderData?.[0]?.order_index != null 
+    ? maxOrderData[0].order_index + 1 
+    : 0;
+
   const { error } = await supabase.from("applications").insert({
     user_id: user.id,
     ...data,
+    order_index: nextOrderIndex,
   });
 
   if (error) throw error;
@@ -306,6 +320,7 @@ export async function getJobApplications() {
       .from("applications")
       .select("*")
       .eq("user_id", user.id)
+      .order("order_index", { ascending: true })
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -364,4 +379,56 @@ export async function deleteJobApplication(id: string) {
   revalidatePath("/tools/tracker");
   revalidatePath("/dashboard");
   return { success: true };
+}
+
+export async function reorderApplications(payload: {
+  id: string;
+  from: string;
+  to: string;
+  ordering: Record<string, Array<{ id: string; order_index: number }>>;
+}) {
+  try {
+    const supabase = await createClient();
+    const user = await getUser();
+
+    if (!user) throw new Error("Unauthorized");
+
+    // 1) Update status kartu yang dipindah (jika kolom berubah)
+    if (payload.from !== payload.to) {
+      const { error } = await supabase
+        .from("applications")
+        .update({ status: payload.to })
+        .eq("id", payload.id)
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+    }
+
+    // 2) Update order_index untuk kolom yang terkait
+    const statuses = [payload.from, payload.to];
+    for (const status of statuses) {
+      const arr = payload.ordering[status] ?? [];
+      for (const item of arr) {
+        const { error } = await supabase
+          .from("applications")
+          .update({ order_index: item.order_index })
+          .eq("id", item.id)
+          .eq("user_id", user.id);
+
+        if (error) {
+          console.error("Error updating order_index:", error);
+          // Continue with other updates even if one fails
+        }
+      }
+    }
+
+    // 3) Revalidate pages
+    revalidatePath("/tools/tracker");
+    revalidatePath("/dashboard");
+
+    return { success: true };
+  } catch (error) {
+    console.error("reorderApplications error:", error);
+    throw new Error(error instanceof Error ? error.message : "Gagal reorder aplikasi");
+  }
 }

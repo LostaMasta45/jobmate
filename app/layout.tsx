@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { SessionTimeout } from "@/components/auth/SessionTimeout";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,7 +29,9 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system" storageKey="jobmate_theme">
           <SessionTimeout timeoutMinutes={120} />
           {children}
+          <Toaster position="top-center" richColors />
         </ThemeProvider>
+        <div id="dnd-portal" />
       </body>
     </html>
   );

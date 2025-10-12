@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { TrackerStats } from "./TrackerStats";
 import { TrackerTable } from "./TrackerTable";
-import { TrackerKanban } from "./TrackerKanban";
+import { TrackerKanbanFixed } from "./TrackerKanbanFixed";
 import { TrackerDetail } from "./TrackerDetail";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,7 @@ type Application = {
   company: string;
   position: string;
   status: string;
+  order_index: number;
   salary?: number;
   contact?: string;
   source?: string;
@@ -206,8 +207,8 @@ export function TrackerClient({ applications }: { applications: Application[] })
 
       {/* View Content */}
       {viewMode === "kanban" ? (
-        <TrackerKanban
-          applications={filteredApplications}
+        <TrackerKanbanFixed
+          initialData={filteredApplications}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onViewDetail={handleViewDetail}

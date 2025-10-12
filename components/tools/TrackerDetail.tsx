@@ -27,6 +27,7 @@ type Application = {
   company: string;
   position: string;
   status: string;
+  order_index: number;
   salary?: number;
   contact?: string;
   source?: string;
