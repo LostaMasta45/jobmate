@@ -38,8 +38,14 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
   
   // Update formData with generated content for saving
   React.useEffect(() => {
-    updateFormData({ generatedContent });
-  }, [generatedContent]);
+    console.log("StepPreview: Updating formData with generatedContent");
+    console.log("Template:", selectedTemplate);
+    console.log("Content length:", generatedContent?.length);
+    updateFormData({ 
+      generatedContent,
+      templateType: selectedTemplate  // Also save template type
+    });
+  }, [generatedContent, selectedTemplate]);
   
   // Download handlers
   const handleDownloadPDF = () => {
@@ -188,14 +194,22 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
       
       {/* Download Buttons */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center items-center p-6 bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg border-2 border-dashed border-primary/30">
-        <div className="text-center sm:text-left">
+        <div className="text-center sm:text-left flex-1">
           <h4 className="font-semibold text-lg mb-1">Download Surat Lamaran</h4>
           <p className="text-sm text-muted-foreground">
-            Download surat lamaran Anda dalam format PDF atau Word
+            {isATSTemplate 
+              ? "Download dalam format PDF atau Word (editable)"
+              : "Download dalam format PDF profesional"}
           </p>
+          {!isATSTemplate && (
+            <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+              <Sparkles className="h-3 w-3" />
+              Template modern dirancang untuk PDF dengan styling profesional
+            </p>
+          )}
         </div>
         
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-shrink-0">
           <Button
             onClick={handleDownloadPDF}
             disabled={downloading}
@@ -206,31 +220,54 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
             Download PDF
           </Button>
           
-          <Button
-            onClick={handleDownloadWord}
-            disabled={downloading}
-            size="lg"
-            variant="outline"
-            className="gap-2"
-          >
-            <FileDown className="h-5 w-5" />
-            Download Word
-          </Button>
+          {isATSTemplate && (
+            <Button
+              onClick={handleDownloadWord}
+              disabled={downloading}
+              size="lg"
+              variant="outline"
+              className="gap-2"
+            >
+              <FileDown className="h-5 w-5" />
+              Download Word
+            </Button>
+          )}
         </div>
       </div>
+
+      {/* Info Card - Format Download */}
+      {!isATSTemplate && (
+        <Card className="p-4 bg-blue-50 border-blue-200">
+          <div className="flex gap-3">
+            <FileText className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-blue-900">Informasi Format Download:</p>
+              <div className="text-sm text-blue-800 space-y-1">
+                <p>• <strong>Template ATS</strong> - Tersedia format PDF & Word (mudah diedit)</p>
+                <p>• <strong>Template Modern</strong> - Hanya format PDF (desain profesional dengan warna & styling)</p>
+                <p className="text-xs text-blue-700 mt-2">
+                  💡 Jika butuh format Word yang editable, gunakan <strong>Template ATS</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Tips Card */}
       <Card className="p-4 bg-primary/5 border-primary/20">
         <div className="flex gap-3">
           <Sparkles className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <p className="text-sm font-medium">Tips:</p>
+            <p className="text-sm font-medium">Tips Profesional:</p>
             <ul className="text-sm text-muted-foreground space-y-1">
               <li>• Pilih template yang sesuai dengan industri dan posisi yang Anda lamar</li>
               <li>• Periksa ejaan nama perusahaan dan posisi dengan teliti</li>
-              <li>• Pastikan semua data diri sudah benar</li>
+              <li>• Pastikan semua data diri sudah benar sebelum download</li>
               <li>• Anda bisa download sekarang atau setelah menyimpan</li>
-              <li>• Format PDF lebih aman untuk dikirim, Word bisa diedit jika diperlukan</li>
+              <li>• {isATSTemplate 
+                  ? "Format PDF untuk kirim email, Word untuk edit lebih lanjut" 
+                  : "Format PDF mempertahankan desain profesional saat dibuka di berbagai device"}</li>
             </ul>
           </div>
         </div>

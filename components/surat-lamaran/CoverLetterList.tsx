@@ -30,6 +30,13 @@ export function CoverLetterList() {
 
   useEffect(() => {
     fetchLetters();
+    
+    // Auto-refresh every 30 seconds for real-time updates
+    const interval = setInterval(() => {
+      fetchLetters();
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   async function fetchLetters() {
@@ -85,10 +92,15 @@ export function CoverLetterList() {
       const templateType = data.template_type || "T0";
       const isATSTemplate = templateType === "T0";
       
+      console.log("History Download - Template Type:", templateType);
+      console.log("History Download - Has generated_content:", !!data.generated_content);
+      console.log("History Download - Content length:", data.generated_content?.length);
+      
       // Use generated_content if available, otherwise generate new
       let htmlContent = data.generated_content;
       
       if (!htmlContent) {
+        console.log("History Download - No generated_content, regenerating...");
         // Generate based on template type
         const formData = {
           companyName: data.company_name,
@@ -183,76 +195,151 @@ export function CoverLetterList() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {letters.map((letter) => (
-        <Card key={letter.id} className="p-6 hover:shadow-md transition-shadow">
-          <div className="space-y-4">
-            {/* Header */}
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-primary/10 p-2">
-                  <FileText className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <span className="text-xs px-2 py-1 rounded-full bg-muted">
+        <Card 
+          key={letter.id} 
+          className="group relative overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 hover:border-primary/50"
+        >
+          {/* Gradient Background Accent */}
+          <div className={`absolute inset-0 opacity-5 ${
+            letter.template_type === 'T0' 
+              ? 'bg-gradient-to-br from-green-400 to-green-600' 
+              : 'bg-gradient-to-br from-purple-400 to-purple-600'
+          }`} />
+          
+          <div className="relative p-5 space-y-4">
+            {/* Header with Icon and Badges */}
+            <div className="flex items-start gap-3">
+              {/* Icon */}
+              <div className={`rounded-xl p-3 shadow-sm ${
+                letter.template_type === 'T0'
+                  ? 'bg-gradient-to-br from-green-50 to-green-100'
+                  : 'bg-gradient-to-br from-purple-50 to-purple-100'
+              }`}>
+                <FileText className={`h-6 w-6 ${
+                  letter.template_type === 'T0' ? 'text-green-600' : 'text-purple-600'
+                }`} />
+              </div>
+              
+              {/* Badges */}
+              <div className="flex flex-col gap-1.5 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                    letter.status === 'draft' 
+                      ? 'bg-amber-100 text-amber-700 border border-amber-200' 
+                      : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                  }`}>
                     {letter.status === 'draft' ? 'Draft' : 'Final'}
+                  </span>
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                    letter.template_type === 'T0' 
+                      ? 'bg-green-100 text-green-700 border border-green-300' 
+                      : 'bg-purple-100 text-purple-700 border border-purple-300'
+                  }`}>
+                    {letter.template_type === 'T0' ? 'ATS' : 'Modern'}
                   </span>
                 </div>
               </div>
             </div>
 
             {/* Content */}
-            <div className="space-y-2">
-              <h3 className="font-semibold line-clamp-1">{letter.company_name}</h3>
-              <p className="text-sm text-muted-foreground line-clamp-1">
-                <Building2 className="h-3 w-3 inline mr-1" />
-                {letter.position}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                <Calendar className="h-3 w-3 inline mr-1" />
-                {formatDistanceToNow(new Date(letter.created_at), {
-                  addSuffix: true,
-                  locale: id,
-                })}
-              </p>
+            <div className="space-y-3">
+              <h3 className="font-bold text-lg line-clamp-1 group-hover:text-primary transition-colors">
+                {letter.company_name}
+              </h3>
+              
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Building2 className="h-4 w-4 flex-shrink-0 text-primary/70" />
+                  <span className="line-clamp-1 font-medium">{letter.position}</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span>
+                    {formatDistanceToNow(new Date(letter.created_at), {
+                      addSuffix: true,
+                      locale: id,
+                    })}
+                  </span>
+                </div>
+                
+                {/* Download Format Badge */}
+                <div className="flex items-center gap-2">
+                  <div className={`text-xs font-medium px-2.5 py-1 rounded-md flex items-center gap-1.5 ${
+                    letter.template_type === 'T0'
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                      : 'bg-slate-100 text-slate-700 border border-slate-200'
+                  }`}>
+                    <FileDown className="h-3 w-3" />
+                    {letter.template_type === 'T0' ? 'PDF & Word' : 'PDF only'}
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Actions */}
-            <div className="flex gap-2 pt-2 border-t">
+            <div className="flex gap-2 pt-3 border-t">
               <Link href={`/surat-lamaran/${letter.id}`} className="flex-1">
-                <Button variant="outline" size="sm" className="w-full">
-                  <Edit className="h-4 w-4 mr-1" />
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  className="w-full font-medium shadow-sm"
+                >
+                  <Edit className="h-4 w-4 mr-1.5" />
                   Edit
                 </Button>
               </Link>
               
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    title="Download"
-                  >
-                    <FileDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleDownload(letter, 'pdf')}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Download PDF
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleDownload(letter, 'word')}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Download Word
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Download Button - conditional based on template */}
+              {letter.template_type === "T0" ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      title="Download PDF atau Word"
+                      className="shadow-sm"
+                    >
+                      <FileDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem 
+                      onClick={() => handleDownload(letter, 'pdf')}
+                      className="cursor-pointer"
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Download PDF
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => handleDownload(letter, 'word')}
+                      className="cursor-pointer"
+                    >
+                      <FileDown className="h-4 w-4 mr-2" />
+                      Download Word
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleDownload(letter, 'pdf')}
+                  title="Download PDF"
+                  className="shadow-sm"
+                >
+                  <FileDown className="h-4 w-4" />
+                </Button>
+              )}
               
               <Button 
                 variant="outline" 
                 size="sm"
                 onClick={() => handleDelete(letter.id)}
                 title="Hapus"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 shadow-sm"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>

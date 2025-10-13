@@ -7,6 +7,7 @@ import { RecentTable } from "@/components/dashboard/RecentTable";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
 import { ToolsGrid } from "@/components/dashboard/ToolsGrid";
 import { WelcomeHero } from "@/components/dashboard/WelcomeHero";
+import { RecentCoverLetters } from "@/components/dashboard/RecentCoverLetters";
 
 export default async function DashboardPage() {
   const profile = await getProfile();
@@ -41,6 +42,7 @@ export default async function DashboardPage() {
           </div>
           
           <div className="space-y-6">
+            <RecentCoverLetters />
             {alerts.length > 0 && <AlertsPanel items={alerts} />}
           </div>
         </div>

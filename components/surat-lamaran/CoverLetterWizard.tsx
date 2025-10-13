@@ -114,6 +114,9 @@ export function CoverLetterWizard({
       // This preserves the selected template (T0-T5)
       const generatedContent = formData.generatedContent || generateCoverLetter(formData);
       
+      console.log("CoverLetterWizard: Saving with template:", formData.templateType);
+      console.log("CoverLetterWizard: Generated content length:", generatedContent?.length);
+      
       let result;
       
       if (editMode && editId) {
