@@ -62,18 +62,22 @@ export function generateModernCoverLetter(data: CoverLetterData): string {
     
     body {
       font-family: ${template.fontFamily}, sans-serif;
-      font-size: 11pt;
-      line-height: 1.5;
+      font-size: 8pt;
+      line-height: 1.4;
       color: #000;
       background: white;
+      margin: 0;
+      padding: 0;
     }
     
     .page {
-      width: 210mm;
+      width: 100%;
+      max-width: 700px;
       min-height: 297mm;
       background: white;
       position: relative;
       overflow: hidden;
+      margin: 0 auto;
     }
     
     /* Header Styles based on template */
@@ -142,66 +146,69 @@ export function generateModernCoverLetter(data: CoverLetterData): string {
     
     /* Content */
     .content {
-      padding: 15mm 20mm 12mm 20mm;
+      padding: 10mm 10mm 8mm 10mm;
     }
     
     .date-line {
       text-align: right;
-      margin-bottom: 10px;
-      font-size: 10pt;
+      margin-bottom: 6px;
+      font-size: 8pt;
     }
     
     .letter-info {
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       line-height: 1.2;
-      font-size: 10pt;
+      font-size: 8pt;
     }
     
     .letter-info div {
-      margin-bottom: 2px;
+      margin-bottom: 1px;
     }
     
     .recipient {
-      margin-top: 12px;
-      margin-bottom: 15px;
-      font-size: 10pt;
-      line-height: 1.3;
+      margin-top: 8px;
+      margin-bottom: 10px;
+      font-size: 8pt;
+      line-height: 1.2;
     }
     
     .opening {
       font-weight: bold;
-      margin-bottom: 12px;
-      font-size: 11pt;
+      margin-bottom: 8px;
+      font-size: 9pt;
     }
     
     .paragraph {
-      text-align: left;
-      margin-bottom: 10px;
-      font-size: 10pt;
-      line-height: 1.5;
       text-align: justify;
+      margin-bottom: 6px;
+      font-size: 8pt;
+      line-height: 1.3;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
     }
     
     .data-section {
-      margin: 12px 0;
-      padding: 12px 15px;
+      margin: 8px 0;
+      padding: 8px 10px;
       background: ${template.accentColor};
-      border-left: 4px solid ${template.themeColor};
-      border-radius: 0 3px 3px 0;
-      font-size: 10pt;
+      border-left: 2px solid ${template.themeColor};
+      border-radius: 0 2px 2px 0;
+      font-size: 8pt;
     }
     
     .data-row {
       display: grid;
-      grid-template-columns: 140px 15px 1fr;
-      margin-bottom: 4px;
-      line-height: 1.4;
+      grid-template-columns: 100px 10px 1fr;
+      margin-bottom: 2px;
+      line-height: 1.2;
       align-items: start;
     }
     
     .data-label {
       font-weight: 600;
       color: ${template.themeColor};
+      font-size: 8pt;
     }
     
     .data-separator {
@@ -212,6 +219,10 @@ export function generateModernCoverLetter(data: CoverLetterData): string {
     
     .data-value {
       color: #000;
+      font-size: 8pt;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
     }
     
     .attachments {

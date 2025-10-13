@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect as React_useEffect } from "react";
+import * as React from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Eye, FileDown, FileText, Sparkles } from "lucide-react";
@@ -34,6 +35,11 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
         templateId: selectedTemplate,
         ...formData
       });
+  
+  // Update formData with generated content for saving
+  React.useEffect(() => {
+    updateFormData({ generatedContent });
+  }, [generatedContent]);
   
   // Download handlers
   const handleDownloadPDF = () => {

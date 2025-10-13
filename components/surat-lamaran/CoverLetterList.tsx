@@ -131,10 +131,10 @@ export function CoverLetterList() {
       // Export based on format
       if (format === 'word') {
         const { exportCoverLetterToWord } = await import("@/lib/exportCoverLetterWord");
-        await exportCoverLetterToWord(htmlContent, `${cleanName}.docx`);
+        exportCoverLetterToWord(htmlContent, `${cleanName}.docx`);
       } else {
         const { exportCoverLetterToPDF } = await import("@/lib/exportCoverLetterPDF");
-        await exportCoverLetterToPDF(htmlContent, `${cleanName}.pdf`);
+        exportCoverLetterToPDF(htmlContent, `${cleanName}.pdf`);
       }
     } catch (error) {
       console.error("Error downloading:", error);

@@ -6,10 +6,19 @@ import { saveAs } from "file-saver";
 
 export async function exportCoverLetterToWord(htmlContent: string, filename: string) {
   try {
-    // Parse HTML content to extract text
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = htmlContent;
-    const textContent = tempDiv.textContent || tempDiv.innerText || "";
+    // Detect if content is HTML or plain text
+    const isHTML = htmlContent.trim().startsWith('<!DOCTYPE') || htmlContent.trim().startsWith('<html');
+    
+    let textContent: string;
+    if (isHTML) {
+      // Parse HTML content to extract text
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = htmlContent;
+      textContent = tempDiv.textContent || tempDiv.innerText || "";
+    } else {
+      // Already plain text
+      textContent = htmlContent;
+    }
     
     // Split into lines
     const lines = textContent
