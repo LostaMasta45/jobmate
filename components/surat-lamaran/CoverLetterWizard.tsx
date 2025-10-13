@@ -110,8 +110,9 @@ export function CoverLetterWizard({
     setSaving(true);
     
     try {
-      // Generate content
-      const generatedContent = generateCoverLetter(formData);
+      // Use generated content from formData (already set by StepPreview)
+      // This preserves the selected template (T0-T5)
+      const generatedContent = formData.generatedContent || generateCoverLetter(formData);
       
       let result;
       

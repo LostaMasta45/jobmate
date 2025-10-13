@@ -11,10 +11,28 @@ export async function exportCoverLetterToWord(htmlContent: string, filename: str
     
     let textContent: string;
     if (isHTML) {
-      // Parse HTML content to extract text
+      // Parse HTML content to extract text - ROBUST METHOD
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = htmlContent;
+      
+      // Remove script and style tags
+      const scripts = tempDiv.getElementsByTagName('script');
+      const styles = tempDiv.getElementsByTagName('style');
+      for (let i = scripts.length - 1; i >= 0; i--) {
+        scripts[i].parentNode?.removeChild(scripts[i]);
+      }
+      for (let i = styles.length - 1; i >= 0; i--) {
+        styles[i].parentNode?.removeChild(styles[i]);
+      }
+      
+      // Get text content
       textContent = tempDiv.textContent || tempDiv.innerText || "";
+      
+      // Clean up extra whitespace
+      textContent = textContent
+        .replace(/\s+/g, ' ')  // Replace multiple spaces with single space
+        .replace(/\n\s*\n/g, '\n')  // Remove empty lines
+        .trim();
     } else {
       // Already plain text
       textContent = htmlContent;
