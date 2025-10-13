@@ -24,13 +24,6 @@ export function RecentCoverLetters() {
 
   useEffect(() => {
     fetchRecentLetters();
-    
-    // Auto-refresh every 30 seconds for real-time updates
-    const interval = setInterval(() => {
-      fetchRecentLetters();
-    }, 30000);
-    
-    return () => clearInterval(interval);
   }, []);
 
   async function fetchRecentLetters() {

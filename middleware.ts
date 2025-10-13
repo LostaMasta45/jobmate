@@ -2,13 +2,13 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
-  const { supabaseResponse, user, supabase } = await updateSession(request);
+  const { supabaseResponse, user, supabase, cachedRole } = await updateSession(request);
 
   const { pathname } = request.nextUrl;
 
-  // Get user profile to check role (do this first before any checks)
-  let userRole = null;
-  if (user) {
+  // Get user role - use cached value or query DB once and cache it
+  let userRole: string | undefined = cachedRole;
+  if (user && !userRole) {
     try {
       const { data: profile } = await supabase
         .from("profiles")
@@ -16,11 +16,25 @@ export async function middleware(request: NextRequest) {
         .eq("id", user.id)
         .single();
       userRole = profile?.role;
+      
+      // Cache role in cookie for 1 hour to avoid repeated DB queries
+      if (userRole) {
+        supabaseResponse.cookies.set('user_role', userRole, {
+          maxAge: 3600, // 1 hour
+          httpOnly: true,
+          sameSite: 'lax',
+          path: '/'
+        });
+      }
     } catch (error) {
-      // If profile check fails, clear the session
       console.error("Profile check failed:", error);
-      userRole = null;
+      userRole = undefined;
     }
+  }
+  
+  // Clear role cache if user is logged out
+  if (!user && cachedRole) {
+    supabaseResponse.cookies.delete('user_role');
   }
 
   // Allow admin login page (public, no auth required)

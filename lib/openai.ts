@@ -1,7 +1,9 @@
 import OpenAI from "openai";
 
+// Initialize OpenAI client with SumoPod base URL (consistent with email generator)
 export const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
+  baseURL: process.env.OPENAI_BASE_URL || 'https://ai.sumopod.com/v1',
 });
 
 export async function generateText(

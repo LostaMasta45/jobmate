@@ -33,5 +33,8 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return { supabaseResponse, user, supabase };
+  // Cache role in cookie to avoid DB query on every request
+  let userRole = request.cookies.get('user_role')?.value;
+
+  return { supabaseResponse, user, supabase, cachedRole: userRole };
 }
