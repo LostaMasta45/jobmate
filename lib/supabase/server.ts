@@ -1,6 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { unstable_cache } from "next/cache";
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -59,29 +58,17 @@ export async function getUserOrDemo() {
   return user;
 }
 
-async function fetchProfile(userId: string, userEmail: string | undefined) {
-  const supabase = await createClient();
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", userId)
-    .single();
-
-  return profile ? { ...profile, email: userEmail } : null;
-}
-
 export async function getProfile() {
+  const supabase = await createClient();
   const user = await getUser();
 
   if (!user) return null;
 
-  // Cache profile for 60 seconds to reduce DB queries
-  const getCachedProfile = unstable_cache(
-    async (userId: string, email: string | undefined) => fetchProfile(userId, email),
-    ["user-profile"],
-    { revalidate: 60, tags: ["profile"] }
-  );
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .single();
 
-  return await getCachedProfile(user.id, user.email);
+  return profile ? { ...profile, email: user.email } : null;
 }

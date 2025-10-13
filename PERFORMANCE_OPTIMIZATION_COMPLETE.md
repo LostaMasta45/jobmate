@@ -30,6 +30,14 @@ Website JobMate mengalami loading yang lambat saat navigasi sidebar dan membuka 
 
 ---
 
+## ⚠️ UPDATE: Fix untuk Next.js 15 Compatibility
+
+Setelah implementasi awal, ditemukan error dengan `unstable_cache` yang tidak kompatibel dengan dynamic data sources (cookies). Solusi telah diupdate:
+
+- ❌ **Tidak bisa**: `unstable_cache` di dalam fungsi yang menggunakan `cookies()`
+- ✅ **Solusi**: Route-level revalidation dengan `export const revalidate = 30`
+- ✅ **Tetap optimal**: Middleware cache untuk role masih aktif
+
 ## ✅ Solusi Yang Diimplementasikan
 
 ### 1. **Cache Role User di Cookie** (middleware.ts + lib/supabase/middleware.ts)
@@ -171,42 +179,60 @@ const getCachedRecent = unstable_cache(
 **Hasil:**
 - ✅ Dashboard load: **12+ queries → 4 queries**
 - ✅ Response time: **Turun 70%**
-- ✅ Cache hit: Data di-cache 30 detik untuk setiap user
+- ✅ Data dioptimalkan dengan single query + aggregation
+
+#### D. Route-Level Revalidation (app/(protected)/dashboard/page.tsx)
+
+**Sesudah:**
+```typescript
+// Revalidate dashboard data every 30 seconds
+export const revalidate = 30;
+
+export default async function DashboardPage() {
+  const profile = await getProfile();
+  const [stats, pipeline, recent, alerts] = await Promise.all([
+    getStats(),
+    getPipeline(),
+    getRecent(5),
+    getAlerts(),
+  ]);
+  // ...
+}
+```
+
+**Hasil:**
+- ✅ Page di-cache oleh Next.js selama 30 detik
+- ✅ Kompatibel dengan dynamic data sources
+- ✅ ISR (Incremental Static Regeneration) untuk optimal performance
 
 ---
 
 ### 3. **Cache User Profile** (lib/supabase/server.ts)
 
+**Note**: Profile tidak di-cache dengan unstable_cache karena conflict dengan cookies(), tetapi sudah dioptimasi dengan single query.
+
 **Sesudah:**
+
 ```typescript
-async function fetchProfile(userId: string, userEmail: string | undefined) {
+export async function getProfile() {
   const supabase = await createClient();
+  const user = await getUser();
+
+  if (!user) return null;
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("*")
-    .eq("id", userId)
+    .eq("id", user.id)
     .single();
-  return profile ? { ...profile, email: userEmail } : null;
-}
 
-export async function getProfile() {
-  const user = await getUser();
-  if (!user) return null;
-
-  // Cache profile for 60 seconds
-  const getCachedProfile = unstable_cache(
-    async (userId: string, email: string | undefined) => fetchProfile(userId, email),
-    ["user-profile"],
-    { revalidate: 60, tags: ["profile"] }
-  );
-
-  return await getCachedProfile(user.id, user.email);
+  return profile ? { ...profile, email: user.email } : null;
 }
 ```
 
 **Hasil:**
-- ✅ Profile di-cache 60 detik
-- ✅ Mengurangi repeated DB queries
+- ✅ Profile query tetap efisien dengan single query
+- ✅ Kompatibel dengan Next.js 15 dynamic data sources
 
 ---
 
@@ -275,13 +301,15 @@ useEffect(() => {
 
 ## 🔧 File Yang Diubah
 
-1. **middleware.ts** - Cache role di cookie
-2. **lib/supabase/middleware.ts** - Return cached role
-3. **lib/supabase/server.ts** - Cache profile
-4. **actions/dashboard/getStats.ts** - Single query + cache
-5. **actions/dashboard/getPipeline.ts** - Single query + cache
-6. **actions/dashboard/getRecent.ts** - Cache
-7. **components/dashboard/RecentCoverLetters.tsx** - Hapus auto-refresh
+1. **middleware.ts** - Cache role di cookie ✅
+2. **lib/supabase/middleware.ts** - Return cached role ✅
+3. **lib/supabase/server.ts** - Optimasi profile query ✅
+4. **actions/dashboard/getStats.ts** - Single query dengan aggregation ✅
+5. **actions/dashboard/getPipeline.ts** - Single query dengan aggregation ✅
+6. **actions/dashboard/getRecent.ts** - Optimasi query ✅
+7. **components/dashboard/RecentCoverLetters.tsx** - Hapus auto-refresh ✅
+8. **app/(protected)/dashboard/page.tsx** - Route-level revalidation ✅
+9. **lib/openai.ts** - Add baseURL config ✅
 
 ---
 
@@ -303,24 +331,25 @@ npm run build
 
 Tidak ada perubahan pada cara penggunaan. Website akan otomatis lebih cepat setelah deploy.
 
-### Cache Invalidation:
-- **Role cache**: Auto-clear saat logout
-- **Dashboard cache**: Auto-revalidate setiap 30 detik
-- **Profile cache**: Auto-revalidate setiap 60 detik
+### Cache Strategy:
+- **Middleware role cache**: 1 jam di cookie (auto-clear saat logout)
+- **Dashboard ISR**: 30 detik revalidation (Next.js route cache)
+- **Query optimization**: Single query + client aggregation
 
 ### Manual Cache Clear (jika perlu):
 - Clear cookies: Auto-clear role cache
-- Refresh page: Force fetch fresh data
+- Hard refresh (Ctrl+F5): Force revalidate dashboard
 
 ---
 
 ## 📝 NOTES
 
-- Caching menggunakan Next.js `unstable_cache` dengan tag-based invalidation
-- Cookie `user_role` adalah httpOnly dan secure
-- Build warnings tentang webpack cache adalah normal (corrupted cache files)
-- Semua fitur website tetap berfungsi normal
-- Tidak ada breaking changes
+- **Next.js 15 Compatibility**: Tidak menggunakan `unstable_cache` dengan cookies() (menyebabkan error)
+- **Route-level caching**: Menggunakan `export const revalidate = 30` untuk ISR
+- **Cookie `user_role`**: httpOnly dan secure, expires dalam 1 jam
+- **Build warnings**: Webpack cache warnings adalah normal (corrupted cache files)
+- **Backward compatible**: Semua fitur website tetap berfungsi normal
+- **No breaking changes**: Tidak ada perubahan API atau behavior yang terlihat user
 
 ---
 

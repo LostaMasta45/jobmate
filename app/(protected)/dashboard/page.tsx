@@ -9,6 +9,9 @@ import { ToolsGrid } from "@/components/dashboard/ToolsGrid";
 import { WelcomeHero } from "@/components/dashboard/WelcomeHero";
 import { RecentCoverLetters } from "@/components/dashboard/RecentCoverLetters";
 
+// Revalidate dashboard data every 30 seconds
+export const revalidate = 30;
+
 export default async function DashboardPage() {
   const profile = await getProfile();
   
