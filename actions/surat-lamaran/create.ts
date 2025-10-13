@@ -14,8 +14,16 @@ export async function createCoverLetter(data: any) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return { error: "Unauthorized" };
+      console.error("Auth error:", authError);
+      return { error: "Unauthorized. Please login again." };
     }
+
+    console.log("Creating cover letter for user:", user.id);
+    console.log("Data received:", {
+      companyName: data.companyName,
+      position: data.position,
+      templateType: data.templateType,
+    });
 
     // Insert cover letter
     const { data: coverLetter, error } = await supabase
@@ -65,7 +73,25 @@ export async function createCoverLetter(data: any) {
 
     if (error) {
       console.error("Error creating cover letter:", error);
-      return { error: error.message };
+      console.error("Error details:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+      });
+      
+      // Better error messages
+      if (error.code === '42P01') {
+        return { error: "Database table 'cover_letters' tidak ditemukan. Silakan run database migration terlebih dahulu." };
+      }
+      if (error.code === '42703') {
+        return { error: "Database column tidak ditemukan. Silakan run migration untuk menambahkan columns baru." };
+      }
+      if (error.code === '23502') {
+        return { error: "Required fields (company_name atau position) tidak boleh kosong." };
+      }
+      
+      return { error: `Database error: ${error.message}` };
     }
 
     revalidatePath("/surat-lamaran");

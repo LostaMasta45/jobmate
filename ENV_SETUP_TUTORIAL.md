@@ -129,29 +129,29 @@ Supabase untuk database, authentication, dan storage.
    a) **Project URL:**
    ```
    Configuration → URL
-   Example: https://gyamsjmrrntwwcqljene.supabase.co
+   Example: https://your-project-id.supabase.co
    ```
    → Paste ke `NEXT_PUBLIC_SUPABASE_URL`
    
    b) **anon public key:**
    ```
    Project API keys → anon public
-   Example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   Example: eyJhbG...long_token_here...
    ```
    → Paste ke `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    
    c) **service_role secret:**
    ```
    Project API keys → service_role (click "Reveal")
-   Example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   Example: eyJhbG...long_token_here...
    ```
    → Paste ke `SUPABASE_SERVICE_ROLE_KEY`
 
 **Result .env.local:**
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://gyamsjmrrntwwcqljene.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5YW1zam1ycm50d3djcWxqZW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NTQ1OTgsImV4cCI6MjA3NTUzMDU5OH0.99iCwwuBJTyxMEJMTpV9Czdzdfp7iGMRFmCqfUg16tE
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5YW1zam1ycm50d3djcWxqZW5lIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTk1NDU5OCwiZXhwIjoyMDc1NTMwNTk4fQ.NH4Ssu6Rs00vD2GU5oAoakBUmp2NXdttgmmJTikU1WE
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...your_anon_key_here...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbG...your_service_role_key_here...
 ```
 
 ---
@@ -176,7 +176,7 @@ OpenAI untuk AI-powered features seperti CV generator.
 
 3. **Paste ke .env.local:**
    ```env
-   OPENAI_API_KEY=sk-proj-Y6x5XJ93yg2Ia-UtLm0G...
+   OPENAI_API_KEY=sk-proj-your-api-key-here
    ```
 
 **Pricing:**
@@ -208,8 +208,8 @@ iLovePDF untuk PDF processing tools.
 
 3. **Paste ke .env.local:**
    ```env
-   ILOVEPDF_PUBLIC_KEY=project_public_fa1dce...
-   ILOVEPDF_SECRET_KEY=secret_key_e5ab451b...
+   ILOVEPDF_PUBLIC_KEY=project_public_your-key-here
+   ILOVEPDF_SECRET_KEY=secret_key_xxxxxxxxxxxxxxxx
    ```
 
 **Pricing:**
@@ -242,8 +242,8 @@ Telegram bot untuk notifications.
 
 3. **Paste ke .env.local:**
    ```env
-   TELEGRAM_BOT_TOKEN=7974285481:AAGyTCCKGXWo...
-   TELEGRAM_ADMIN_CHAT_ID=474127500
+   TELEGRAM_BOT_TOKEN=1234567890:XXXXXXXXXXXXXXXXXXXXXx
+   TELEGRAM_ADMIN_CHAT_ID=123456789
    ```
 
 **Kalau tidak punya:**
@@ -262,20 +262,20 @@ Telegram bot untuk notifications.
 # =====================================================
 
 # ===== SUPABASE (REQUIRED) =====
-NEXT_PUBLIC_SUPABASE_URL=https://gyamsjmrrntwwcqljene.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5YW1zam1ycm50d3djcWxqZW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NTQ1OTgsImV4cCI6MjA3NTUzMDU5OH0.99iCwwuBJTyxMEJMTpV9Czdzdfp7iGMRFmCqfUg16tE
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5YW1zam1ycm50d3djcWxqZW5lIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTk1NDU5OCwiZXhwIjoyMDc1NTMwNTk4fQ.NH4Ssu6Rs00vD2GU5oAoakBUmp2NXdttgmmJTikU1WE
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 # ===== OPENAI (OPTIONAL) =====
-OPENAI_API_KEY=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
+OPENAI_API_KEY=sk-proj-your-openai-api-key-here
 
 # ===== ILOVEPDF (OPTIONAL) =====
-ILOVEPDF_PUBLIC_KEY=project_public_fa1dce6798894535b5cd082c0a8684dd_kYQjM6f1f2428afa806b693d33f63f8a9ecd8
-ILOVEPDF_SECRET_KEY=secret_key_e5ab451ba8a4c44e27be1d3ea3aece59_-Qc-Jad36a6d0a84b10be065dd9b3e865c7b8
+ILOVEPDF_PUBLIC_KEY=project_public_your-public-key-here
+ILOVEPDF_SECRET_KEY=secret_key_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 # ===== TELEGRAM (OPTIONAL) =====
-TELEGRAM_BOT_TOKEN=7974285481:AAGyTCCKGXWohPprzhMkZU-KWMX38S7Ecw4
-TELEGRAM_ADMIN_CHAT_ID=474127500
+TELEGRAM_BOT_TOKEN=1234567890:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+TELEGRAM_ADMIN_CHAT_ID=123456789
 ```
 
 ---
@@ -335,10 +335,10 @@ npm run dev
 **Solution:**
 ```env
 # WRONG ❌
-NEXT_PUBLIC_SUPABASE_URL=gyamsjmrrntwwcqljene.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=your-project-url.supabase.co
 
 # CORRECT ✅
-NEXT_PUBLIC_SUPABASE_URL=https://gyamsjmrrntwwcqljene.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 ```
 
 ### Problem 2: "Unauthorized"

@@ -91,7 +91,7 @@ export function CoverLetterWizard({
   });
 
   const updateFormData = (data: Partial<typeof formData>) => {
-    setFormData((prev) => ({ ...prev, ...data }));
+    setFormData((prev: typeof formData) => ({ ...prev, ...data }));
   };
 
   const nextStep = () => {

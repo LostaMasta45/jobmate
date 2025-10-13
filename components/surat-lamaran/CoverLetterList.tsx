@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Trash2, Download, Edit, Calendar, Building2 } from "lucide-react";
+import { FileText, Trash2, Download, Edit, Calendar, Building2, FileDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
@@ -64,7 +70,7 @@ export function CoverLetterList() {
     }
   }
 
-  async function handleDownload(letter: CoverLetter) {
+  async function handleDownload(letter: CoverLetter, format: 'pdf' | 'word' = 'pdf') {
     try {
       // Get full letter data
       const { getCoverLetter } = await import("@/actions/surat-lamaran/get");
@@ -76,39 +82,63 @@ export function CoverLetterList() {
       }
 
       const data = result.data;
+      const templateType = data.template_type || "T0";
+      const isATSTemplate = templateType === "T0";
       
       // Use generated_content if available, otherwise generate new
       let htmlContent = data.generated_content;
       
       if (!htmlContent) {
-        // Generate if not exists
-        const { generateCoverLetter } = await import("@/lib/coverLetterGenerator");
+        // Generate based on template type
         const formData = {
           companyName: data.company_name,
           companyAddress: data.company_address,
           hrdName: data.hrd_name,
           position: data.position,
           jobSource: data.job_source,
+          jobSourceCustom: data.job_source === "custom" ? data.job_source : "",
           ...data.personal_data,
           ...data.education_data,
           experiences: data.experiences || [],
+          experienceType: (data.experiences && data.experiences.length > 0) ? "experienced" : "fresh_graduate",
           attachments: data.attachments || [],
           customAttachments: data.custom_attachments || [],
           includeAttachmentsList: data.include_attachments_list !== false,
-          ...data.optional_statements,
-          templateType: data.template_type,
+          includeAvailability: data.optional_statements?.include_availability !== false,
+          includeWillingStatement: data.optional_statements?.include_willing_statement !== false,
+          includeOvertimeStatement: data.optional_statements?.include_overtime_statement || false,
+          includeCommitmentStatement: data.optional_statements?.include_commitment_statement || false,
+          templateType: templateType,
         };
-        htmlContent = generateCoverLetter(formData);
+        
+        if (isATSTemplate) {
+          // Use plain ATS generator
+          const { generateCoverLetter } = await import("@/lib/coverLetterGenerator");
+          htmlContent = generateCoverLetter(formData);
+        } else {
+          // Use modern template generator
+          const { generateModernCoverLetter } = await import("@/lib/modernCoverLetterGenerator");
+          htmlContent = generateModernCoverLetter({
+            templateId: templateType,
+            ...formData
+          });
+        }
       }
 
-      // Export to PDF
-      const { exportCoverLetterToPDF } = await import("@/lib/exportCoverLetterPDF");
-      const filename = `Surat_Lamaran_${data.company_name.replace(/\s+/g, '_')}_${data.position.replace(/\s+/g, '_')}.pdf`;
+      // Clean filename
+      const cleanName = `Surat_Lamaran_${data.company_name.replace(/[^a-zA-Z0-9]/g, '_')}_${data.position.replace(/[^a-zA-Z0-9]/g, '_')}`;
       
-      await exportCoverLetterToPDF(htmlContent, filename);
+      // Export based on format
+      if (format === 'word') {
+        const { exportCoverLetterToWord } = await import("@/lib/exportCoverLetterWord");
+        await exportCoverLetterToWord(htmlContent, `${cleanName}.docx`);
+      } else {
+        const { exportCoverLetterToPDF } = await import("@/lib/exportCoverLetterPDF");
+        await exportCoverLetterToPDF(htmlContent, `${cleanName}.pdf`);
+      }
     } catch (error) {
       console.error("Error downloading:", error);
-      alert("Gagal download PDF");
+      alert(`Gagal download ${format.toUpperCase()}`);
     }
   }
 
@@ -195,14 +225,29 @@ export function CoverLetterList() {
                   Edit
                 </Button>
               </Link>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => handleDownload(letter)}
-                title="Download PDF"
-              >
-                <Download className="h-4 w-4" />
-              </Button>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    title="Download"
+                  >
+                    <FileDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleDownload(letter, 'pdf')}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Download PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDownload(letter, 'word')}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Download Word
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
               <Button 
                 variant="outline" 
                 size="sm"

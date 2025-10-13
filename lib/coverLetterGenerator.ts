@@ -1,368 +1,202 @@
-// Cover Letter Generator - Format Indonesia
-// Template hardcoded untuk MVP, nanti bisa integrate dengan AI
+// Cover Letter Generator - Optimized for 1 Page A4
+// Format Indonesia yang ATS-friendly dan concise
 
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
 export function generateCoverLetter(formData: any): string {
   const today = format(new Date(), "d MMMM yyyy", { locale: id });
-  const city = formData.address ? formData.address.split(",")[0] : "Jakarta";
+  const city = formData.address ? formData.address.split(",")[0].trim() : "Jakarta";
   
-  // Format tanggal lahir
-  const birthDateFormatted = formData.birthDate 
-    ? format(new Date(formData.birthDate), "d MMMM yyyy", { locale: id })
-    : "-";
+  // Determine if fresh graduate
+  const isFreshGrad = formData.experienceType === "fresh_graduate" || 
+                      !formData.experiences || 
+                      formData.experiences.length === 0;
 
-  // Determine template based on experience type
-  const isFreshGrad = formData.experienceType === "fresh_graduate";
-  
-  // Generate content sections
-  const header = generateHeader(city, today, formData);
-  const attachmentsList = generateAttachmentsList(formData);
-  const opening = generateOpening(formData, isFreshGrad);
-  const personalData = generatePersonalData(formData, birthDateFormatted);
-  const education = generateEducation(formData, isFreshGrad);
-  const experience = isFreshGrad 
-    ? generateFreshGradExperience(formData) 
-    : generateExperiencedBackground(formData);
-  const motivation = generateMotivation(formData);
-  const optionalStatements = generateOptionalStatements(formData);
-  const closing = generateClosing();
-  const signature = generateSignature(formData);
+  // Build content - proper order for Indonesia
+  const sections = [
+    generateHeader(city, today, formData),
+    generateOpening(formData, isFreshGrad),
+    generatePersonalDataInline(formData),
+    generateEducationConcise(formData, isFreshGrad),
+    generateExperienceConcise(formData, isFreshGrad),
+    generateMotivationConcise(formData),
+    generateOptionalStatements(formData),
+    generateClosing(),
+    generateSignature(formData),
+  ];
 
-  return `
-    ${header}
-    ${attachmentsList}
-    ${opening}
-    ${personalData}
-    ${education}
-    ${experience}
-    ${motivation}
-    ${optionalStatements}
-    ${closing}
-    ${signature}
-  `;
+  return sections.filter(s => s).join('\n\n');
 }
 
 function generateHeader(city: string, date: string, formData: any): string {
-  // Count attachments if included
+  const hrdName = formData.hrdName || "HRD Manager";
+  
+  // Lampiran count
   const attachmentCount = formData.includeAttachmentsList 
     ? (formData.attachments?.length || 0) + (formData.customAttachments?.filter((c: string) => c).length || 0)
     : 0;
-  const lampiran = attachmentCount > 0 ? `${attachmentCount} (${numberToWords(attachmentCount)}) berkas` : "1 (satu) berkas";
-  const hrdName = formData.hrdName || "HRD Manager";
-  
-  return `
-    <div style="text-align: right; margin-bottom: 40px;">
-      ${city}, ${date}
-    </div>
-    
-    <div style="margin-bottom: 10px;">
-      <table style="border: none;">
-        <tr>
-          <td style="width: 100px; padding: 0;">Lampiran</td>
-          <td style="padding: 0;">: ${lampiran}</td>
-        </tr>
-        <tr>
-          <td style="padding: 0;">Perihal</td>
-          <td style="padding: 0;">: <strong>Lamaran Pekerjaan sebagai ${formData.position}</strong></td>
-        </tr>
-      </table>
-    </div>
-    
-    <div style="margin-bottom: 30px; margin-top: 20px;">
-      <p style="margin: 0;">Kepada Yth.</p>
-      <p style="margin: 0;">${hrdName} ${formData.companyName}</p>
-      ${formData.companyAddress ? `<p style="margin: 0;">${formData.companyAddress}</p>` : ''}
-    </div>
-    
-    <p><strong>Dengan hormat,</strong></p>
-  `;
+  const lampiran = attachmentCount > 0 
+    ? `${attachmentCount} (${numberToWords(attachmentCount)}) berkas` 
+    : "1 (satu) berkas";
+
+  return `${city}, ${date}
+
+Lampiran : ${lampiran}
+Perihal  : Lamaran Pekerjaan sebagai ${formData.position}
+
+Kepada Yth.
+${hrdName}
+${formData.companyName}${formData.companyAddress ? `\n${formData.companyAddress}` : ''}`;
 }
 
 function generateOpening(formData: any, isFreshGrad: boolean): string {
   const source = getJobSourceText(formData.jobSource, formData.jobSourceCustom);
-  const educationContext = formData.degree === "tidak_sekolah" 
-    ? "pengalaman dan keahlian yang saya miliki"
-    : formData.major 
-      ? `latar belakang ${formData.major}`
-      : `latar belakang pendidikan ${getDegreeText(formData.degree)}`;
   
-  if (isFreshGrad) {
-    return `
-      <p style="text-align: justify;">
-        Saya yang bertanda tangan di bawah ini bermaksud mengajukan lamaran pekerjaan 
-        untuk posisi <strong>${formData.position}</strong> di <strong>${formData.companyName}</strong> 
-        yang saya ketahui melalui ${source}. Sebagai fresh graduate dengan ${educationContext}, 
-        saya sangat tertarik untuk bergabung dan berkontribusi di perusahaan yang Bapak/Ibu pimpin.
-      </p>
-    `;
-  } else {
-    const expCount = formData.experiences?.length > 0 
-      ? getYearsFromDuration(formData.experiences[0].duration)
-      : "beberapa";
-    return `
-      <p style="text-align: justify;">
-        Saya yang bertanda tangan di bawah ini bermaksud mengajukan lamaran pekerjaan 
-        untuk posisi <strong>${formData.position}</strong> di <strong>${formData.companyName}</strong>. 
-        Dengan pengalaman ${expCount} tahun di bidang terkait, saya yakin dapat memberikan 
-        kontribusi positif bagi perkembangan perusahaan.
-      </p>
-    `;
-  }
+  return `Dengan hormat,
+
+Saya bermaksud melamar posisi ${formData.position} di ${formData.companyName} yang saya ketahui melalui ${source}. ${isFreshGrad ? 'Sebagai fresh graduate, ' : ''}Saya yakin dapat memberikan kontribusi positif bagi perusahaan.`;
 }
 
-function generatePersonalData(formData: any, birthDateFormatted: string): string {
-  const statusText = formData.status === "menikah" ? "Menikah" : "Lajang";
+function generatePersonalDataInline(formData: any): string {
+  const birthDate = formData.birthDate 
+    ? format(new Date(formData.birthDate), "d MMMM yyyy", { locale: id })
+    : "-";
   
-  // Format education line based on degree
-  let educationText = '';
-  if (formData.degree === "tidak_sekolah") {
-    educationText = formData.selfLearning || "Pendidikan Non-Formal";
-  } else if (["sd", "smp", "sma"].includes(formData.degree)) {
-    educationText = `${getDegreeText(formData.degree)} ${formData.university || ''}`;
-  } else if (["smk", "smka"].includes(formData.degree)) {
-    // SMK/SMKA with major
-    const majorText = formData.major ? ` jurusan ${formData.major}` : '';
-    educationText = `${getDegreeText(formData.degree)}${majorText}, ${formData.university || ''}`;
-  } else {
-    // D3, S1, S2
-    educationText = `${getDegreeText(formData.degree)} ${formData.major || ''}, ${formData.university || ''}`;
-  }
+  const status = formData.status === "menikah" ? "Menikah" : "Lajang";
   
-  return `
-    <p style="text-align: justify;">Adapun data diri saya sebagai berikut:</p>
-    
-    <div style="margin-left: 20px;">
-      <table style="border: none; line-height: 1.8;">
-        <tr>
-          <td style="width: 200px; padding: 2px 0;">Nama</td>
-          <td style="padding: 2px 0;">: ${formData.fullName}</td>
-        </tr>
-        <tr>
-          <td style="padding: 2px 0;">Tempat, Tanggal Lahir</td>
-          <td style="padding: 2px 0;">: ${formData.birthPlace}, ${birthDateFormatted}</td>
-        </tr>
-        <tr>
-          <td style="padding: 2px 0;">Alamat</td>
-          <td style="padding: 2px 0;">: ${formData.address}</td>
-        </tr>
-        <tr>
-          <td style="padding: 2px 0;">No. Telepon</td>
-          <td style="padding: 2px 0;">: ${formData.phone}</td>
-        </tr>
-        <tr>
-          <td style="padding: 2px 0;">Email</td>
-          <td style="padding: 2px 0;">: ${formData.email}</td>
-        </tr>
-        <tr>
-          <td style="padding: 2px 0;">Pendidikan Terakhir</td>
-          <td style="padding: 2px 0;">: ${educationText}</td>
-        </tr>
-        <tr>
-          <td style="padding: 2px 0;">Status</td>
-          <td style="padding: 2px 0;">: ${statusText}</td>
-        </tr>
-      </table>
-    </div>
-  `;
+  // Education text concise
+  const eduText = getEducationTextShort(formData);
+
+  return `Berikut data diri saya:
+
+Nama: ${formData.fullName}
+Tempat, Tanggal Lahir: ${formData.birthPlace}, ${birthDate}
+Alamat: ${formData.address}
+Telepon: ${formData.phone}
+Email: ${formData.email}
+Pendidikan: ${eduText}
+Status: ${status}`;
 }
 
-function generateEducation(formData: any, isFreshGrad: boolean): string {
+function generateEducationConcise(formData: any, isFreshGrad: boolean): string {
   if (formData.degree === "tidak_sekolah") {
-    return `
-      <p style="text-align: justify;">
-        Meskipun saya tidak menempuh pendidikan formal, saya memiliki pengalaman belajar dan 
-        mengembangkan keahlian secara otodidak. ${formData.selfLearning ? `Saya telah ${formData.selfLearning.toLowerCase()} yang relevan dengan pekerjaan ini.` : ''}
-        Saya memiliki semangat belajar yang tinggi dan siap untuk terus mengembangkan diri.
-      </p>
-    `;
+    return `Saya memiliki pengalaman belajar mandiri dan siap terus berkembang di dunia kerja.${formData.selfLearning ? ' ' + formData.selfLearning + '.' : ''}`;
   }
-  
-  const gpaText = formData.gpa && parseFloat(formData.gpa) >= 3.0 
-    ? ` dengan IPK ${formData.gpa}` 
-    : '';
-  
+
   const isCollege = ["d3", "s1", "s2"].includes(formData.degree);
   const isVocational = ["smk", "smka"].includes(formData.degree);
-  const periodText = isCollege ? "perkuliahan" : "sekolah";
   
+  let text = `Saya ${formData.graduationYear >= new Date().getFullYear() ? 'akan lulus' : 'lulus'} ${getDegreeText(formData.degree)}`;
+  
+  if (isCollege || isVocational) {
+    text += ` jurusan ${formData.major}`;
+  }
+  
+  text += ` dari ${formData.university}`;
+  
+  if (formData.graduationYear) {
+    text += ` tahun ${formData.graduationYear}`;
+  }
+  
+  // Add GPA if good
+  if (formData.gpa && parseFloat(formData.gpa) >= 3.0) {
+    text += ` dengan IPK ${formData.gpa}`;
+  }
+  
+  text += '.';
+  
+  // Add activities if fresh grad and has them
+  if (isFreshGrad && formData.activities) {
+    text += ` Saya aktif dalam ${formData.activities}.`;
+  }
+
+  return text;
+}
+
+function generateExperienceConcise(formData: any, isFreshGrad: boolean): string {
   if (isFreshGrad) {
-    const activitiesText = formData.activities 
-      ? ` Selama masa ${periodText}, saya aktif dalam ${formData.activities} yang mengasah kemampuan saya dalam teamwork, leadership, dan komunikasi.`
-      : '';
-    
-    if (isCollege) {
-      return `
-        <p style="text-align: justify;">
-          Saya telah menyelesaikan pendidikan ${getDegreeText(formData.degree)} di 
-          ${formData.university} jurusan ${formData.major}${gpaText} pada tahun ${formData.graduationYear}.${activitiesText}
-        </p>
-      `;
-    } else if (isVocational) {
-      // SMK/SMKA with vocational focus
-      const majorText = formData.major ? ` jurusan ${formData.major}` : '';
-      return `
-        <p style="text-align: justify;">
-          Saya telah menyelesaikan pendidikan ${getDegreeText(formData.degree)} di 
-          ${formData.university}${majorText} pada tahun ${formData.graduationYear}.${activitiesText} 
-          Pendidikan kejuruan ini telah membekali saya dengan keterampilan praktis yang siap diterapkan 
-          di dunia kerja.
-        </p>
-      `;
-    } else {
-      // SD, SMP, SMA
-      const majorText = formData.major ? ` jurusan ${formData.major}` : '';
-      return `
-        <p style="text-align: justify;">
-          Saya telah menyelesaikan pendidikan ${getDegreeText(formData.degree)} di 
-          ${formData.university}${majorText} pada tahun ${formData.graduationYear}.${activitiesText}
-        </p>
-      `;
-    }
+    // Fresh grad - focus on skills
+    return `Saya menguasai keterampilan yang relevan dengan posisi ini serta memiliki kemampuan komunikasi, teamwork, dan problem solving yang baik. Saya siap belajar dan beradaptasi dengan cepat.`;
   } else {
-    if (isCollege) {
-      return `
-        <p style="text-align: justify;">
-          Saya merupakan lulusan ${getDegreeText(formData.degree)} jurusan ${formData.major} 
-          dari ${formData.university}. Pendidikan formal ini memberikan saya foundation yang 
-          kuat dalam bidang yang relevan dengan posisi yang dilamar.
-        </p>
-      `;
-    } else {
-      return `
-        <p style="text-align: justify;">
-          Saya merupakan lulusan ${getDegreeText(formData.degree)} dari ${formData.university}. 
-          Latar belakang pendidikan ini telah membekali saya dengan pengetahuan dasar yang baik 
-          dan kemampuan untuk terus belajar dan berkembang di dunia kerja.
-        </p>
-      `;
+    // Experienced
+    if (formData.experiences && formData.experiences.length > 0) {
+      const exp = formData.experiences[0];
+      return `Saya memiliki pengalaman sebagai ${exp.position} di ${exp.company} selama ${exp.duration}, dengan tanggung jawab ${exp.responsibilities}. Pengalaman ini membekali saya dengan keahlian yang relevan untuk posisi ini.`;
     }
+    return `Saya memiliki pengalaman kerja yang relevan dengan posisi yang dilamar.`;
   }
 }
 
-function generateFreshGradExperience(formData: any): string {
-  return `
-    <p style="text-align: justify;">
-      Meskipun saya belum memiliki pengalaman kerja full-time, saya memiliki kemauan kuat 
-      untuk belajar dan berkembang. Saya menguasai berbagai soft skills seperti komunikasi, 
-      teamwork, problem solving, dan adaptabilitas yang saya yakini akan sangat berguna 
-      untuk posisi ini.
-    </p>
-  `;
-}
-
-function generateExperiencedBackground(formData: any): string {
-  if (!formData.experiences || formData.experiences.length === 0) {
-    return '';
-  }
-  
-  const mainExp = formData.experiences[0];
-  return `
-    <p style="text-align: justify;">
-      Saya memiliki pengalaman kerja di ${mainExp.company} sebagai ${mainExp.position} 
-      selama ${mainExp.duration}, dengan tanggung jawab meliputi ${mainExp.responsibilities}. 
-      Pengalaman ini telah membekali saya dengan keahlian dan kompetensi yang sangat 
-      relevan dengan posisi yang Bapak/Ibu butuhkan.
-    </p>
-  `;
-}
-
-function generateMotivation(formData: any): string {
-  return `
-    <p style="text-align: justify;">
-      Saya sangat tertarik untuk bergabung dengan ${formData.companyName} karena reputasi 
-      perusahaan yang solid dan kesempatan untuk berkembang bersama tim profesional. 
-      Saya yakin dengan kemampuan, dedikasi, dan semangat yang saya miliki, saya dapat 
-      berkontribusi positif dan tumbuh bersama perusahaan.
-    </p>
-  `;
+function generateMotivationConcise(formData: any): string {
+  return `Saya tertarik bergabung dengan ${formData.companyName} karena reputasi perusahaan yang baik dan kesempatan untuk berkembang bersama tim profesional. Saya yakin dapat berkontribusi dan tumbuh bersama perusahaan.`;
 }
 
 function generateOptionalStatements(formData: any): string {
   const statements = [];
   
   if (formData.includeAvailability) {
-    statements.push("Saya bersedia ditempatkan di seluruh wilayah Indonesia");
+    statements.push("bersedia ditempatkan di seluruh wilayah Indonesia");
   }
   
   if (formData.includeWillingStatement) {
-    statements.push("Saya bersedia bekerja dengan target dan di bawah tekanan");
+    statements.push("bersedia bekerja dengan target dan di bawah tekanan");
   }
   
   if (formData.includeOvertimeStatement) {
-    statements.push("Saya bersedia bekerja lembur jika diperlukan");
+    statements.push("bersedia bekerja lembur jika diperlukan");
   }
   
   if (formData.includeCommitmentStatement) {
-    statements.push("Saya siap memberikan kontribusi terbaik untuk kemajuan perusahaan");
+    statements.push("siap memberikan kontribusi terbaik");
   }
   
   if (statements.length === 0) return '';
   
-  return `
-    <p style="text-align: justify;">
-      ${statements.join('. ')}${statements.length > 0 ? '.' : ''}
-    </p>
-  `;
+  return `Saya ${statements.join(', ')}.`;
 }
 
 function generateClosing(): string {
-  return `
-    <p style="text-align: justify;">
-      Demikian surat lamaran ini saya buat dengan sebenar-benarnya. Besar harapan saya 
-      untuk dapat diberikan kesempatan interview sehingga saya dapat menjelaskan lebih 
-      detail mengenai potensi dan kompetensi yang saya miliki. Atas perhatian dan 
-      kesempatan yang diberikan, saya ucapkan terima kasih.
-    </p>
-  `;
+  return `Demikian surat lamaran ini saya buat. Besar harapan saya untuk diberikan kesempatan wawancara. Atas perhatian Bapak/Ibu, saya ucapkan terima kasih.`;
 }
 
 function generateSignature(formData: any): string {
-  return `
-    <div style="margin-top: 40px;">
-      <p><strong>Hormat saya,</strong></p>
-      <div style="margin-top: 60px; margin-bottom: 10px;">
-        <p><strong>${formData.fullName}</strong></p>
-      </div>
-    </div>
-  `;
+  return `Hormat saya,
+
+
+${formData.fullName}`;
 }
 
 // Helper functions
-function generateAttachmentsList(formData: any): string {
-  if (!formData.includeAttachmentsList) return '';
+function getEducationTextShort(formData: any): string {
+  if (formData.degree === "tidak_sekolah") {
+    return "Pendidikan Non-Formal";
+  }
   
-  const attachments = formData.attachments || [];
-  const customAttachments = (formData.customAttachments || []).filter((c: string) => c.trim());
+  const degreeText = getDegreeText(formData.degree);
+  const isCollege = ["d3", "s1", "s2"].includes(formData.degree);
+  const isVocational = ["smk", "smka"].includes(formData.degree);
   
-  if (attachments.length === 0 && customAttachments.length === 0) return '';
+  if (isCollege || isVocational) {
+    return `${degreeText} ${formData.major || ''} - ${formData.university || ''}`.trim();
+  }
   
-  const attachmentLabels: Record<string, string> = {
-    cv: "CV / Daftar Riwayat Hidup",
-    ktp: "Fotocopy KTP",
-    ijazah: "Fotocopy Ijazah",
-    transkrip: "Fotocopy Transkrip Nilai",
-    photo: "Pas Foto terbaru",
-    skck: "SKCK (Surat Keterangan Catatan Kepolisian)",
-    kesehatan: "Surat Keterangan Sehat",
-    sertifikat: "Sertifikat / Piagam Penghargaan",
-    portfolio: "Portfolio / Hasil Karya",
+  return `${degreeText} - ${formData.university || ''}`.trim();
+}
+
+function getDegreeText(degree: string): string {
+  const degreeMap: Record<string, string> = {
+    sd: "SD",
+    smp: "SMP/MTs",
+    sma: "SMA/MA",
+    smk: "SMK",
+    smka: "SMKA",
+    d3: "D3",
+    s1: "S1",
+    s2: "S2",
+    tidak_sekolah: "Pendidikan Non-Formal",
   };
-  
-  const allAttachments = [
-    ...attachments.map((a: string) => attachmentLabels[a] || a),
-    ...customAttachments
-  ];
-  
-  return `
-    <p style="text-align: justify; margin-top: 15px;">Berikut saya lampirkan:</p>
-    <div style="margin-left: 20px;">
-      <ol style="line-height: 1.8;">
-        ${allAttachments.map(a => `<li>${a}</li>`).join('\n        ')}
-      </ol>
-    </div>
-  `;
+  return degreeMap[degree] || degree;
 }
 
 function getJobSourceText(source: string, customSource?: string): string {
@@ -377,34 +211,14 @@ function getJobSourceText(source: string, customSource?: string): string {
     whatsapp: "WhatsApp",
     telegram: "Telegram",
     referensi: "referensi teman",
-    koran: "koran/media massa",
+    koran: "koran/media",
     custom: customSource || "sumber terpercaya",
   };
   return sourceMap[source] || "sumber terpercaya";
 }
 
-function getDegreeText(degree: string): string {
-  const degreeMap: Record<string, string> = {
-    sd: "SD",
-    smp: "SMP/MTs",
-    sma: "SMA/MA",
-    smk: "SMK",
-    smka: "SMKA",
-    d3: "Diploma (D3)",
-    s1: "Sarjana (S1)",
-    s2: "Magister (S2)",
-    tidak_sekolah: "Pendidikan Non-Formal",
-  };
-  return degreeMap[degree] || degree;
-}
-
 function numberToWords(num: number): string {
   const words = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh"];
-  return words[num] || num.toString();
-}
-
-function getYearsFromDuration(duration: string): string {
-  // Simple extraction, e.g., "4 tahun" from input
-  const match = duration.match(/(\d+)\s*tahun/i);
-  return match ? match[1] : "beberapa";
+  if (num <= 10) return words[num];
+  return num.toString();
 }
