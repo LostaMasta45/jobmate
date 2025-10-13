@@ -51,8 +51,6 @@ export default function AdminLoginPage() {
         .eq("id", authData.user.id)
         .single();
 
-      console.log("Profile check:", { profile, profileError });
-
       if (profileError) {
         console.error("Profile error:", profileError);
         setError(`Error: ${profileError.message}`);
@@ -67,7 +65,6 @@ export default function AdminLoginPage() {
       }
 
       // Success - redirect to admin dashboard
-      console.log("Admin login success! Redirecting...");
       window.location.href = "/admin/applications"; // Force full page reload
     } catch (err: any) {
       setError(`Terjadi kesalahan: ${err.message || "Unknown error"}`);

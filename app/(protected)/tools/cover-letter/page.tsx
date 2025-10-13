@@ -35,9 +35,7 @@ export default function CoverLetterPage() {
 
   const loadTemplates = async () => {
     try {
-      console.log("Loading templates...");
       const data = await getTemplates("cover_letter");
-      console.log("Templates loaded:", data);
       setTemplates(data);
     } catch (error) {
       console.error("Failed to load templates:", error);
@@ -51,9 +49,7 @@ export default function CoverLetterPage() {
     setResult(null);
 
     try {
-      console.log("Generating cover letter with data:", formData);
       const { content } = await createCoverLetter(formData);
-      console.log("Cover letter generated, content length:", content?.length);
       
       if (!content || content.trim() === "") {
         throw new Error("Tidak ada hasil yang dihasilkan. Silakan coba lagi.");
@@ -61,9 +57,7 @@ export default function CoverLetterPage() {
       setResult(content);
       
       // Refresh templates after successful generation
-      console.log("Refreshing templates in 1 second...");
       setTimeout(() => {
-        console.log("Now refreshing templates...");
         loadTemplates();
       }, 1000);
     } catch (error) {
