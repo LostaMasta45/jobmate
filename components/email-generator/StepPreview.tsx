@@ -22,18 +22,21 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState<'id' | 'en'>('id');
 
   // Auto-generate on mount if not already generated
   useEffect(() => {
     if (!formData.bodyContent && !generating) {
-      handleGenerate();
+      handleGenerate('id');
     }
   }, []);
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (language: 'id' | 'en' = 'id') => {
     setGenerating(true);
+    setCurrentLanguage(language);
     try {
       const result = await generateEmailWithAI({
+        language,
         emailType: formData.emailType,
         position: formData.position,
         companyName: formData.companyName,
@@ -152,50 +155,66 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
 
       {!generating && (formData.subjectLine || formData.bodyContent) && (
         <div className="space-y-6">
-          {/* Actions Bar */}
-          <div className="flex flex-wrap gap-3">
-            <Button
-              onClick={handleGenerate}
-              variant="outline"
-              className="gap-2"
-              disabled={generating}
-            >
-              <RefreshCw className={`h-4 w-4 ${generating ? 'animate-spin' : ''}`} />
-              Regenerate
-            </Button>
+          {/* Actions Bar - Responsive */}
+          <div className="space-y-4">
+            {/* Language Selection - Full width on mobile */}
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button
+                onClick={() => handleGenerate('id')}
+                variant={currentLanguage === 'id' ? 'default' : 'outline'}
+                className="gap-2 flex-1"
+                disabled={generating}
+              >
+                <RefreshCw className={`h-4 w-4 ${generating && currentLanguage === 'id' ? 'animate-spin' : ''}`} />
+                🇮🇩 Bahasa Indonesia
+              </Button>
+              
+              <Button
+                onClick={() => handleGenerate('en')}
+                variant={currentLanguage === 'en' ? 'default' : 'outline'}
+                className="gap-2 flex-1"
+                disabled={generating}
+              >
+                <RefreshCw className={`h-4 w-4 ${generating && currentLanguage === 'en' ? 'animate-spin' : ''}`} />
+                🇬🇧 English
+              </Button>
+            </div>
 
-            <Button onClick={handleCopy} variant="outline" className="gap-2">
-              <Copy className="h-4 w-4" />
-              Copy Email
-            </Button>
+            {/* Action Buttons - Responsive Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <Button onClick={handleCopy} variant="outline" className="gap-2">
+                <Copy className="h-4 w-4" />
+                Copy Email
+              </Button>
 
-            <Button
-              onClick={handleSave}
-              variant="default"
-              className="gap-2"
-              disabled={saving || saved}
-            >
-              {saved ? (
-                <>
-                  <CheckCircle2 className="h-4 w-4" />
-                  Tersimpan
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4" />
-                  {saving ? "Menyimpan..." : "Simpan Draft"}
-                </>
+              <Button
+                onClick={handleSave}
+                variant="default"
+                className="gap-2"
+                disabled={saving || saved}
+              >
+                {saved ? (
+                  <>
+                    <CheckCircle2 className="h-4 w-4" />
+                    Tersimpan
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    {saving ? "Menyimpan..." : "Simpan Draft"}
+                  </>
+                )}
+              </Button>
+
+              {saved && (
+                <Link href="/tools/email-generator/history" className="w-full">
+                  <Button variant="outline" className="gap-2 w-full">
+                    <Eye className="h-4 w-4" />
+                    Lihat History
+                  </Button>
+                </Link>
               )}
-            </Button>
-
-            {saved && (
-              <Link href="/tools/email-generator/history">
-                <Button variant="outline" className="gap-2">
-                  <Eye className="h-4 w-4" />
-                  Lihat History
-                </Button>
-              </Link>
-            )}
+            </div>
           </div>
 
           {/* Subject Line */}

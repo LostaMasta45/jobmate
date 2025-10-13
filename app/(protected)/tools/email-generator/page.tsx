@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { getProfile } from "@/lib/supabase/server";
-import { EmailWizard } from "@/components/email-generator/EmailWizard";
+import { EmailGeneratorMain } from "@/components/email-generator/EmailGeneratorMain";
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +10,7 @@ export default async function EmailGeneratorPage() {
 
   return (
     <AppShell isAdmin={isAdmin}>
-      <EmailWizard />
+      <EmailGeneratorMain />
     </AppShell>
   );
 }

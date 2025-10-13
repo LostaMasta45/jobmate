@@ -1,9 +1,10 @@
-// AI-powered Email Generator using OpenAI
+// AI-powered Email Generator using OpenAI (via SumoPod)
 import OpenAI from 'openai';
 
-// Initialize OpenAI client
+// Initialize OpenAI client with SumoPod base URL
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+  baseURL: process.env.OPENAI_BASE_URL || 'https://ai.sumopod.com/v1',
 });
 
 // Email generation data interface
@@ -22,6 +23,9 @@ export interface EmailGenerationData {
   yourName: string;
   currentRole?: string;
   yearsExperience?: number;
+  
+  // Language
+  language?: 'id' | 'en'; // Default: id (Indonesian)
   
   // Tone & Style
   toneStyle: 'formal' | 'semi-formal' | 'casual' | 'creative';
@@ -80,9 +84,9 @@ export async function generateEmail(data: EmailGenerationData): Promise<{
     
     console.log('Generating email with OpenAI...');
     
-    // Call OpenAI API
+    // Call OpenAI API - Using gpt-4o-mini via SumoPod
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -119,14 +123,25 @@ export async function generateEmail(data: EmailGenerationData): Promise<{
 
 // Build comprehensive prompt for AI
 function buildEmailPrompt(data: EmailGenerationData): string {
-  const emailTypeContext = {
+  const language = data.language || 'id'; // Default to Indonesian
+  
+  const emailTypeContext = language === 'id' ? {
+    application: 'email lamaran kerja untuk melamar posisi',
+    follow_up: 'email follow-up mengenai lamaran yang sudah dikirim',
+    thank_you: 'email terima kasih setelah interview kerja',
+    inquiry: 'email inquiry menanyakan peluang kerja'
+  } : {
     application: 'a job application email applying for a position',
     follow_up: 'a follow-up email regarding a previously submitted application',
     thank_you: 'a thank you email after a job interview',
     inquiry: 'an inquiry email asking about potential job opportunities'
   };
 
-  let prompt = `Generate a professional ${emailTypeContext[data.emailType]} with the following requirements:
+  const promptLanguage = language === 'id' 
+    ? 'Generate email lamaran kerja profesional dalam BAHASA INDONESIA yang natural dan formal'
+    : 'Generate a professional job application email in ENGLISH';
+
+  let prompt = `${promptLanguage} ${emailTypeContext[data.emailType]} with the following requirements:
 
 CONTEXT:
 - Position: ${data.position}
@@ -178,24 +193,39 @@ CONTENT REQUIREMENTS:`;
   prompt += `
 
 IMPORTANT GUIDELINES:
-1. Start with an appropriate greeting based on the recipient information
-2. DO NOT use cliché openings like "I am writing to apply for..."
-3. Use active voice and specific examples
-4. Keep paragraphs short and scannable
-5. Show genuine interest and enthusiasm (adjusted to the personality type)
-6. End with a clear next step
-7. Use proper email formatting with line breaks between paragraphs
-8. For Indonesian context: use professional business etiquette
+${language === 'id' ? `
+1. Tulis SELURUH EMAIL dalam BAHASA INDONESIA yang baik dan benar
+2. Gunakan sapaan formal yang sesuai (Bapak/Ibu/Saudara)
+3. JANGAN gunakan kalimat pembuka klise seperti "Saya menulis untuk melamar..."
+4. Gunakan kalimat aktif dan berikan contoh spesifik
+5. Paragraf pendek dan mudah dibaca
+6. Tunjukkan minat dan antusiasme genuine (sesuai tipe kepribadian)
+7. Akhiri dengan langkah selanjutnya yang jelas
+8. Format email yang rapi dengan jarak antar paragraf
+9. Gunakan etika bisnis Indonesia yang profesional
+10. Personal dan autentik, tidak seperti template
+11. Tutup dengan salam profesional yang sesuai
+12. PENTING: Gunakan kata ganti "saya" (bukan "I" atau "me")
+` : `
+1. Write the ENTIRE EMAIL in ENGLISH
+2. Start with an appropriate greeting based on the recipient information
+3. DO NOT use cliché openings like "I am writing to apply for..."
+4. Use active voice and specific examples
+5. Keep paragraphs short and scannable
+6. Show genuine interest and enthusiasm (adjusted to the personality type)
+7. End with a clear next step
+8. Use proper email formatting with line breaks between paragraphs
 9. Make it personal and authentic, not template-like
 10. Include a professional sign-off
+`}
 
 OUTPUT FORMAT:
 Return the response in this exact format:
 
-SUBJECT: [A compelling subject line]
+SUBJECT: [${language === 'id' ? 'Subject line menarik dalam Bahasa Indonesia' : 'A compelling subject line in English'}]
 
 BODY:
-[The complete email body with proper formatting]
+[${language === 'id' ? 'Isi email lengkap dalam Bahasa Indonesia dengan format yang rapi' : 'The complete email body in English with proper formatting'}]
 
 Important: Return ONLY the subject and body. No additional commentary or explanations.`;
 
@@ -280,7 +310,7 @@ Make it specific and personal.
 Return ONLY the subject line, nothing else.`;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',

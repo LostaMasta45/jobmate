@@ -19,6 +19,7 @@ import {
   ChevronRight,
   X,
   FileSignature,
+  MailPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,11 @@ const navItems: NavItem[] = [
     title: "Surat Lamaran",
     href: "/surat-lamaran",
     icon: FileSignature,
+  },
+  {
+    title: "Email Generator",
+    href: "/tools/email-generator",
+    icon: MailPlus,
   },
   {
     title: "Cover Letter",

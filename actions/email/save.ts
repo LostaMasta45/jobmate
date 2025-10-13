@@ -68,7 +68,7 @@ export async function saveEmailDraft(data: SaveEmailData) {
         has_attachment: data.hasAttachment,
         status: data.status || 'draft',
         notes: data.notes,
-        ai_model: data.aiModel || 'gpt-4',
+        ai_model: data.aiModel || 'gpt-4o-mini',
         generation_count: 1,
       })
       .select()

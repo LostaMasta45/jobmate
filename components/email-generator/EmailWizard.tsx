@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { StepEmailType } from "./StepEmailType";
 import { StepBasicInfo } from "./StepBasicInfo";
 import { StepToneStyle } from "./StepToneStyle";
 import { StepContent } from "./StepContent";
@@ -23,6 +24,11 @@ export interface EmailFormData {
   currentRole?: string;
   yearsExperience?: number;
   
+  // Conditional fields
+  interviewDate?: string; // For thank_you
+  applicationDate?: string; // For follow_up
+  specificTopics?: string; // For thank_you
+  
   // Tone & Style
   toneStyle: 'formal' | 'semi-formal' | 'casual' | 'creative';
   personality: 'confident' | 'humble' | 'enthusiastic' | 'balanced';
@@ -41,10 +47,11 @@ export interface EmailFormData {
 }
 
 const STEPS = [
-  { id: 1, title: "Info Dasar", icon: "📋" },
-  { id: 2, title: "Tone & Style", icon: "🎨" },
-  { id: 3, title: "Konten", icon: "📝" },
-  { id: 4, title: "Preview", icon: "👁️" },
+  { id: 1, title: "Jenis Email", icon: "📧" },
+  { id: 2, title: "Info Dasar", icon: "📋" },
+  { id: 3, title: "Tone & Style", icon: "🎨" },
+  { id: 4, title: "Konten", icon: "📝" },
+  { id: 5, title: "Preview", icon: "👁️" },
 ];
 
 export function EmailWizard() {
@@ -82,11 +89,13 @@ export function EmailWizard() {
   const canProceedToNext = () => {
     switch (currentStep) {
       case 1:
-        return formData.position && formData.companyName && formData.yourName;
+        return formData.emailType; // Step 1: Email type must be selected
       case 2:
-        return true; // Always can proceed from step 2
+        return formData.position && formData.companyName && formData.yourName;
       case 3:
         return true; // Always can proceed from step 3
+      case 4:
+        return true; // Always can proceed from step 4
       default:
         return false;
     }
@@ -157,21 +166,24 @@ export function EmailWizard() {
         {/* Step Content */}
         <div className="min-h-[400px]">
           {currentStep === 1 && (
-            <StepBasicInfo formData={formData} updateFormData={updateFormData} />
+            <StepEmailType formData={formData} updateFormData={updateFormData} />
           )}
           {currentStep === 2 && (
-            <StepToneStyle formData={formData} updateFormData={updateFormData} />
+            <StepBasicInfo formData={formData} updateFormData={updateFormData} />
           )}
           {currentStep === 3 && (
-            <StepContent formData={formData} updateFormData={updateFormData} />
+            <StepToneStyle formData={formData} updateFormData={updateFormData} />
           )}
           {currentStep === 4 && (
+            <StepContent formData={formData} updateFormData={updateFormData} />
+          )}
+          {currentStep === 5 && (
             <StepPreview formData={formData} updateFormData={updateFormData} />
           )}
         </div>
 
         {/* Navigation Buttons */}
-        {currentStep < 4 && (
+        {currentStep < 5 && (
           <div className="flex justify-between mt-8 pt-6 border-t">
             <Button
               variant="outline"
@@ -188,7 +200,7 @@ export function EmailWizard() {
               disabled={!canProceedToNext()}
               className="gap-2"
             >
-              {currentStep === 3 ? "Generate Email" : "Lanjut"}
+              {currentStep === 4 ? "Generate Email" : "Lanjut"}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
