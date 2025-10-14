@@ -3,49 +3,91 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Edit, ArrowRight, FileDown, Building2, Calendar } from "lucide-react";
+import { Mail, Edit, ArrowRight, Building2, Calendar, Send, FileText } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
 
-interface CoverLetter {
+interface EmailDraft {
   id: string;
+  email_type: string;
   company_name: string;
   position: string;
-  template_type: string;
+  subject_line: string;
+  tone_style: string;
   status: string;
   created_at: string;
   updated_at: string;
 }
 
-export function RecentCoverLetters() {
-  const [letters, setLetters] = useState<CoverLetter[]>([]);
+export function RecentEmails() {
+  const [emails, setEmails] = useState<EmailDraft[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchRecentLetters();
+    fetchRecentEmails();
   }, []);
 
-  async function fetchRecentLetters() {
+  async function fetchRecentEmails() {
     try {
-      const { listCoverLetters } = await import("@/actions/surat-lamaran/list");
-      const result = await listCoverLetters();
+      const { listEmailDrafts } = await import("@/actions/email/list");
+      const result = await listEmailDrafts();
       
       if (result.error) {
-        console.error("Error fetching cover letters:", result.error);
-        setLetters([]);
+        console.error("Error fetching email drafts:", result.error);
+        setEmails([]);
       } else {
-        // Get only the 3 most recent letters
+        // Get only the 3 most recent emails
         const recent = (result.data || []).slice(0, 3);
-        setLetters(recent);
+        setEmails(recent);
       }
     } catch (error) {
-      console.error("Error fetching cover letters:", error);
-      setLetters([]);
+      console.error("Error fetching email drafts:", error);
+      setEmails([]);
     } finally {
       setLoading(false);
     }
   }
+
+  const getEmailTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      application: "Lamaran",
+      follow_up: "Follow-up",
+      thank_you: "Terima Kasih",
+      inquiry: "Inquiry",
+    };
+    return labels[type] || type;
+  };
+
+  const getEmailTypeColor = (type: string) => {
+    const colors: Record<string, string> = {
+      application: "bg-blue-100 text-blue-700",
+      follow_up: "bg-amber-100 text-amber-700",
+      thank_you: "bg-green-100 text-green-700",
+      inquiry: "bg-purple-100 text-purple-700",
+    };
+    return colors[type] || "bg-gray-100 text-gray-700";
+  };
+
+  const getToneIcon = (tone: string) => {
+    const gradients: Record<string, string> = {
+      formal: "from-blue-50 to-blue-100",
+      "semi-formal": "from-indigo-50 to-indigo-100",
+      casual: "from-cyan-50 to-cyan-100",
+      creative: "from-purple-50 to-purple-100",
+    };
+    return gradients[tone] || "from-gray-50 to-gray-100";
+  };
+
+  const getToneIconColor = (tone: string) => {
+    const colors: Record<string, string> = {
+      formal: "text-blue-600",
+      "semi-formal": "text-indigo-600",
+      casual: "text-cyan-600",
+      creative: "text-purple-600",
+    };
+    return colors[tone] || "text-gray-600";
+  };
 
   if (loading) {
     return (
@@ -63,19 +105,19 @@ export function RecentCoverLetters() {
     );
   }
 
-  if (letters.length === 0) {
+  if (emails.length === 0) {
     return (
       <div className="text-center py-12">
         <div className="rounded-full bg-primary/10 p-4 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
-          <FileText className="h-8 w-8 text-primary" />
+          <Mail className="h-8 w-8 text-primary" />
         </div>
         <p className="text-sm text-muted-foreground mb-4">
-          Belum ada surat lamaran dibuat
+          Belum ada email lamaran dibuat
         </p>
-        <Link href="/surat-lamaran/buat">
+        <Link href="/tools/email-generator">
           <Button size="sm" className="gap-2">
-            <FileText className="h-4 w-4" />
-            Buat Surat Pertama
+            <Mail className="h-4 w-4" />
+            Buat Email Pertama
           </Button>
         </Link>
       </div>
@@ -86,7 +128,7 @@ export function RecentCoverLetters() {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold">Aktivitas Terbaru</h3>
-        <Link href="/surat-lamaran">
+        <Link href="/tools/email-generator/history">
           <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
             Lihat Semua
             <ArrowRight className="h-3.5 w-3.5" />
@@ -95,48 +137,38 @@ export function RecentCoverLetters() {
       </div>
 
       <div className="space-y-3">
-        {letters.map((letter) => (
+        {emails.map((email) => (
           <Link 
-            key={letter.id} 
-            href={`/surat-lamaran/${letter.id}`}
+            key={email.id} 
+            href={`/tools/email-generator?edit=${email.id}`}
             className="block group"
           >
             <div className="flex items-center gap-3 p-3 rounded-lg border hover:border-primary/50 hover:bg-accent/50 transition-all">
               {/* Icon */}
-              <div className={`rounded-lg p-2.5 shadow-sm group-hover:scale-110 transition-transform ${
-                letter.template_type === 'T0'
-                  ? 'bg-gradient-to-br from-green-50 to-green-100'
-                  : 'bg-gradient-to-br from-purple-50 to-purple-100'
-              }`}>
-                <FileText className={`h-5 w-5 ${
-                  letter.template_type === 'T0' ? 'text-green-600' : 'text-purple-600'
-                }`} />
+              <div className={`rounded-lg p-2.5 shadow-sm group-hover:scale-110 transition-transform bg-gradient-to-br ${getToneIcon(email.tone_style)}`}>
+                <Mail className={`h-5 w-5 ${getToneIconColor(email.tone_style)}`} />
               </div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <h4 className="font-semibold text-sm line-clamp-1 group-hover:text-primary transition-colors">
-                    {letter.company_name}
+                    {email.company_name}
                   </h4>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${
-                    letter.template_type === 'T0' 
-                      ? 'bg-green-100 text-green-700' 
-                      : 'bg-purple-100 text-purple-700'
-                  }`}>
-                    {letter.template_type === 'T0' ? 'ATS' : 'Modern'}
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${getEmailTypeColor(email.email_type)}`}>
+                    {getEmailTypeLabel(email.email_type)}
                   </span>
                 </div>
                 
                 <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1.5">
                     <Building2 className="h-3 w-3 flex-shrink-0" />
-                    <span className="line-clamp-1">{letter.position}</span>
+                    <span className="line-clamp-1">{email.position}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Calendar className="h-3 w-3 flex-shrink-0" />
                     <span>
-                      {formatDistanceToNow(new Date(letter.created_at), {
+                      {formatDistanceToNow(new Date(email.created_at), {
                         addSuffix: true,
                         locale: id,
                       })}

@@ -7,7 +7,7 @@ import { RecentTable } from "@/components/dashboard/RecentTable";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
 import { ToolsGrid } from "@/components/dashboard/ToolsGrid";
 import { WelcomeHero } from "@/components/dashboard/WelcomeHero";
-import { RecentCoverLetters } from "@/components/dashboard/RecentCoverLetters";
+import { RecentActivities } from "@/components/dashboard/RecentActivities";
 
 // Revalidate dashboard data every 30 seconds
 export const revalidate = 30;
@@ -28,24 +28,24 @@ export default async function DashboardPage() {
 
   return (
     <AppShell isAdmin={isAdmin}>
-      <WelcomeHero 
-        userName={userName}
-        userEmail={userEmail}
-        avatarUrl={profile?.avatar_url}
-        totalApplications={stats?.total || 0}
-      />
-
       <div className="space-y-6">
+        <WelcomeHero 
+          userName={userName}
+          userEmail={userEmail}
+          avatarUrl={profile?.avatar_url}
+          totalApplications={stats?.total || 0}
+        />
+
         <StatCards data={stats} />
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid gap-6 lg:grid-cols-5">
+          <div className="lg:col-span-3 space-y-6">
             <PipelineMini data={pipeline} />
             <RecentTable rows={recent} />
           </div>
           
-          <div className="space-y-6">
-            <RecentCoverLetters />
+          <div className="lg:col-span-2 space-y-6">
+            <RecentActivities />
             {alerts.length > 0 && <AlertsPanel items={alerts} />}
           </div>
         </div>

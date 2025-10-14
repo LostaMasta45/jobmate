@@ -157,55 +157,55 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
+        className="mb-8"
       >
-        <Card className="relative overflow-hidden border border-primary/10 bg-gradient-to-r from-background via-background to-primary/5">
-          {/* Background decoration */}
-          <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,white,transparent)]" />
-          
-          <div className="relative p-6">
-            <div className="flex items-center gap-4">
-              {/* Avatar */}
-              <Avatar className="h-16 w-16 ring-2 ring-primary/20">
-                <AvatarImage src={avatarUrl || undefined} alt={userName} />
-                <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-primary to-primary/70 text-primary-foreground">
-                  {getInitials(userName)}
-                </AvatarFallback>
-              </Avatar>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            {/* Avatar */}
+            <Avatar className="h-14 w-14 ring-2 ring-primary/20 shadow-lg">
+              <AvatarImage src={avatarUrl || undefined} alt={userName} />
+              <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-primary to-primary/70 text-primary-foreground">
+                {getInitials(userName)}
+              </AvatarFallback>
+            </Avatar>
 
-              {/* Text content */}
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-                    {getTimeGreeting()}, {userName}!
-                  </h1>
-                  <motion.div
-                    animate={{ rotate: [0, 14, -8, 14, 0] }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                  >
-                    👋
-                  </motion.div>
-                </div>
-                <p className="text-muted-foreground flex items-center gap-2 mt-1">
-                  <GreetingIcon className="h-4 w-4 text-primary" />
-                  {greeting.text} - Ringkasan progres lamaran dan alat bantu karier
-                </p>
-              </div>
-
-              {/* Stats badge */}
-              {totalApplications > 0 && (
+            {/* Text content */}
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold">
+                  {getTimeGreeting()}, {userName.split(' ')[0]}!
+                </h1>
                 <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.5, type: "spring" }}
-                  className="hidden sm:flex flex-col items-center justify-center bg-primary/10 rounded-xl px-6 py-3 border border-primary/20"
+                  animate={{ rotate: [0, 14, -8, 14, 0] }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
                 >
-                  <span className="text-3xl font-bold text-primary">{totalApplications}</span>
-                  <span className="text-xs text-muted-foreground">Lamaran</span>
+                  👋
                 </motion.div>
-              )}
+              </div>
+              <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                <GreetingIcon className="h-3.5 w-3.5 text-primary" />
+                {greeting.text}
+              </p>
             </div>
           </div>
-        </Card>
+
+          {/* Stats badge */}
+          {totalApplications > 0 && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.5, type: "spring" }}
+              className="hidden lg:flex items-center gap-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl px-5 py-3 border border-primary/20"
+            >
+              <div className="text-right">
+                <span className="text-2xl font-bold text-primary">{totalApplications}</span>
+                <p className="text-xs text-muted-foreground">Total Lamaran</p>
+              </div>
+              <div className="h-8 w-px bg-primary/20" />
+              <GreetingIcon className="h-6 w-6 text-primary" />
+            </motion.div>
+          )}
+        </div>
       </motion.div>
     </>
   );
