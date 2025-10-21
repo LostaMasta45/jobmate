@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import crypto from 'crypto';
 
-// Verify Xendit webhook signature
-function verifyXenditSignature(payload: string, signature: string): boolean {
+// Verify Xendit webhook callback token
+function verifyXenditToken(callbackToken: string): boolean {
   const webhookToken = process.env.XENDIT_WEBHOOK_VERIFICATION_TOKEN;
   
   if (!webhookToken) {
@@ -15,27 +14,23 @@ function verifyXenditSignature(payload: string, signature: string): boolean {
     return false;
   }
 
-  const computedSignature = crypto
-    .createHmac('sha256', webhookToken)
-    .update(payload)
-    .digest('hex');
-
-  return computedSignature === signature;
+  // For Invoice webhooks, Xendit sends the verification token directly in x-callback-token header
+  // Simply compare the tokens
+  return callbackToken === webhookToken;
 }
 
 export async function POST(request: NextRequest) {
   try {
     console.log('[Xendit Webhook] POST request received');
 
-    // Get raw body for signature verification
-    const rawBody = await request.text();
-    const signature = request.headers.get('x-callback-token') || '';
+    // Get callback token from header
+    const callbackToken = request.headers.get('x-callback-token') || '';
 
-    console.log('[Xendit Webhook] Signature:', signature ? 'Present' : 'Missing');
+    console.log('[Xendit Webhook] Callback Token:', callbackToken ? 'Present' : 'Missing');
 
-    // Verify signature
-    if (!verifyXenditSignature(rawBody, signature)) {
-      console.error('[Xendit Webhook] Invalid signature');
+    // Verify callback token
+    if (!verifyXenditToken(callbackToken)) {
+      console.error('[Xendit Webhook] Invalid callback token');
       return NextResponse.json(
         { error: 'Invalid signature' },
         { status: 401 }
@@ -43,6 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse webhook payload
+    const rawBody = await request.text();
     const payload = JSON.parse(rawBody);
     console.log('[Xendit Webhook] Payload received:', JSON.stringify(payload, null, 2));
 

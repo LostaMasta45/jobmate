@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LoadingScreen } from "@/components/ui/loading-screen";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SignInPage() {
@@ -14,6 +15,7 @@ export default function SignInPage() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+  const [showLoadingScreen, setShowLoadingScreen] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -60,6 +62,12 @@ export default function SignInPage() {
 
       console.log("🔄 Redirecting to:", redirectPath);
 
+      // Show beautiful loading screen
+      setShowLoadingScreen(true);
+
+      // Small delay for smooth transition
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       // CRITICAL: Use window.location.replace for reliable one-click login
       // This forces full page reload with new session cookies
       window.location.replace(redirectPath);
@@ -68,12 +76,16 @@ export default function SignInPage() {
       console.error("Login error:", err);
       setError("Terjadi kesalahan saat login. Silakan coba lagi.");
       setLoading(false);
+      setShowLoadingScreen(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
+    <>
+      {showLoadingScreen && <LoadingScreen message="Memuat dashboard..." />}
+      
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-brand text-white">
             <span className="text-2xl font-bold">JM</span>
@@ -136,5 +148,6 @@ export default function SignInPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

@@ -1,10 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { GraduationCap } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { GraduationCap, Sparkles, Loader2, CheckCircle, RefreshCw, Info } from "lucide-react";
+import { enhanceActivity } from "@/actions/surat-lamaran/enhance-activity";
+import { useToast } from "@/hooks/use-toast";
 
 interface StepEducationProps {
   formData: any;
@@ -12,6 +18,70 @@ interface StepEducationProps {
 }
 
 export function StepEducation({ formData, updateFormData }: StepEducationProps) {
+  const { toast } = useToast();
+  const [enhancing, setEnhancing] = useState(false);
+  const [enhancedActivity, setEnhancedActivity] = useState<string | null>(null);
+
+  const handleEnhanceActivity = async () => {
+    if (!formData.activities || formData.activities.trim().length < 10) {
+      toast({
+        title: "Aktivitas terlalu pendek",
+        description: "Minimal 10 karakter untuk hasil yang baik.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setEnhancing(true);
+
+    try {
+      const result = await enhanceActivity(
+        formData.activities,
+        formData.position || undefined
+      );
+
+      if (result.error) {
+        toast({
+          title: "Gagal enhance",
+          description: result.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (result.data) {
+        setEnhancedActivity(result.data);
+        toast({
+          title: "✨ Berhasil!",
+          description: "Aktivitas berhasil diperbaiki dengan AI.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat memperbaiki aktivitas.",
+        variant: "destructive",
+      });
+    } finally {
+      setEnhancing(false);
+    }
+  };
+
+  const handleUseEnhanced = () => {
+    if (enhancedActivity) {
+      updateFormData({ activities: enhancedActivity });
+      setEnhancedActivity(null);
+      toast({
+        title: "✅ Tersimpan",
+        description: "Aktivitas yang diperbaiki sudah digunakan.",
+      });
+    }
+  };
+
+  const handleRegenerateActivity = () => {
+    setEnhancedActivity(null);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 mb-6">
@@ -180,7 +250,7 @@ export function StepEducation({ formData, updateFormData }: StepEducationProps) 
         )}
 
         {formData.degree !== "tidak_sekolah" && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label htmlFor="activities">
               {["d3", "s1", "s2"].includes(formData.degree) 
                 ? "Organisasi / Kegiatan Kampus (opsional)" 
@@ -202,6 +272,65 @@ export function StepEducation({ formData, updateFormData }: StepEducationProps) 
             <p className="text-xs text-muted-foreground">
               <strong>Penting untuk fresh graduate!</strong> Tuliskan organisasi, magang, PKL, atau pencapaian yang relevan.
             </p>
+
+            {/* AI Enhancement Button */}
+            {formData.activities && formData.activities.length > 10 && !enhancedActivity && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full border-purple-300 hover:bg-purple-50 dark:border-purple-700 dark:hover:bg-purple-900"
+                onClick={handleEnhanceActivity}
+                disabled={enhancing}
+              >
+                {enhancing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    AI sedang memperbaiki...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Perbaiki dengan AI
+                  </>
+                )}
+              </Button>
+            )}
+
+            {/* Enhanced Activity Result */}
+            {enhancedActivity && (
+              <Card className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 dark:from-blue-950 dark:to-indigo-950 dark:border-blue-800">
+                <div className="flex items-start gap-3">
+                  <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0" />
+                  <div className="flex-1 space-y-3">
+                    <h4 className="font-semibold text-blue-900 dark:text-blue-100 flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" />
+                      ✨ Versi AI yang Lebih Baik:
+                    </h4>
+                    <p className="text-sm leading-relaxed text-blue-800 dark:text-blue-200">
+                      {enhancedActivity}
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700"
+                        onClick={handleUseEnhanced}
+                      >
+                        <CheckCircle className="mr-2 h-3 w-3" />
+                        Gunakan Versi Ini
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleRegenerateActivity}
+                      >
+                        <RefreshCw className="mr-2 h-3 w-3" />
+                        Generate Ulang
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            )}
           </div>
         )}
 

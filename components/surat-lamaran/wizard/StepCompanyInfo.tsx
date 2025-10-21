@@ -1,10 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Building2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Building2, FileText, Sparkles, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { parseJobDescription } from "@/actions/surat-lamaran/parse-job-desc";
+import { useToast } from "@/hooks/use-toast";
 
 interface StepCompanyInfoProps {
   formData: any;
@@ -12,6 +18,73 @@ interface StepCompanyInfoProps {
 }
 
 export function StepCompanyInfo({ formData, updateFormData }: StepCompanyInfoProps) {
+  const { toast } = useToast();
+  const [showJobDescModal, setShowJobDescModal] = useState(false);
+  const [jobDescText, setJobDescText] = useState("");
+  const [parsing, setParsing] = useState(false);
+  const [parseSuccess, setParseSuccess] = useState(false);
+
+  const handleParseJobDesc = async () => {
+    if (!jobDescText || jobDescText.trim().length < 50) {
+      toast({
+        title: "Job description terlalu pendek",
+        description: "Minimal 50 karakter untuk hasil yang akurat.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setParsing(true);
+    setParseSuccess(false);
+
+    try {
+      const result = await parseJobDescription(jobDescText);
+
+      if (result.error) {
+        toast({
+          title: "Gagal memproses",
+          description: result.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (result.data) {
+        // Auto-fill form
+        const updates: any = {};
+        
+        if (result.data.position) updates.position = result.data.position;
+        if (result.data.company) updates.companyName = result.data.company;
+        if (result.data.location) updates.companyAddress = result.data.location;
+        
+        // Store parsed data untuk digunakan di step selanjutnya
+        updates.parsedJobDescription = result.data;
+
+        updateFormData(updates);
+        setParseSuccess(true);
+
+        toast({
+          title: "✨ Berhasil!",
+          description: "Informasi dari job description berhasil diekstrak.",
+        });
+
+        // Close modal after 1.5s
+        setTimeout(() => {
+          setShowJobDescModal(false);
+          setJobDescText("");
+        }, 1500);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat memproses job description.",
+        variant: "destructive",
+      });
+    } finally {
+      setParsing(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 mb-6">
@@ -23,6 +96,108 @@ export function StepCompanyInfo({ formData, updateFormData }: StepCompanyInfoPro
           </p>
         </div>
       </div>
+
+      {/* AI Job Desc Parser CTA */}
+      <Alert className="bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200 dark:from-purple-950 dark:to-blue-950 dark:border-purple-800">
+        <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+        <AlertTitle className="text-purple-900 dark:text-purple-100">
+          💡 Tips: Paste Job Description
+        </AlertTitle>
+        <AlertDescription className="text-purple-800 dark:text-purple-200">
+          Punya job description? AI kami bisa extract informasi penting secara otomatis!
+        </AlertDescription>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-3 border-purple-300 hover:bg-purple-100 dark:border-purple-700 dark:hover:bg-purple-900"
+          onClick={() => setShowJobDescModal(true)}
+        >
+          <FileText className="mr-2 h-4 w-4" />
+          Parse Job Description dengan AI
+        </Button>
+      </Alert>
+
+      {/* Job Desc Parser Modal */}
+      <Dialog open={showJobDescModal} onOpenChange={setShowJobDescModal}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-purple-600" />
+              AI Job Description Parser
+            </DialogTitle>
+            <DialogDescription>
+              Paste job description lengkap di bawah. AI akan extract posisi, perusahaan, skills, dan informasi penting lainnya.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="jobDescInput">Job Description</Label>
+              <Textarea
+                id="jobDescInput"
+                placeholder="Paste job description di sini...
+
+Contoh:
+We are looking for a Frontend Developer to join our team at Tokopedia...
+
+Requirements:
+- 2+ years experience in React
+- Strong understanding of JavaScript/TypeScript
+- etc..."
+                value={jobDescText}
+                onChange={(e) => setJobDescText(e.target.value)}
+                rows={12}
+                className="mt-2 font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {jobDescText.length} karakter (minimal 50)
+              </p>
+            </div>
+
+            {parseSuccess && (
+              <Alert className="bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800">
+                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <AlertTitle className="text-green-900 dark:text-green-100">
+                  Berhasil!
+                </AlertTitle>
+                <AlertDescription className="text-green-800 dark:text-green-200">
+                  Informasi berhasil diekstrak dan form sudah diisi otomatis.
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowJobDescModal(false);
+                setJobDescText("");
+                setParseSuccess(false);
+              }}
+              disabled={parsing}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={handleParseJobDesc}
+              disabled={parsing || jobDescText.length < 50}
+            >
+              {parsing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  AI sedang memproses...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Extract dengan AI
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="space-y-4">
         <div className="space-y-2">

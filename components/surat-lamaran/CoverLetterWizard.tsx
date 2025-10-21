@@ -10,6 +10,7 @@ import { StepCompanyInfo } from "./wizard/StepCompanyInfo";
 import { StepPersonalData } from "./wizard/StepPersonalData";
 import { StepEducation } from "./wizard/StepEducation";
 import { StepExperience } from "./wizard/StepExperience";
+import { StepMotivation } from "./wizard/StepMotivation";
 import { StepAttachments } from "./wizard/StepAttachments";
 import { StepPreview } from "./wizard/StepPreview";
 import { createCoverLetter } from "@/actions/surat-lamaran/create";
@@ -21,8 +22,9 @@ const steps = [
   { id: 2, title: "Data Diri", component: StepPersonalData },
   { id: 3, title: "Pendidikan", component: StepEducation },
   { id: 4, title: "Pengalaman", component: StepExperience },
-  { id: 5, title: "Lampiran", component: StepAttachments },
-  { id: 6, title: "Preview", component: StepPreview },
+  { id: 5, title: "Motivasi", component: StepMotivation },
+  { id: 6, title: "Lampiran", component: StepAttachments },
+  { id: 7, title: "Preview", component: StepPreview },
 ];
 
 interface CoverLetterWizardProps {
@@ -49,6 +51,7 @@ export function CoverLetterWizard({
     hrdName: "",
     position: "",
     jobSource: "",
+    parsedJobDescription: null, // AI parsed job desc data
     
     // Personal Data (pre-fill from profile)
     fullName: profile?.full_name || "",
@@ -71,6 +74,16 @@ export function CoverLetterWizard({
     // Experience
     experienceType: "fresh_graduate",
     experiences: [] as any[],
+    rawExperience: "", // For fresh grad AI story
+    generatedExperienceStory: null, // AI generated story
+    
+    // Motivation (NEW STEP - AI Generated)
+    motivationPosition: "",
+    motivationCompany: "",
+    motivationValue: "",
+    motivationFit: "",
+    generatedMotivation: null, // AI generated motivation
+    finalMotivation: null, // User selected/edited motivation
     
     // Skills
     skills: [] as string[],

@@ -7,7 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card } from "@/components/ui/card";
-import { Briefcase, Plus, Trash2 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Briefcase, Plus, Trash2, Sparkles, Loader2, Info, RefreshCw, CheckCircle } from "lucide-react";
+import { generateExperienceStory } from "@/actions/surat-lamaran/generate-experience-story";
+import { useToast } from "@/hooks/use-toast";
 
 interface StepExperienceProps {
   formData: any;
@@ -15,7 +18,9 @@ interface StepExperienceProps {
 }
 
 export function StepExperience({ formData, updateFormData }: StepExperienceProps) {
+  const { toast } = useToast();
   const [showExperienceForm, setShowExperienceForm] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   const addExperience = () => {
     const newExp = {
@@ -43,6 +48,56 @@ export function StepExperience({ formData, updateFormData }: StepExperienceProps
       i === index ? { ...exp, [field]: value } : exp
     );
     updateFormData({ experiences: updated });
+  };
+
+  const handleGenerateStory = async () => {
+    if (!formData.rawExperience || formData.rawExperience.length < 20) {
+      toast({
+        title: "Pengalaman terlalu pendek",
+        description: "Minimal 20 karakter untuk hasil yang baik.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setGenerating(true);
+
+    try {
+      const result = await generateExperienceStory({
+        rawExperience: formData.rawExperience,
+        position: formData.position || "posisi ini",
+        isFreshGrad: formData.experienceType === "fresh_graduate",
+      });
+
+      if (result.error) {
+        toast({
+          title: "Gagal generate",
+          description: result.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (result.data) {
+        updateFormData({ generatedExperienceStory: result.data });
+        toast({
+          title: "✨ Berhasil!",
+          description: "Cerita pengalaman berhasil di-generate.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat generate cerita.",
+        variant: "destructive",
+      });
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleRegenerateStory = () => {
+    updateFormData({ generatedExperienceStory: null });
   };
 
   return (
@@ -181,12 +236,83 @@ export function StepExperience({ formData, updateFormData }: StepExperienceProps
         )}
 
         {formData.experienceType === "fresh_graduate" && (
-          <Card className="p-4 bg-muted/50">
-            <p className="text-sm text-muted-foreground">
-              💡 Sebagai fresh graduate, fokus pada pendidikan, organisasi kampus, magang, 
-              dan soft skills akan lebih ditekankan di surat lamaran Anda.
-            </p>
-          </Card>
+          <>
+            <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
+              <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <AlertTitle className="text-blue-900 dark:text-blue-100">
+                💡 Tips untuk Fresh Graduate
+              </AlertTitle>
+              <AlertDescription className="text-blue-800 dark:text-blue-200">
+                Ceritakan pengalaman magang, organisasi, project kampus, atau pengalaman lain yang relevan. AI akan membantu membuat cerita yang menarik!
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-3">
+              <Label htmlFor="rawExperience">Pengalaman Relevan (Opsional)</Label>
+              <Textarea
+                id="rawExperience"
+                placeholder="Contoh: 
+- Magang di PT Maju Jaya sebagai Web Developer selama 3 bulan, buat fitur chat realtime
+- Ketua Divisi IT HMTI, kelola 20 anggota dan bikin website kampus
+- Freelance bikin 5 website untuk UMKM lokal"
+                rows={5}
+                value={formData.rawExperience || ""}
+                onChange={(e) => updateFormData({ rawExperience: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground">
+                Tulis dalam poin-poin atau paragraf sederhana. AI akan transform menjadi narasi profesional.
+              </p>
+
+              {formData.rawExperience && formData.rawExperience.length > 20 && !formData.generatedExperienceStory && (
+                <Button
+                  variant="outline"
+                  className="w-full border-purple-300 hover:bg-purple-50 dark:border-purple-700 dark:hover:bg-purple-900"
+                  onClick={handleGenerateStory}
+                  disabled={generating}
+                >
+                  {generating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      AI sedang membuat cerita...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Generate Cerita Pengalaman dengan AI
+                    </>
+                  )}
+                </Button>
+              )}
+
+              {formData.generatedExperienceStory && (
+                <Card className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 dark:from-green-950 dark:to-emerald-950 dark:border-green-800">
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="h-5 w-5 text-green-600 dark:text-green-400 mt-1 flex-shrink-0" />
+                    <div className="flex-1 space-y-3">
+                      <h4 className="font-semibold text-green-900 dark:text-green-100 flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4" />
+                        ✨ Cerita Pengalaman Anda:
+                      </h4>
+                      <p className="text-sm leading-relaxed text-green-800 dark:text-green-200">
+                        {formData.generatedExperienceStory}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleRegenerateStory}
+                          disabled={generating}
+                        >
+                          <RefreshCw className="mr-2 h-3 w-3" />
+                          Generate Ulang
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              )}
+            </div>
+          </>
         )}
       </div>
     </div>
