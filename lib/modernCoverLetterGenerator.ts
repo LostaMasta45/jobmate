@@ -64,7 +64,7 @@ export function generateModernCoverLetter(data: CoverLetterData): string {
       font-family: ${template.fontFamily}, sans-serif;
       font-size: 8pt;
       line-height: 1.4;
-      color: #000;
+      color: #1a1a1a;
       background: white;
       margin: 0;
       padding: 0;
@@ -186,6 +186,7 @@ export function generateModernCoverLetter(data: CoverLetterData): string {
       word-wrap: break-word;
       overflow-wrap: break-word;
       hyphens: auto;
+      color: #1a1a1a;
     }
     
     .data-section {
@@ -218,7 +219,7 @@ export function generateModernCoverLetter(data: CoverLetterData): string {
     }
     
     .data-value {
-      color: #000;
+      color: #1a1a1a;
       font-size: 8pt;
       word-wrap: break-word;
       overflow-wrap: break-word;
@@ -227,16 +228,19 @@ export function generateModernCoverLetter(data: CoverLetterData): string {
     
     .attachments {
       margin: 12px 0;
-      font-size: 10pt;
+      font-size: 8pt;
+      color: #1a1a1a;
     }
     
     .attachments ol {
       margin-left: 20px;
       margin-top: 5px;
+      color: #1a1a1a;
     }
     
     .attachments li {
       margin-bottom: 2px;
+      color: #1a1a1a;
     }
     
     .closing {
@@ -459,18 +463,33 @@ function generateOptionalStatements(data: CoverLetterData): string {
 }
 
 function generateAttachmentsList(data: CoverLetterData): string {
-  if (!data.includeAttachmentsList) return '';
+  // Jika user explicitly set false, jangan tampilkan
+  if (data.includeAttachmentsList === false) return '';
   
+  // Collect attachments
   const attachments = [
     ...(data.attachments || []),
     ...(data.customAttachments?.filter(c => c) || [])
   ];
   
-  if (attachments.length === 0) return '';
+  // Jika tidak ada attachments, tampilkan default minimal
+  if (attachments.length === 0) {
+    return `
+    <div class="attachments">
+      <div style="font-weight: 600; margin-bottom: 8px; color: #1a1a1a;">Surat Lamaran diatas saya buat dalam keadaan sehat, sebagai bahan pertimbangan tambahan, saya lampirkan :</div>
+      <ol>
+        <li>Daftar Riwayat Hidup</li>
+        <li>Fotocopy Ijazah dan Transkrip Nilai</li>
+        <li>Fotocopy KTP</li>
+        <li>Pas Foto terbaru</li>
+      </ol>
+    </div>
+  `;
+  }
   
   return `
     <div class="attachments">
-      <div style="font-weight: 600; margin-bottom: 8px;">Surat Lamaran diatas saya buat dalam keadaan sehat, sebagai bahan pertimbangan tambahan, saya lampirkan :</div>
+      <div style="font-weight: 600; margin-bottom: 8px; color: #1a1a1a;">Surat Lamaran diatas saya buat dalam keadaan sehat, sebagai bahan pertimbangan tambahan, saya lampirkan :</div>
       <ol>
         ${attachments.map(att => `<li>${att}</li>`).join('\n        ')}
       </ol>

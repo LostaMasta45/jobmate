@@ -185,8 +185,8 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
         onSelectTemplate={handleTemplateChange}
       />
       
-      {/* AI Polish CTA - Only for ATS template */}
-      {isATSTemplate && !aiPolished && (
+      {/* AI Polish CTA - Available for ALL templates */}
+      {!aiPolished && (
         <Alert className="bg-gradient-to-r from-purple-50 via-blue-50 to-pink-50 border-purple-200 dark:from-purple-950 dark:via-blue-950 dark:to-pink-950 dark:border-purple-800">
           <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
           <AlertTitle className="text-purple-900 dark:text-purple-100 text-lg">

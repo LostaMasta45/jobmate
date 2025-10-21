@@ -101,7 +101,7 @@ export function ToolsPricingCTA() {
               size="lg"
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
             >
-              <a href="/vip?plan=basic">Mulai dengan Basic</a>
+              <a href="/payment?plan=basic">Mulai dengan Basic</a>
             </Button>
 
             <p className="text-xs text-center text-muted-foreground mt-4">
@@ -161,7 +161,7 @@ export function ToolsPricingCTA() {
               size="lg"
               className="w-full bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white font-semibold"
             >
-              <a href="/vip?plan=premium">Upgrade ke Premium Sekarang</a>
+              <a href="/payment?plan=premium">Upgrade ke Premium Sekarang</a>
             </Button>
 
             <p className="text-xs text-center text-muted-foreground mt-4">

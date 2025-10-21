@@ -2,14 +2,20 @@
 
 import { generateText } from "@/lib/openai";
 import { generateCoverLetter } from "@/lib/coverLetterGenerator";
+import { generateModernCoverLetter } from "@/lib/modernCoverLetterGenerator";
 
 export async function polishCoverLetterWithAI(formData: any): Promise<{
   data?: string;
   error?: string;
 }> {
   try {
+    // Detect if using modern template (T1-T5) or ATS (T0)
+    const isModernTemplate = formData.templateType && formData.templateType !== "T0";
+    
     // Generate standard version first
-    const standardContent = generateCoverLetter(formData);
+    const standardContent = isModernTemplate 
+      ? generateModernCoverLetter({ templateId: formData.templateType, ...formData })
+      : generateCoverLetter(formData);
 
     const context = {
       position: formData.position,
@@ -114,6 +120,13 @@ Hormat saya,
 
 Output langsung surat lengkap, TANPA penjelasan atau komentar tambahan.`;
 
+    // Untuk modern templates (T1-T5), kembalikan HTML yang sudah di-generate
+    // karena template sudah styled dan structured dengan baik
+    if (isModernTemplate) {
+      return { data: standardContent };
+    }
+    
+    // Untuk ATS template (T0), polish dengan AI
     const result = await generateText(prompt, {
       model: "gpt-4o-mini",
       temperature: 0.7,

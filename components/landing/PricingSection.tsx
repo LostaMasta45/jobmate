@@ -89,7 +89,7 @@ export function PricingSection() {
               size="lg"
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm sm:text-base py-5 sm:py-6"
             >
-              <a href="/vip?plan=basic" className="flex items-center justify-center">Mulai dengan Basic</a>
+              <a href="/payment?plan=basic" className="flex items-center justify-center">Mulai dengan Basic</a>
             </Button>
 
             <p className="text-[10px] sm:text-xs text-center text-muted-foreground mt-3 sm:mt-4">
@@ -151,7 +151,7 @@ export function PricingSection() {
               size="lg"
               className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-sm sm:text-base py-5 sm:py-6 shadow-lg"
             >
-              <a href="/vip?plan=premium" className="flex items-center justify-center">
+              <a href="/payment?plan=premium" className="flex items-center justify-center">
                 Ambil Premium Sekarang! 🚀
               </a>
             </Button>

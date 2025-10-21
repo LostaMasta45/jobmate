@@ -10,6 +10,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Allow payment routes (public access for checkout)
+  if (pathname.startsWith('/payment') || pathname.startsWith('/api/payment/')) {
+    console.log('[MIDDLEWARE] Payment route, public access:', pathname);
+    return NextResponse.next();
+  }
+
   // Define PROTECTED routes (routes that REQUIRE login)
   const protectedRoutes = [
     '/vip',           // VIP Career Portal
