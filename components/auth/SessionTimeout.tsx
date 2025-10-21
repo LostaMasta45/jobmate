@@ -20,8 +20,22 @@ export function SessionTimeout({
   const lastActivityRef = useRef<number>(Date.now());
 
   const isPublicRoute = () => {
-    const publicRoutes = ["/sign-in", "/admin/login", "/ajukan-akun", "/"];
-    return publicRoutes.some((route) => pathname === route || pathname?.startsWith(route + "/"));
+    // Define PROTECTED routes (routes that REQUIRE login)
+    const protectedRoutes = [
+      "/vip",           // VIP Career Portal
+      "/dashboard",     // User dashboard
+      "/tools",         // JobMate Premium tools
+      "/admin",         // Admin panel
+      "/settings",      // User settings
+      "/applications",  // Job applications
+      "/surat-lamaran", // Surat lamaran tool
+    ];
+    
+    // Check if current path is protected
+    const isProtected = protectedRoutes.some(route => pathname?.startsWith(route));
+    
+    // Return true if NOT protected (i.e., it's public)
+    return !isProtected;
   };
 
   const handleLogout = async () => {
@@ -30,7 +44,7 @@ export function SessionTimeout({
       
       // Hard redirect to clear all state
       if (pathname?.startsWith("/admin")) {
-        window.location.href = "/admin/login";
+        window.location.href = "/admin-login";
       } else {
         window.location.href = "/sign-in";
       }
@@ -38,7 +52,7 @@ export function SessionTimeout({
       console.error("Auto-logout error:", error);
       // Force redirect even on error
       if (pathname?.startsWith("/admin")) {
-        window.location.href = "/admin/login";
+        window.location.href = "/admin-login";
       } else {
         window.location.href = "/sign-in";
       }
@@ -66,16 +80,23 @@ export function SessionTimeout({
   };
 
   useEffect(() => {
-    // Check if user is authenticated
+    // Skip session check on public routes
+    if (isPublicRoute()) {
+      console.log('[SessionTimeout] Skipping session check for public route:', pathname);
+      return;
+    }
+
+    // Check if user is authenticated (only for protected routes)
     const checkSession = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
-      if (!session && !isPublicRoute()) {
-        // No session and not on public route, redirect to login
+      if (!session) {
+        // No session on protected route, redirect to login
+        console.log('[SessionTimeout] No session, redirecting to login from:', pathname);
         if (pathname?.startsWith("/admin")) {
-          window.location.href = "/admin/login";
+          window.location.href = "/admin-login";
         } else {
           window.location.href = "/sign-in";
         }

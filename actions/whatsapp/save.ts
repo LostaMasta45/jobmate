@@ -7,13 +7,13 @@ export interface SaveWAMessageData {
   // Message Details
   messageType: string;
   content: string;
-  plainContent?: string;
   
   // Context
   position: string;
   companyName: string;
   hrdName?: string;
   hrdTitle?: string;
+  hrdPhone?: string;
   jobSource?: string;
   referralName?: string;
   previousInteraction?: string;
@@ -30,7 +30,6 @@ export interface SaveWAMessageData {
   toneStyle?: string;
   personality?: string;
   messageLength?: string;
-  variationLevel?: string;
   useEmoji?: boolean;
   
   // Preferences
@@ -42,7 +41,6 @@ export interface SaveWAMessageData {
   // Analytics
   wordCount?: number;
   charCount?: number;
-  spintaxCount?: number;
   
   // Usage
   templateId?: string;
@@ -72,11 +70,11 @@ export async function saveWAMessage(data: SaveWAMessageData) {
         user_id: user.id,
         message_type: data.messageType,
         content: data.content,
-        plain_content: data.plainContent,
         position: data.position,
         company_name: data.companyName,
         hrd_name: data.hrdName,
         hrd_title: data.hrdTitle,
+        hrd_phone: data.hrdPhone,
         job_source: data.jobSource,
         referral_name: data.referralName,
         previous_interaction: data.previousInteraction,
@@ -89,7 +87,6 @@ export async function saveWAMessage(data: SaveWAMessageData) {
         tone_style: data.toneStyle || 'semi-formal',
         personality: data.personality || 'balanced',
         message_length: data.messageLength || 'medium',
-        variation_level: data.variationLevel || 'medium',
         use_emoji: data.useEmoji || false,
         include_greeting: data.includeGreeting !== false,
         include_intro: data.includeIntro !== false,
@@ -97,7 +94,6 @@ export async function saveWAMessage(data: SaveWAMessageData) {
         attachment_mention: data.attachmentMention || false,
         word_count: data.wordCount,
         char_count: data.charCount,
-        spintax_count: data.spintaxCount,
         template_id: data.templateId,
         application_id: data.applicationId,
         status: data.status || 'draft',

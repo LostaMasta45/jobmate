@@ -35,6 +35,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { FollowUpBadge } from "@/components/followup/FollowUpBadge";
+import { useFollowUpReminders } from "@/hooks/useFollowUpReminders";
 
 type Application = {
   id: string;
@@ -69,6 +71,7 @@ function ApplicationCard({
   onDelete: (id: string) => void;
   onViewDetail: (app: Application) => void;
 }) {
+  const { count, nextDueDate } = useFollowUpReminders(application.id);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ 
       id: application.id,
@@ -154,6 +157,18 @@ function ApplicationCard({
               </div>
             )}
           </div>
+
+          {/* Follow-up Badge */}
+          {count > 0 && (
+            <div className="mt-2 pt-2 border-t">
+              <FollowUpBadge 
+                count={count} 
+                nextDueDate={nextDueDate}
+                showDate
+                className="w-full justify-center"
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

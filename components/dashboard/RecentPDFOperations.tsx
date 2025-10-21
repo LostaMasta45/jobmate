@@ -168,17 +168,7 @@ export function RecentPDFOperations() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold">Aktivitas Terbaru</h3>
-        <Link href="/tools/pdf-tools">
-          <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
-            Lihat Semua
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Button>
-        </Link>
-      </div>
-
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {operations.map((operation) => {
           const Icon = getOperationIcon(operation.operation);
 
@@ -188,80 +178,69 @@ export function RecentPDFOperations() {
               href="/tools/pdf-tools"
               className="block group"
             >
-              <div className="flex items-center gap-3 p-3 rounded-lg border hover:border-primary/50 hover:bg-accent/50 transition-all">
-                {/* Icon */}
-                <div
-                  className={`rounded-lg p-2.5 shadow-sm group-hover:scale-110 transition-transform bg-gradient-to-br ${getOperationGradient(
-                    operation.operation
-                  )}`}
-                >
-                  <Icon
-                    className={`h-5 w-5 ${getOperationIconColor(
-                      operation.operation
-                    )}`}
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-semibold text-sm group-hover:text-primary transition-colors">
-                      {getOperationLabel(operation.operation)}
-                    </h4>
-                    {operation.status === "completed" && (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-green-600 flex-shrink-0" />
-                    )}
-                    {operation.status === "failed" && (
-                      <XCircle className="h-3.5 w-3.5 text-destructive flex-shrink-0" />
-                    )}
-                    {operation.status === "processing" && (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin text-primary flex-shrink-0" />
-                    )}
-                  </div>
-
-                  <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
-                    {operation.file_size && operation.status === "completed" && (
-                      <div className="flex items-center gap-1.5">
-                        <FileText className="h-3 w-3 flex-shrink-0" />
-                        <span>{formatFileSize(operation.file_size)}</span>
-                        {operation.metadata?.reductionPercent && (
-                          <span className="text-green-600 font-medium">
-                            • {operation.metadata.reductionPercent}% lebih kecil
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    {operation.metadata?.fileCount && (
-                      <div className="flex items-center gap-1.5">
-                        <FileStack className="h-3 w-3 flex-shrink-0" />
-                        <span>{operation.metadata.fileCount} file digabung</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="h-3 w-3 flex-shrink-0" />
-                      <span>
-                        {formatDistanceToNow(new Date(operation.created_at), {
-                          addSuffix: true,
-                          locale: id,
-                        })}
-                      </span>
+              <div className="p-2.5 rounded-lg border hover:border-orange-300 hover:bg-orange-50/50 dark:hover:bg-orange-950/20 transition-all">
+                {/* Header Row */}
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="flex items-start gap-2 flex-1 min-w-0">
+                    <Icon
+                      className={`h-4 w-4 flex-shrink-0 mt-0.5 ${getOperationIconColor(operation.operation)}`}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-sm leading-tight mb-1">
+                        {getOperationLabel(operation.operation)}
+                      </h4>
+                      {operation.file_size && operation.status === "completed" && (
+                        <p className="text-xs text-muted-foreground">
+                          {formatFileSize(operation.file_size)}
+                          {operation.metadata?.reductionPercent && (
+                            <span className="text-green-600 font-medium ml-1">
+                              • {operation.metadata.reductionPercent}% ↓
+                            </span>
+                          )}
+                        </p>
+                      )}
+                      {operation.metadata?.fileCount && (
+                        <p className="text-xs text-muted-foreground">
+                          {operation.metadata.fileCount} file digabung
+                        </p>
+                      )}
                     </div>
                   </div>
+                  {operation.status === "completed" && (
+                    <CheckCircle2 className="h-3.5 w-3.5 text-green-600 flex-shrink-0" />
+                  )}
+                  {operation.status === "failed" && (
+                    <XCircle className="h-3.5 w-3.5 text-destructive flex-shrink-0" />
+                  )}
+                  {operation.status === "processing" && (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-primary flex-shrink-0" />
+                  )}
                 </div>
 
-                {/* Action Hint */}
-                {operation.status === "completed" && (
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Download className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Download</span>
-                  </div>
-                )}
+                {/* Time */}
+                <div className="text-[10px] text-muted-foreground">
+                  {formatDistanceToNow(new Date(operation.created_at), {
+                    addSuffix: true,
+                    locale: id,
+                  })}
+                </div>
               </div>
             </Link>
           );
         })}
       </div>
 
+      {/* View All Link */}
+      {operations.length > 0 && (
+        <div className="mt-3 pt-3 border-t">
+          <Link href="/tools/pdf-tools">
+            <Button variant="ghost" size="sm" className="w-full gap-2 text-xs hover:bg-orange-50 hover:text-orange-700 dark:hover:bg-orange-950">
+              Lihat Semua
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Button>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

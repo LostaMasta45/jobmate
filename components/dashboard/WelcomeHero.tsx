@@ -156,34 +156,34 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-8"
+        transition={{ duration: 0.3 }}
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* Avatar */}
-            <Avatar className="h-14 w-14 ring-2 ring-primary/20 shadow-lg">
+            <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-md">
               <AvatarImage src={avatarUrl || undefined} alt={userName} />
-              <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-primary to-primary/70 text-primary-foreground">
+              <AvatarFallback className="text-base font-bold bg-gradient-to-br from-primary to-primary/70 text-primary-foreground">
                 {getInitials(userName)}
               </AvatarFallback>
             </Avatar>
 
             {/* Text content */}
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold">
+              <div className="flex items-center gap-1.5">
+                <h1 className="text-xl sm:text-2xl font-bold">
                   {getTimeGreeting()}, {userName.split(' ')[0]}!
                 </h1>
-                <motion.div
+                <motion.span
                   animate={{ rotate: [0, 14, -8, 14, 0] }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="text-lg"
                 >
                   👋
-                </motion.div>
+                </motion.span>
               </div>
-              <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                <GreetingIcon className="h-3.5 w-3.5 text-primary" />
+              <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5">
+                <GreetingIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
                 {greeting.text}
               </p>
             </div>
@@ -194,15 +194,14 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 0.5, type: "spring" }}
-              className="hidden lg:flex items-center gap-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl px-5 py-3 border border-primary/20"
+              transition={{ delay: 0.4, type: "spring" }}
+              className="hidden md:flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg px-3 sm:px-4 py-2 border border-primary/20"
             >
               <div className="text-right">
-                <span className="text-2xl font-bold text-primary">{totalApplications}</span>
-                <p className="text-xs text-muted-foreground">Total Lamaran</p>
+                <span className="text-xl sm:text-2xl font-bold text-primary">{totalApplications}</span>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">Lamaran</p>
               </div>
-              <div className="h-8 w-px bg-primary/20" />
-              <GreetingIcon className="h-6 w-6 text-primary" />
+              <GreetingIcon className="h-5 w-5 text-primary" />
             </motion.div>
           )}
         </div>

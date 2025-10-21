@@ -122,15 +122,45 @@ export async function approveApplication(applicationId: string) {
     .single();
 
   if (!existingProfile) {
-    // Create profile only if it doesn't exist
+    // Create profile with proper initial values
     const { error: profileError } = await adminClient.from("profiles").insert({
-      id: userId,
-      name: application.full_name,
+      id: userId, // ✅ Use auth.users ID (critical!)
       email: application.email,
+      full_name: application.full_name,
+      name: application.full_name,
       role: "user",
+      membership: "free", // Start as free
+      membership_status: "inactive",
+      membership_expiry: null,
+      whatsapp: application.whatsapp,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     });
 
-    if (profileError) throw profileError;
+    if (profileError) {
+      console.error("Failed to create profile:", profileError);
+      throw profileError;
+    }
+    
+    console.log(`✅ Profile created for ${application.email} (ID: ${userId})`);
+  } else {
+    // Profile exists - ensure data is synced
+    console.log(`Profile already exists for ${application.email}, ensuring data sync...`);
+    
+    // Update to ensure consistency
+    const { error: updateProfileError } = await adminClient.from("profiles").update({
+      full_name: application.full_name,
+      name: application.full_name,
+      email: application.email, // Ensure email matches
+      whatsapp: application.whatsapp,
+      updated_at: new Date().toISOString(),
+    }).eq("id", userId);
+    
+    if (updateProfileError) {
+      console.error("Failed to update profile:", updateProfileError);
+    } else {
+      console.log(`✅ Profile updated for ${application.email}`);
+    }
   }
 
   const { error: updateError } = await adminClient

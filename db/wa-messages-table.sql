@@ -16,7 +16,6 @@ create table if not exists wa_templates (
   default_tone text default 'semi-formal',
   default_personality text default 'balanced',
   default_length text default 'medium',
-  default_variation text default 'medium',
   use_emoji boolean default false,
   
   -- System or User
@@ -78,14 +77,14 @@ create table if not exists wa_messages (
   
   -- Message Details
   message_type text not null check (message_type in ('application', 'follow_up', 'interview_confirmation', 'thank_you', 'status_inquiry', 're_application', 'referral')),
-  content text not null, -- Generated message with spintax
-  plain_content text, -- Resolved spintax (one variation)
+  content text not null, -- Generated message (clean, no spintax)
   
   -- Context
   position text not null,
   company_name text not null,
   hrd_name text,
   hrd_title text,
+  hrd_phone text,
   job_source text,
   referral_name text,
   previous_interaction text,
@@ -102,7 +101,6 @@ create table if not exists wa_messages (
   tone_style text default 'semi-formal' check (tone_style in ('formal', 'semi-formal', 'friendly', 'enthusiastic')),
   personality text default 'balanced' check (personality in ('confident', 'humble', 'balanced')),
   message_length text default 'medium' check (message_length in ('short', 'medium', 'long')),
-  variation_level text default 'medium' check (variation_level in ('low', 'medium', 'high')),
   use_emoji boolean default false,
   
   -- Preferences
@@ -114,7 +112,6 @@ create table if not exists wa_messages (
   -- Analytics
   word_count integer,
   char_count integer,
-  spintax_count integer, -- Number of spintax variations
   
   -- Usage
   template_id uuid references wa_templates(id) on delete set null,
@@ -189,13 +186,13 @@ create trigger wa_messages_updated_at
 -- ============================================
 
 -- Insert System Templates
-insert into wa_templates (name, description, message_type, template_content, default_tone, default_length, default_variation, is_system, display_order)
+insert into wa_templates (name, description, message_type, template_content, default_tone, default_length, is_system, display_order)
 values
   (
     'Express Application',
     'Pesan cepat untuk apply, cocok untuk startup/informal',
     'application',
-    '{Halo|Hi} Kak,
+    'Halo Kak,
 
 Saya [NAMA], tertarik untuk posisi [POSISI] di [PERUSAHAAN].
 [EXPERIENCE]
@@ -205,7 +202,6 @@ Boleh info lebih lanjut? 🙏
 [NAMA]',
     'friendly',
     'short',
-    'low',
     true,
     1
   ),
@@ -213,7 +209,7 @@ Boleh info lebih lanjut? 🙏
     'Professional Application',
     'Format profesional untuk perusahaan corporate',
     'application',
-    '{Selamat pagi|Selamat siang} {Bapak/Ibu|Kak} [HRD_NAME],
+    'Selamat pagi Bapak/Ibu [HRD_NAME],
 
 Perkenalkan, saya [NAMA], [CURRENT_ROLE] dengan pengalaman [YEARS] tahun di [SKILLS].
 
@@ -228,7 +224,6 @@ Hormat saya,
 [NAMA]',
     'formal',
     'medium',
-    'medium',
     true,
     2
   ),
@@ -236,16 +231,15 @@ Hormat saya,
     'Polite Follow-Up',
     'Follow-up sopan 3-7 hari setelah apply',
     'follow_up',
-    '{Assalamu''alaikum|Selamat siang} Kak [HRD_NAME],
+    'Assalamu''alaikum Kak [HRD_NAME],
 
-Saya [NAMA], {beberapa hari lalu|sebelumnya} sudah {mengirimkan|kirim} lamaran untuk posisi [POSISI].
+Saya [NAMA], beberapa hari lalu sudah mengirimkan lamaran untuk posisi [POSISI].
 
-{Boleh saya tahu|Apakah ada update} terkait {proses seleksi|lamaran saya}? 
+Apakah ada update terkait proses seleksi?
 
-{Terima kasih|Mohon maaf jika mengganggu} 🙏',
+Terima kasih 🙏',
     'semi-formal',
     'short',
-    'medium',
     true,
     3
   ),
@@ -253,21 +247,20 @@ Saya [NAMA], {beberapa hari lalu|sebelumnya} sudah {mengirimkan|kirim} lamaran u
     'Interview Confirmation',
     'Konfirmasi kehadiran interview',
     'interview_confirmation',
-    '{Terima kasih|Terima kasih banyak} Kak [HRD_NAME] atas undangan interviewnya 🙏
+    'Terima kasih Kak [HRD_NAME] atas undangan interviewnya 🙏
 
-Saya [NAMA] {konfirmasi hadir|siap hadir} untuk interview posisi [POSISI] pada:
+Saya [NAMA] konfirmasi hadir untuk interview posisi [POSISI] pada:
 📅 [DATE]
 🕐 [TIME]
 📍 [LOCATION]
 
 [AVAILABILITY_NOTE]
 
-{See you|Sampai jumpa|Ditunggu}! 
+Sampai jumpa!
 
 [NAMA]',
     'friendly',
     'short',
-    'low',
     true,
     4
   ),
@@ -275,20 +268,19 @@ Saya [NAMA] {konfirmasi hadir|siap hadir} untuk interview posisi [POSISI] pada:
     'Post-Interview Thank You',
     'Terima kasih dalam 24 jam setelah interview',
     'thank_you',
-    '{Halo|Selamat siang} Kak [HRD_NAME],
+    'Halo Kak [HRD_NAME],
 
-{Terima kasih banyak|Terimakasih} atas {waktu dan kesempatan|kesempatan} interview {hari ini|tadi|kemarin} untuk posisi [POSISI] 🙏
+Terima kasih banyak atas kesempatan interview hari ini untuk posisi [POSISI] 🙏
 
-Saya {sangat senang|excited} {bisa diskusi|berbincang} lebih dalam tentang {role ini|posisi ini} dan {visi|goals} [PERUSAHAAN].
+Saya sangat senang bisa diskusi lebih dalam tentang role ini dan visi [PERUSAHAAN].
 
 [SPECIFIC_TAKEAWAY]
 
-{Ditunggu kabar selanjutnya|Hope to hear from you soon} ✨
+Ditunggu kabar selanjutnya ✨
 
-{Best regards|Warm regards|Hormat saya},
+Best regards,
 [NAMA]',
     'friendly',
-    'medium',
     'medium',
     true,
     5
@@ -297,16 +289,15 @@ Saya {sangat senang|excited} {bisa diskusi|berbincang} lebih dalam tentang {role
     'Status Inquiry',
     'Tanya status 1-2 minggu setelah interview',
     'status_inquiry',
-    '{Assalamu''alaikum|Selamat siang} Kak [HRD_NAME],
+    'Selamat siang Kak [HRD_NAME],
 
-Saya [NAMA], {sebelumnya|kemarin} sudah interview untuk posisi [POSISI].
+Saya [NAMA], sebelumnya sudah interview untuk posisi [POSISI].
 
-{Boleh tahu|Apakah ada info} update terkait {hasil interview|proses seleksi}nya?
+Apakah ada info update terkait hasil interviewnya?
 
-{Terima kasih|Mohon maaf mengganggu} 🙏',
+Terima kasih 🙏',
     'semi-formal',
     'short',
-    'low',
     true,
     6
   )

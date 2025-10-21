@@ -41,6 +41,10 @@ export interface Profile {
   email: string;
   role: UserRole;
   avatar_url?: string;
+  full_name?: string;
+  membership?: "free" | "vip_basic" | "vip_premium";
+  membership_expiry?: string;
+  membership_status?: "active" | "inactive" | "expired";
   created_at: string;
   updated_at: string;
 }

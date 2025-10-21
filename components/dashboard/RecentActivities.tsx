@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Mail, Sparkles } from "lucide-react";
+import { FileText, Mail, Sparkles, MessageCircle } from "lucide-react";
 import { RecentCoverLetters } from "./RecentCoverLetters";
 import { RecentEmails } from "./RecentEmails";
 import { RecentPDFOperations } from "./RecentPDFOperations";
+import { RecentWhatsAppMessages } from "./RecentWhatsAppMessages";
 
 export function RecentActivities() {
   return (
@@ -37,6 +38,14 @@ export function RecentActivities() {
               <span className="hidden sm:inline">PDF Tools</span>
               <span className="sm:hidden">PDF</span>
             </TabsTrigger>
+            <TabsTrigger
+              value="whatsapp"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3"
+            >
+              <MessageCircle className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">WhatsApp</span>
+              <span className="sm:hidden">WA</span>
+            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -51,6 +60,10 @@ export function RecentActivities() {
 
           <TabsContent value="pdf-tools" className="m-0">
             <RecentPDFOperations />
+          </TabsContent>
+
+          <TabsContent value="whatsapp" className="m-0">
+            <RecentWhatsAppMessages />
           </TabsContent>
         </div>
       </Tabs>

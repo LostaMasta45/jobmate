@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { History, Search, Copy, MessageCircle, Trash2, ChevronRight, Check } from "lucide-react";
+import { History, Search, Copy, MessageCircle, Trash2, ChevronRight, Check, Plus, ArrowLeft, Sparkles } from "lucide-react";
 import { getWAMessages, getWAStats } from "@/actions/whatsapp/list";
 import { deleteWAMessage } from "@/actions/whatsapp/delete";
 import { markAsSent, incrementCopyCount } from "@/actions/whatsapp/save";
@@ -130,10 +130,30 @@ export default function WAHistoryPage() {
 
   return (
     <AppShell>
-      <PageHeader
-        title="WhatsApp History"
-        description="Lihat dan kelola semua pesan WhatsApp yang sudah di-generate"
-      />
+      {/* Navigation Bar */}
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Link href="/tools/wa-generator">
+            <Button variant="outline" size="sm" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Kembali
+            </Button>
+          </Link>
+          <div className="h-6 w-px bg-border" />
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">WhatsApp History</h1>
+            <p className="text-sm text-muted-foreground">
+              Lihat dan kelola semua pesan yang sudah di-generate
+            </p>
+          </div>
+        </div>
+        <Link href="/tools/wa-generator">
+          <Button className="gap-2 bg-green-600 hover:bg-green-700">
+            <Plus className="h-4 w-4" />
+            Buat Pesan Baru
+          </Button>
+        </Link>
+      </div>
 
       {/* Stats Cards */}
       {stats && (
@@ -235,16 +255,37 @@ export default function WAHistoryPage() {
         </Card>
       ) : filteredMessages.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center">
-            <History className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-            <p className="text-muted-foreground mb-4">
-              {searchTerm ? "Tidak ada pesan yang cocok dengan pencarian" : "Belum ada history pesan"}
-            </p>
-            <Link href="/tools/wa-generator">
-              <Button>
-                Generate Pesan Pertama
-              </Button>
-            </Link>
+          <CardContent className="py-16 text-center">
+            <div className="max-w-md mx-auto">
+              {searchTerm ? (
+                <>
+                  <Search className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                  <h3 className="text-lg font-semibold mb-2">Tidak ada hasil</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Tidak ada pesan yang cocok dengan pencarian "{searchTerm}"
+                  </p>
+                  <Button variant="outline" onClick={() => setSearchTerm("")}>
+                    Hapus Filter
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div className="relative mb-6">
+                    <Sparkles className="h-16 w-16 mx-auto text-green-600 dark:text-green-400 animate-pulse" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Belum ada pesan tersimpan</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Mulai generate pesan WhatsApp profesional untuk lamaran kerja Anda
+                  </p>
+                  <Link href="/tools/wa-generator">
+                    <Button className="gap-2 bg-green-600 hover:bg-green-700">
+                      <Plus className="h-4 w-4" />
+                      Buat Pesan Pertama
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
           </CardContent>
         </Card>
       ) : (
@@ -360,6 +401,24 @@ export default function WAHistoryPage() {
               </CardContent>
             </Card>
           ))}
+          
+          {/* Quick Action Card at Bottom */}
+          {filteredMessages.length > 0 && (
+            <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-green-200 dark:border-green-800">
+              <CardContent className="py-8 text-center">
+                <h3 className="font-semibold mb-2">Perlu pesan baru?</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Generate pesan WhatsApp untuk lamaran atau follow-up lainnya
+                </p>
+                <Link href="/tools/wa-generator">
+                  <Button className="gap-2 bg-green-600 hover:bg-green-700">
+                    <Plus className="h-4 w-4" />
+                    Buat Pesan Baru
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
     </AppShell>

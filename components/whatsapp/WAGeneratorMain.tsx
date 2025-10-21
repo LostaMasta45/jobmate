@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Zap, MessageCircle } from "lucide-react";
-import { SpintaxPreview } from "./SpintaxPreview";
+import { MessagePreview } from "./MessagePreview";
 import { AIFormHelper } from "./AIFormHelper";
 import { generateWhatsAppMessage } from "@/actions/whatsapp/generate";
 import { saveWAMessage } from "@/actions/whatsapp/save";
@@ -32,10 +32,8 @@ export function WAGeneratorMain() {
   const [saving, setSaving] = useState(false);
   const [generatedMessage, setGeneratedMessage] = useState<{
     content: string;
-    plainContent: string;
     wordCount: number;
     charCount: number;
-    spintaxCount: number;
   } | null>(null);
 
   // Form state
@@ -46,6 +44,7 @@ export function WAGeneratorMain() {
     companyName: '',
     hrdName: '',
     hrdTitle: '',
+    hrdPhone: '',
     jobSource: '',
     referralName: '',
     previousInteraction: '',
@@ -61,7 +60,7 @@ export function WAGeneratorMain() {
     specificReason: '',
     recentAchievement: '',
     availability: '',
-    variationLevel: 'medium',
+
     useEmoji: true,
     messageLength: 'medium'
   });
@@ -103,10 +102,8 @@ export function WAGeneratorMain() {
 
       setGeneratedMessage({
         content: result.content || '',
-        plainContent: result.plainContent || '',
         wordCount: result.wordCount || 0,
-        charCount: result.charCount || 0,
-        spintaxCount: result.spintaxCount || 0
+        charCount: result.charCount || 0
       });
       
       toast.success('Pesan berhasil di-generate! 🎉');
@@ -126,11 +123,11 @@ export function WAGeneratorMain() {
       const result = await saveWAMessage({
         messageType: formData.messageType || 'application',
         content: generatedMessage.content,
-        plainContent: generatedMessage.plainContent,
         position: formData.position || '',
         companyName: formData.companyName || '',
         hrdName: formData.hrdName,
         hrdTitle: formData.hrdTitle,
+        hrdPhone: formData.hrdPhone,
         jobSource: formData.jobSource,
         referralName: formData.referralName,
         previousInteraction: formData.previousInteraction,
@@ -143,7 +140,7 @@ export function WAGeneratorMain() {
         toneStyle: formData.toneStyle,
         personality: formData.personality,
         messageLength: formData.messageLength,
-        variationLevel: formData.variationLevel,
+
         useEmoji: formData.useEmoji,
         includeGreeting: formData.includeGreeting,
         includeIntro: formData.includeIntro,
@@ -151,7 +148,7 @@ export function WAGeneratorMain() {
         attachmentMention: formData.attachmentMention,
         wordCount: generatedMessage.wordCount,
         charCount: generatedMessage.charCount,
-        spintaxCount: generatedMessage.spintaxCount,
+
         status: 'draft'
       });
 
@@ -272,6 +269,28 @@ export function WAGeneratorMain() {
                   placeholder="HR Manager"
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="hrdPhone">
+                Nomor WhatsApp HRD
+                <span className="ml-1 text-xs text-purple-600 dark:text-purple-400">✨ Untuk kirim langsung</span>
+              </Label>
+              <Input
+                id="hrdPhone"
+                type="tel"
+                value={formData.hrdPhone}
+                onChange={(e) => {
+                  // Auto-format: remove non-digits
+                  const cleaned = e.target.value.replace(/\D/g, '');
+                  setFormData(prev => ({ ...prev, hrdPhone: cleaned }));
+                }}
+                placeholder="08123456789 atau +628123456789"
+                maxLength={15}
+              />
+              <p className="text-xs text-muted-foreground">
+                Format: 08xxx atau +628xxx (angka saja, tanpa spasi/strip)
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -494,40 +513,21 @@ export function WAGeneratorMain() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label>Panjang Pesan</Label>
-                <Select
-                  value={formData.messageLength}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, messageLength: value as any }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="short">Pendek (50-80 kata)</SelectItem>
-                    <SelectItem value="medium">Medium (80-120 kata)</SelectItem>
-                    <SelectItem value="long">Panjang (120-150 kata)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Variasi Spintax</Label>
-                <Select
-                  value={formData.variationLevel}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, variationLevel: value as any }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low (2-3 variasi)</SelectItem>
-                    <SelectItem value="medium">Medium (4-6 variasi)</SelectItem>
-                    <SelectItem value="high">High (7-10 variasi)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label>Panjang Pesan</Label>
+              <Select
+                value={formData.messageLength}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, messageLength: value as any }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="short">Pendek (50-80 kata)</SelectItem>
+                  <SelectItem value="medium">Medium (80-120 kata)</SelectItem>
+                  <SelectItem value="long">Panjang (120-150 kata)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Preferences */}
@@ -579,22 +579,22 @@ export function WAGeneratorMain() {
           </div>
 
           {/* Generate Button */}
-          <div className="sticky bottom-0 -mx-6 -mb-6 p-4 bg-background border-t">
+          <div className="sticky bottom-0 -mx-6 -mb-6 p-4 bg-gradient-to-t from-background via-background to-transparent border-t">
             <Button
               onClick={handleGenerate}
               disabled={loading || !formData.yourName || !formData.position || !formData.companyName}
-              className="w-full shadow-lg"
+              className="w-full shadow-lg h-14 text-base font-semibold"
               size="lg"
             >
               {loading ? (
                 <>
-                  <Zap className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-pulse" />
-                  <span className="text-sm sm:text-base">Generating...</span>
+                  <Zap className="mr-2 h-5 w-5 animate-pulse" />
+                  <span>Generating...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  <span className="text-sm sm:text-base">Generate Pesan WA</span>
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  <span>Generate Pesan WA</span>
                 </>
               )}
             </Button>
@@ -605,13 +605,16 @@ export function WAGeneratorMain() {
 
       {/* Right Column: Preview */}
       <div className="order-1 lg:order-2 lg:sticky lg:top-6">
-        <SpintaxPreview
+        <MessagePreview
           content={generatedMessage?.content || ''}
           wordCount={generatedMessage?.wordCount || 0}
           charCount={generatedMessage?.charCount || 0}
-          spintaxCount={generatedMessage?.spintaxCount || 0}
+          hrdPhone={formData.hrdPhone}
+          hrdName={formData.hrdName}
           onSave={handleSave}
+          onRegenerate={handleGenerate}
           isSaving={saving}
+          isGenerating={loading}
         />
       </div>
     </div>

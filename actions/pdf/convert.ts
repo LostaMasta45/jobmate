@@ -144,7 +144,6 @@ export async function imagesToPDF(
       orientation: options.orientation || 'portrait',
       margin: options.margin || 0,
       pagesize: options.pageSize || 'fit',
-      merge_after: options.mergeIntoOne !== false,
     });
 
     // Upload result

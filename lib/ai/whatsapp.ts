@@ -3,7 +3,6 @@
  */
 
 import { openai } from "@/lib/openai";
-import { spintax } from "@/lib/spintax";
 
 export interface WAGenerationData {
   messageType: 'application' | 'follow_up' | 'interview_confirmation' | 'thank_you' | 'status_inquiry' | 're_application' | 'referral';
@@ -14,6 +13,7 @@ export interface WAGenerationData {
   // Optional Context
   hrdName?: string;
   hrdTitle?: string;
+  hrdPhone?: string;
   jobSource?: string;
   referralName?: string;
   previousInteraction?: string;
@@ -36,18 +36,15 @@ export interface WAGenerationData {
   recentAchievement?: string;
   availability?: string;
   
-  // Spintax Control
-  variationLevel: 'low' | 'medium' | 'high';
+  // Message Control
   useEmoji: boolean;
   messageLength: 'short' | 'medium' | 'long';
 }
 
 export interface WAGenerationResult {
   content: string;
-  plainContent: string;
   wordCount: number;
   charCount: number;
-  spintaxCount: number;
   error?: string;
 }
 
@@ -81,23 +78,17 @@ export async function generateWAMessage(data: WAGenerationData): Promise<WAGener
 
     // Analyze the generated message
     const analysis = analyzeMessage(content);
-    
-    // Generate one plain variation
-    const plainContent = spintax.resolve(content);
 
     return {
       content,
-      plainContent,
       ...analysis
     };
   } catch (error: any) {
     console.error('Error generating WA message:', error);
     return {
       content: '',
-      plainContent: '',
       wordCount: 0,
       charCount: 0,
-      spintaxCount: 0,
       error: error.message || 'Failed to generate message'
     };
   }
@@ -110,11 +101,12 @@ Your goal: Create WhatsApp messages that are:
 1. Natural and conversational (not stiff/robotic)
 2. Professional yet approachable
 3. Concise and respectful of HRD's time
-4. Include subtle variations (spintax) to avoid detection as templates
+4. Personalized and genuine (feels human-written, not templated)
 5. Culturally appropriate for Indonesian business communication
 6. Mobile-friendly (short paragraphs, easy to read on phones)
+7. Unique and creative in wording (different every time)
 
-SPINTAX FORMAT: Use {option1|option2|option3} for variations.`;
+IMPORTANT: Generate a clean, ready-to-send message. NO placeholders, NO spintax, NO brackets.`;
 }
 
 function buildWAPrompt(data: WAGenerationData): string {
@@ -122,12 +114,6 @@ function buildWAPrompt(data: WAGenerationData): string {
     short: '50-80 words (very concise)',
     medium: '80-120 words (balanced)',
     long: '120-150 words (detailed but not too long)'
-  };
-
-  const variationGuide = {
-    low: '2-3 spintax points (greeting + 1-2 key phrases)',
-    medium: '4-6 spintax points (greeting, main verbs, closing)',
-    high: '7-10 spintax points (almost every sentence has variations)'
   };
 
   let prompt = `Generate a WhatsApp message for ${data.messageType.toUpperCase().replace('_', ' ')} with these requirements:
@@ -156,7 +142,7 @@ CONTEXT:
 - Emoji: ${data.useEmoji ? 'Use 1-2 professional emojis (🙏, ✨, 📄)' : 'No emoji'}
 
 MESSAGE STRUCTURE:
-1. ${data.includeGreeting ? 'Salam pembuka dengan spintax: {Assalamu\'alaikum|Selamat pagi/siang|Halo}' : 'Skip greeting, start direct'}`;
+1. ${data.includeGreeting ? 'Salam pembuka natural (contoh: Assalamu\'alaikum, Selamat pagi, Halo)' : 'Skip greeting, start direct'}`;
 
   if (data.messageType === 'application') {
     prompt += `\n2. ${data.includeIntro ? 'Brief self-intro (1-2 sentences about relevant experience/skills)' : 'Direct to purpose'}
@@ -192,23 +178,20 @@ MESSAGE STRUCTURE:
 
   prompt += `\n7. Close with polite gratitude
 
-SPINTAX REQUIREMENTS (Variation Level: ${data.variationLevel}):
-${variationGuide[data.variationLevel]}
-
 IMPORTANT RULES:
 1. Write in BAHASA INDONESIA (natural, bukan terjemahan kaku)
 2. Keep it mobile-friendly (short paragraphs, max 3-4 lines per paragraph)
-3. NO CLICHE phrases like "Perkenalkan nama saya..." - be creative!
-4. Use spintax format: {option1|option2|option3}
-5. Make it sound PERSONAL, not like a template
-6. Respectful of recipient's time (concise but complete)
-7. Include line breaks between paragraphs (use \\n\\n for double line break)
-8. Natural flow - like you're texting a professional contact
-9. Avoid overly formal language that sounds outdated
-10. Match the tone to the company culture
+3. NO CLICHE phrases like "Perkenalkan nama saya..." - be creative and varied!
+4. Make it sound PERSONAL and UNIQUE, not like a template
+5. Respectful of recipient's time (concise but complete)
+6. Include line breaks between paragraphs (use \\n\\n for double line break)
+7. Natural flow - like you're texting a professional contact
+8. Avoid overly formal language that sounds outdated
+9. Match the tone to the company culture
+10. Be creative with wording - each generation should feel different
 
 OUTPUT FORMAT:
-Return ONLY the WhatsApp message text with spintax. No explanations, no subject line, no headers.`;
+Return ONLY the final WhatsApp message text. Clean and ready to send. No placeholders, no explanations, no subject line.`;
 
   return prompt;
 }
@@ -226,7 +209,6 @@ function getToneDescription(tone: string): string {
 function analyzeMessage(content: string): {
   wordCount: number;
   charCount: number;
-  spintaxCount: number;
 } {
   // Count words (Indonesian/English)
   const words = content.trim().split(/\s+/).length;
@@ -234,13 +216,9 @@ function analyzeMessage(content: string): {
   // Count characters (excluding whitespace)
   const chars = content.replace(/\s/g, '').length;
   
-  // Count spintax variations using our spintax utility
-  const spintaxCount = spintax.countSpintax(content);
-  
   return {
     wordCount: words,
-    charCount: chars,
-    spintaxCount
+    charCount: chars
   };
 }
 
@@ -281,7 +259,6 @@ export interface MessageQuality {
   feedback: {
     tone: { score: number; message: string };
     length: { score: number; message: string };
-    spintax: { score: number; message: string };
     personalization: { score: number; message: string };
     mobileReadability: { score: number; message: string };
   };
@@ -291,7 +268,7 @@ export function analyzeMessageQuality(
   content: string,
   data: WAGenerationData
 ): MessageQuality {
-  const { wordCount, charCount, spintaxCount } = analyzeMessage(content);
+  const { wordCount, charCount } = analyzeMessage(content);
   
   // Tone Score (check if matches desired tone)
   const toneScore = 80; // Placeholder - could use sentiment analysis
@@ -306,13 +283,7 @@ export function analyzeMessageQuality(
     lengthScore = 70;
   }
   
-  // Spintax Score (optimal: 4-6 variations)
-  let spintaxScore = 100;
-  if (spintaxCount < 2) spintaxScore = 50;
-  else if (spintaxCount < 4) spintaxScore = 80;
-  else if (spintaxCount > 10) spintaxScore = 70;
-  
-  // Personalization Score (check for placeholders filled)
+  // Personalization Score (check for context provided)
   let personalizationScore = 100;
   if (!data.hrdName) personalizationScore -= 10;
   if (!data.specificReason && data.messageType === 'application') personalizationScore -= 15;
@@ -327,7 +298,7 @@ export function analyzeMessageQuality(
   
   // Overall Score
   const overallScore = Math.round(
-    (toneScore + lengthScore + spintaxScore + personalizationScore + mobileReadabilityScore) / 5
+    (toneScore + lengthScore + personalizationScore + mobileReadabilityScore) / 4
   );
   
   return {
@@ -340,10 +311,6 @@ export function analyzeMessageQuality(
       length: {
         score: lengthScore,
         message: lengthScore >= 90 ? 'Panjang optimal' : lengthScore >= 70 ? 'Sedikit terlalu panjang/pendek' : 'Terlalu panjang/pendek'
-      },
-      spintax: {
-        score: spintaxScore,
-        message: spintaxScore >= 90 ? 'Variasi spintax optimal (4-6)' : spintaxCount < 2 ? 'Terlalu sedikit variasi' : 'Terlalu banyak variasi'
       },
       personalization: {
         score: personalizationScore,

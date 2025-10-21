@@ -14,10 +14,8 @@ export async function generateWhatsAppMessage(data: WAGenerationData) {
 
     return {
       content: result.content,
-      plainContent: result.plainContent,
       wordCount: result.wordCount,
-      charCount: result.charCount,
-      spintaxCount: result.spintaxCount
+      charCount: result.charCount
     };
   } catch (error: any) {
     console.error("Error in generateWhatsAppMessage:", error);

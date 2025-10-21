@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Mail, Edit, ArrowRight, Building2, Calendar, Send, FileText } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
@@ -126,67 +127,55 @@ export function RecentEmails() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold">Aktivitas Terbaru</h3>
-        <Link href="/tools/email-generator/history">
-          <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
-            Lihat Semua
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Button>
-        </Link>
-      </div>
-
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {emails.map((email) => (
           <Link 
             key={email.id} 
             href={`/tools/email-generator?edit=${email.id}`}
             className="block group"
           >
-            <div className="flex items-center gap-3 p-3 rounded-lg border hover:border-primary/50 hover:bg-accent/50 transition-all">
-              {/* Icon */}
-              <div className={`rounded-lg p-2.5 shadow-sm group-hover:scale-110 transition-transform bg-gradient-to-br ${getToneIcon(email.tone_style)}`}>
-                <Mail className={`h-5 w-5 ${getToneIconColor(email.tone_style)}`} />
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-semibold text-sm line-clamp-1 group-hover:text-primary transition-colors">
+            <div className="p-2.5 rounded-lg border hover:border-blue-300 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition-all">
+              {/* Header Row */}
+              <div className="flex items-start gap-2 mb-2">
+                <Mail className={`h-4 w-4 flex-shrink-0 mt-0.5 ${getToneIconColor(email.tone_style)}`} />
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-sm leading-tight mb-1">
                     {email.company_name}
                   </h4>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${getEmailTypeColor(email.email_type)}`}>
-                    {getEmailTypeLabel(email.email_type)}
-                  </span>
-                </div>
-                
-                <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1.5">
-                    <Building2 className="h-3 w-3 flex-shrink-0" />
-                    <span className="line-clamp-1">{email.position}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="h-3 w-3 flex-shrink-0" />
-                    <span>
-                      {formatDistanceToNow(new Date(email.created_at), {
-                        addSuffix: true,
-                        locale: id,
-                      })}
-                    </span>
-                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-1">
+                    {email.position}
+                  </p>
                 </div>
               </div>
 
-              {/* Action Hint */}
-              <div className="flex items-center gap-1 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-                <Edit className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Edit</span>
+              {/* Badge & Time */}
+              <div className="flex items-center justify-between">
+                <Badge className={`text-[10px] py-0 px-1.5 h-5 ${getEmailTypeColor(email.email_type)}`}>
+                  {getEmailTypeLabel(email.email_type)}
+                </Badge>
+                <span className="text-[10px] text-muted-foreground">
+                  {formatDistanceToNow(new Date(email.created_at), {
+                    addSuffix: true,
+                    locale: id,
+                  })}
+                </span>
               </div>
             </div>
           </Link>
         ))}
       </div>
 
+      {/* View All Link */}
+      {emails.length > 0 && (
+        <div className="mt-3 pt-3 border-t">
+          <Link href="/tools/email-generator/history">
+            <Button variant="ghost" size="sm" className="w-full gap-2 text-xs hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-950">
+              Lihat Semua
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Button>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,18 +1,31 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Poppins } from "next/font/google";
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
-import { SessionTimeout } from "@/components/auth/SessionTimeout";
+import { ConditionalSessionTimeout } from "@/components/auth/ConditionalSessionTimeout";
 import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-inter",
+  display: 'swap',
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
   title: "JobMate 2.0 - AI-Powered Job Application Assistant",
   description: "Simplify your job search with AI-powered tools for cover letters, resumes, and application tracking",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
@@ -23,11 +36,12 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <body 
-        className={`${inter.variable} font-sans antialiased`}
+        className={`${inter.variable} ${poppins.variable} antialiased`}
+        style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}
         suppressHydrationWarning
       >
         <ThemeProvider defaultTheme="system" storageKey="jobmate_theme">
-          <SessionTimeout timeoutMinutes={120} />
+          <ConditionalSessionTimeout />
           {children}
           <Toaster position="top-center" richColors />
         </ThemeProvider>

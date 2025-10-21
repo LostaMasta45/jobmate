@@ -14,7 +14,10 @@ export async function POST(request: NextRequest) {
     const password = formData.get("password") as string;
     const proofFile = formData.get("proofFile") as File;
 
+    console.log("[Ajukan Akun API] Received application:", { fullName, username, email, whatsapp });
+
     if (!fullName || !username || !email || !whatsapp || !password || !proofFile) {
+      console.error("[Ajukan Akun API] Missing fields");
       return NextResponse.json(
         { error: "Semua field harus diisi" },
         { status: 400 }
@@ -22,25 +25,34 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
+    console.log("[Ajukan Akun API] Supabase client created");
 
     // Upload proof file
     const fileExt = proofFile.name.split(".").pop();
     const fileName = `${Date.now()}-${username}.${fileExt}`;
+    
+    console.log("[Ajukan Akun API] Uploading file:", fileName);
+    
     const { error: uploadError } = await supabase.storage
       .from("proofs")
       .upload(fileName, proofFile);
 
     if (uploadError) {
+      console.error("[Ajukan Akun API] Upload error:", uploadError);
       return NextResponse.json(
         { error: "Gagal upload bukti transfer: " + uploadError.message },
         { status: 500 }
       );
     }
+    
+    console.log("[Ajukan Akun API] File uploaded successfully");
 
     // Generate telegram link code
     const telegramLinkCode = generateCode(12);
 
     // Insert application
+    console.log("[Ajukan Akun API] Inserting application to database");
+    
     const { data, error: insertError } = await supabase
       .from("account_applications")
       .insert({
@@ -57,11 +69,14 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
+      console.error("[Ajukan Akun API] Database insert error:", insertError);
       return NextResponse.json(
         { error: "Gagal menyimpan pengajuan: " + insertError.message },
         { status: 500 }
       );
     }
+    
+    console.log("[Ajukan Akun API] Application saved successfully, ID:", data.id);
 
     // Send notification to admin (don't block on failure)
     try {
@@ -78,14 +93,16 @@ export async function POST(request: NextRequest) {
       // Continue anyway - application is saved
     }
 
+    console.log("[Ajukan Akun API] Application submitted successfully");
+    
     return NextResponse.json({
       success: true,
       telegramLinkCode,
     });
   } catch (error) {
-    console.error("API Error:", error);
+    console.error("[Ajukan Akun API] Unexpected error:", error);
     return NextResponse.json(
-      { error: "Terjadi kesalahan. Silakan coba lagi." },
+      { error: "Terjadi kesalahan. Silakan coba lagi. Error: " + (error as Error).message },
       { status: 500 }
     );
   }

@@ -26,31 +26,31 @@ export function PipelineMini({ data }: PipelineMiniProps) {
   const total = data.reduce((sum, s) => sum + s.count, 0);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Pipeline Lamaran</CardTitle>
+    <Card className="h-full">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg">Pipeline Lamaran</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="space-y-3">
           {data.map((item, index) => {
             const percentage = total > 0 ? (item.count / total) * 100 : 0;
             
             return (
               <motion.div
                 key={item.status}
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                className="space-y-2"
+                transition={{ duration: 0.2, delay: index * 0.03 }}
+                className="space-y-1.5"
               >
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${STATUS_COLORS[item.status]}`} />
-                    <span className="font-medium">{item.status}</span>
+                <div className="flex items-center justify-between text-xs sm:text-sm">
+                  <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+                    <div className={`w-2.5 h-2.5 rounded-full ${STATUS_COLORS[item.status]} flex-shrink-0`} />
+                    <span className="font-medium truncate">{item.status}</span>
                   </div>
-                  <span className="text-muted-foreground">{item.count}</span>
+                  <span className="text-muted-foreground font-semibold ml-2">{item.count}</span>
                 </div>
-                <Progress value={percentage} className="h-2" />
+                <Progress value={percentage} className="h-1.5" />
               </motion.div>
             );
           })}

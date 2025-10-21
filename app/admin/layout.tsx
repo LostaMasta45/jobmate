@@ -7,11 +7,13 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Skip auth check for login page - it has its own layout
+  // Note: Admin login page is at /admin-login (outside /admin directory)
+  // This prevents parent layout from running and causing redirect loop
+  
   const profile = await getProfile();
 
   if (!profile) {
-    redirect("/admin/login");
+    redirect("/admin-login");
   }
 
   if (profile.role !== "admin") {
@@ -19,10 +21,13 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-background">
+      {/* Sidebar - Fixed */}
       <AdminSidebar />
-      <main className="flex-1 overflow-y-auto bg-background">
-        <div className="container mx-auto p-6">
+      
+      {/* Main Content Area - Scrollable */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="container mx-auto p-6 max-w-[1600px]">
           {children}
         </div>
       </main>

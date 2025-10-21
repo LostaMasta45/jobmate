@@ -63,6 +63,10 @@ export class ILovePDFClient {
       // Token expires in 1 hour, cache for 50 minutes
       this.tokenExpiry = Date.now() + 50 * 60 * 1000;
 
+      if (!this.token) {
+        throw new Error('Failed to obtain authentication token');
+      }
+
       return this.token;
     } catch (error: any) {
       throw new Error(`Authentication failed: ${error.message}`);
@@ -112,7 +116,7 @@ export class ILovePDFClient {
 
       const formData = new FormData();
       formData.append('task', task.task);
-      formData.append('file', new Blob([fileBuffer], { type: getMimeType(filename) }), filename);
+      formData.append('file', new Blob([fileBuffer as unknown as BlobPart], { type: getMimeType(filename) }), filename);
 
       console.log('📤 Uploading:', filename, fileBuffer.length, 'bytes');
 
@@ -148,19 +152,19 @@ export class ILovePDFClient {
   ): Promise<void> {
     const token = await this.getToken();
 
+    // Build minimal request body
+    const requestBody: any = {
+      task: task.task,
+    };
+
+    // Add ONLY the params we need, excluding undefined/null
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== null) {
+        requestBody[key] = params[key];
+      }
+    });
+
     try {
-      // Build minimal request body
-      const requestBody: any = {
-        task: task.task,
-      };
-
-      // Add ONLY the params we need, excluding undefined/null
-      Object.keys(params).forEach(key => {
-        if (params[key] !== undefined && params[key] !== null) {
-          requestBody[key] = params[key];
-        }
-      });
-
       console.log('Processing task with body:', JSON.stringify(requestBody, null, 2));
 
       const response = await this.axios.post(

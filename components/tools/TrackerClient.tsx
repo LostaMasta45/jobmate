@@ -6,6 +6,7 @@ import { TrackerStats } from "./TrackerStats";
 import { TrackerTable } from "./TrackerTable";
 import { TrackerKanbanFixed } from "./TrackerKanbanFixed";
 import { TrackerDetail } from "./TrackerDetail";
+import { FollowUpTrackerPanel } from "@/components/followup/FollowUpTrackerPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,6 +49,7 @@ export function TrackerClient({ applications }: { applications: Application[] })
   const [viewMode, setViewMode] = React.useState<ViewMode>("kanban");
   const [searchQuery, setSearchQuery] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
+  const [showOnlyWithFollowUps, setShowOnlyWithFollowUps] = React.useState(false);
   const [showAddDialog, setShowAddDialog] = React.useState(false);
   const [editingApp, setEditingApp] = React.useState<Application | null>(null);
   const [detailApp, setDetailApp] = React.useState<Application | null>(null);
@@ -204,6 +206,11 @@ export function TrackerClient({ applications }: { applications: Application[] })
           </Button>
         </div>
       </div>
+
+      {/* Follow-up Reminders Panel */}
+      <FollowUpTrackerPanel 
+        onFilterChange={setShowOnlyWithFollowUps}
+      />
 
       {/* View Content */}
       {viewMode === "kanban" ? (

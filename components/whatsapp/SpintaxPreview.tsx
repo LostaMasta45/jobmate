@@ -12,6 +12,8 @@ interface SpintaxPreviewProps {
   wordCount: number;
   charCount: number;
   spintaxCount: number;
+  hrdPhone?: string;
+  hrdName?: string;
   onCopy?: () => void;
   onSave?: () => void;
   onSendWhatsApp?: () => void;
@@ -23,6 +25,8 @@ export function SpintaxPreview({
   wordCount,
   charCount,
   spintaxCount,
+  hrdPhone,
+  hrdName,
   onCopy,
   onSave,
   onSendWhatsApp,
@@ -65,10 +69,38 @@ export function SpintaxPreview({
     onCopy?.();
   };
 
+  const formatPhoneNumber = (phone: string): string => {
+    if (!phone) return '';
+    
+    // Remove all non-digits
+    let cleaned = phone.replace(/\D/g, '');
+    
+    // If starts with 0, replace with 62
+    if (cleaned.startsWith('0')) {
+      cleaned = '62' + cleaned.slice(1);
+    }
+    
+    // If doesn't start with 62, add it
+    if (!cleaned.startsWith('62')) {
+      cleaned = '62' + cleaned;
+    }
+    
+    return cleaned;
+  };
+
   const handleSendWhatsApp = () => {
     const textToSend = showPlain ? plainVariation : spintax.resolve(content);
     const encodedMessage = encodeURIComponent(textToSend);
-    window.open(`https://wa.me/?text=${encodedMessage}`, "_blank");
+    
+    // If phone number exists, send directly to that number
+    if (hrdPhone) {
+      const formattedPhone = formatPhoneNumber(hrdPhone);
+      window.open(`https://wa.me/${formattedPhone}?text=${encodedMessage}`, "_blank");
+    } else {
+      // Otherwise, open WhatsApp with message only (user picks contact)
+      window.open(`https://wa.me/?text=${encodedMessage}`, "_blank");
+    }
+    
     onSendWhatsApp?.();
   };
 
@@ -166,48 +198,54 @@ export function SpintaxPreview({
         )}
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-3">
           <Button
             variant="outline"
             onClick={handleCopy}
             disabled={!content}
-            className="h-auto py-3"
+            className="h-12 sm:h-14"
           >
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-2">
               {copied ? (
                 <>
-                  <Check className="h-4 w-4" />
-                  <span className="text-xs">Tersalin!</span>
+                  <Check className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="text-sm sm:text-base font-medium">Tersalin!</span>
                 </>
               ) : (
                 <>
-                  <Copy className="h-4 w-4" />
-                  <span className="text-xs">Copy</span>
+                  <Copy className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="text-sm sm:text-base font-medium">Copy</span>
                 </>
               )}
             </div>
           </Button>
           <Button
             variant="default"
-            className="bg-green-600 hover:bg-green-700 h-auto py-3"
+            className="bg-green-600 hover:bg-green-700 h-12 sm:h-14"
             onClick={handleSendWhatsApp}
             disabled={!content}
+            title={hrdPhone ? `Kirim ke ${formatPhoneNumber(hrdPhone)}` : 'Pilih kontak WhatsApp'}
           >
-            <div className="flex flex-col items-center gap-1">
-              <MessageCircle className="h-4 w-4" />
-              <span className="text-xs">Kirim WA</span>
+            <div className="flex items-center gap-2">
+              <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="text-sm sm:text-base font-medium">
+                {hrdPhone ? (hrdName ? `Kirim ke ${hrdName}` : 'Kirim WA') : 'Kirim WA'}
+              </span>
             </div>
           </Button>
-          <Button
-            variant="secondary"
-            className="col-span-2 sm:col-span-1"
-            onClick={onSave}
-            disabled={!content || isSaving}
-          >
-            <Save className="h-4 w-4 mr-2" />
-            <span className="text-sm">{isSaving ? "Menyimpan..." : "Simpan"}</span>
-          </Button>
         </div>
+        
+        <Button
+          variant="secondary"
+          className="w-full h-12 sm:h-14"
+          onClick={onSave}
+          disabled={!content || isSaving}
+        >
+          <Save className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+          <span className="text-sm sm:text-base font-medium">
+            {isSaving ? "Menyimpan..." : "Simpan ke History"}
+          </span>
+        </Button>
 
         {/* Tips */}
         <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 p-4">

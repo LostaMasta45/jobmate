@@ -23,18 +23,49 @@ export default function SignInPage() {
 
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) {
-        setError(error.message);
+      if (signInError) {
+        setError(signInError.message);
         return;
       }
 
-      router.push("/dashboard");
-      router.refresh();
+      if (!authData.user) {
+        setError("Login gagal. Silakan coba lagi.");
+        return;
+      }
+
+      // Fetch user role & membership to determine redirect
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, membership")
+        .eq("id", authData.user.id)
+        .single();
+
+      // CRITICAL: Wait for session to fully sync before redirect
+      // This prevents double login issue where middleware hasn't detected session yet
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Force refresh session on client
+      await supabase.auth.getSession();
+      
+      // Redirect based on role & membership
+      if (profile?.role === "admin") {
+        // Admin → redirect to admin dashboard
+        window.location.href = "/admin/dashboard";
+      } else if (profile?.membership === "vip_premium") {
+        // VIP Premium → redirect to JobMate dashboard (full access)
+        window.location.href = "/dashboard";
+      } else if (profile?.membership === "vip_basic") {
+        // VIP Basic → redirect to VIP Career dashboard
+        window.location.href = "/vip";
+      } else {
+        // Free user → redirect to regular dashboard
+        window.location.href = "/dashboard";
+      }
     } catch (err) {
       setError("An unexpected error occurred");
     } finally {

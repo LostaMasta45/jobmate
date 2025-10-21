@@ -52,10 +52,10 @@ export function ApplicationsTable({ applications }: { applications: Application[
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (app) =>
-          app.full_name.toLowerCase().includes(query) ||
-          app.email.toLowerCase().includes(query) ||
-          app.username.toLowerCase().includes(query) ||
-          app.whatsapp.includes(query)
+          (app.full_name || "").toLowerCase().includes(query) ||
+          (app.email || "").toLowerCase().includes(query) ||
+          (app.username || "").toLowerCase().includes(query) ||
+          (app.whatsapp || "").includes(query)
       );
     }
     
