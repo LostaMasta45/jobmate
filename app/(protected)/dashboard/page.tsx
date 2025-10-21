@@ -56,7 +56,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Activity History Section */}
-        <div>
+        <div className="w-full overflow-hidden">
           <div className="flex items-center gap-2 mb-4">
             <Activity className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">Aktivitas Terbaru</h2>
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
             <RecentFollowUps />
           </div>
           
-          <div className="grid gap-4 sm:gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full">
             {/* Cover Letters History */}
             <Card className="group hover:shadow-lg transition-all border-l-4 border-l-green-500 bg-gradient-to-br from-green-50/50 to-transparent dark:from-green-950/20">
               <CardHeader className="pb-3">

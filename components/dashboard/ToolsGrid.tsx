@@ -4,10 +4,10 @@ import { FileText, Target, User, Mail, MessageSquare, Briefcase, FileStack, Arro
 
 const tools = [
   {
-    title: "Cover Letter",
-    description: "Generate cover letter dengan AI",
+    title: "Surat Lamaran",
+    description: "Buat surat lamaran profesional",
     icon: FileText,
-    href: "/tools/cover-letter",
+    href: "/surat-lamaran",
     gradient: "from-blue-500/10 to-blue-600/5",
     iconBg: "bg-blue-500/10",
     iconColor: "text-blue-600",

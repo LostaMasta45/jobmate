@@ -62,7 +62,7 @@ const navItems: NavItem[] = [
   },
   {
     title: "Surat Lamaran",
-    href: "/tools/cover-letter",
+    href: "/surat-lamaran",
     icon: FileSignature,
     premiumOnly: true,
     divider: true,

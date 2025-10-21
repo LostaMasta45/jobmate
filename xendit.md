@@ -98,9 +98,108 @@ Report                   [None]  [Read]  [Write] ← Optional: Read
 - Tanpa permission **Invoices: Write**, API call `createInvoice()` akan error `403 Forbidden`
 - Pastikan permissions sudah benar sebelum testing
 
-### 1.4 Setup Callback/Webhook URL (Localhost ke Public URL)
+### 1.4 Setup Callback/Webhook URL
 
-Xendit webhook butuh **public URL** yang bisa diakses dari internet. Karena `localhost:3000` tidak bisa diakses dari luar, kita perlu "expose" localhost ke public URL menggunakan **ngrok** atau tools sejenis.
+Xendit webhook butuh **public URL** yang bisa diakses dari internet. Ada 2 skenario:
+
+---
+
+#### 🚀 Opsi A: Deploy ke Vercel (RECOMMENDED untuk production & testing)
+
+**Ini cara paling mudah dan stabil!** Langsung deploy ke Vercel, webhook akan otomatis jalan.
+
+##### Step 1: Deploy ke Vercel
+
+```bash
+# Commit semua changes
+git add .
+git commit -m "feat: integrate xendit payment gateway"
+git push origin main
+
+# Deploy ke Vercel (jika belum setup)
+# Install Vercel CLI
+npm install -g vercel
+
+# Deploy
+vercel --prod
+```
+
+Atau via Vercel Dashboard:
+1. Login ke https://vercel.com/
+2. Import repository dari GitHub
+3. Klik **Deploy**
+4. Tunggu deployment selesai
+
+##### Step 2: Copy Vercel URL
+
+Setelah deploy sukses, copy URL deployment:
+- Format: `https://yourapp.vercel.app`
+- Atau custom domain jika sudah setup: `https://yourdomain.com`
+
+##### Step 3: Setup Environment Variables di Vercel
+
+1. Buka Vercel Dashboard: https://vercel.com/dashboard
+2. Pilih project **JobMate**
+3. Go to **Settings** > **Environment Variables**
+4. Tambahkan environment variables:
+
+```bash
+XENDIT_SECRET_KEY=xnd_test_YOUR_TEST_KEY  # Untuk test mode dulu
+XENDIT_WEBHOOK_VERIFICATION_TOKEN=your_webhook_token
+NEXT_PUBLIC_BASE_URL=https://yourapp.vercel.app
+```
+
+5. Klik **Save**
+6. **Redeploy** project agar environment variables aktif:
+   - Go to **Deployments** tab
+   - Klik **⋯** (three dots) pada latest deployment
+   - Klik **Redeploy**
+
+##### Step 4: Setup Webhook URL di Xendit Dashboard
+
+1. Buka Xendit Dashboard: https://dashboard.xendit.co/settings/developers#webhooks
+2. **Pastikan di Test Mode**
+3. Klik **"+ Add Webhook URL"**
+4. **Webhook URL:**
+   ```
+   https://yourapp.vercel.app/api/webhooks/xendit
+   ```
+5. **Environment:** Test
+6. **Events:**
+   - ✅ `invoice.paid` ⭐
+   - ✅ `invoice.expired` ⭐
+7. Klik **"Test Webhook"**
+   - Jika sukses: ✅ Webhook siap dipakai!
+   - Jika gagal: Cek troubleshooting di bawah
+8. Klik **"Create Webhook"**
+
+##### Step 5: Copy Verification Token
+
+1. Copy **Verification Token** dari webhook yang baru dibuat
+2. Tambahkan ke **Vercel Environment Variables**:
+   - Go to Settings > Environment Variables
+   - Add: `XENDIT_WEBHOOK_VERIFICATION_TOKEN=your_token`
+   - Save & Redeploy
+
+##### Step 6: Test Full Flow
+
+1. Buka website: `https://yourapp.vercel.app`
+2. Scroll ke **Pricing Section**
+3. Klik **"Mulai dengan Basic"**
+4. Isi form payment
+5. Bayar di Xendit payment page (gunakan test payment method)
+6. Verify:
+   - Payment status updated di database
+   - Redirect ke success page
+   - Webhook received (cek Vercel logs)
+
+✅ **Done! Webhook siap production.**
+
+---
+
+#### 🧪 Opsi B: Development dengan ngrok (Untuk localhost testing)
+
+Jika ingin test di localhost sebelum deploy, gunakan ngrok untuk "expose" localhost ke public URL.
 
 #### Step 1: Install ngrok
 

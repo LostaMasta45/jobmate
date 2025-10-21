@@ -38,37 +38,35 @@ export default function SignInPage() {
         return;
       }
 
-      // Fetch user role & membership to determine redirect
+      console.log("✅ Login successful, user ID:", authData.user.id);
+      
+      // Determine redirect based on role & membership
       const { data: profile } = await supabase
         .from("profiles")
         .select("role, membership")
         .eq("id", authData.user.id)
         .single();
 
-      // CRITICAL: Wait for session to fully sync before redirect
-      // This prevents double login issue where middleware hasn't detected session yet
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // Force refresh session on client
-      await supabase.auth.getSession();
-      
-      // Redirect based on role & membership
+      console.log("📋 Profile loaded:", { role: profile?.role, membership: profile?.membership });
+
+      let redirectPath = "/dashboard";
       if (profile?.role === "admin") {
-        // Admin → redirect to admin dashboard
-        window.location.href = "/admin/dashboard";
+        redirectPath = "/admin/dashboard";
       } else if (profile?.membership === "vip_premium") {
-        // VIP Premium → redirect to JobMate dashboard (full access)
-        window.location.href = "/dashboard";
+        redirectPath = "/dashboard";
       } else if (profile?.membership === "vip_basic") {
-        // VIP Basic → redirect to VIP Career dashboard
-        window.location.href = "/vip";
-      } else {
-        // Free user → redirect to regular dashboard
-        window.location.href = "/dashboard";
+        redirectPath = "/vip";
       }
+
+      console.log("🔄 Redirecting to:", redirectPath);
+
+      // CRITICAL: Use window.location.replace for reliable one-click login
+      // This forces full page reload with new session cookies
+      window.location.replace(redirectPath);
+      
     } catch (err) {
-      setError("An unexpected error occurred");
-    } finally {
+      console.error("Login error:", err);
+      setError("Terjadi kesalahan saat login. Silakan coba lagi.");
       setLoading(false);
     }
   };
