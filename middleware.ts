@@ -4,6 +4,12 @@ import { updateSession } from "@/lib/supabase/middleware";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Allow webhook endpoints (no auth required)
+  if (pathname.startsWith('/api/webhooks/')) {
+    console.log('[MIDDLEWARE] Webhook endpoint, bypassing auth:', pathname);
+    return NextResponse.next();
+  }
+
   // Define PROTECTED routes (routes that REQUIRE login)
   const protectedRoutes = [
     '/vip',           // VIP Career Portal
