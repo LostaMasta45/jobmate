@@ -69,21 +69,43 @@ export async function POST(request: NextRequest) {
     if (status === 'PAID') {
       console.log('[Xendit Webhook] Payment successful, updating database...');
 
-      // Payment successful
+      // Extract plan type from external_id
+      const planType = externalId.includes('premium') ? 'premium' : 'basic';
+      const amount = planType === 'premium' ? 39000 : 10000;
+      
+      // Get customer info from payload
+      const customerEmail = payload.payer_email || payload.customer?.email || 'unknown@example.com';
+      const customerName = payload.customer?.given_names || payload.customer?.surname || 'Unknown User';
+      const customerPhone = payload.customer?.mobile_number || payload.customer?.phone_number || '';
+
+      console.log('[Xendit Webhook] Customer info:', { customerEmail, customerName, customerPhone });
+
+      // Use UPSERT to handle both insert and update cases
       const { data, error } = await supabase
         .from('payments')
-        .update({
+        .upsert({
+          external_id: externalId,
+          invoice_id: invoiceId,
+          user_email: customerEmail,
+          user_name: customerName,
+          user_whatsapp: customerPhone,
+          plan_type: planType,
+          amount: amount,
           status: 'paid',
           paid_at: paid_at ? new Date(paid_at).toISOString() : new Date().toISOString(),
           payment_method: payment_method || payment_channel || 'unknown',
+          invoice_url: payload.invoice_url || '',
+          expired_at: new Date(Date.now() + (planType === 'premium' ? 365 : 30) * 24 * 60 * 60 * 1000).toISOString(),
           updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'external_id',
+          ignoreDuplicates: false,
         })
-        .eq('external_id', externalId)
         .select()
         .single();
 
       if (error) {
-        console.error('[Xendit Webhook] Database update error:', error);
+        console.error('[Xendit Webhook] Database upsert error:', error);
         
         // Return 200 anyway so Xendit doesn't retry (payment already processed)
         return NextResponse.json({
@@ -93,7 +115,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      console.log('[Xendit Webhook] Payment updated successfully:', data);
+      console.log('[Xendit Webhook] Payment upserted successfully:', data);
 
       // TODO: Additional actions on successful payment:
       // - Send confirmation email
