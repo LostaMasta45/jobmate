@@ -99,25 +99,39 @@ export async function POST(request: NextRequest) {
     const invoice = await xenditResponse.json();
     console.log('[Create Invoice] Invoice created:', invoice.id);
 
-    // Save payment to database
+    // Save payment to database with UPSERT (ensure always succeeds)
     const supabase = await createClient();
-    const { error: dbError } = await supabase.from('payments').insert({
-      external_id: externalId,
-      user_email: email,
-      user_name: fullName,
-      user_whatsapp: whatsapp,
-      plan_type: plan,
-      amount: amount,
-      status: 'pending',
-      invoice_id: invoice.id,
-      invoice_url: invoice.invoice_url,
-      expired_at: invoice.expiry_date,
-    });
+    const { data: paymentData, error: dbError } = await supabase
+      .from('payments')
+      .upsert({
+        external_id: externalId,
+        user_email: email,
+        user_name: fullName,
+        user_whatsapp: whatsapp,
+        plan_type: plan,
+        amount: amount,
+        status: 'pending',
+        invoice_id: invoice.id,
+        invoice_url: invoice.invoice_url,
+        expired_at: invoice.expiry_date,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'external_id',
+        ignoreDuplicates: false,
+      })
+      .select()
+      .single();
 
     if (dbError) {
-      console.error('[Create Invoice] Database error:', dbError);
-      // Invoice already created in Xendit, but failed to save to DB
-      // User can still pay, we'll handle via webhook
+      console.error('[Create Invoice] Database UPSERT error:', dbError);
+      console.error('[Create Invoice] CRITICAL: Payment created in Xendit but not in database!');
+      console.error('[Create Invoice] External ID:', externalId);
+      console.error('[Create Invoice] Invoice ID:', invoice.id);
+      // Still return success - webhook will handle the save
+      // But this is logged as CRITICAL for monitoring
+    } else {
+      console.log('[Create Invoice] Payment saved to database:', paymentData?.external_id);
     }
 
     return NextResponse.json({

@@ -29,6 +29,9 @@ function SuccessPageContent() {
   const [loading, setLoading] = useState(true);
   const [paymentData, setPaymentData] = useState<any>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const maxRetries = 10; // Retry up to 10 times (30 seconds total)
 
   // Epic confetti celebration 🎉
   const fireConfetti = () => {
@@ -66,37 +69,79 @@ function SuccessPageContent() {
     }, 250);
   };
 
-  useEffect(() => {
-    // Check payment status
-    if (externalId) {
-      console.log('[Success Page] Fetching payment status for:', externalId);
-      
-      fetch(`/api/payment/check-status?external_id=${externalId}`)
-        .then(res => {
-          console.log('[Success Page] API Response status:', res.status);
-          if (!res.ok) {
-            throw new Error(`API returned ${res.status}`);
-          }
-          return res.json();
-        })
-        .then(data => {
-          console.log('[Success Page] Payment data:', data);
-          if (data.success) {
-            setPaymentData(data.payment);
-            setShowConfetti(true);
-          } else {
-            console.error('[Success Page] Payment not found:', data.error);
-          }
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error('[Success Page] Error fetching payment:', error);
-          setLoading(false);
-        });
-    } else {
+  // Function to fetch payment status with retry logic
+  const fetchPaymentStatus = async (attempt: number = 0) => {
+    if (!externalId) {
       console.warn('[Success Page] No external_id provided');
       setLoading(false);
+      return;
     }
+
+    console.log(`[Success Page] Fetching payment status (attempt ${attempt + 1}/${maxRetries})...`);
+    setIsRetrying(attempt > 0);
+    
+    try {
+      const response = await fetch(`/api/payment/check-status?external_id=${externalId}`);
+      console.log('[Success Page] API Response status:', response.status);
+      
+      if (!response.ok) {
+        // If 404 and we haven't exceeded retries, retry after delay
+        if (response.status === 404 && attempt < maxRetries) {
+          console.log(`[Success Page] Payment not found yet, will retry in 3 seconds... (${attempt + 1}/${maxRetries})`);
+          setRetryCount(attempt + 1);
+          
+          setTimeout(() => {
+            fetchPaymentStatus(attempt + 1);
+          }, 3000); // Retry after 3 seconds
+          
+          return;
+        }
+        
+        // Max retries exceeded or other error
+        throw new Error(`API returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('[Success Page] Payment data:', data);
+      
+      if (data.success && data.payment) {
+        // Success! Payment found
+        setPaymentData(data.payment);
+        setShowConfetti(true);
+        setLoading(false);
+        setIsRetrying(false);
+        console.log('[Success Page] Payment found successfully!', data.source ? `(source: ${data.source})` : '');
+      } else {
+        console.error('[Success Page] Payment not found:', data.error);
+        setLoading(false);
+        setIsRetrying(false);
+      }
+      
+    } catch (error: any) {
+      console.error('[Success Page] Error fetching payment:', error);
+      
+      // If we haven't exceeded retries, try again
+      if (attempt < maxRetries) {
+        console.log(`[Success Page] Error occurred, will retry in 3 seconds... (${attempt + 1}/${maxRetries})`);
+        setRetryCount(attempt + 1);
+        
+        setTimeout(() => {
+          fetchPaymentStatus(attempt + 1);
+        }, 3000);
+      } else {
+        // Max retries exceeded
+        console.error('[Success Page] Max retries exceeded, giving up');
+        setLoading(false);
+        setIsRetrying(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Start fetching payment status when component mounts
+    fetchPaymentStatus();
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [externalId]);
 
   useEffect(() => {
@@ -115,10 +160,32 @@ function SuccessPageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-        <div className="text-center space-y-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 px-4">
+        <div className="text-center space-y-4 max-w-md">
           <Loader2 className="w-12 h-12 sm:w-16 sm:h-16 animate-spin mx-auto text-emerald-600" />
-          <p className="text-sm sm:text-base text-muted-foreground">Memuat data pembayaran...</p>
+          <div className="space-y-2">
+            <p className="text-sm sm:text-base font-semibold text-foreground">
+              {isRetrying ? '🔄 Menunggu konfirmasi pembayaran...' : '📋 Memuat data pembayaran...'}
+            </p>
+            {isRetrying && (
+              <div className="space-y-1">
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  Sedang memproses pembayaran Anda dari Xendit
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Percobaan ke-{retryCount} dari {maxRetries}
+                </p>
+                <p className="text-xs text-muted-foreground italic">
+                  Mohon tunggu, ini normal untuk pembayaran baru... ⏳
+                </p>
+              </div>
+            )}
+            {!isRetrying && (
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Mohon tunggu sebentar...
+              </p>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -324,10 +391,36 @@ function SuccessPageContent() {
                     <h3 className="font-bold text-base sm:text-lg">Detail Pembayaran</h3>
                   </div>
                   <div className="space-y-2 sm:space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
+                    {/* Customer Info Section */}
+                    <div className="bg-white/50 dark:bg-slate-800/50 rounded-lg p-3 space-y-2">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Informasi Customer</h4>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs text-muted-foreground min-w-[80px]">Nama</span>
+                          <span className="text-sm font-medium">{paymentData.userName || '-'}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs text-muted-foreground min-w-[80px]">Email</span>
+                          <span className="text-sm font-medium break-all">{paymentData.userEmail || '-'}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs text-muted-foreground min-w-[80px]">WhatsApp</span>
+                          <span className="text-sm font-medium">{paymentData.userWhatsapp || '-'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Transaction Info */}
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 pt-2 border-t border-emerald-200/50 dark:border-emerald-700/50">
                       <span className="text-xs sm:text-sm text-muted-foreground">ID Transaksi</span>
                       <span className="font-mono text-xs sm:text-sm font-semibold break-all sm:break-normal">{paymentData.externalId?.slice(0, 40)}...</span>
                     </div>
+                    {paymentData.invoiceId && (
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
+                        <span className="text-xs sm:text-sm text-muted-foreground">Invoice ID</span>
+                        <span className="font-mono text-xs sm:text-sm font-semibold">{paymentData.invoiceId}</span>
+                      </div>
+                    )}
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                       <span className="text-xs sm:text-sm text-muted-foreground">Paket</span>
                       <div className={`px-3 py-1.5 rounded-lg font-bold text-sm sm:text-base flex items-center gap-2 ${
@@ -341,6 +434,12 @@ function SuccessPageContent() {
                         VIP {isPremium ? 'PREMIUM' : 'BASIC'}
                       </div>
                     </div>
+                    {paymentData.paymentMethod && (
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
+                        <span className="text-xs sm:text-sm text-muted-foreground">Metode Pembayaran</span>
+                        <span className="text-sm font-medium">{paymentData.paymentMethod}</span>
+                      </div>
+                    )}
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pt-2 sm:pt-3 border-t-2 border-emerald-200 dark:border-emerald-800 gap-1 sm:gap-0">
                       <span className="font-semibold text-sm sm:text-base">Total Dibayar</span>
                       <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1">
@@ -357,6 +456,27 @@ function SuccessPageContent() {
                         LUNAS
                       </span>
                     </div>
+                    {paymentData.paidAt && (
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
+                        <span className="text-xs sm:text-sm text-muted-foreground">Dibayar pada</span>
+                        <span className="text-xs sm:text-sm">
+                          {new Date(paymentData.paidAt).toLocaleString('id-ID', { 
+                            dateStyle: 'long', 
+                            timeStyle: 'short' 
+                          })}
+                        </span>
+                      </div>
+                    )}
+                    {paymentData.expiredAt && (
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
+                        <span className="text-xs sm:text-sm text-muted-foreground">Berlaku hingga</span>
+                        <span className="text-xs sm:text-sm font-semibold text-amber-600">
+                          {new Date(paymentData.expiredAt).toLocaleDateString('id-ID', { 
+                            dateStyle: 'long'
+                          })}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
