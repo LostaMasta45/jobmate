@@ -49,6 +49,14 @@ function convertXenditToPayment(invoice: any) {
   const planType = invoice.external_id?.includes('premium') ? 'premium' : 'basic';
   const amount = planType === 'premium' ? 39000 : 10000;
   
+  // Extract customer name (combine given_names and surname if available)
+  let userName = 'Unknown User';
+  if (invoice.customer) {
+    const givenNames = invoice.customer.given_names || '';
+    const surname = invoice.customer.surname || '';
+    userName = [givenNames, surname].filter(Boolean).join(' ').trim() || 'Unknown User';
+  }
+  
   return {
     externalId: invoice.external_id,
     invoiceId: invoice.id,
@@ -58,7 +66,7 @@ function convertXenditToPayment(invoice: any) {
     paidAt: invoice.paid_at || null,
     expiredAt: invoice.expiry_date || null,
     createdAt: invoice.created || null,
-    userName: invoice.customer?.given_names || invoice.customer?.surname || 'Unknown',
+    userName: userName,
     userEmail: invoice.payer_email || invoice.customer?.email || '',
     userWhatsapp: invoice.customer?.mobile_number || invoice.customer?.phone_number || '',
     paymentMethod: invoice.payment_method || invoice.payment_channel || null,

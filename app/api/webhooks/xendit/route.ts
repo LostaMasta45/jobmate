@@ -75,10 +75,20 @@ export async function POST(request: NextRequest) {
       
       // Get customer info from payload
       const customerEmail = payload.payer_email || payload.customer?.email || 'unknown@example.com';
-      const customerName = payload.customer?.given_names || payload.customer?.surname || 'Unknown User';
+      
+      // Extract customer name (combine given_names and surname if available)
+      let customerName = 'Unknown User';
+      if (payload.customer) {
+        const givenNames = payload.customer.given_names || '';
+        const surname = payload.customer.surname || '';
+        customerName = [givenNames, surname].filter(Boolean).join(' ').trim() || 'Unknown User';
+      }
+      
+      // Extract phone number
       const customerPhone = payload.customer?.mobile_number || payload.customer?.phone_number || '';
 
       console.log('[Xendit Webhook] Customer info:', { customerEmail, customerName, customerPhone });
+      console.log('[Xendit Webhook] Raw customer data:', payload.customer);
 
       // Use UPSERT to handle both insert and update cases
       const { data, error } = await supabase
@@ -117,8 +127,32 @@ export async function POST(request: NextRequest) {
 
       console.log('[Xendit Webhook] Payment upserted successfully:', data);
 
+      // Send confirmation email (async, don't wait)
+      try {
+        const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://jobmate-ivory.vercel.app'}/api/payment/send-confirmation-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userName: customerName,
+            userEmail: customerEmail,
+            planType: planType,
+            amount: amount,
+            externalId: externalId,
+            invoiceId: invoiceId,
+          }),
+        });
+
+        if (emailResponse.ok) {
+          console.log('[Xendit Webhook] Confirmation email sent successfully');
+        } else {
+          console.error('[Xendit Webhook] Failed to send confirmation email:', await emailResponse.text());
+        }
+      } catch (emailError) {
+        console.error('[Xendit Webhook] Error sending confirmation email:', emailError);
+        // Don't fail the webhook if email fails
+      }
+
       // TODO: Additional actions on successful payment:
-      // - Send confirmation email
       // - Send WhatsApp notification
       // - Trigger Telegram notification to admin
       // - Auto-approve account if enabled
