@@ -232,15 +232,6 @@ function SuccessPageContent() {
   const planName = paymentData?.planType === 'premium' ? 'Premium' : 'Basic';
   const isPremium = paymentData?.planType === 'premium';
 
-  // Debug: Log payment data to check if userName is received
-  useEffect(() => {
-    if (paymentData) {
-      console.log('Payment Data:', paymentData);
-      console.log('User Name:', paymentData.userName);
-      console.log('First Name:', firstName);
-    }
-  }, [paymentData, firstName]);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-6 sm:py-12 px-3 sm:px-4 lg:px-6 relative overflow-hidden">
       {/* Animated Background Elements - Hide on mobile for performance */}
