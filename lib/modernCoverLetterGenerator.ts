@@ -186,15 +186,15 @@ export function generateModernCoverLetter(data: CoverLetterData): string {
       word-wrap: break-word;
       overflow-wrap: break-word;
       hyphens: auto;
-      color: #1a1a1a;
+      color: #000000;
     }
     
     .data-section {
       margin: 8px 0;
       padding: 8px 10px;
       background: ${template.accentColor};
-      border-left: 2px solid ${template.themeColor};
-      border-radius: 0 2px 2px 0;
+      border-left: 3px solid ${template.themeColor};
+      border-radius: 0 4px 4px 0;
       font-size: 8pt;
     }
     
@@ -219,7 +219,7 @@ export function generateModernCoverLetter(data: CoverLetterData): string {
     }
     
     .data-value {
-      color: #1a1a1a;
+      color: #000000;
       font-size: 8pt;
       word-wrap: break-word;
       overflow-wrap: break-word;
@@ -229,18 +229,18 @@ export function generateModernCoverLetter(data: CoverLetterData): string {
     .attachments {
       margin: 12px 0;
       font-size: 8pt;
-      color: #1a1a1a;
+      color: #000000;
     }
     
     .attachments ol {
       margin-left: 20px;
       margin-top: 5px;
-      color: #1a1a1a;
+      color: #000000;
     }
     
     .attachments li {
       margin-bottom: 2px;
-      color: #1a1a1a;
+      color: #000000;
     }
     
     .closing {
@@ -357,9 +357,7 @@ export function generateModernCoverLetter(data: CoverLetterData): string {
         Saya menguasai keterampilan yang relevan dengan posisi ini${data.skills && data.skills.length > 0 ? ` seperti ${data.skills.join(', ')}` : ''} serta memiliki kemampuan komunikasi, teamwork, dan problem solving yang baik. Saya siap belajar dan beradaptasi dengan cepat.
       </div>
       
-      <div class="paragraph">
-        Saya tertarik bergabung dengan ${data.companyName} karena reputasi perusahaan yang baik dan kesempatan untuk berkembang bersama tim profesional. Saya yakin dapat berkontribusi dan tumbuh bersama perusahaan.
-      </div>
+      ${generateMotivationParagraph(data)}
       
       ${generateOptionalStatements(data)}
       
@@ -438,6 +436,30 @@ function generateExperienceSection(data: CoverLetterData): string {
       </div>
     `;
   }
+}
+
+function generateMotivationParagraph(data: any): string {
+  // Use AI-generated motivation if available
+  if (data.finalMotivation) {
+    return `
+      <div class="paragraph">
+        ${data.finalMotivation}
+      </div>
+    `;
+  }
+  if (data.generatedMotivation) {
+    return `
+      <div class="paragraph">
+        ${data.generatedMotivation}
+      </div>
+    `;
+  }
+  // Fallback to default
+  return `
+      <div class="paragraph">
+        Saya tertarik bergabung dengan ${data.companyName} karena reputasi perusahaan yang baik dan kesempatan untuk berkembang bersama tim profesional. Saya yakin dapat berkontribusi dan tumbuh bersama perusahaan.
+      </div>
+  `;
 }
 
 function generateOptionalStatements(data: CoverLetterData): string {

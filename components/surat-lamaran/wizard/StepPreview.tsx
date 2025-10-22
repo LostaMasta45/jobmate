@@ -43,9 +43,8 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
   const handleTemplateChange = (templateId: string) => {
     setSelectedTemplate(templateId);
     updateFormData({ templateType: templateId });
-    // Reset AI polish when template changes
-    setAiPolished(null);
-    setSelectedVersion("standard");
+    // PRESERVE AI polish when template changes - don't reset!
+    // User can still see their AI polished version after switching templates
   };
   
   // Generate content based on template type

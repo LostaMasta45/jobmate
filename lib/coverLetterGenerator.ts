@@ -129,6 +129,14 @@ function generateExperienceConcise(formData: any, isFreshGrad: boolean): string 
 }
 
 function generateMotivationConcise(formData: any): string {
+  // Use AI-generated motivation if available
+  if (formData.finalMotivation) {
+    return formData.finalMotivation;
+  }
+  if (formData.generatedMotivation) {
+    return formData.generatedMotivation;
+  }
+  // Fallback to default
   return `Saya tertarik bergabung dengan ${formData.companyName} karena reputasi perusahaan yang baik dan kesempatan untuk berkembang bersama tim profesional. Saya yakin dapat berkontribusi dan tumbuh bersama perusahaan.`;
 }
 

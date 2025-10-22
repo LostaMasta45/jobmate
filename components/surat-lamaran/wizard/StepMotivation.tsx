@@ -117,9 +117,9 @@ export function StepMotivation({ formData, updateFormData }: StepMotivationProps
         </AlertDescription>
       </Alert>
 
-      {/* Guided Questions */}
-      <div className="space-y-5">
-        {/* Question 1 */}
+      {/* Simple & Quick Form - EASIER TO FILL */}
+      <div className="space-y-4">
+        {/* Question 1 - Simplified */}
         <div className="space-y-2">
           <Label htmlFor="motivationPosition" className="text-base font-semibold">
             1. Kenapa Anda tertarik dengan posisi {formData.position || "ini"}?{" "}
@@ -127,21 +127,17 @@ export function StepMotivation({ formData, updateFormData }: StepMotivationProps
           </Label>
           <Textarea
             id="motivationPosition"
-            placeholder="Contoh: Saya passion di UI/UX design dan ingin berkembang di industri fintech karena melihat dampak langsung pada kehidupan masyarakat..."
-            rows={3}
+            placeholder="Contoh singkat: Saya tertarik karena posisi ini sesuai dengan skill React saya dan ingin berkembang di industri teknologi..."
+            rows={2}
             value={formData.motivationPosition || ""}
             onChange={(e) =>
               updateFormData({ motivationPosition: e.target.value })
             }
             className="resize-none"
           />
-          <p className="text-xs text-muted-foreground">
-            💡 Tips: Ceritakan passion Anda dan kenapa posisi ini align dengan
-            karir goal
-          </p>
         </div>
 
-        {/* Question 2 */}
+        {/* Question 2 - Simplified */}
         <div className="space-y-2">
           <Label htmlFor="motivationCompany" className="text-base font-semibold">
             2. Apa yang Anda tahu tentang {formData.companyName || "perusahaan ini"}?{" "}
@@ -149,56 +145,40 @@ export function StepMotivation({ formData, updateFormData }: StepMotivationProps
           </Label>
           <Textarea
             id="motivationCompany"
-            placeholder="Contoh: Tokopedia adalah marketplace terbesar di Indonesia dengan 10 juta+ merchant, terkenal dengan budaya inovasi dan program pemberdayaan UMKM..."
-            rows={3}
+            placeholder="Contoh singkat: {formData.companyName} adalah perusahaan terkemuka di bidang teknologi dengan reputasi yang baik..."
+            rows={2}
             value={formData.motivationCompany || ""}
             onChange={(e) =>
               updateFormData({ motivationCompany: e.target.value })
             }
             className="resize-none"
           />
-          <p className="text-xs text-muted-foreground">
-            💡 Tips: Research dulu! Mention produk, values, atau achievement
-            perusahaan yang Anda respect
-          </p>
         </div>
 
-        {/* Question 3 */}
+        {/* Question 3 - Simplified */}
         <div className="space-y-2">
           <Label htmlFor="motivationValue" className="text-base font-semibold">
-            3. Value/kontribusi apa yang bisa Anda bawa ke perusahaan?{" "}
+            3. Apa yang bisa Anda kontribusikan?{" "}
             <span className="text-red-500">*</span>
           </Label>
           <Textarea
             id="motivationValue"
-            placeholder="Contoh: Dengan skill React dan portfolio 10+ project, saya yakin bisa berkontribusi dalam mengembangkan user interface yang engaging dan performance-optimized..."
-            rows={3}
+            placeholder="Contoh singkat: Saya bisa berkontribusi dengan skill programming dan pengalaman saya dalam menyelesaikan project..."
+            rows={2}
             value={formData.motivationValue || ""}
             onChange={(e) =>
               updateFormData({ motivationValue: e.target.value })
             }
             className="resize-none"
           />
-          <p className="text-xs text-muted-foreground">
-            💡 Tips: Fokus pada apa yang bisa Anda BERI, bukan apa yang Anda
-            DAPAT
-          </p>
         </div>
-
-        {/* Question 4 (Optional) */}
-        <div className="space-y-2">
-          <Label htmlFor="motivationFit" className="text-base font-semibold">
-            4. Kenapa Anda cocok untuk posisi ini? (Opsional)
-          </Label>
-          <Textarea
-            id="motivationFit"
-            placeholder="Contoh: Saya detail-oriented, terbiasa kerja dalam deadline ketat, dan suka belajar teknologi baru. Pengalaman kerja dalam tim remote juga membekali saya dengan communication skills yang baik..."
-            rows={2}
-            value={formData.motivationFit || ""}
-            onChange={(e) => updateFormData({ motivationFit: e.target.value })}
-            className="resize-none"
-          />
-        </div>
+        
+        <Alert className="bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800">
+          <Info className="h-4 w-4 text-green-600 dark:text-green-400" />
+          <AlertDescription className="text-green-800 dark:text-green-200">
+            ✨ <strong>Cukup 3 jawaban singkat!</strong> AI akan mengembangkan jawaban Anda menjadi paragraf motivasi yang meyakinkan dan profesional. Tidak perlu detail panjang.
+          </AlertDescription>
+        </Alert>
       </div>
 
       {/* Generate Button */}
