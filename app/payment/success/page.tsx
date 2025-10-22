@@ -111,6 +111,16 @@ function SuccessPageContent() {
 
   const firstName = getFirstName(paymentData?.userName || '');
   const planName = paymentData?.planType === 'premium' ? 'Premium' : 'Basic';
+  const isPremium = paymentData?.planType === 'premium';
+
+  // Debug: Log payment data to check if userName is received
+  useEffect(() => {
+    if (paymentData) {
+      console.log('Payment Data:', paymentData);
+      console.log('User Name:', paymentData.userName);
+      console.log('First Name:', firstName);
+    }
+  }, [paymentData, firstName]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-6 sm:py-12 px-3 sm:px-4 lg:px-6 relative overflow-hidden">
@@ -212,16 +222,14 @@ function SuccessPageContent() {
                 className="space-y-2 sm:space-y-3"
               >
                 {/* Personalized Greeting */}
-                {firstName && (
-                  <motion.h2 
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="text-xl sm:text-2xl lg:text-3xl font-bold text-emerald-700 dark:text-emerald-400"
-                  >
-                    Terima Kasih, {firstName}! 🙏
-                  </motion.h2>
-                )}
+                <motion.h2 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-xl sm:text-2xl lg:text-3xl font-bold text-emerald-700 dark:text-emerald-400"
+                >
+                  Terima Kasih{firstName ? `, ${firstName}` : ''}! 🙏
+                </motion.h2>
                 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 bg-clip-text text-transparent px-4">
                   Pembayaran Berhasil!
@@ -238,9 +246,15 @@ function SuccessPageContent() {
                   <span>🚀</span>
                 </motion.div>
                 
-                <p className="text-base sm:text-lg lg:text-xl font-semibold text-emerald-700 dark:text-emerald-400 px-4">
-                  Selamat! Anda sekarang member VIP {planName}
-                </p>
+                <div className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-base sm:text-lg lg:text-xl ${
+                  isPremium
+                    ? 'bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-white shadow-lg shadow-amber-500/50'
+                    : 'bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-500 text-white shadow-lg shadow-emerald-500/50'
+                }`}>
+                  <Crown className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <span>Member VIP {isPremium ? 'PREMIUM' : 'BASIC'}</span>
+                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
+                </div>
               </motion.div>
             </CardHeader>
 
@@ -264,16 +278,25 @@ function SuccessPageContent() {
                     </div>
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                       <span className="text-xs sm:text-sm text-muted-foreground">Paket</span>
-                      <span className="font-bold text-sm sm:text-base flex items-center gap-2 capitalize">
-                        <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-amber-500" />
-                        VIP {paymentData.planType}
-                      </span>
+                      <div className={`px-3 py-1.5 rounded-lg font-bold text-sm sm:text-base flex items-center gap-2 ${
+                        isPremium 
+                          ? 'bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 text-amber-700 dark:text-amber-400 border-2 border-amber-300 dark:border-amber-700'
+                          : 'bg-gradient-to-r from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 text-emerald-700 dark:text-emerald-400 border-2 border-emerald-300 dark:border-emerald-700'
+                      }`}>
+                        <Crown className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                          isPremium ? 'text-amber-500 fill-amber-500' : 'text-emerald-500 fill-emerald-500'
+                        }`} />
+                        VIP {isPremium ? 'PREMIUM' : 'BASIC'}
+                      </div>
                     </div>
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pt-2 sm:pt-3 border-t-2 border-emerald-200 dark:border-emerald-800 gap-1 sm:gap-0">
                       <span className="font-semibold text-sm sm:text-base">Total Dibayar</span>
-                      <span className="text-xl sm:text-2xl font-black text-emerald-600">
-                        Rp {paymentData.amount?.toLocaleString('id-ID')}
-                      </span>
+                      <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1">
+                        <span className="text-base sm:text-lg lg:text-xl font-black text-emerald-600">Rp</span>
+                        <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-emerald-600 tabular-nums">
+                          {paymentData.amount?.toLocaleString('id-ID')}
+                        </span>
+                      </div>
                     </div>
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                       <span className="text-xs sm:text-sm text-muted-foreground">Status</span>
