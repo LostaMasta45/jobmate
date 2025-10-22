@@ -10,23 +10,34 @@ async function fetchInvoiceFromXendit(invoiceIdOrExternalId: string) {
   }
 
   try {
-    // Try to fetch by invoice ID
-    console.log('[Xendit Fetch] Fetching invoice:', invoiceIdOrExternalId);
+    // Try to fetch by external_id first (most common)
+    console.log('[Xendit Fetch] Fetching invoice by external_id:', invoiceIdOrExternalId);
     
-    const response = await fetch(`https://api.xendit.co/v2/invoices/${invoiceIdOrExternalId}`, {
+    // Xendit API: Get invoices by external_id
+    const listResponse = await fetch(`https://api.xendit.co/v2/invoices?external_id=${invoiceIdOrExternalId}`, {
       headers: {
         'Authorization': `Basic ${Buffer.from(xenditSecretKey + ':').toString('base64')}`,
       },
     });
 
-    if (!response.ok) {
-      console.error('[Xendit Fetch] Failed to fetch invoice:', response.status);
+    if (!listResponse.ok) {
+      const errorText = await listResponse.text();
+      console.error('[Xendit Fetch] Failed to fetch invoices:', listResponse.status, errorText);
       return null;
     }
 
-    const invoice = await response.json();
-    console.log('[Xendit Fetch] Invoice found:', invoice.id, 'Status:', invoice.status);
-    return invoice;
+    const invoices = await listResponse.json();
+    console.log('[Xendit Fetch] Found invoices:', invoices.length);
+    
+    if (invoices && invoices.length > 0) {
+      // Return the most recent invoice
+      const invoice = invoices[0];
+      console.log('[Xendit Fetch] Invoice found:', invoice.id, 'Status:', invoice.status);
+      return invoice;
+    }
+
+    console.error('[Xendit Fetch] No invoices found for external_id:', invoiceIdOrExternalId);
+    return null;
   } catch (error) {
     console.error('[Xendit Fetch] Error:', error);
     return null;
@@ -109,11 +120,24 @@ export async function GET(request: NextRequest) {
     
     if (!xenditInvoice) {
       console.error('[Check Status] Payment not found in database OR Xendit');
+      console.error('[Check Status] External ID:', externalId);
+      console.error('[Check Status] Database error:', error);
+      
+      // Check if Xendit credentials are set
+      const hasXenditKey = !!process.env.XENDIT_SECRET_KEY;
+      console.error('[Check Status] Xendit credentials configured:', hasXenditKey);
+      
       return NextResponse.json(
         { 
           error: 'Payment not found',
           message: 'Invoice tidak ditemukan di database maupun Xendit. Kemungkinan invoice belum dibuat atau sudah expired.',
           externalId: externalId,
+          debug: {
+            checkedDatabase: true,
+            databaseError: error?.message || 'Not found',
+            checkedXendit: true,
+            xenditConfigured: hasXenditKey,
+          }
         },
         { status: 404 }
       );
