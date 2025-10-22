@@ -3,12 +3,13 @@
 import * as React from "react";
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle2, CreditCard, Loader2, ArrowLeft } from "lucide-react";
+import { CheckCircle2, CreditCard, Loader2, ArrowLeft, Sparkles, Shield, Zap, Crown, Mail, User, Phone } from "lucide-react";
 
 function PaymentFormContent() {
   const router = useRouter();
@@ -73,48 +74,144 @@ function PaymentFormContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 py-12 px-4">
-      <div className="container max-w-2xl mx-auto">
-        <Button
-          variant="ghost"
-          onClick={() => router.push('/#pricing')}
-          className="mb-6"
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-12 px-4 relative overflow-hidden">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 0.1, scale: 1 }}
+          transition={{ duration: 1 }}
+          className="absolute top-20 -left-20 w-96 h-96 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full blur-3xl"
+        />
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 0.1, scale: 1 }}
+          transition={{ duration: 1, delay: 0.2 }}
+          className="absolute bottom-20 -right-20 w-96 h-96 bg-gradient-to-br from-orange-400 to-red-500 rounded-full blur-3xl"
+        />
+      </div>
+
+      <div className="container max-w-3xl mx-auto relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Kembali
-        </Button>
+          <Button
+            variant="ghost"
+            onClick={() => router.push('/#pricing')}
+            className="mb-6 hover:bg-white/50 dark:hover:bg-slate-800/50"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Kembali
+          </Button>
+        </motion.div>
 
-        <Card className="shadow-xl">
-          <CardHeader className="text-center space-y-2 pb-4">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mb-4">
-              <CreditCard className="w-8 h-8 text-white" />
-            </div>
-            <CardTitle className="text-2xl sm:text-3xl">
-              Pembayaran {currentPlan.name}
-            </CardTitle>
-            <CardDescription className="text-lg">
-              Lengkapi data di bawah untuk melanjutkan pembayaran
-            </CardDescription>
-          </CardHeader>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Card className="shadow-2xl border-2 border-amber-200/50 dark:border-amber-900/50 backdrop-blur-sm bg-white/95 dark:bg-slate-900/95">
+            <CardHeader className="text-center space-y-4 pb-6 relative">
+              {/* Decorative Crown Icon for Premium */}
+              {plan === 'premium' && (
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ duration: 0.6, type: "spring" }}
+                  className="absolute -top-6 left-1/2 -translate-x-1/2"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                    <Crown className="w-6 h-6 text-white" />
+                  </div>
+                </motion.div>
+              )}
+              
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5, type: "spring" }}
+                className="mx-auto w-20 h-20 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-4 shadow-xl relative"
+              >
+                <CreditCard className="w-10 h-10 text-white" />
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 0, 0.5]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="absolute inset-0 rounded-2xl bg-amber-400 blur-xl"
+                />
+              </motion.div>
+              
+              <div className="space-y-2">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <CardTitle className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 bg-clip-text text-transparent">
+                    Pembayaran {currentPlan.name}
+                  </CardTitle>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <CardDescription className="text-base sm:text-lg">
+                    ✨ Lengkapi data untuk melanjutkan pembayaran
+                  </CardDescription>
+                </motion.div>
+              </div>
+            </CardHeader>
 
-          <CardContent className="space-y-6">
-            {/* Plan Summary */}
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 rounded-xl p-6 border-2 border-amber-200 dark:border-amber-800">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">Paket yang dipilih</span>
-                <span className="font-semibold">{currentPlan.name}</span>
+          <CardContent className="space-y-6 px-4 sm:px-8 pb-8">
+            {/* Plan Summary with Animation */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+              className="bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50 dark:from-amber-950/30 dark:via-orange-950/30 dark:to-amber-950/30 rounded-2xl p-6 border-2 border-amber-300/50 dark:border-amber-700/50 shadow-lg relative overflow-hidden"
+            >
+              {/* Sparkle decoration */}
+              <div className="absolute top-2 right-2">
+                <Sparkles className="w-5 h-5 text-amber-500 animate-pulse" />
               </div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">Durasi</span>
-                <span className="font-semibold">{currentPlan.duration}</span>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Crown className="w-4 h-4" />
+                    Paket yang dipilih
+                  </span>
+                  <span className="font-bold text-lg">{currentPlan.name}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Zap className="w-4 h-4" />
+                    Durasi
+                  </span>
+                  <span className="font-semibold">{currentPlan.duration}</span>
+                </div>
+                <div className="flex items-center justify-between pt-4 mt-4 border-t-2 border-amber-300/50 dark:border-amber-700/50">
+                  <span className="font-bold text-lg">Total Pembayaran</span>
+                  <motion.span
+                    initial={{ scale: 1 }}
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="text-3xl font-black bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent"
+                  >
+                    {currentPlan.priceText}
+                  </motion.span>
+                </div>
               </div>
-              <div className="flex items-center justify-between pt-3 border-t border-amber-200 dark:border-amber-800">
-                <span className="font-semibold">Total Pembayaran</span>
-                <span className="text-2xl font-bold text-amber-600">
-                  {currentPlan.priceText}
-                </span>
-              </div>
-            </div>
+            </motion.div>
 
             {error && (
               <Alert variant="destructive">
@@ -122,10 +219,24 @@ function PaymentFormContent() {
               </Alert>
             )}
 
-            {/* Payment Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Nama Lengkap *</Label>
+            {/* Payment Form with Animations */}
+            <motion.form
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+              onSubmit={handleSubmit}
+              className="space-y-5"
+            >
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6 }}
+                className="space-y-2"
+              >
+                <Label htmlFor="fullName" className="text-base font-semibold flex items-center gap-2">
+                  <User className="w-4 h-4 text-amber-600" />
+                  Nama Lengkap *
+                </Label>
                 <Input
                   id="fullName"
                   type="text"
@@ -134,11 +245,20 @@ function PaymentFormContent() {
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   required
                   disabled={loading}
+                  className="h-12 border-2 border-amber-200 focus:border-amber-500 dark:border-amber-800 dark:focus:border-amber-600 transition-colors"
                 />
-              </div>
+              </motion.div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.7 }}
+                className="space-y-2"
+              >
+                <Label htmlFor="email" className="text-base font-semibold flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-amber-600" />
+                  Email *
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -147,14 +267,24 @@ function PaymentFormContent() {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                   disabled={loading}
+                  className="h-12 border-2 border-amber-200 focus:border-amber-500 dark:border-amber-800 dark:focus:border-amber-600 transition-colors"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Shield className="w-3 h-3" />
                   Invoice pembayaran akan dikirim ke email ini
                 </p>
-              </div>
+              </motion.div>
 
-              <div className="space-y-2">
-                <Label htmlFor="whatsapp">Nomor WhatsApp *</Label>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.8 }}
+                className="space-y-2"
+              >
+                <Label htmlFor="whatsapp" className="text-base font-semibold flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-amber-600" />
+                  Nomor WhatsApp *
+                </Label>
                 <Input
                   id="whatsapp"
                   type="tel"
@@ -163,53 +293,104 @@ function PaymentFormContent() {
                   onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                   required
                   disabled={loading}
+                  className="h-12 border-2 border-amber-200 focus:border-amber-500 dark:border-amber-800 dark:focus:border-amber-600 transition-colors"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Shield className="w-3 h-3" />
                   Untuk konfirmasi pembayaran dan akses grup VIP
                 </p>
-              </div>
+              </motion.div>
 
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold"
-                disabled={loading}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9 }}
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Memproses...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="w-5 h-5 mr-2" />
-                    Lanjut ke Pembayaran
-                  </>
-                )}
-              </Button>
-            </form>
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full h-14 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-6 h-6 mr-2 animate-spin" />
+                      Memproses Pembayaran...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-6 h-6 mr-2" />
+                      Lanjut ke Pembayaran
+                      <Zap className="w-5 h-5 ml-2" />
+                    </>
+                  )}
+                </Button>
+              </motion.div>
+            </motion.form>
 
             {/* Payment Methods Info */}
-            <div className="pt-4 border-t">
-              <p className="text-sm text-muted-foreground text-center mb-3">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.0 }}
+              className="pt-6 border-t-2 border-dashed border-amber-200 dark:border-amber-800"
+            >
+              <p className="text-sm font-semibold text-center mb-4 flex items-center justify-center gap-2">
+                <CreditCard className="w-4 h-4 text-amber-600" />
                 Metode pembayaran yang tersedia:
               </p>
-              <div className="flex flex-wrap justify-center gap-2 text-xs">
-                <span className="px-3 py-1 bg-muted rounded-full">QRIS</span>
-                <span className="px-3 py-1 bg-muted rounded-full">Virtual Account</span>
-                <span className="px-3 py-1 bg-muted rounded-full">E-Wallet</span>
-                <span className="px-3 py-1 bg-muted rounded-full">Credit Card</span>
-                <span className="px-3 py-1 bg-muted rounded-full">Retail</span>
+              <div className="flex flex-wrap justify-center gap-3 text-xs">
+                <motion.span
+                  whileHover={{ scale: 1.05 }}
+                  className="px-4 py-2 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-full font-semibold border border-amber-300 dark:border-amber-700 shadow-sm"
+                >
+                  📱 QRIS
+                </motion.span>
+                <motion.span
+                  whileHover={{ scale: 1.05 }}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-full font-semibold border border-blue-300 dark:border-blue-700 shadow-sm"
+                >
+                  🏦 Virtual Account
+                </motion.span>
+                <motion.span
+                  whileHover={{ scale: 1.05 }}
+                  className="px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-full font-semibold border border-green-300 dark:border-green-700 shadow-sm"
+                >
+                  💳 E-Wallet
+                </motion.span>
+                <motion.span
+                  whileHover={{ scale: 1.05 }}
+                  className="px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-full font-semibold border border-purple-300 dark:border-purple-700 shadow-sm"
+                >
+                  💎 Credit Card
+                </motion.span>
+                <motion.span
+                  whileHover={{ scale: 1.05 }}
+                  className="px-4 py-2 bg-gradient-to-r from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 rounded-full font-semibold border border-red-300 dark:border-red-700 shadow-sm"
+                >
+                  🏪 Retail
+                </motion.span>
               </div>
-            </div>
+            </motion.div>
 
             {/* Security Badge */}
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground pt-2">
-              <span className="text-lg">🔒</span>
-              <span>Pembayaran aman melalui Xendit</span>
-            </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.1 }}
+              className="flex flex-col items-center gap-3 pt-6"
+            >
+              <div className="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 px-6 py-3 rounded-full border border-emerald-300 dark:border-emerald-700">
+                <Shield className="w-5 h-5 text-emerald-600" />
+                <span>Pembayaran aman melalui Xendit</span>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                🔐 Data Anda dilindungi dengan enkripsi SSL 256-bit
+              </p>
+            </motion.div>
           </CardContent>
         </Card>
+        </motion.div>
       </div>
     </div>
   );
