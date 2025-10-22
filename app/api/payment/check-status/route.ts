@@ -6,7 +6,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const externalId = searchParams.get('external_id');
 
+    console.log('[Check Status] Request received for external_id:', externalId);
+
     if (!externalId) {
+      console.error('[Check Status] No external_id provided');
       return NextResponse.json(
         { error: 'external_id is required' },
         { status: 400 }
@@ -20,12 +23,23 @@ export async function GET(request: NextRequest) {
       .eq('external_id', externalId)
       .single();
 
-    if (error || !payment) {
+    if (error) {
+      console.error('[Check Status] Database error:', error);
+      return NextResponse.json(
+        { error: 'Payment not found', details: error.message },
+        { status: 404 }
+      );
+    }
+
+    if (!payment) {
+      console.error('[Check Status] Payment not found for external_id:', externalId);
       return NextResponse.json(
         { error: 'Payment not found' },
         { status: 404 }
       );
     }
+
+    console.log('[Check Status] Payment found:', payment.external_id, 'Status:', payment.status);
 
     return NextResponse.json({
       success: true,

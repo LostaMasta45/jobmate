@@ -69,17 +69,32 @@ function SuccessPageContent() {
   useEffect(() => {
     // Check payment status
     if (externalId) {
+      console.log('[Success Page] Fetching payment status for:', externalId);
+      
       fetch(`/api/payment/check-status?external_id=${externalId}`)
-        .then(res => res.json())
+        .then(res => {
+          console.log('[Success Page] API Response status:', res.status);
+          if (!res.ok) {
+            throw new Error(`API returned ${res.status}`);
+          }
+          return res.json();
+        })
         .then(data => {
+          console.log('[Success Page] Payment data:', data);
           if (data.success) {
             setPaymentData(data.payment);
             setShowConfetti(true);
+          } else {
+            console.error('[Success Page] Payment not found:', data.error);
           }
           setLoading(false);
         })
-        .catch(() => setLoading(false));
+        .catch((error) => {
+          console.error('[Success Page] Error fetching payment:', error);
+          setLoading(false);
+        });
     } else {
+      console.warn('[Success Page] No external_id provided');
       setLoading(false);
     }
   }, [externalId]);
@@ -105,6 +120,43 @@ function SuccessPageContent() {
           <Loader2 className="w-12 h-12 sm:w-16 sm:h-16 animate-spin mx-auto text-emerald-600" />
           <p className="text-sm sm:text-base text-muted-foreground">Memuat data pembayaran...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Handle payment not found
+  if (!loading && !paymentData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-4">
+        <Card className="max-w-md w-full">
+          <CardHeader className="text-center">
+            <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-red-600">Data Pembayaran Tidak Ditemukan</h2>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-muted-foreground">
+              Maaf, kami tidak dapat menemukan data pembayaran Anda.
+            </p>
+            <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg text-xs font-mono break-all">
+              {externalId || 'No external_id provided'}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Kemungkinan penyebab:
+            </p>
+            <ul className="text-sm text-left space-y-1 text-muted-foreground">
+              <li>• Invoice belum dibayar</li>
+              <li>• Data sedang diproses (tunggu 1-2 menit)</li>
+              <li>• Link sudah kadaluarsa</li>
+            </ul>
+            <Button asChild className="w-full">
+              <a href="/payment">Kembali ke Halaman Payment</a>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
