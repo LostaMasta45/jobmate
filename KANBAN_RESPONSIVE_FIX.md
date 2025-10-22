@@ -5,7 +5,7 @@
 **Solution:** Responsive grid yang adapt ke ukuran layar - no horizontal scroll needed!
 
 ---
-
+asdasdasd
 ## 📐 Responsive Breakpoints
 
 ### **Layout per Viewport:**
