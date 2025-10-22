@@ -138,7 +138,7 @@ NEXT_PUBLIC_BASE_URL=https://jobmate.web.id
 1. `XENDIT_SECRET_KEY`: Xendit Dashboard > Settings > API Keys
 2. `XENDIT_WEBHOOK_VERIFICATION_TOKEN`: Xendit Dashboard > Settings > Webhooks > Copy token
 
----
+---ffff
 
 ## ✅ Testing Checklist
 
