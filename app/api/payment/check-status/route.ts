@@ -36,6 +36,8 @@ export async function GET(request: NextRequest) {
         planType: payment.plan_type,
         paidAt: payment.paid_at,
         expiredAt: payment.expired_at,
+        userName: payment.user_name,
+        userEmail: payment.user_email,
       },
     });
 
