@@ -1,5 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { resend, FROM_EMAIL } from '@/lib/resend';
+
+// Email template untuk payment confirmation
+const PaymentSuccessEmail = ({ userName, amount, transactionDate, planType }: any) => `
+  <html>
+    <body style="font-family: Arial, sans-serif;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: #10B981; color: white; padding: 20px; text-align: center;">
+          <h1>✓ Pembayaran Berhasil!</h1>
+        </div>
+        <div style="padding: 30px; background: #f9fafb;">
+          <p>Halo ${userName},</p>
+          <p>Pembayaran Anda telah berhasil diproses.</p>
+          <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h2>Detail Pembayaran</h2>
+            <p><strong>Jumlah:</strong> IDR ${amount.toLocaleString('id-ID')}</p>
+            <p><strong>Tanggal:</strong> ${new Date(transactionDate).toLocaleString('id-ID')}</p>
+            <p style="color: #10B981; font-weight: bold;">Status: PAID ✓</p>
+          </div>
+          <p>Terima kasih atas pembayaran Anda!</p>
+          <p><strong>Akses VIP Anda telah diaktifkan!</strong></p>
+        </div>
+      </div>
+    </body>
+  </html>
+`;
 
 // Verify Xendit webhook callback token
 function verifyXenditToken(callbackToken: string): boolean {
@@ -127,29 +153,32 @@ export async function POST(request: NextRequest) {
 
       console.log('[Xendit Webhook] Payment upserted successfully:', data);
 
-      // Send confirmation email (async, don't wait)
+      // Send payment confirmation email directly via Resend
       try {
-        const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://jobmate-ivory.vercel.app'}/api/payment/send-confirmation-email`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userName: customerName,
-            userEmail: customerEmail,
-            planType: planType,
-            amount: amount,
-            externalId: externalId,
-            invoiceId: invoiceId,
-          }),
+        console.log('[Xendit Webhook] Sending payment confirmation email to:', customerEmail);
+        
+        const emailHtml = PaymentSuccessEmail({
+          userName: customerName,
+          amount: amount,
+          transactionDate: paid_at || new Date().toISOString(),
+          planType: planType,
         });
 
-        if (emailResponse.ok) {
-          console.log('[Xendit Webhook] Confirmation email sent successfully');
-        } else {
-          console.error('[Xendit Webhook] Failed to send confirmation email:', await emailResponse.text());
-        }
+        const emailResponse = await resend.emails.send({
+          from: FROM_EMAIL,
+          to: customerEmail,
+          subject: `✅ Pembayaran ${planType === 'premium' ? 'VIP Premium' : 'VIP Basic'} Berhasil - JOBMATE`,
+          html: emailHtml,
+          tags: [
+            { name: 'category', value: 'payment-confirmation' },
+            { name: 'plan', value: planType },
+          ],
+        });
+
+        console.log('[Xendit Webhook] Payment confirmation email sent successfully:', emailResponse);
       } catch (emailError) {
-        console.error('[Xendit Webhook] Error sending confirmation email:', emailError);
-        // Don't fail the webhook if email fails
+        console.error('[Xendit Webhook] Error sending payment confirmation email:', emailError);
+        // Don't fail webhook if email fails
       }
 
       // TODO: Additional actions on successful payment:

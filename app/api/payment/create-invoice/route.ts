@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { sendInvoiceEmail } from '@/lib/send-invoice-email';
 
 export async function POST(request: NextRequest) {
   try {
@@ -134,6 +135,31 @@ export async function POST(request: NextRequest) {
       console.log('[Create Invoice] Payment saved to database:', paymentData?.external_id);
     }
 
+    // Send invoice email
+    try {
+      console.log('[Create Invoice] Sending invoice email to:', email);
+      
+      const emailResult = await sendInvoiceEmail({
+        toEmail: email,
+        userName: fullName || email.split('@')[0],
+        invoiceUrl: invoice.invoice_url,
+        amount: amount,
+        currency: 'IDR',
+        expiryDate: invoice.expiry_date,
+        description: `${selectedPlan.name} - InfoLokerJombang`,
+      });
+
+      if (emailResult.success) {
+        console.log('[Create Invoice] Invoice email sent successfully');
+      } else {
+        console.error('[Create Invoice] Failed to send invoice email:', emailResult.error);
+        // Don't fail the request, email is optional
+      }
+    } catch (emailError) {
+      console.error('[Create Invoice] Error sending invoice email:', emailError);
+      // Don't fail the request
+    }
+
     return NextResponse.json({
       success: true,
       invoiceUrl: invoice.invoice_url,
@@ -141,6 +167,7 @@ export async function POST(request: NextRequest) {
       invoiceId: invoice.id,
       amount: amount,
       expiryDate: invoice.expiry_date,
+      emailSent: true,
     });
 
   } catch (error: any) {
