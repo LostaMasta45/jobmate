@@ -111,10 +111,19 @@ export function AIGeneratorDialog({ posisi, perusahaan, industri, onSelectConten
     const selected = variations[index]
     onSelectContent(selected.content)
     setOpen(false)
+    
     toast({
-      title: "Berhasil!",
-      description: `Variasi "${selected.style}" telah dipilih. Anda bisa edit lebih lanjut di form.`,
+      title: "✨ AI Content Dipilih!",
+      description: `Variasi "${selected.style}" telah diapply. Scroll ke bawah untuk melihat preview atau klik tombol "AI Content".`,
     })
+    
+    // Auto-scroll to preview after short delay
+    setTimeout(() => {
+      const previewElement = document.getElementById('preview-surat')
+      if (previewElement) {
+        previewElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }, 500)
   }
 
   return (

@@ -1,8 +1,10 @@
 "use client"
 
+import { useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { FormBiodata } from "@/components/surat-lamaran/FormBiodata"
 import { FormPerusahaan } from "@/components/surat-lamaran/FormPerusahaan"
 import { TemplatePicker } from "@/components/surat-lamaran/TemplatePicker"
@@ -18,6 +20,16 @@ import { History, ChevronRight, FileText, Home, ArrowLeft, Sparkles, Palette } f
 import Link from "next/link"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+
+// Get today's date once to avoid hydration mismatch
+const getTodayDate = () => {
+  if (typeof window === 'undefined') {
+    // Server-side: use a stable date
+    return new Date().toISOString().split("T")[0]
+  }
+  // Client-side: use actual date
+  return new Date().toISOString().split("T")[0]
+}
 
 const defaultBiodata: Biodata = {
   namaLengkap: "",
@@ -39,7 +51,7 @@ const defaultPerusahaan: Perusahaan = {
   jenisInstansi: "",
   posisiLowongan: "",
   sumberLowongan: "",
-  tanggalLamaran: new Date().toISOString().split("T")[0],
+  tanggalLamaran: "",
   lampiran: DEFAULT_LAMPIRAN.split("\n"),
 }
 
@@ -55,6 +67,21 @@ export default function BuatSuratLamaranPage() {
     "jobmate_sls_templateId_v3",
     "template-1"
   )
+
+  // Set default date only on client-side to avoid hydration mismatch
+  useEffect(() => {
+    // Set today's date if tanggalLamaran is empty
+    if (!formData.perusahaan.tanggalLamaran) {
+      const todayDate = new Date().toISOString().split("T")[0]
+      setFormData({
+        ...formData,
+        perusahaan: {
+          ...formData.perusahaan,
+          tanggalLamaran: todayDate
+        }
+      })
+    }
+  }, []) // Run only once on mount
 
   const updateBiodata = (biodata: Biodata) => {
     setFormData({ ...formData, biodata })
@@ -154,34 +181,53 @@ export default function BuatSuratLamaranPage() {
           </Card>
 
           {/* Step 2: AI Generator */}
-          <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+          <Card className={`border-2 ${formData.content ? 'border-green-500/50 bg-gradient-to-br from-green-500/10 to-transparent' : 'border-primary/20 bg-gradient-to-br from-primary/5 to-transparent'}`}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
                   2
                 </span>
-                <Sparkles className="w-5 h-5 text-primary" />
+                <Sparkles className={`w-5 h-5 ${formData.content ? 'text-green-600' : 'text-primary'}`} />
                 Generate dengan AI (Opsional)
+                {formData.content && (
+                  <Badge className="bg-green-600">Active</Badge>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Biarkan AI membuat surat lamaran profesional untuk Anda. Cukup klik tombol di bawah untuk mendapatkan 3 variasi yang berbeda.
-              </p>
-              <div className="flex items-center gap-4">
+              {formData.content ? (
+                <div className="p-4 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-green-900 dark:text-green-100 mb-1">
+                        ✨ AI Content Aktif
+                      </p>
+                      <p className="text-xs text-green-700 dark:text-green-300">
+                        Content dari AI sudah digunakan. Scroll ke <strong>Step 5: Preview</strong> dan klik tombol <strong>"AI Content"</strong> untuk melihat hasilnya.
+                        Atau edit manual di textbox di bawah.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Biarkan AI membuat surat lamaran profesional untuk Anda. Cukup klik tombol di bawah untuk mendapatkan 3 variasi yang berbeda.
+                </p>
+              )}
+              
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <AIGeneratorDialog
                   posisi={formData.perusahaan.posisiLowongan}
                   perusahaan={formData.perusahaan.namaPerusahaan}
                   industri=""
                   onSelectContent={updateContent}
                 />
-                <div className="text-xs text-muted-foreground">
-                  {formData.content ? (
-                    <span className="text-green-600 font-medium">✓ AI content telah di-generate</span>
-                  ) : (
-                    <span>Atau tulis manual di form di bawah</span>
-                  )}
-                </div>
+                {!formData.content && (
+                  <div className="text-xs text-muted-foreground">
+                    Atau tulis manual di textbox di bawah
+                  </div>
+                )}
               </div>
 
               {/* Manual Content Editor */}
@@ -256,7 +302,7 @@ export default function BuatSuratLamaranPage() {
           </Card>
 
           {/* Step 5: Preview Full A4 */}
-          <div className="space-y-4">
+          <div id="preview-section" className="space-y-4 scroll-mt-20">
             <div className="flex items-center gap-2">
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
                 5

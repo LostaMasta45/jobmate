@@ -55,9 +55,8 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
           filename,
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: ['css', 'legacy'] }
-        })
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        } as any)
         .from(element)
         .save()
 
@@ -189,12 +188,12 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
             new Table({
               width: { size: 100, type: WidthType.PERCENTAGE },
               borders: {
-                top: { style: 0, size: 0, color: "FFFFFF" },
-                bottom: { style: 0, size: 0, color: "FFFFFF" },
-                left: { style: 0, size: 0, color: "FFFFFF" },
-                right: { style: 0, size: 0, color: "FFFFFF" },
-                insideHorizontal: { style: 0, size: 0, color: "FFFFFF" },
-                insideVertical: { style: 0, size: 0, color: "FFFFFF" },
+                top: { style: 'none' as any, size: 0, color: "FFFFFF" },
+                bottom: { style: 'none' as any, size: 0, color: "FFFFFF" },
+                left: { style: 'none' as any, size: 0, color: "FFFFFF" },
+                right: { style: 'none' as any, size: 0, color: "FFFFFF" },
+                insideHorizontal: { style: 'none' as any, size: 0, color: "FFFFFF" },
+                insideVertical: { style: 'none' as any, size: 0, color: "FFFFFF" },
               },
               rows: [
                 ["Tempat/Tanggal Lahir", `${biodata.tempatLahir || "—"}, ${formatTanggalID(biodata.tanggalLahir)}`],
