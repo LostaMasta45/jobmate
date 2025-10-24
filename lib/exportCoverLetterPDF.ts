@@ -20,24 +20,22 @@ export function exportCoverLetterToPDF(htmlContent: string, filename: string) {
 }
 
 function exportHTMLToPDF(htmlContent: string, filename: string) {
-  // Minimal margins (10mm) to maximize content space
+  // Match surat-lamaran-sederhana: 25mm margins
   const opt = {
-    margin: [10, 10, 10, 10] as [number, number, number, number], // top, right, bottom, left in mm
+    margin: [25, 25, 25, 25] as [number, number, number, number], // top, right, bottom, left in mm
     filename: filename,
-    image: { type: 'jpeg' as const, quality: 0.92 },
+    image: { type: 'jpeg' as const, quality: 0.98 },
     html2canvas: { 
       scale: 2,
       useCORS: true,
-      letterRendering: true,
-      windowWidth: 700 // Smaller to prevent overflow
+      letterRendering: true
     },
     jsPDF: { 
       unit: 'mm' as const, 
       format: 'a4' as const, 
-      orientation: 'portrait' as const,
-      compress: true
+      orientation: 'portrait' as const
     },
-    pagebreak: { mode: 'avoid-all' }
+    pagebreak: { mode: ['css', 'legacy'] }
   };
 
   return html2pdf().set(opt).from(htmlContent).save();
@@ -53,22 +51,22 @@ function exportPlainTextToPDF(htmlContent: string, filename: string) {
     });
 
     // A4 size: 210 x 297 mm
-    // Professional margins for Indonesia: 2.5cm (25mm) top/bottom, 2cm (20mm) left/right
+    // Match surat-lamaran-sederhana: 25mm margins, font 12pt
     const pageWidth = 210;
     const pageHeight = 297;
-    const marginLeft = 20;
-    const marginRight = 20;
-    const marginTop = 20;
+    const marginLeft = 25;
+    const marginRight = 25;
+    const marginTop = 25;
     const marginBottom = 25;
-    const contentWidth = pageWidth - marginLeft - marginRight; // 170mm
+    const contentWidth = pageWidth - marginLeft - marginRight; // 160mm
 
     let y = marginTop;
     const lineHeight = 4.5; // Tight spacing for 1 page
     const paragraphSpacing = 2.5; // Reduced spacing
 
-    // Set default font
+    // Set default font - Match sederhana: 12pt
     pdf.setFont("times", "normal");
-    pdf.setFontSize(11);
+    pdf.setFontSize(12);
 
     // Helper function to add text with proper wrapping
     const addText = (text: string, options: { bold?: boolean; align?: "left" | "right" | "center" } = {}) => {

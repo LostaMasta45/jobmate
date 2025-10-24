@@ -182,3 +182,225 @@
     background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
   }
 }
+
+/* === A4 Layout & Typography for Surat Lamaran === */
+.a4-wrap {
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(to bottom, #f3f4f6 0%, #e5e7eb 100%);
+  padding: 40px 20px;
+  border-radius: 12px;
+}
+
+.a4-page {
+  width: 210mm;            /* A4 width */
+  min-height: 297mm;       /* A4 height */
+  padding: 25mm;           /* margin konten 25mm = 2.5cm */
+  background: #fff;
+  color: #000;
+  font-family: "Times New Roman", ui-serif, Georgia, Cambria, "Times", serif;
+  font-size: 12pt;         /* standar surat */
+  line-height: 1.5;
+  letter-spacing: 0.1px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+    0 4px 6px -2px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+/* Dark mode adjustments */
+.dark .a4-wrap {
+  background: linear-gradient(to bottom, #1e293b 0%, #0f172a 100%);
+}
+
+.dark .a4-page {
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.3), 
+    0 4px 6px -2px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Paragraf rapi dengan justify */
+.a4-page p {
+  margin: 0 0 8pt 0;
+  text-align: justify;
+}
+
+.a4-page .section-gap {
+  margin-top: 10pt;
+}
+
+.a4-page .sign-gap {
+  margin-top: 20pt;
+}
+
+/* Tabel label : nilai (Data Pribadi) */
+.kv {
+  border-collapse: collapse;
+  margin-top: 4pt;
+  width: 100%;
+}
+
+.kv-label {
+  width: 42%;
+  padding: 0 0 1pt 0;
+  vertical-align: top;
+}
+
+.kv-sep {
+  width: 12pt;
+  padding: 0 0 1pt 0;
+  text-align: center;
+}
+
+.kv-value {
+  width: 58%;
+  padding: 0 0 1pt 0;
+  vertical-align: top;
+}
+
+/* Daftar lampiran (numerik) */
+.ol-tight {
+  margin: 4pt 0 0 18pt;
+  padding-left: 0;
+}
+
+.ol-tight li {
+  margin: 0 0 2pt 0;
+}
+
+/* Print/A4 Settings */
+@page {
+  size: A4;
+  margin: 0; /* margin 0 karena padding sudah di .a4-page */
+}
+
+/* Template-Specific Styles */
+.template-modern {
+  font-family: 'Calibri', 'Arial', sans-serif;
+}
+
+.template-corporate {
+  font-family: 'Times New Roman', serif;
+}
+
+.template-elegant {
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+.template-two-column {
+  font-family: 'Arial', sans-serif;
+}
+
+.template-bold {
+  font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+.template-compact {
+  font-family: 'Arial', sans-serif;
+  font-size: 10pt;
+}
+
+.template-executive {
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+.template-freshgrad {
+  font-family: 'Poppins', 'Arial', sans-serif;
+}
+
+/* Ensure flex layouts work in print */
+@media print {
+  .template-modern,
+  .template-two-column,
+  .template-bold,
+  .template-freshgrad {
+    display: block;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #preview-surat,
+  #preview-surat * {
+    visibility: visible !important;
+  }
+  #preview-surat {
+    position: absolute;
+    inset: 0;
+    box-shadow: none !important;
+  }
+  .a4-wrap {
+    background: white;
+    padding: 0;
+  }
+}
+
+/* Color Theme System - ATS Friendly */
+.themed-letter {
+  color: var(--theme-text, #000000);
+}
+
+/* Apply theme colors to specific elements */
+.themed-letter strong,
+.themed-letter b {
+  color: var(--theme-primary, #000000);
+}
+
+.themed-letter h1,
+.themed-letter h2,
+.themed-letter h3,
+.themed-letter h4 {
+  color: var(--theme-primary, #000000);
+}
+
+/* Borders and lines */
+.themed-letter hr {
+  border-color: var(--theme-accent, #000000);
+}
+
+/* Subtle accent on section headers */
+.themed-letter .section-header {
+  border-left: 3px solid var(--theme-accent, #000000);
+  padding-left: 8px;
+}
+
+/* Table styling with theme colors */
+.themed-letter table th {
+  color: var(--theme-primary, #000000);
+}
+
+.themed-letter table tr {
+  border-color: var(--theme-accent, #dddddd);
+}
+
+/* Links */
+.themed-letter a {
+  color: var(--theme-primary, #000000);
+}
+
+/* Keep body text always black for ATS */
+.themed-letter p,
+.themed-letter span,
+.themed-letter div {
+  color: var(--theme-text, #000000);
+}
+
+/* Signature line */
+.themed-letter .signature-line {
+  border-top: 1px solid var(--theme-accent, #000000);
+}
+
+/* Print: Preserve colors */
+@media print {
+  .themed-letter {
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

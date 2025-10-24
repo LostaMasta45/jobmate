@@ -1,0 +1,272 @@
+"use client"
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
+import { FormBiodata } from "@/components/surat-lamaran/FormBiodata"
+import { FormPerusahaan } from "@/components/surat-lamaran/FormPerusahaan"
+import { TemplatePicker } from "@/components/surat-lamaran/TemplatePicker"
+import { PreviewSurat } from "@/components/surat-lamaran/PreviewSurat"
+import { ToolbarActions } from "@/components/surat-lamaran/ToolbarActions"
+import { ColorThemeSelector } from "@/components/surat-lamaran/ColorThemeSelector"
+import { AIGeneratorDialog } from "@/components/surat-lamaran/AIGeneratorDialog"
+import { Toaster } from "@/components/ui/toaster"
+import { usePersistedState } from "@/lib/usePersistedState"
+import { DEFAULT_LAMPIRAN, type FormState, type Biodata, type Perusahaan } from "@/lib/surat-lamaran-utils"
+import { templates } from "@/lib/templates"
+import { History, ChevronRight, FileText, Home, ArrowLeft, Sparkles, Palette } from "lucide-react"
+import Link from "next/link"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+
+const defaultBiodata: Biodata = {
+  namaLengkap: "",
+  tempatLahir: "",
+  tanggalLahir: "",
+  jenisKelamin: "",
+  status: "",
+  pendidikan: "",
+  noHandphone: "",
+  email: "",
+  alamatKota: "",
+  alamatLengkap: "",
+}
+
+const defaultPerusahaan: Perusahaan = {
+  kepadaYth: "",
+  namaPerusahaan: "",
+  kotaPerusahaan: "",
+  jenisInstansi: "",
+  posisiLowongan: "",
+  sumberLowongan: "",
+  tanggalLamaran: new Date().toISOString().split("T")[0],
+  lampiran: DEFAULT_LAMPIRAN.split("\n"),
+}
+
+export default function BuatSuratLamaranPage() {
+  const [formData, setFormData] = usePersistedState<FormState>("jobmate_sls_form_v3", {
+    biodata: defaultBiodata,
+    perusahaan: defaultPerusahaan,
+    content: "",
+    colorTheme: "classic"
+  })
+
+  const [templateId, setTemplateId] = usePersistedState<string>(
+    "jobmate_sls_templateId_v3",
+    "template-1"
+  )
+
+  const updateBiodata = (biodata: Biodata) => {
+    setFormData({ ...formData, biodata })
+  }
+
+  const updatePerusahaan = (perusahaan: Perusahaan) => {
+    setFormData({ ...formData, perusahaan })
+  }
+
+  const updateContent = (content: string) => {
+    setFormData({ ...formData, content })
+  }
+
+  const updateColorTheme = (colorTheme: string) => {
+    setFormData({ ...formData, colorTheme })
+  }
+
+  const handleReset = () => {
+    localStorage.removeItem("jobmate_sls_form_v3")
+    localStorage.removeItem("jobmate_sls_templateId_v3")
+    window.location.reload()
+  }
+
+  return (
+    <>
+      <Toaster />
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Breadcrumb Navigation */}
+        <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
+          <Link href="/dashboard" className="hover:text-foreground flex items-center gap-1">
+            <Home className="h-4 w-4" />
+            Dashboard
+          </Link>
+          <ChevronRight className="h-4 w-4" />
+          <Link href="/surat-lamaran-sederhana/history" className="hover:text-foreground">
+            Surat Lamaran Sederhana
+          </Link>
+          <ChevronRight className="h-4 w-4" />
+          <span className="text-foreground font-medium">Buat Baru</span>
+        </div>
+
+        {/* Header */}
+        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <FileText className="h-6 w-6 text-primary" />
+              </div>
+              <h1 className="text-3xl font-bold">Buat Surat Lamaran</h1>
+            </div>
+            <p className="text-muted-foreground">
+              Buat surat lamaran kerja profesional dalam 3 langkah mudah: isi data, pilih template, dan download.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Link href="/surat-lamaran-sederhana/history">
+              <Button variant="outline" size="sm" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">Kembali</span>
+              </Button>
+            </Link>
+            <Link href="/surat-lamaran-sederhana/history">
+              <Button variant="default" size="sm" className="gap-2">
+                <History className="h-4 w-4" />
+                History
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Main Content - Vertical Layout */}
+        <div className="space-y-8 max-w-6xl mx-auto">
+          {/* Step 1: Data Form */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
+                  1
+                </span>
+                Isi Data Anda
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="biodata" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="biodata">Biodata</TabsTrigger>
+                  <TabsTrigger value="lamaran">Data Lamaran</TabsTrigger>
+                </TabsList>
+                <TabsContent value="biodata" className="space-y-4 mt-4">
+                  <FormBiodata data={formData.biodata} onChange={updateBiodata} />
+                </TabsContent>
+                <TabsContent value="lamaran" className="space-y-4 mt-4">
+                  <FormPerusahaan data={formData.perusahaan} onChange={updatePerusahaan} />
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+
+          {/* Step 2: AI Generator */}
+          <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
+                  2
+                </span>
+                <Sparkles className="w-5 h-5 text-primary" />
+                Generate dengan AI (Opsional)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Biarkan AI membuat surat lamaran profesional untuk Anda. Cukup klik tombol di bawah untuk mendapatkan 3 variasi yang berbeda.
+              </p>
+              <div className="flex items-center gap-4">
+                <AIGeneratorDialog
+                  posisi={formData.perusahaan.posisiLowongan}
+                  perusahaan={formData.perusahaan.namaPerusahaan}
+                  industri=""
+                  onSelectContent={updateContent}
+                />
+                <div className="text-xs text-muted-foreground">
+                  {formData.content ? (
+                    <span className="text-green-600 font-medium">✓ AI content telah di-generate</span>
+                  ) : (
+                    <span>Atau tulis manual di form di bawah</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Manual Content Editor */}
+              <div className="space-y-2">
+                <Label htmlFor="content">Custom Content (Opsional)</Label>
+                <Textarea
+                  id="content"
+                  value={formData.content || ""}
+                  onChange={(e) => updateContent(e.target.value)}
+                  placeholder="Isi surat akan otomatis di-generate dari template, atau Anda bisa menulis custom content di sini..."
+                  rows={6}
+                  className="font-mono text-sm"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Kosongkan jika ingin menggunakan template default. Isi jika ingin custom content atau hasil generate AI.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Step 3: Template & Color Selection */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
+                  3
+                </span>
+                Pilih Template & Warna
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Template Picker */}
+              <div>
+                <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Template Surat
+                </h4>
+                <TemplatePicker
+                  selectedId={templateId}
+                  onChange={setTemplateId}
+                />
+              </div>
+
+              {/* Color Theme Selector */}
+              <div className="pt-4 border-t">
+                <div className="mb-3 flex items-center gap-2">
+                  <Palette className="w-4 h-4" />
+                  <h4 className="text-sm font-semibold">Tema Warna</h4>
+                </div>
+                <ColorThemeSelector
+                  selected={formData.colorTheme || "classic"}
+                  onChange={updateColorTheme}
+                  position={formData.perusahaan.posisiLowongan}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Step 4: Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
+                  4
+                </span>
+                Aksi & Download
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ToolbarActions formData={formData} templateId={templateId} onReset={handleReset} />
+            </CardContent>
+          </Card>
+
+          {/* Step 5: Preview Full A4 */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
+                5
+              </span>
+              <h2 className="text-2xl font-bold">Preview Surat Lamaran</h2>
+            </div>
+            <PreviewSurat templateId={templateId} formData={formData} />
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}

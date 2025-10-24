@@ -100,7 +100,7 @@ export async function exportCoverLetterToWord(htmlContent: string, filename: str
             new TextRun({
               text: line,
               font: "Times New Roman",
-              size: 22, // 11pt (size in half-points)
+              size: 24, // 12pt (size in half-points) - Match sederhana
               bold: bold,
             }),
           ],
@@ -122,10 +122,10 @@ export async function exportCoverLetterToWord(htmlContent: string, filename: str
                 height: convertInchesToTwip(11.69),
               },
               margin: {
-                top: convertInchesToTwip(0.79), // 20mm
-                right: convertInchesToTwip(0.79), // 20mm
-                bottom: convertInchesToTwip(0.79), // 20mm
-                left: convertInchesToTwip(0.79), // 20mm
+                top: convertInchesToTwip(0.98), // 25mm - Match sederhana
+                right: convertInchesToTwip(0.98), // 25mm
+                bottom: convertInchesToTwip(0.98), // 25mm
+                left: convertInchesToTwip(0.98), // 25mm
               },
             },
           },
@@ -162,7 +162,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: `${city}, ${today}`,
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
           }),
         ],
         alignment: AlignmentType.RIGHT,
@@ -175,7 +175,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: "Lampiran : 1 (satu) berkas",
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
           }),
         ],
         spacing: { after: 100 },
@@ -187,7 +187,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: `Perihal  : Lamaran Pekerjaan sebagai ${data.position}`,
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
           }),
         ],
         spacing: { after: 200 },
@@ -199,7 +199,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: "Kepada Yth.",
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
           }),
         ],
         spacing: { after: 100 },
@@ -210,7 +210,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: `${data.hrdName || "HRD Manager"}`,
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
           }),
         ],
         spacing: { after: 100 },
@@ -221,7 +221,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: data.companyName,
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
           }),
         ],
         spacing: { after: 200 },
@@ -233,7 +233,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: "Dengan hormat,",
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
             bold: true,
           }),
         ],
@@ -246,7 +246,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: `Saya bermaksud melamar posisi ${data.position} di ${data.companyName}. Saya yakin dapat memberikan kontribusi positif bagi perusahaan.`,
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
           }),
         ],
         alignment: AlignmentType.JUSTIFIED,
@@ -259,7 +259,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: `Nama: ${data.fullName}`,
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
           }),
         ],
         spacing: { after: 100 },
@@ -270,7 +270,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: `Telepon: ${data.phone}`,
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
           }),
         ],
         spacing: { after: 100 },
@@ -281,7 +281,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: `Email: ${data.email}`,
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
           }),
         ],
         spacing: { after: 200 },
@@ -293,7 +293,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: "Demikian surat lamaran ini saya buat. Besar harapan saya untuk diberikan kesempatan wawancara. Atas perhatian Bapak/Ibu, saya ucapkan terima kasih.",
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
           }),
         ],
         alignment: AlignmentType.JUSTIFIED,
@@ -306,7 +306,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: "Hormat saya,",
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
             bold: true,
           }),
         ],
@@ -319,7 +319,7 @@ export async function exportCoverLetterToWordSimple(data: any, filename: string)
           new TextRun({
             text: data.fullName,
             font: "Times New Roman",
-            size: 22,
+            size: 24, // 12pt
             bold: true,
           }),
         ],

@@ -25,10 +25,73 @@ import { exportCoverLetterToWord } from "@/lib/exportCoverLetterWord";
 import { polishCoverLetterWithAI } from "@/actions/surat-lamaran/polish-with-ai";
 import { TemplateSelector } from "../TemplateSelector";
 import { useToast } from "@/hooks/use-toast";
+import { TemplateSkyBlue } from "../creative-templates/TemplateSkyBlue";
+import { TemplateForestGreen } from "../creative-templates/TemplateForestGreen";
+import { TemplateCoral } from "../creative-templates/TemplateCoral";
+import { TemplatePurple } from "../creative-templates/TemplatePurple";
+import { TemplateRose } from "../creative-templates/TemplateRose";
+import { TemplateTeal } from "../creative-templates/TemplateTeal";
+import { TemplateNavy } from "../creative-templates/TemplateNavy";
+import { TemplateAmber } from "../creative-templates/TemplateAmber";
+import { TemplateSlate } from "../creative-templates/TemplateSlate";
+import { TemplateGradient } from "../creative-templates/TemplateGradient";
+import type { FormState } from "@/lib/surat-lamaran-utils";
 
 interface StepPreviewProps {
   formData: any;
   updateFormData: (data: any) => void;
+}
+
+// Helper function to render creative templates
+function renderCreativeTemplate(templateId: string, data: any): React.ReactNode {
+  // Transform formData to FormState for creative templates
+  const formState: FormState = {
+    biodata: {
+      namaLengkap: data.fullName || "",
+      tempatLahir: data.birthPlace || "",
+      tanggalLahir: data.birthDate || "",
+      alamatLengkap: data.address || "",
+      noHandphone: data.phone || "",
+      email: data.email || "",
+      pendidikan: data.degree ? `${data.degree} ${data.major || ""}`.trim() : "",
+      status: data.status || ""
+    },
+    perusahaan: {
+      namaPerusahaan: data.companyName || "",
+      jenisInstansi: "", // Not available in formData
+      kotaPerusahaan: data.address ? data.address.split(",")[0].trim() : "Jakarta",
+      posisiLowongan: data.position || "",
+      kepadaYth: data.hrdName || "HRD",
+      tanggalLamaran: new Date().toISOString(),
+      sumberLowongan: data.jobSource || "Website Perusahaan",
+      lampiran: data.attachments || []
+    }
+  };
+
+  switch (templateId) {
+    case "SKY_BLUE":
+      return <TemplateSkyBlue data={formState} />;
+    case "FOREST_GREEN":
+      return <TemplateForestGreen data={formState} />;
+    case "CORAL":
+      return <TemplateCoral data={formState} />;
+    case "PURPLE":
+      return <TemplatePurple data={formState} />;
+    case "ROSE":
+      return <TemplateRose data={formState} />;
+    case "TEAL":
+      return <TemplateTeal data={formState} />;
+    case "NAVY":
+      return <TemplateNavy data={formState} />;
+    case "AMBER":
+      return <TemplateAmber data={formState} />;
+    case "SLATE":
+      return <TemplateSlate data={formState} />;
+    case "GRADIENT":
+      return <TemplateGradient data={formState} />;
+    default:
+      return <TemplateSkyBlue data={formState} />;
+  }
 }
 
 export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
@@ -47,15 +110,20 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
     // User can still see their AI polished version after switching templates
   };
   
-  // Generate content based on template type
+  // Check template type
   const isATSTemplate = selectedTemplate === "T0";
+  const isCreativeTemplate = ["SKY_BLUE", "FOREST_GREEN", "CORAL", "PURPLE", "ROSE", "TEAL", "NAVY", "AMBER", "SLATE", "GRADIENT"].includes(selectedTemplate);
+  const isOldModernTemplate = ["T1", "T2", "T3", "T4", "T5"].includes(selectedTemplate);
   
+  // Generate content based on template type
   const standardContent = isATSTemplate 
     ? generateCoverLetter(formData)
-    : generateModernCoverLetter({
-        templateId: selectedTemplate,
-        ...formData
-      });
+    : isOldModernTemplate
+      ? generateModernCoverLetter({
+          templateId: selectedTemplate,
+          ...formData
+        })
+      : ""; // Creative templates use React components, not HTML strings
   
   // Current display content
   const displayContent = selectedVersion === "ai" && aiPolished 
@@ -335,8 +403,17 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
             })}
           </div>
         </Card>
+      ) : isCreativeTemplate ? (
+        // Creative Template: React Component with A4 wrapper
+        <Card className="p-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 overflow-hidden shadow-lg">
+          <div className="a4-wrap">
+            <div className="a4-page" id="preview-surat">
+              {renderCreativeTemplate(selectedTemplate, formData)}
+            </div>
+          </div>
+        </Card>
       ) : (
-        // Modern Template: HTML preview
+        // Old Modern Template: HTML preview
         <Card className="p-0 bg-white overflow-hidden shadow-lg">
           <div 
             dangerouslySetInnerHTML={{ __html: displayContent }}

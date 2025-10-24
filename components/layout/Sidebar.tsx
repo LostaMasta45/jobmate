@@ -68,6 +68,12 @@ const navItems: NavItem[] = [
     divider: true,
   },
   {
+    title: "Surat Lamaran Sederhana",
+    href: "/surat-lamaran-sederhana/history",
+    icon: FileText,
+    premiumOnly: true,
+  },
+  {
     title: "Email Generator",
     href: "/tools/email-generator",
     icon: MailPlus,
