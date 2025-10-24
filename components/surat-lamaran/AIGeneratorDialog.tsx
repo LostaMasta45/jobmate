@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Sparkles, Loader2, Check } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
 type AIVariation = {
   style: string
@@ -38,6 +38,7 @@ type Props = {
 }
 
 export function AIGeneratorDialog({ posisi, perusahaan, industri, onSelectContent, trigger }: Props) {
+  const { toast } = useToast()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [level, setLevel] = useState<string>("fresh-grad")
