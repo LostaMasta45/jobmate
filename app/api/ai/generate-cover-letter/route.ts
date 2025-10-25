@@ -170,12 +170,14 @@ ${biodata?.pendidikan ? `- Pendidikan: ${biodata.pendidikan}` : ''}
 REQUIREMENTS:
 1. Bahasa Indonesia formal dan profesional
 2. ATS-friendly (hindari formatting berlebihan, gunakan bahasa yang jelas)
-3. Panjang: 250-300 kata
-4. Struktur: Pembuka → Self-intro → Motivasi → Value proposition → Penutup
-5. Hindari: kalimat klise, bahasa terlalu umum, redundansi
-6. Sertakan: specific skills/qualities yang relevan untuk ${posisi}
-7. Tunjukkan: pemahaman tentang industri ${industri || 'yang dilamar'}
-8. Sesuaikan dengan level ${level}
+3. Panjang: MAKSIMAL 150-180 kata (sangat penting!)
+4. HARUS muat dalam 1 halaman A4 dengan margin 25mm
+5. Struktur RINGKAS: Pembuka (1 paragraf) → Motivasi & Value (2 paragraf) → Penutup (1 paragraf)
+6. Hindari: kalimat klise, bahasa terlalu umum, redundansi, paragraf panjang
+7. Sertakan: specific skills/qualities yang relevan untuk ${posisi}
+8. Tunjukkan: pemahaman tentang industri ${industri || 'yang dilamar'}
+9. Sesuaikan dengan level ${level}
+10. CRITICAL: Buat PENDEK dan PADAT, fokus pada poin-poin penting saja
 
 STYLE KHUSUS UNTUK ${style.toUpperCase()}:
 ${style === 'conservative' ? '- Gunakan bahasa sangat formal dan tradisional\n- Fokus pada kesopanan dan penghormatan\n- Struktur sangat teratur' : ''}
@@ -196,7 +198,9 @@ Mulai langsung dengan:
 PENTING: 
 - Jangan gunakan placeholder seperti [Nama], [Posisi], dll
 - Gunakan ${posisi} dan ${perusahaan} langsung dalam surat
-- Tulis lengkap dan siap pakai`
+- Tulis lengkap dan siap pakai
+- MAKSIMAL 180 KATA! Ini sangat penting karena harus muat 1 halaman A4
+- Jika terlalu panjang akan terpotong, jadi buat RINGKAS dan EFEKTIF`
 
   try {
     console.log(`Generating ${style} variation for ${posisi} at ${perusahaan}...`)
@@ -214,7 +218,7 @@ PENTING:
         }
       ],
       temperature: style === 'conservative' ? 0.3 : style === 'balanced' ? 0.5 : 0.7,
-      max_tokens: 800
+      max_tokens: 400  // Reduced to force shorter, concise responses
     })
 
     const content = response.choices[0]?.message?.content?.trim() || ''

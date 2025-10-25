@@ -404,5 +404,75 @@ Hormat saya,
 
 
 {{namaLengkap}}`
+  },
+  {
+    id: "template-11",
+    name: "Modern Blue Box",
+    description: "ATS-friendly, box berwarna biru, data dalam kotak",
+    category: "IT, Tech, Digital, Modern Company",
+    body: "{{TEMPLATE_RENDERED_BY_COMPONENT}}"
+  },
+  {
+    id: "template-12",
+    name: "Professional Green",
+    description: "ATS-friendly, accent hijau, serif font, compact",
+    category: "Finance, Banking, Corporate",
+    body: "{{TEMPLATE_RENDERED_BY_COMPONENT}}"
+  },
+  {
+    id: "template-13",
+    name: "Teal Modern",
+    description: "ATS-friendly, gradient header, 2-column data, modern",
+    category: "Startup, Creative, Marketing",
+    body: "{{TEMPLATE_RENDERED_BY_COMPONENT}}"
+  },
+  {
+    id: "template-14",
+    name: "Purple Executive",
+    description: "ATS-friendly, purple elegant, tabel formal, executive",
+    category: "Manager, Senior, Executive, Leadership",
+    body: "{{TEMPLATE_RENDERED_BY_COMPONENT}}"
+  },
+  {
+    id: "template-15",
+    name: "Orange Creative",
+    description: "ATS-friendly, orange energetic, circle avatar, creative",
+    category: "Design, Media, Creative Industry",
+    body: "{{TEMPLATE_RENDERED_BY_COMPONENT}}"
+  },
+  {
+    id: "template-16",
+    name: "Navy Corporate",
+    description: "ATS-friendly, navy blue header, compact, professional",
+    category: "Consulting, Legal, Audit, Professional Services",
+    body: "{{TEMPLATE_RENDERED_BY_COMPONENT}}"
+  },
+  {
+    id: "template-17",
+    name: "Forest Green",
+    description: "ATS-friendly, dark green, double border, classic serif",
+    category: "Education, Healthcare, NGO, Government",
+    body: "{{TEMPLATE_RENDERED_BY_COMPONENT}}"
+  },
+  {
+    id: "template-18",
+    name: "Royal Blue",
+    description: "ATS-friendly, royal blue header, centered, grid data",
+    category: "Hospitality, Retail, Customer Service",
+    body: "{{TEMPLATE_RENDERED_BY_COMPONENT}}"
+  },
+  {
+    id: "template-19",
+    name: "Burgundy Elegant",
+    description: "ATS-friendly, burgundy borders, elegant serif, sophisticated",
+    category: "Fashion, Luxury, High-end, Premium Brands",
+    body: "{{TEMPLATE_RENDERED_BY_COMPONENT}}"
+  },
+  {
+    id: "template-20",
+    name: "Slate Professional",
+    description: "ATS-friendly, slate gray, clean layout, minimalist",
+    category: "Engineering, Architecture, Construction",
+    body: "{{TEMPLATE_RENDERED_BY_COMPONENT}}"
   }
 ]

@@ -9,6 +9,16 @@ import { Template7Bold } from "./templates/Template7Bold"
 import { Template8Compact } from "./templates/Template8Compact"
 import { Template9Executive } from "./templates/Template9Executive"
 import { Template10FreshGrad } from "./templates/Template10FreshGrad"
+import { Template11BlueBox } from "./templates/Template11BlueBox"
+import { Template12GreenPro } from "./templates/Template12GreenPro"
+import { Template13TealModern } from "./templates/Template13TealModern"
+import { Template14PurpleExec } from "./templates/Template14PurpleExec"
+import { Template15OrangeCreative } from "./templates/Template15OrangeCreative"
+import { Template16NavyCorp } from "./templates/Template16NavyCorp"
+import { Template17ForestGreen } from "./templates/Template17ForestGreen"
+import { Template18RoyalBlue } from "./templates/Template18RoyalBlue"
+import { Template19BurgundyElegant } from "./templates/Template19BurgundyElegant"
+import { Template20SlatePro } from "./templates/Template20SlatePro"
 import { getThemeById } from "@/lib/colorThemes"
 
 type Props = {
@@ -59,6 +69,36 @@ export function Letter({ data, templateId }: Props) {
       break
     case "template-10":
       TemplateComponent = Template10FreshGrad
+      break
+    case "template-11":
+      TemplateComponent = Template11BlueBox
+      break
+    case "template-12":
+      TemplateComponent = Template12GreenPro
+      break
+    case "template-13":
+      TemplateComponent = Template13TealModern
+      break
+    case "template-14":
+      TemplateComponent = Template14PurpleExec
+      break
+    case "template-15":
+      TemplateComponent = Template15OrangeCreative
+      break
+    case "template-16":
+      TemplateComponent = Template16NavyCorp
+      break
+    case "template-17":
+      TemplateComponent = Template17ForestGreen
+      break
+    case "template-18":
+      TemplateComponent = Template18RoyalBlue
+      break
+    case "template-19":
+      TemplateComponent = Template19BurgundyElegant
+      break
+    case "template-20":
+      TemplateComponent = Template20SlatePro
       break
     default:
       // Fallback to template 1 if unknown
