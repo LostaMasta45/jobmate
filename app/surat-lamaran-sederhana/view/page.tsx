@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -43,7 +43,7 @@ const defaultPerusahaan: Perusahaan = {
   lampiran: DEFAULT_LAMPIRAN.split("\n"),
 }
 
-export default function ViewSuratLamaranPage() {
+function ViewSuratLamaranContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const suratId = searchParams.get("id")
@@ -274,5 +274,18 @@ export default function ViewSuratLamaranPage() {
         </div>
       </div>
     </>
+  )
+}
+
+// Wrap with Suspense to handle useSearchParams
+export default function ViewSuratLamaranPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    }>
+      <ViewSuratLamaranContent />
+    </Suspense>
   )
 }
