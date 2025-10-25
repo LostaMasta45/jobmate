@@ -49,13 +49,46 @@ function convertXenditToPayment(invoice: any) {
   const planType = invoice.external_id?.includes('premium') ? 'premium' : 'basic';
   const amount = planType === 'premium' ? 39000 : 10000;
   
-  // Extract customer name (combine given_names and surname if available)
+  // Extract customer name (try multiple fields)
   let userName = 'Unknown User';
   if (invoice.customer) {
-    const givenNames = invoice.customer.given_names || '';
-    const surname = invoice.customer.surname || '';
-    userName = [givenNames, surname].filter(Boolean).join(' ').trim() || 'Unknown User';
+    // Try given_names first (this is what we send in create-invoice)
+    const givenNames = invoice.customer.given_names || invoice.customer.given_name || '';
+    const surname = invoice.customer.surname || invoice.customer.sur_name || '';
+    userName = [givenNames, surname].filter(Boolean).join(' ').trim();
   }
+  
+  // If still no name, try customer_name or billing_address name
+  if (!userName || userName === 'Unknown User') {
+    userName = invoice.customer_name 
+      || invoice.billing_address?.name 
+      || invoice.customer?.name
+      || 'Unknown User';
+  }
+  
+  // Extract WhatsApp/phone number (try multiple fields)
+  let userWhatsapp = '';
+  if (invoice.customer) {
+    userWhatsapp = invoice.customer.mobile_number 
+      || invoice.customer.phone_number
+      || invoice.customer.phone
+      || invoice.customer.mobile
+      || invoice.billing_address?.phone_number
+      || '';
+  }
+  
+  // Extract email
+  const userEmail = invoice.payer_email 
+    || invoice.customer?.email 
+    || invoice.billing_address?.email
+    || '';
+  
+  console.log('[convertXenditToPayment] Customer data:', {
+    userName,
+    userEmail,
+    userWhatsapp,
+    rawCustomer: invoice.customer,
+  });
   
   return {
     externalId: invoice.external_id,
@@ -67,8 +100,8 @@ function convertXenditToPayment(invoice: any) {
     expiredAt: invoice.expiry_date || null,
     createdAt: invoice.created || null,
     userName: userName,
-    userEmail: invoice.payer_email || invoice.customer?.email || '',
-    userWhatsapp: invoice.customer?.mobile_number || invoice.customer?.phone_number || '',
+    userEmail: userEmail,
+    userWhatsapp: userWhatsapp,
     paymentMethod: invoice.payment_method || invoice.payment_channel || null,
     invoiceUrl: invoice.invoice_url || '',
   };
@@ -100,6 +133,11 @@ export async function GET(request: NextRequest) {
     // If found in database, return it
     if (payment && !error) {
       console.log('[Check Status] Payment found in database:', payment.external_id, 'Status:', payment.status);
+      console.log('[Check Status] Customer data from DB:', {
+        userName: payment.user_name,
+        userEmail: payment.user_email,
+        userWhatsapp: payment.user_whatsapp,
+      });
 
       return NextResponse.json({
         success: true,
@@ -118,6 +156,7 @@ export async function GET(request: NextRequest) {
           paymentMethod: payment.payment_method,
           invoiceUrl: payment.invoice_url,
         },
+        source: 'database',
       });
     }
 

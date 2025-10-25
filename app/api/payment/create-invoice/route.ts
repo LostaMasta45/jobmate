@@ -102,6 +102,16 @@ export async function POST(request: NextRequest) {
 
     // Save payment to database with UPSERT (ensure always succeeds)
     const supabase = await createClient();
+    
+    console.log('[Create Invoice] Saving to database:', {
+      external_id: externalId,
+      user_email: email,
+      user_name: fullName,
+      user_whatsapp: whatsapp,
+      plan_type: plan,
+      amount: amount,
+    });
+    
     const { data: paymentData, error: dbError } = await supabase
       .from('payments')
       .upsert({
@@ -132,7 +142,13 @@ export async function POST(request: NextRequest) {
       // Still return success - webhook will handle the save
       // But this is logged as CRITICAL for monitoring
     } else {
-      console.log('[Create Invoice] Payment saved to database:', paymentData?.external_id);
+      console.log('[Create Invoice] Payment saved to database successfully');
+      console.log('[Create Invoice] Saved data:', {
+        external_id: paymentData?.external_id,
+        user_name: paymentData?.user_name,
+        user_email: paymentData?.user_email,
+        user_whatsapp: paymentData?.user_whatsapp,
+      });
     }
 
     // Send invoice email
