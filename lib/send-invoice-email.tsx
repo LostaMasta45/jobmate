@@ -15,8 +15,8 @@ interface SendInvoiceEmailParams {
 
 export async function sendInvoiceEmail(params: SendInvoiceEmailParams) {
   try {
-    const emailHtml = await render(<InvoiceEmail {...params} />);
-    const emailText = InvoiceEmailText(params);
+    const emailHtml: string = await render(<InvoiceEmail {...params} />);
+    const emailText: string = InvoiceEmailText(params);
 
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
