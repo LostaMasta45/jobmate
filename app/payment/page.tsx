@@ -10,6 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2, CreditCard, Loader2, ArrowLeft, Sparkles, Shield, Zap, Crown, Mail, User, Phone } from "lucide-react";
+import { TrustBanner } from "@/components/payment/TrustBanner";
+import { BenefitReminder } from "@/components/payment/BenefitReminder";
+import { FAQAccordion } from "@/components/payment/FAQAccordion";
+import { validateEmail, validateWhatsApp, formatWhatsApp, formatWhatsAppForAPI } from "@/lib/form-validation";
 
 function PaymentFormContent() {
   const router = useRouter();
@@ -23,6 +27,9 @@ function PaymentFormContent() {
     fullName: "",
     whatsapp: "",
   });
+  const [emailError, setEmailError] = React.useState<string | null>(null);
+  const [emailSuggestion, setEmailSuggestion] = React.useState<string | null>(null);
+  const [whatsappError, setWhatsappError] = React.useState<string | null>(null);
 
   const planDetails = {
     basic: { name: 'VIP Basic', price: 10000, priceText: 'Rp 10.000', duration: '/bulan' },
@@ -31,16 +38,69 @@ function PaymentFormContent() {
 
   const currentPlan = plan && planDetails[plan] ? planDetails[plan] : planDetails.premium;
 
+  // Real-time validation handlers
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const email = e.target.value;
+    setFormData({ ...formData, email });
+    
+    if (email) {
+      const validation = validateEmail(email);
+      if (!validation.valid) {
+        setEmailError(validation.error || null);
+        setEmailSuggestion(validation.suggestion || null);
+      } else {
+        setEmailError(null);
+        setEmailSuggestion(null);
+      }
+    } else {
+      setEmailError(null);
+      setEmailSuggestion(null);
+    }
+  };
+
+  const handleWhatsAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const phone = e.target.value;
+    const formatted = formatWhatsApp(phone);
+    setFormData({ ...formData, whatsapp: formatted });
+    
+    if (phone) {
+      const validation = validateWhatsApp(phone);
+      if (!validation.valid) {
+        setWhatsappError(validation.error || null);
+      } else {
+        setWhatsappError(null);
+      }
+    } else {
+      setWhatsappError(null);
+    }
+  };
+
+  const applySuggestion = () => {
+    if (emailSuggestion) {
+      setFormData({ ...formData, email: emailSuggestion });
+      setEmailError(null);
+      setEmailSuggestion(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      // Validate WhatsApp number format
-      const cleanWhatsapp = formData.whatsapp.replace(/\D/g, '');
-      if (cleanWhatsapp.length < 10) {
-        setError('Nomor WhatsApp tidak valid');
+      // Validate form
+      const emailValidation = validateEmail(formData.email);
+      const whatsappValidation = validateWhatsApp(formData.whatsapp);
+      
+      if (!emailValidation.valid) {
+        setError(emailValidation.error || 'Email tidak valid');
+        setLoading(false);
+        return;
+      }
+      
+      if (!whatsappValidation.valid) {
+        setError(whatsappValidation.error || 'Nomor WhatsApp tidak valid');
         setLoading(false);
         return;
       }
@@ -53,7 +113,7 @@ function PaymentFormContent() {
           plan: plan || 'premium',
           email: formData.email,
           fullName: formData.fullName,
-          whatsapp: cleanWhatsapp.startsWith('62') ? '+' + cleanWhatsapp : '+62' + cleanWhatsapp.replace(/^0/, ''),
+          whatsapp: formatWhatsAppForAPI(formData.whatsapp),
         }),
       });
 
@@ -106,6 +166,9 @@ function PaymentFormContent() {
             Kembali
           </Button>
         </motion.div>
+
+        {/* NEW: Trust Banner */}
+        <TrustBanner />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -213,6 +276,9 @@ function PaymentFormContent() {
               </div>
             </motion.div>
 
+            {/* NEW: Benefit Reminder */}
+            <BenefitReminder plan={plan || 'premium'} />
+
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
@@ -264,11 +330,31 @@ function PaymentFormContent() {
                   type="email"
                   placeholder="email@example.com"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={handleEmailChange}
                   required
                   disabled={loading}
-                  className="h-12 border-2 border-amber-200 focus:border-amber-500 dark:border-amber-800 dark:focus:border-amber-600 transition-colors"
+                  className={`h-12 border-2 transition-colors ${
+                    emailError 
+                      ? 'border-red-500 focus:border-red-500' 
+                      : 'border-amber-200 focus:border-amber-500 dark:border-amber-800 dark:focus:border-amber-600'
+                  }`}
                 />
+                {emailError && (
+                  <p className="text-xs text-red-600 flex items-center gap-1">
+                    ⚠️ {emailError}
+                  </p>
+                )}
+                {emailSuggestion && (
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    onClick={applySuggestion}
+                    className="p-0 h-auto text-blue-600"
+                  >
+                    Maksud Anda: <strong>{emailSuggestion}</strong>? Klik untuk gunakan
+                  </Button>
+                )}
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <Shield className="w-3 h-3" />
                   Invoice pembayaran akan dikirim ke email ini
@@ -290,11 +376,21 @@ function PaymentFormContent() {
                   type="tel"
                   placeholder="08123456789"
                   value={formData.whatsapp}
-                  onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                  onChange={handleWhatsAppChange}
                   required
                   disabled={loading}
-                  className="h-12 border-2 border-amber-200 focus:border-amber-500 dark:border-amber-800 dark:focus:border-amber-600 transition-colors"
+                  inputMode="numeric"
+                  className={`h-12 border-2 transition-colors ${
+                    whatsappError 
+                      ? 'border-red-500 focus:border-red-500' 
+                      : 'border-amber-200 focus:border-amber-500 dark:border-amber-800 dark:focus:border-amber-600'
+                  }`}
                 />
+                {whatsappError && (
+                  <p className="text-xs text-red-600 flex items-center gap-1">
+                    ⚠️ {whatsappError}
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <Shield className="w-3 h-3" />
                   Untuk konfirmasi pembayaran dan akses grup VIP
@@ -388,9 +484,16 @@ function PaymentFormContent() {
                 🔐 Data Anda dilindungi dengan enkripsi SSL 256-bit
               </p>
             </motion.div>
+
+            {/* NEW: FAQ Accordion */}
+            <FAQAccordion />
           </CardContent>
         </Card>
         </motion.div>
+
+        {/* NEW: FAQ Below Card (Alternative Position) */}
+        {/* Uncomment if you want FAQ outside the main card */}
+        {/* <FAQAccordion /> */}
       </div>
     </div>
   );

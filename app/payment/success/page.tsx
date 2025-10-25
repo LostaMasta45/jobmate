@@ -20,6 +20,10 @@ import {
   Star,
   Phone
 } from "lucide-react";
+import { NextStepsChecklist } from "@/components/payment/NextStepsChecklist";
+import { SocialShareReferral } from "@/components/payment/SocialShareReferral";
+import { EmailPreview } from "@/components/payment/EmailPreview";
+import { GamificationBadge } from "@/components/payment/GamificationBadge";
 
 function SuccessPageContent() {
   const router = useRouter();
@@ -625,6 +629,34 @@ function SuccessPageContent() {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* NEW: Success Page Enhancements */}
+        <div className="space-y-6">
+          {/* Gamification Badge */}
+          <GamificationBadge 
+            planType={paymentData?.plan_type || 'premium'} 
+            memberNumber={10234}
+          />
+
+          {/* Email Preview */}
+          <EmailPreview 
+            email={paymentData?.userEmail || paymentData?.user_email || ''}
+            userName={paymentData?.userName || paymentData?.user_name || 'Member'}
+          />
+
+          {/* Next Steps Checklist */}
+          <NextStepsChecklist 
+            email={paymentData?.userEmail || paymentData?.user_email || ''}
+            userName={paymentData?.userName || paymentData?.user_name || 'Member'}
+            planType={paymentData?.plan_type || 'premium'}
+          />
+
+          {/* Social Share & Referral */}
+          <SocialShareReferral 
+            userName={paymentData?.userName || paymentData?.user_name || 'Member'}
+            userId={paymentData?.user_id}
+          />
+        </div>
       </div>
     </div>
   );
