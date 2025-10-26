@@ -13,6 +13,8 @@ import { CheckCircle2, CreditCard, Loader2, ArrowLeft, Sparkles, Shield, Zap, Cr
 import { TrustBanner } from "@/components/payment/TrustBanner";
 import { BenefitReminder } from "@/components/payment/BenefitReminder";
 import { FAQAccordion } from "@/components/payment/FAQAccordion";
+import { PaymentProcessingOverlay } from "@/components/payment/PaymentProcessingOverlay";
+import { PaymentMethodLogos } from "@/components/payment/PaymentMethodLogos";
 import { validateEmail, validateWhatsApp, formatWhatsApp, formatWhatsAppForAPI } from "@/lib/form-validation";
 
 function PaymentFormContent() {
@@ -21,6 +23,7 @@ function PaymentFormContent() {
   const plan = searchParams.get('plan') as 'basic' | 'premium';
 
   const [loading, setLoading] = React.useState(false);
+  const [showOverlay, setShowOverlay] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [formData, setFormData] = React.useState({
     email: "",
@@ -86,6 +89,7 @@ function PaymentFormContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setShowOverlay(true);  // Show overlay immediately
     setError(null);
 
     try {
@@ -96,12 +100,14 @@ function PaymentFormContent() {
       if (!emailValidation.valid) {
         setError(emailValidation.error || 'Email tidak valid');
         setLoading(false);
+        setShowOverlay(false);
         return;
       }
       
       if (!whatsappValidation.valid) {
         setError(whatsappValidation.error || 'Nomor WhatsApp tidak valid');
         setLoading(false);
+        setShowOverlay(false);
         return;
       }
 
@@ -123,18 +129,26 @@ function PaymentFormContent() {
         throw new Error(data.error || data.message || 'Gagal membuat invoice');
       }
 
-      // Redirect to Xendit payment page
-      window.location.href = data.invoiceUrl;
+      // Wait a bit for overlay animation to complete before redirect
+      setTimeout(() => {
+        // Redirect to Xendit payment page
+        window.location.href = data.invoiceUrl;
+      }, 3000);  // Match progress bar duration
 
     } catch (err: any) {
       console.error('Payment error:', err);
       setError(err.message || 'Terjadi kesalahan. Silakan coba lagi.');
       setLoading(false);
+      setShowOverlay(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-12 px-4 relative overflow-hidden">
+    <>
+      {/* Payment Processing Overlay */}
+      <PaymentProcessingOverlay isOpen={showOverlay} />
+
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-12 px-4 relative overflow-hidden">
       {/* Decorative Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <motion.div
@@ -405,69 +419,49 @@ function PaymentFormContent() {
                 <Button
                   type="submit"
                   size="lg"
-                  className="w-full h-14 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
+                  className={`w-full h-14 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] relative overflow-hidden ${
+                    loading ? 'cursor-wait' : ''
+                  }`}
                   disabled={loading}
                 >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-6 h-6 mr-2 animate-spin" />
-                      Memproses Pembayaran...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-6 h-6 mr-2" />
-                      Lanjut ke Pembayaran
-                      <Zap className="w-5 h-5 ml-2" />
-                    </>
+                  {/* Skeleton Shimmer Effect When Loading */}
+                  {loading && (
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                      animate={{
+                        x: ['-100%', '200%'],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: 'linear',
+                      }}
+                    />
                   )}
+                  
+                  {/* Button Content */}
+                  <span className="relative z-10 flex items-center justify-center">
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-6 h-6 mr-2 animate-spin" />
+                        Menghubungkan ke Xendit...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-6 h-6 mr-2" />
+                        Lanjut ke Pembayaran
+                        <Zap className="w-5 h-5 ml-2" />
+                      </>
+                    )}
+                  </span>
                 </Button>
               </motion.div>
             </motion.form>
 
-            {/* Payment Methods Info */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.0 }}
-              className="pt-6 border-t-2 border-dashed border-amber-200 dark:border-amber-800"
-            >
-              <p className="text-sm font-semibold text-center mb-4 flex items-center justify-center gap-2">
-                <CreditCard className="w-4 h-4 text-amber-600" />
-                Metode pembayaran yang tersedia:
-              </p>
-              <div className="flex flex-wrap justify-center gap-3 text-xs">
-                <motion.span
-                  whileHover={{ scale: 1.05 }}
-                  className="px-4 py-2 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-full font-semibold border border-amber-300 dark:border-amber-700 shadow-sm"
-                >
-                  📱 QRIS
-                </motion.span>
-                <motion.span
-                  whileHover={{ scale: 1.05 }}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-full font-semibold border border-blue-300 dark:border-blue-700 shadow-sm"
-                >
-                  🏦 Virtual Account
-                </motion.span>
-                <motion.span
-                  whileHover={{ scale: 1.05 }}
-                  className="px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-full font-semibold border border-green-300 dark:border-green-700 shadow-sm"
-                >
-                  💳 E-Wallet
-                </motion.span>
-                <motion.span
-                  whileHover={{ scale: 1.05 }}
-                  className="px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-full font-semibold border border-purple-300 dark:border-purple-700 shadow-sm"
-                >
-                  💎 Credit Card
-                </motion.span>
-                <motion.span
-                  whileHover={{ scale: 1.05 }}
-                  className="px-4 py-2 bg-gradient-to-r from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 rounded-full font-semibold border border-red-300 dark:border-red-700 shadow-sm"
-                >
-                  🏪 Retail
-                </motion.span>
-              </div>
-            </motion.div>
+            {/* Payment Method Logos */}
+            <div className="pt-6 border-t-2 border-dashed border-amber-200 dark:border-amber-800">
+              <PaymentMethodLogos />
+            </div>
 
             {/* Security Badge */}
             <motion.div
@@ -495,7 +489,8 @@ function PaymentFormContent() {
         {/* Uncomment if you want FAQ outside the main card */}
         {/* <FAQAccordion /> */}
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
