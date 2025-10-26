@@ -99,6 +99,15 @@ export async function POST(request: NextRequest) {
       const planType = externalId.includes('premium') ? 'premium' : 'basic';
       const amount = planType === 'premium' ? 39000 : 10000;
       
+      // STEP 1: Check if payment already exists in database
+      const { data: existingPayment } = await supabase
+        .from('payments')
+        .select('*')
+        .eq('external_id', externalId)
+        .single();
+
+      console.log('[Xendit Webhook] Existing payment:', existingPayment ? 'FOUND' : 'NOT FOUND');
+      
       // Get customer info from payload
       const customerEmail = payload.payer_email || payload.customer?.email || 'unknown@example.com';
       
@@ -113,8 +122,27 @@ export async function POST(request: NextRequest) {
       // Extract phone number
       const customerPhone = payload.customer?.mobile_number || payload.customer?.phone_number || '';
 
-      console.log('[Xendit Webhook] Customer info:', { customerEmail, customerName, customerPhone });
+      console.log('[Xendit Webhook] Customer info from webhook:', { customerEmail, customerName, customerPhone });
       console.log('[Xendit Webhook] Raw customer data:', payload.customer);
+
+      // STEP 2: Preserve existing customer data if available (DON'T OVERWRITE!)
+      const finalCustomerName = existingPayment?.user_name && existingPayment.user_name !== 'Unknown User' 
+        ? existingPayment.user_name 
+        : customerName;
+      
+      const finalCustomerEmail = existingPayment?.user_email && existingPayment.user_email !== 'unknown@example.com'
+        ? existingPayment.user_email
+        : customerEmail;
+      
+      const finalCustomerPhone = existingPayment?.user_whatsapp && existingPayment.user_whatsapp !== ''
+        ? existingPayment.user_whatsapp
+        : customerPhone;
+
+      console.log('[Xendit Webhook] Final customer data (preserved):', {
+        name: finalCustomerName,
+        email: finalCustomerEmail,
+        phone: finalCustomerPhone,
+      });
 
       // Use UPSERT to handle both insert and update cases
       const { data, error } = await supabase
@@ -122,9 +150,9 @@ export async function POST(request: NextRequest) {
         .upsert({
           external_id: externalId,
           invoice_id: invoiceId,
-          user_email: customerEmail,
-          user_name: customerName,
-          user_whatsapp: customerPhone,
+          user_email: finalCustomerEmail,  // ← Preserved!
+          user_name: finalCustomerName,    // ← Preserved!
+          user_whatsapp: finalCustomerPhone, // ← Preserved!
           plan_type: planType,
           amount: amount,
           status: 'paid',
@@ -158,7 +186,7 @@ export async function POST(request: NextRequest) {
         console.log('[Xendit Webhook] Sending payment confirmation email to:', customerEmail);
         
         const emailHtml = PaymentSuccessEmail({
-          userName: customerName,
+          userName: finalCustomerName,  // ← Use preserved name
           amount: amount,
           transactionDate: paid_at || new Date().toISOString(),
           planType: planType,
@@ -166,7 +194,7 @@ export async function POST(request: NextRequest) {
 
         const emailResponse = await resend.emails.send({
           from: FROM_EMAIL,
-          to: customerEmail,
+          to: finalCustomerEmail,  // ← Use preserved email
           subject: `✅ Pembayaran ${planType === 'premium' ? 'VIP Premium' : 'VIP Basic'} Berhasil - JOBMATE`,
           html: emailHtml,
           tags: [
