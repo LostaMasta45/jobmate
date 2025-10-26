@@ -195,13 +195,13 @@
 .a4-page {
   width: 210mm;            /* A4 width */
   min-height: 297mm;       /* A4 height */
-  padding: 25mm;           /* margin konten 25mm = 2.5cm */
+  padding: 20mm 20mm 20mm 25mm; /* top, right, bottom, left - presisi margin A4 */
   background: #fff;
   color: #000;
   font-family: "Times New Roman", ui-serif, Georgia, Cambria, "Times", serif;
-  font-size: 12pt;         /* standar surat */
+  font-size: 11.5pt;       /* slightly smaller untuk fit content */
   line-height: 1.5;
-  letter-spacing: 0.1px;
+  letter-spacing: 0.05px;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
   box-shadow: 

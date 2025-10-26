@@ -5,9 +5,9 @@ export function Template16NavyCorp({ data }: { data: FormState }) {
   const { biodata, perusahaan } = data
 
   return (
-    <div className="space-y-3" style={{ fontFamily: 'Arial, sans-serif', fontSize: '10.5pt', lineHeight: '1.5', color: 'var(--theme-text, #0f172a)' }}>
+    <div className="space-y-3" style={{ fontFamily: 'Arial, sans-serif', fontSize: '10.5pt', lineHeight: '1.5', color: '#0f172a' }}>
       {/* Corporate Header Bar */}
-      <div style={{ backgroundColor: 'var(--theme-primary, #1e40af)', color: 'white', padding: '10px 14px', marginBottom: '12px', borderRadius: '4px' }}>
+      <div style={{ backgroundColor: '#1E3A8A', color: 'white', padding: '10px 14px', marginBottom: '12px', borderRadius: '4px' }}>
         <div style={{ fontSize: '12pt', fontWeight: 'bold' }}>Surat Permohonan Kerja</div>
         <div style={{ fontSize: '9pt', opacity: 0.9 }}>Posisi: {perusahaan.posisiLowongan || "—"}</div>
       </div>
@@ -44,7 +44,7 @@ export function Template16NavyCorp({ data }: { data: FormState }) {
       </p>
 
       {perusahaan.lampiran && perusahaan.lampiran.length > 0 && (
-        <div style={{ padding: '8px', backgroundColor: 'var(--theme-accent, #dbeafe)', borderLeft: '3px solid var(--theme-primary, #1e40af)', fontSize: '9pt' }}>
+        <div style={{ padding: '8px', backgroundColor: '#DBEAFE', borderLeft: '3px solid #1E3A8A', fontSize: '9pt' }}>
           <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Lampiran:</div>
           {perusahaan.lampiran.map((item, i) => (
             <div key={i}>• {item}</div>

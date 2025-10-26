@@ -18,6 +18,10 @@ export interface SaveSuratLamaranData {
   // Generated Content
   generatedContent: string;
   
+  // AI Content (custom/edited)
+  aiContent?: string;
+  colorTheme?: string;
+  
   // Metadata
   status?: string;
   wordCount?: number;
@@ -65,6 +69,8 @@ export async function saveSuratLamaran(data: SaveSuratLamaranData) {
         template_name: data.templateName,
         // Content
         generated_content: data.generatedContent,
+        custom_content: data.aiContent || null,
+        color_theme: data.colorTheme || 'classic',
         // Metadata
         status: data.status || 'draft',
         word_count: data.wordCount || 0,
@@ -131,6 +137,8 @@ export async function updateSuratLamaran(id: string, updates: Partial<SaveSuratL
     if (updates.templateId) updateData.template_id = updates.templateId;
     if (updates.templateName) updateData.template_name = updates.templateName;
     if (updates.generatedContent) updateData.generated_content = updates.generatedContent;
+    if (updates.aiContent !== undefined) updateData.custom_content = updates.aiContent;
+    if (updates.colorTheme) updateData.color_theme = updates.colorTheme;
     if (updates.status) updateData.status = updates.status;
     if (updates.wordCount) updateData.word_count = updates.wordCount;
     if (updates.charCount) updateData.char_count = updates.charCount;

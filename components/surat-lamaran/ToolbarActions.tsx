@@ -53,9 +53,22 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
       await html2pdf()
         .set({
           filename,
+          margin: [20, 20, 20, 20], // top, right, bottom, left in mm - presisi A4
           image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          html2canvas: { 
+            scale: 2, 
+            useCORS: true,
+            letterRendering: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+          },
+          jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait',
+            compress: true
+          },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         } as any)
         .from(element)
         .save()
@@ -137,10 +150,10 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
           properties: {
             page: {
               margin: {
-                top: mmToTwip(25),
-                right: mmToTwip(25),
-                bottom: mmToTwip(25),
-                left: mmToTwip(25),
+                top: mmToTwip(20),    // 20mm = 2cm - presisi top
+                right: mmToTwip(20),   // 20mm = 2cm
+                bottom: mmToTwip(20),  // 20mm = 2cm
+                left: mmToTwip(25),    // 25mm = 2.5cm (sedikit lebih untuk binding)
               },
             },
           },
@@ -293,6 +306,8 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
         templateId,
         templateName: template.name,
         generatedContent,
+        aiContent: formData.content || "",  // Save AI content
+        colorTheme: formData.colorTheme || "classic",
         wordCount: generatedContent.split(/\s+/).length,
         charCount: generatedContent.length,
         status: 'final'

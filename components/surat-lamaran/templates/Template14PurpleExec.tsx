@@ -5,10 +5,10 @@ export function Template14PurpleExec({ data }: { data: FormState }) {
   const { biodata, perusahaan } = data
 
   return (
-    <div className="space-y-4" style={{ fontFamily: 'Times New Roman, serif', fontSize: '11pt', lineHeight: '1.6', color: 'var(--theme-text, #1e293b)' }}>
+    <div className="space-y-4" style={{ fontFamily: 'Times New Roman, serif', fontSize: '11pt', lineHeight: '1.6', color: '#1e293b' }}>
       {/* Executive Header */}
-      <div style={{ textAlign: 'center', borderBottom: '2px solid var(--theme-primary, #7c3aed)', paddingBottom: '8px', marginBottom: '16px' }}>
-        <div style={{ fontSize: '14pt', fontWeight: 'bold', color: 'var(--theme-primary, #7c3aed)', letterSpacing: '1px' }}>
+      <div style={{ textAlign: 'center', borderBottom: '2px solid #8B5CF6', paddingBottom: '8px', marginBottom: '16px' }}>
+        <div style={{ fontSize: '14pt', fontWeight: 'bold', color: '#8B5CF6', letterSpacing: '1px' }}>
           SURAT LAMARAN PEKERJAAN
         </div>
       </div>
@@ -29,25 +29,25 @@ export function Template14PurpleExec({ data }: { data: FormState }) {
       <p style={{ marginTop: '12px' }}>Dengan hormat,</p>
 
       <p>
-        Saya yang bertanda tangan di bawah ini, <strong>{biodata.namaLengkap || "—"}</strong>, bermaksud mengajukan lamaran untuk posisi <strong style={{ color: 'var(--theme-primary, #7c3aed)' }}>{perusahaan.posisiLowongan || "yang tersedia"}</strong> di {perusahaan.namaPerusahaan || "perusahaan Bapak/Ibu"}.
+        Saya yang bertanda tangan di bawah ini, <strong>{biodata.namaLengkap || "—"}</strong>, bermaksud mengajukan lamaran untuk posisi <strong style={{ color: '#8B5CF6' }}>{perusahaan.posisiLowongan || "yang tersedia"}</strong> di {perusahaan.namaPerusahaan || "perusahaan Bapak/Ibu"}.
       </p>
 
       {/* Executive Biodata Table */}
       <table style={{ width: '100%', fontSize: '10pt', borderCollapse: 'collapse', marginTop: '12px', marginBottom: '12px' }}>
         <tbody>
-          <tr style={{ borderBottom: '1px solid var(--theme-accent, #ddd6fe)' }}>
+          <tr style={{ borderBottom: '1px solid #E9D5FF' }}>
             <td style={{ padding: '6px 0', width: '40%', fontWeight: '500' }}>Tempat/Tanggal Lahir</td>
             <td style={{ padding: '6px 0' }}>{biodata.tempatLahir || "—"}, {formatTanggalID(biodata.tanggalLahir)}</td>
           </tr>
-          <tr style={{ borderBottom: '1px solid var(--theme-accent, #ddd6fe)' }}>
+          <tr style={{ borderBottom: '1px solid #E9D5FF' }}>
             <td style={{ padding: '6px 0', fontWeight: '500' }}>Pendidikan</td>
             <td style={{ padding: '6px 0' }}>{biodata.pendidikan || "—"}</td>
           </tr>
-          <tr style={{ borderBottom: '1px solid var(--theme-accent, #ddd6fe)' }}>
+          <tr style={{ borderBottom: '1px solid #E9D5FF' }}>
             <td style={{ padding: '6px 0', fontWeight: '500' }}>Status</td>
             <td style={{ padding: '6px 0' }}>{biodata.status || "—"}</td>
           </tr>
-          <tr style={{ borderBottom: '1px solid var(--theme-accent, #ddd6fe)' }}>
+          <tr style={{ borderBottom: '1px solid #E9D5FF' }}>
             <td style={{ padding: '6px 0', fontWeight: '500' }}>Kontak</td>
             <td style={{ padding: '6px 0' }}>{biodata.noHandphone || "—"} | {biodata.email || "—"}</td>
           </tr>
@@ -65,7 +65,7 @@ export function Template14PurpleExec({ data }: { data: FormState }) {
       {/* Lampiran */}
       {perusahaan.lampiran && perusahaan.lampiran.length > 0 && (
         <div>
-          <p style={{ fontWeight: 'bold', color: 'var(--theme-primary, #7c3aed)' }}>Kelengkapan Dokumen:</p>
+          <p style={{ fontWeight: 'bold', color: '#8B5CF6' }}>Kelengkapan Dokumen:</p>
           <ol style={{ paddingLeft: '20px', marginTop: '6px' }}>
             {perusahaan.lampiran.map((item, i) => (
               <li key={i}>{item}</li>

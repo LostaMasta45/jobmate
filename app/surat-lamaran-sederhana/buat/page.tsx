@@ -10,13 +10,13 @@ import { FormPerusahaan } from "@/components/surat-lamaran/FormPerusahaan"
 import { TemplatePicker } from "@/components/surat-lamaran/TemplatePicker"
 import { PreviewSurat } from "@/components/surat-lamaran/PreviewSurat"
 import { ToolbarActions } from "@/components/surat-lamaran/ToolbarActions"
-import { ColorThemeSelector } from "@/components/surat-lamaran/ColorThemeSelector"
+// ColorThemeSelector removed - colors are now built into templates 11-20
 import { AIGeneratorDialog } from "@/components/surat-lamaran/AIGeneratorDialog"
 import { Toaster } from "@/components/ui/toaster"
 import { usePersistedState } from "@/lib/usePersistedState"
 import { DEFAULT_LAMPIRAN, type FormState, type Biodata, type Perusahaan } from "@/lib/surat-lamaran-utils"
 import { templates } from "@/lib/templates"
-import { History, ChevronRight, FileText, Home, ArrowLeft, Sparkles, Palette } from "lucide-react"
+import { History, ChevronRight, FileText, Home, ArrowLeft, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
@@ -248,41 +248,21 @@ export default function BuatSuratLamaranPage() {
             </CardContent>
           </Card>
 
-          {/* Step 3: Template & Color Selection */}
+          {/* Step 3: Template Selection */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
                   3
                 </span>
-                Pilih Template & Warna
+                Pilih Template Surat
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Template Picker */}
-              <div>
-                <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  Template Surat
-                </h4>
-                <TemplatePicker
-                  selectedId={templateId}
-                  onChange={setTemplateId}
-                />
-              </div>
-
-              {/* Color Theme Selector */}
-              <div className="pt-4 border-t">
-                <div className="mb-3 flex items-center gap-2">
-                  <Palette className="w-4 h-4" />
-                  <h4 className="text-sm font-semibold">Tema Warna</h4>
-                </div>
-                <ColorThemeSelector
-                  selected={formData.colorTheme || "classic"}
-                  onChange={updateColorTheme}
-                  position={formData.perusahaan.posisiLowongan}
-                />
-              </div>
+            <CardContent>
+              <TemplatePicker
+                selectedId={templateId}
+                onChange={setTemplateId}
+              />
             </CardContent>
           </Card>
 

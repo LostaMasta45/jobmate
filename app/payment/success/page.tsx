@@ -233,8 +233,21 @@ function SuccessPageContent() {
   }
 
   const firstName = getFirstName(paymentData?.userName || '');
-  const planName = paymentData?.planType === 'premium' ? 'Premium' : 'Basic';
-  const isPremium = paymentData?.planType === 'premium';
+  const planType = paymentData?.planType || paymentData?.plan_type || 'premium';
+  const planName = planType === 'premium' ? 'Premium' : 'Basic';
+  const isPremium = planType === 'premium';
+  
+  // Debug logging
+  console.log('[Success Page] Payment Data:', {
+    planType: paymentData?.planType,
+    plan_type: paymentData?.plan_type,
+    resolvedPlanType: planType,
+    isPremium,
+    userName: paymentData?.userName,
+    user_name: paymentData?.user_name,
+    userWhatsapp: paymentData?.userWhatsapp,
+    user_whatsapp: paymentData?.user_whatsapp,
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-6 sm:py-12 px-3 sm:px-4 lg:px-6 relative overflow-hidden">
@@ -392,15 +405,15 @@ function SuccessPageContent() {
                       <div className="flex flex-col gap-1.5">
                         <div className="flex items-start gap-2">
                           <span className="text-xs text-muted-foreground min-w-[80px]">Nama</span>
-                          <span className="text-sm font-medium">{paymentData.userName || '-'}</span>
+                          <span className="text-sm font-medium">{paymentData.userName || paymentData.user_name || '-'}</span>
                         </div>
                         <div className="flex items-start gap-2">
                           <span className="text-xs text-muted-foreground min-w-[80px]">Email</span>
-                          <span className="text-sm font-medium break-all">{paymentData.userEmail || '-'}</span>
+                          <span className="text-sm font-medium break-all">{paymentData.userEmail || paymentData.user_email || '-'}</span>
                         </div>
                         <div className="flex items-start gap-2">
                           <span className="text-xs text-muted-foreground min-w-[80px]">WhatsApp</span>
-                          <span className="text-sm font-medium">{paymentData.userWhatsapp || '-'}</span>
+                          <span className="text-sm font-medium">{paymentData.userWhatsapp || paymentData.user_whatsapp || '-'}</span>
                         </div>
                       </div>
                     </div>
@@ -634,26 +647,26 @@ function SuccessPageContent() {
         <div className="space-y-6">
           {/* Gamification Badge */}
           <GamificationBadge 
-            planType={paymentData?.plan_type || 'premium'} 
+            planType={planType} 
             memberNumber={10234}
           />
 
           {/* Email Preview */}
           <EmailPreview 
             email={paymentData?.userEmail || paymentData?.user_email || ''}
-            userName={paymentData?.userName || paymentData?.user_name || 'Member'}
+            userName={paymentData?.userName || paymentData?.user_name || firstName || 'Member'}
           />
 
           {/* Next Steps Checklist */}
           <NextStepsChecklist 
             email={paymentData?.userEmail || paymentData?.user_email || ''}
-            userName={paymentData?.userName || paymentData?.user_name || 'Member'}
-            planType={paymentData?.plan_type || 'premium'}
+            userName={paymentData?.userName || paymentData?.user_name || firstName || 'Member'}
+            planType={planType}
           />
 
           {/* Social Share & Referral */}
           <SocialShareReferral 
-            userName={paymentData?.userName || paymentData?.user_name || 'Member'}
+            userName={paymentData?.userName || paymentData?.user_name || firstName || 'Member'}
             userId={paymentData?.user_id}
           />
         </div>

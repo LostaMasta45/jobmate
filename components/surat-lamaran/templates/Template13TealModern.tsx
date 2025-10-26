@@ -5,10 +5,10 @@ export function Template13TealModern({ data }: { data: FormState }) {
   const { biodata, perusahaan } = data
 
   return (
-    <div className="space-y-4" style={{ fontFamily: 'Helvetica, Arial, sans-serif', fontSize: '11pt', lineHeight: '1.5', color: 'var(--theme-text, #0f172a)' }}>
+    <div className="space-y-4" style={{ fontFamily: 'Helvetica, Arial, sans-serif', fontSize: '11pt', lineHeight: '1.5', color: '#0f172a' }}>
       {/* Modern Header */}
       <div style={{ 
-        background: `linear-gradient(to right, var(--theme-primary, #0d9488), var(--theme-accent, #5eead4))`,
+        background: 'linear-gradient(to right, #14B8A6, #5EEAD4)',
         color: 'white',
         padding: '12px 16px',
         borderRadius: '8px',
@@ -34,9 +34,9 @@ export function Template13TealModern({ data }: { data: FormState }) {
       <p>Dengan hormat,</p>
 
       {/* 2-Column Layout for Data */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', padding: '12px', border: '1px solid var(--theme-accent, #99f6e4)', borderRadius: '6px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', padding: '12px', border: '1px solid #99F6E4', borderRadius: '6px' }}>
         <div>
-          <div style={{ fontWeight: 'bold', color: 'var(--theme-primary, #0d9488)', marginBottom: '6px', fontSize: '10pt' }}>IDENTITAS</div>
+          <div style={{ fontWeight: 'bold', color: '#14B8A6', marginBottom: '6px', fontSize: '10pt' }}>IDENTITAS</div>
           <div style={{ fontSize: '9pt', lineHeight: '1.4' }}>
             <div><strong>Nama:</strong> {biodata.namaLengkap || "—"}</div>
             <div><strong>Lahir:</strong> {biodata.tempatLahir || "—"}, {formatTanggalID(biodata.tanggalLahir)}</div>
@@ -44,7 +44,7 @@ export function Template13TealModern({ data }: { data: FormState }) {
           </div>
         </div>
         <div>
-          <div style={{ fontWeight: 'bold', color: 'var(--theme-primary, #0d9488)', marginBottom: '6px', fontSize: '10pt' }}>KONTAK</div>
+          <div style={{ fontWeight: 'bold', color: '#14B8A6', marginBottom: '6px', fontSize: '10pt' }}>KONTAK</div>
           <div style={{ fontSize: '9pt', lineHeight: '1.4' }}>
             <div><strong>HP:</strong> {biodata.noHandphone || "—"}</div>
             <div><strong>Email:</strong> {biodata.email || "—"}</div>
@@ -66,13 +66,13 @@ export function Template13TealModern({ data }: { data: FormState }) {
       {/* Lampiran with styled list */}
       {perusahaan.lampiran && perusahaan.lampiran.length > 0 && (
         <div style={{ marginTop: '12px' }}>
-          <div style={{ fontWeight: 'bold', color: 'var(--theme-primary, #0d9488)', marginBottom: '4px' }}>Lampiran:</div>
+          <div style={{ fontWeight: 'bold', color: '#14B8A6', marginBottom: '4px' }}>Lampiran:</div>
           <div style={{ fontSize: '10pt' }}>
             {perusahaan.lampiran.map((item, i) => (
               <div key={i} style={{ 
                 padding: '4px 8px', 
                 marginBottom: '3px', 
-                borderLeft: '2px solid var(--theme-accent, #99f6e4)',
+                borderLeft: '2px solid #99F6E4',
                 paddingLeft: '12px'
               }}>{item}</div>
             ))}
@@ -88,7 +88,7 @@ export function Template13TealModern({ data }: { data: FormState }) {
         <div style={{ height: "60px" }} />
         <div style={{ 
           display: 'inline-block',
-          borderBottom: '2px solid var(--theme-primary, #0d9488)',
+          borderBottom: '2px solid #14B8A6',
           paddingBottom: '2px'
         }}>
           <p style={{ fontWeight: 'bold', margin: 0 }}>{biodata.namaLengkap || "—"}</p>

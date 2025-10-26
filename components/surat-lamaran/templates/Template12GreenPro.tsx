@@ -5,18 +5,18 @@ export function Template12GreenPro({ data }: { data: FormState }) {
   const { biodata, perusahaan } = data
 
   return (
-    <div className="space-y-4" style={{ fontFamily: 'Georgia, serif', fontSize: '11pt', lineHeight: '1.6', color: 'var(--theme-text, #1e293b)' }}>
+    <div className="space-y-4" style={{ fontFamily: 'Georgia, serif', fontSize: '11pt', lineHeight: '1.6', color: '#1e293b' }}>
       {/* Header with top border */}
-      <div style={{ borderTop: '3px solid var(--theme-primary, #059669)', paddingTop: '8px' }}>
+      <div style={{ borderTop: '3px solid #10B981', paddingTop: '8px' }}>
         <div style={{ textAlign: 'right', fontSize: '10pt', color: '#64748b' }}>
           {perusahaan.kotaPerusahaan || "—"}, {formatTanggalID(perusahaan.tanggalLamaran)}
         </div>
       </div>
 
       {/* Recipient with accent */}
-      <div style={{ paddingLeft: '8px', borderLeft: '3px solid var(--theme-accent, #a7f3d0)' }}>
+      <div style={{ paddingLeft: '8px', borderLeft: '3px solid #86EFAC' }}>
         <p style={{ marginBottom: '2px' }}>Kepada Yth.</p>
-        <p style={{ fontWeight: 'bold', color: 'var(--theme-primary, #059669)' }}>{perusahaan.kepadaYth || "HRD Manager"}</p>
+        <p style={{ fontWeight: 'bold', color: '#10B981' }}>{perusahaan.kepadaYth || "HRD Manager"}</p>
         <p>{perusahaan.jenisInstansi && `${perusahaan.jenisInstansi} `}{perusahaan.namaPerusahaan || "—"}</p>
         <p>Di tempat</p>
       </div>
@@ -26,11 +26,11 @@ export function Template12GreenPro({ data }: { data: FormState }) {
       {/* Content */}
       <p>
         Saya <strong>{biodata.namaLengkap || "—"}</strong>, lulusan {biodata.pendidikan || "—"} yang berdomisili di {biodata.alamatKota || "—"}, 
-        dengan ini mengajukan permohonan untuk mengisi posisi <strong style={{ color: 'var(--theme-primary, #059669)' }}>{perusahaan.posisiLowongan || "yang tersedia"}</strong> di {perusahaan.namaPerusahaan || "perusahaan Bapak/Ibu"}.
+        dengan ini mengajukan permohonan untuk mengisi posisi <strong style={{ color: '#10B981' }}>{perusahaan.posisiLowongan || "yang tersedia"}</strong> di {perusahaan.namaPerusahaan || "perusahaan Bapak/Ibu"}.
       </p>
 
       {/* Biodata Compact */}
-      <div style={{ fontSize: '10pt', lineHeight: '1.4', padding: '8px 12px', backgroundColor: 'var(--theme-accent, #ecfdf5)', borderRadius: '4px' }}>
+      <div style={{ fontSize: '10pt', lineHeight: '1.4', padding: '8px 12px', backgroundColor: '#D1FAE5', borderRadius: '4px' }}>
         <div><strong>Lahir:</strong> {biodata.tempatLahir || "—"}, {formatTanggalID(biodata.tanggalLahir)}</div>
         <div><strong>Status:</strong> {biodata.status || "—"} | <strong>Jenis Kelamin:</strong> {biodata.jenisKelamin || "—"}</div>
         <div><strong>Kontak:</strong> {biodata.noHandphone || "—"} | {biodata.email || "—"}</div>
@@ -45,10 +45,10 @@ export function Template12GreenPro({ data }: { data: FormState }) {
       {/* Lampiran */}
       {perusahaan.lampiran && perusahaan.lampiran.length > 0 && (
         <div>
-          <p style={{ fontWeight: 'bold', color: 'var(--theme-primary, #059669)', marginBottom: '4px' }}>Dokumen Lampiran:</p>
+          <p style={{ fontWeight: 'bold', color: '#10B981', marginBottom: '4px' }}>Dokumen Lampiran:</p>
           {perusahaan.lampiran.map((item, i) => (
             <div key={i} style={{ paddingLeft: '20px', position: 'relative', marginBottom: '2px' }}>
-              <span style={{ position: 'absolute', left: '0', color: 'var(--theme-primary, #059669)' }}>•</span> {item}
+              <span style={{ position: 'absolute', left: '0', color: '#10B981' }}>•</span> {item}
             </div>
           ))}
         </div>

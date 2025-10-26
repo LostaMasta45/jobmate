@@ -50,15 +50,30 @@ export async function POST(req: Request) {
     // Check VIP status untuk unlimited generations
     const { data: profile } = await supabase
       .from('profiles')
-      .select('membership')
+      .select('membership, membership_status')
       .eq('id', user.id)
       .single()
 
-    const isVIP = profile?.membership === 'VIP'
+    // Support all VIP membership types (vip_basic, vip_premium, or legacy 'VIP')
+    const membership = profile?.membership || 'free'
+    const isVIP = membership === 'vip_basic' || 
+                  membership === 'vip_premium' || 
+                  membership === 'VIP'
+    
+    // Also check if membership is active
+    const isActive = profile?.membership_status === 'active'
+    
+    console.log('[AI Generation Check]', {
+      userId: user.id,
+      membership,
+      isVIP,
+      isActive,
+      willCheckLimit: !isVIP || !isActive
+    })
 
-    // For Free users, check generation limit (3 per month)
+    // For Free users or inactive VIP, check generation limit (3 per month)
     let currentCount = 0
-    if (!isVIP) {
+    if (!isVIP || !isActive) {
       const startOfMonth = new Date()
       startOfMonth.setDate(1)
       startOfMonth.setHours(0, 0, 0, 0)
@@ -124,7 +139,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ 
       success: true,
       variations,
-      remaining: isVIP ? null : (3 - (currentCount + 1))
+      remaining: (isVIP && isActive) ? null : (3 - (currentCount + 1))
     })
 
   } catch (error: any) {

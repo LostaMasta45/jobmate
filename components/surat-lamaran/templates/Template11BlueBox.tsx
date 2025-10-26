@@ -5,14 +5,14 @@ export function Template11BlueBox({ data }: { data: FormState }) {
   const { biodata, perusahaan } = data
 
   return (
-    <div className="space-y-4" style={{ fontFamily: 'Arial, sans-serif', fontSize: '11pt', lineHeight: '1.5', color: 'var(--theme-text, #1e293b)' }}>
+    <div className="space-y-4" style={{ fontFamily: 'Arial, sans-serif', fontSize: '11pt', lineHeight: '1.5', color: '#1e293b' }}>
       {/* Header dengan box berwarna */}
       <div style={{ 
-        borderLeft: '4px solid var(--theme-primary, #2563eb)',
+        borderLeft: '4px solid #3B82F6',
         paddingLeft: '12px',
         marginBottom: '16px'
       }}>
-        <div style={{ fontWeight: 'bold', fontSize: '14pt', color: 'var(--theme-primary, #2563eb)' }}>
+        <div style={{ fontWeight: 'bold', fontSize: '14pt', color: '#3B82F6' }}>
           SURAT LAMARAN KERJA
         </div>
         <div style={{ fontSize: '10pt', color: '#64748b' }}>
@@ -33,14 +33,14 @@ export function Template11BlueBox({ data }: { data: FormState }) {
 
       {/* Biodata dalam box */}
       <div style={{
-        border: '2px solid var(--theme-accent, #dbeafe)',
+        border: '2px solid #DBEAFE',
         borderRadius: '8px',
         padding: '12px',
-        backgroundColor: 'var(--theme-accent, #dbeafe)',
+        backgroundColor: '#EFF6FF',
         marginTop: '12px',
         marginBottom: '12px'
       }}>
-        <p style={{ fontWeight: 'bold', marginBottom: '8px', color: 'var(--theme-primary, #2563eb)' }}>DATA PRIBADI</p>
+        <p style={{ fontWeight: 'bold', marginBottom: '8px', color: '#3B82F6' }}>DATA PRIBADI</p>
         <table style={{ width: '100%', fontSize: '10pt' }}>
           <tbody>
             <tr>
@@ -96,7 +96,7 @@ export function Template11BlueBox({ data }: { data: FormState }) {
       {/* Lampiran */}
       {perusahaan.lampiran && perusahaan.lampiran.length > 0 && (
         <div style={{ marginTop: '12px' }}>
-          <p style={{ fontWeight: 'bold', color: 'var(--theme-primary, #2563eb)' }}>Lampiran:</p>
+          <p style={{ fontWeight: 'bold', color: '#3B82F6' }}>Lampiran:</p>
           <ol style={{ paddingLeft: '20px', margin: '8px 0' }}>
             {perusahaan.lampiran.map((item, i) => (
               <li key={i} style={{ marginBottom: '4px' }}>{item}</li>
@@ -116,7 +116,7 @@ export function Template11BlueBox({ data }: { data: FormState }) {
       <div style={{ marginTop: '24px' }}>
         <p>Hormat saya,</p>
         <div style={{ height: "60px" }} />
-        <p style={{ fontWeight: 'bold', borderTop: `2px solid var(--theme-primary, #2563eb)`, paddingTop: '4px', display: 'inline-block' }}>
+        <p style={{ fontWeight: 'bold', borderTop: '2px solid #3B82F6', paddingTop: '4px', display: 'inline-block' }}>
           {biodata.namaLengkap || "—"}
         </p>
       </div>
