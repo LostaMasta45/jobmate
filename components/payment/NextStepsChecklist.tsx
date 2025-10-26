@@ -192,35 +192,43 @@ export function NextStepsChecklist({ email, userName, planType }: NextStepsCheck
               
               <Button 
                 className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-sm sm:text-base h-10 sm:h-11"
-                onClick={() => window.location.href = dashboardLink}
+                onClick={() => {
+                  // VIP BASIC -> Web Portal, VIP PREMIUM -> Dashboard Tools
+                  const targetUrl = planType.toLowerCase().includes('basic') ? '/vip' : dashboardLink;
+                  window.location.href = targetUrl;
+                }}
               >
                 <Zap className="w-4 h-4 mr-2 flex-shrink-0" />
-                Buka Dashboard
+                {planType.toLowerCase().includes('basic') ? 'Buka Web Portal' : 'Buka Dashboard'}
               </Button>
               <p className="text-xs text-muted-foreground">
-                ⚡ Akses aktif sekarang - mulai buat CV profesional!
+                {planType.toLowerCase().includes('basic') 
+                  ? '⚡ Akses aktif sekarang - cari lowongan kerja impian!' 
+                  : '⚡ Akses aktif sekarang - mulai buat CV profesional!'}
               </p>
             </div>
           </motion.div>
 
-          {/* Bonus: Quick Links */}
-          <div className="pt-4 border-t-2 border-dashed">
-            <p className="text-sm font-semibold mb-3 text-center">🔥 Quick Access:</p>
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" size="sm" className="text-xs h-9" onClick={() => window.location.href = '/cv-ats-generator'}>
-                <span className="truncate">📄 CV Generator</span>
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs h-9" onClick={() => window.location.href = '/surat-lamaran'}>
-                <span className="truncate">✉️ Surat Lamaran</span>
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs h-9" onClick={() => window.location.href = '/tracker'}>
-                <span className="truncate">📊 Job Tracker</span>
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs h-9" onClick={() => window.location.href = '/pdf-tools'}>
-                <span className="truncate">🔧 PDF Tools</span>
-              </Button>
+          {/* Bonus: Quick Links - ONLY FOR PREMIUM */}
+          {!planType.toLowerCase().includes('basic') && (
+            <div className="pt-4 border-t-2 border-dashed">
+              <p className="text-sm font-semibold mb-3 text-center">🔥 Quick Access:</p>
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="outline" size="sm" className="text-xs h-9" onClick={() => window.location.href = '/tools/cv-ats'}>
+                  <span className="truncate">📄 CV Generator</span>
+                </Button>
+                <Button variant="outline" size="sm" className="text-xs h-9" onClick={() => window.location.href = '/surat-lamaran'}>
+                  <span className="truncate">✉️ Surat Lamaran</span>
+                </Button>
+                <Button variant="outline" size="sm" className="text-xs h-9" onClick={() => window.location.href = '/tools/tracker'}>
+                  <span className="truncate">📊 Job Tracker</span>
+                </Button>
+                <Button variant="outline" size="sm" className="text-xs h-9" onClick={() => window.location.href = '/tools/pdf-tools'}>
+                  <span className="truncate">🔧 PDF Tools</span>
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </motion.div>

@@ -106,10 +106,22 @@ function SuccessPageContent() {
       }
 
       const data = await response.json();
-      console.log('[Success Page] Payment data:', data);
+      console.log('[Success Page] Raw API Response:', data);
+      console.log('[Success Page] Payment data:', data.payment);
       
       if (data.success && data.payment) {
         // Success! Payment found
+        console.log('[Success Page] Payment object details:', {
+          userName: data.payment.userName,
+          user_name: data.payment.user_name,
+          userEmail: data.payment.userEmail,
+          user_email: data.payment.user_email,
+          userWhatsapp: data.payment.userWhatsapp,
+          user_whatsapp: data.payment.user_whatsapp,
+          planType: data.payment.planType,
+          plan_type: data.payment.plan_type,
+        });
+        
         setPaymentData(data.payment);
         setShowConfetti(true);
         setLoading(false);
@@ -232,21 +244,24 @@ function SuccessPageContent() {
     );
   }
 
-  const firstName = getFirstName(paymentData?.userName || '');
+  // Resolve customer data with fallbacks
+  const userName = paymentData?.userName || paymentData?.user_name || '';
+  const userEmail = paymentData?.userEmail || paymentData?.user_email || '';
+  const userWhatsapp = paymentData?.userWhatsapp || paymentData?.user_whatsapp || '';
+  const firstName = getFirstName(userName);
   const planType = paymentData?.planType || paymentData?.plan_type || 'premium';
   const planName = planType === 'premium' ? 'Premium' : 'Basic';
   const isPremium = planType === 'premium';
   
   // Debug logging
-  console.log('[Success Page] Payment Data:', {
-    planType: paymentData?.planType,
-    plan_type: paymentData?.plan_type,
-    resolvedPlanType: planType,
+  console.log('[Success Page] Resolved Customer Data:', {
+    userName,
+    userEmail,
+    userWhatsapp,
+    firstName,
+    planType,
     isPremium,
-    userName: paymentData?.userName,
-    user_name: paymentData?.user_name,
-    userWhatsapp: paymentData?.userWhatsapp,
-    user_whatsapp: paymentData?.user_whatsapp,
+    rawPaymentData: paymentData,
   });
 
   return (
@@ -405,15 +420,15 @@ function SuccessPageContent() {
                       <div className="flex flex-col gap-1.5">
                         <div className="flex items-start gap-2">
                           <span className="text-xs text-muted-foreground min-w-[80px]">Nama</span>
-                          <span className="text-sm font-medium">{paymentData.userName || paymentData.user_name || '-'}</span>
+                          <span className="text-sm font-medium">{userName || '-'}</span>
                         </div>
                         <div className="flex items-start gap-2">
                           <span className="text-xs text-muted-foreground min-w-[80px]">Email</span>
-                          <span className="text-sm font-medium break-all">{paymentData.userEmail || paymentData.user_email || '-'}</span>
+                          <span className="text-sm font-medium break-all">{userEmail || '-'}</span>
                         </div>
                         <div className="flex items-start gap-2">
                           <span className="text-xs text-muted-foreground min-w-[80px]">WhatsApp</span>
-                          <span className="text-sm font-medium">{paymentData.userWhatsapp || paymentData.user_whatsapp || '-'}</span>
+                          <span className="text-sm font-medium">{userWhatsapp || '-'}</span>
                         </div>
                       </div>
                     </div>
@@ -653,20 +668,20 @@ function SuccessPageContent() {
 
           {/* Email Preview */}
           <EmailPreview 
-            email={paymentData?.userEmail || paymentData?.user_email || ''}
-            userName={paymentData?.userName || paymentData?.user_name || firstName || 'Member'}
+            email={userEmail}
+            userName={userName || firstName || 'Member'}
           />
 
           {/* Next Steps Checklist */}
           <NextStepsChecklist 
-            email={paymentData?.userEmail || paymentData?.user_email || ''}
-            userName={paymentData?.userName || paymentData?.user_name || firstName || 'Member'}
+            email={userEmail}
+            userName={userName || firstName || 'Member'}
             planType={planType}
           />
 
           {/* Social Share & Referral */}
           <SocialShareReferral 
-            userName={paymentData?.userName || paymentData?.user_name || firstName || 'Member'}
+            userName={userName || firstName || 'Member'}
             userId={paymentData?.user_id}
           />
         </div>

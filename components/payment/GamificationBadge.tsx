@@ -86,47 +86,24 @@ export function GamificationBadge({ planType, memberNumber = 10234 }: Gamificati
             </motion.div>
           </div>
 
-          {/* Progress to next tier (for Basic users) */}
+          {/* Basic benefits highlight */}
           {!isPremium && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.4 }}
-              className="space-y-3 p-4 bg-white dark:bg-slate-800 rounded-lg border-2 border-amber-300 dark:border-amber-700"
+              className="p-4 bg-white dark:bg-slate-800 rounded-lg border-2 border-amber-300 dark:border-amber-700 text-center"
             >
-              <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-amber-500" />
-                  VIP Basic
-                </span>
-                <span className="flex items-center gap-1 text-muted-foreground">
-                  <Crown className="w-4 h-4" />
-                  VIP Premium
-                </span>
-              </div>
-              
-              <div className="space-y-2">
-                <Progress value={progress} className="h-2" />
-                <p className="text-xs text-center text-muted-foreground">
-                  Gunakan 5 tools lagi untuk unlock VIP Premium gratis! 🎁
-                </p>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                <div>
-                  <Zap className="w-4 h-4 mx-auto mb-1 text-emerald-500" />
-                  <p className="font-semibold">3/8</p>
-                  <p className="text-muted-foreground">Tools Used</p>
+              <p className="text-sm font-semibold mb-2">✨ Akses VIP BASIC Aktif!</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Nikmati akses Grup WhatsApp eksklusif & Web Portal dengan info loker 100% valid!
+              </p>
+              <div className="flex justify-center gap-2 mt-3 flex-wrap">
+                <div className="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 rounded-full text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                  ✓ Grup WA VIP
                 </div>
-                <div>
-                  <Trophy className="w-4 h-4 mx-auto mb-1 text-blue-500" />
-                  <p className="font-semibold">0/5</p>
-                  <p className="text-muted-foreground">Applications</p>
-                </div>
-                <div>
-                  <Crown className="w-4 h-4 mx-auto mb-1 text-amber-500" />
-                  <p className="font-semibold">30%</p>
-                  <p className="text-muted-foreground">Complete</p>
+                <div className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full text-xs font-semibold text-blue-700 dark:text-blue-400">
+                  ✓ Portal Loker
                 </div>
               </div>
             </motion.div>
