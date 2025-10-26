@@ -49,21 +49,28 @@ function convertXenditToPayment(invoice: any) {
   const planType = invoice.external_id?.includes('premium') ? 'premium' : 'basic';
   const amount = planType === 'premium' ? 39000 : 10000;
   
-  // Extract customer name (try multiple fields)
-  let userName = 'Unknown User';
-  if (invoice.customer) {
-    // Try given_names first (this is what we send in create-invoice)
-    const givenNames = invoice.customer.given_names || invoice.customer.given_name || '';
-    const surname = invoice.customer.surname || invoice.customer.sur_name || '';
-    userName = [givenNames, surname].filter(Boolean).join(' ').trim();
+  // Extract customer name (try multiple fields in priority order)
+  let userName = '';
+  
+  // Priority 1: given_names (we send full name here)
+  if (invoice.customer?.given_names) {
+    userName = invoice.customer.given_names.trim();
   }
   
-  // If still no name, try customer_name or billing_address name
-  if (!userName || userName === 'Unknown User') {
+  // Priority 2: Combine given_name + surname (fallback)
+  if (!userName && invoice.customer) {
+    const givenName = invoice.customer.given_name || '';
+    const surname = invoice.customer.surname || invoice.customer.sur_name || '';
+    const combined = [givenName, surname].filter(Boolean).join(' ').trim();
+    if (combined) userName = combined;
+  }
+  
+  // Priority 3: Other name fields
+  if (!userName) {
     userName = invoice.customer_name 
-      || invoice.billing_address?.name 
       || invoice.customer?.name
-      || 'Unknown User';
+      || invoice.billing_address?.name
+      || '';
   }
   
   // Extract WhatsApp/phone number (try multiple fields)
@@ -73,7 +80,13 @@ function convertXenditToPayment(invoice: any) {
       || invoice.customer.phone_number
       || invoice.customer.phone
       || invoice.customer.mobile
-      || invoice.billing_address?.phone_number
+      || '';
+  }
+  
+  // Fallback to billing_address
+  if (!userWhatsapp && invoice.billing_address) {
+    userWhatsapp = invoice.billing_address.phone_number 
+      || invoice.billing_address.mobile_number
       || '';
   }
   
@@ -83,11 +96,18 @@ function convertXenditToPayment(invoice: any) {
     || invoice.billing_address?.email
     || '';
   
-  console.log('[convertXenditToPayment] Customer data:', {
+  console.log('[convertXenditToPayment] Extracting customer data from Xendit invoice:', {
+    givenNames: invoice.customer?.given_names,
+    givenName: invoice.customer?.given_name,
+    surname: invoice.customer?.surname,
+    mobileNumber: invoice.customer?.mobile_number,
+    payerEmail: invoice.payer_email,
+  });
+  
+  console.log('[convertXenditToPayment] Extracted customer data:', {
     userName,
     userEmail,
     userWhatsapp,
-    rawCustomer: invoice.customer,
   });
   
   return {
