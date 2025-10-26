@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "gyamsjmrrntwwcqljene.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "seeklogo.com",
+      },
     ],
   },
 };
