@@ -8,49 +8,49 @@ export function PaymentMethodLogos() {
   const paymentMethods = [
     {
       name: "QRIS",
-      logo: "https://seeklogo.com/images/Q/quick-response-code-indonesian-standard-qris-logo-F300D5EB32-seeklogo.com.png",
+      logo: "/payment-logos/qris.png",
       bg: "from-white to-gray-50 dark:from-slate-800 dark:to-slate-900",
       border: "border-gray-200 dark:border-gray-700",
     },
     {
       name: "DANA",
-      logo: "https://seeklogo.com/images/D/dana-logo-3E5BAAE5BE-seeklogo.com.png",
+      logo: "/payment-logos/dana.png",
       bg: "from-blue-50 to-cyan-50 dark:from-blue-950/40 dark:to-cyan-950/40",
       border: "border-blue-200 dark:border-blue-700",
     },
     {
       name: "OVO",
-      logo: "https://seeklogo.com/images/O/ovo-logo-4229017539-seeklogo.com.png",
+      logo: "/payment-logos/ovo.png",
       bg: "from-purple-50 to-violet-50 dark:from-purple-950/40 dark:to-violet-950/40",
       border: "border-purple-200 dark:border-purple-700",
     },
     {
       name: "GoPay",
-      logo: "https://seeklogo.com/images/G/gopay-logo-96D8DCBE1B-seeklogo.com.png",
+      logo: "/payment-logos/gopay.png",
       bg: "from-green-50 to-emerald-50 dark:from-green-950/40 dark:to-emerald-950/40",
       border: "border-green-200 dark:border-green-700",
     },
     {
       name: "BCA",
-      logo: "https://seeklogo.com/images/B/bca-bank-central-asia-logo-F5B12BAC9E-seeklogo.com.png",
+      logo: "/payment-logos/bca.png",
       bg: "from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40",
       border: "border-blue-200 dark:border-blue-700",
     },
     {
       name: "Mandiri",
-      logo: "https://seeklogo.com/images/B/bank-mandiri-logo-875499888A-seeklogo.com.png",
+      logo: "/payment-logos/mandiri.png",
       bg: "from-yellow-50 to-orange-50 dark:from-yellow-950/40 dark:to-orange-950/40",
       border: "border-yellow-200 dark:border-yellow-700",
     },
     {
       name: "BNI",
-      logo: "https://seeklogo.com/images/B/bni-bank-negara-indonesia-logo-DCFE1B0C7E-seeklogo.com.png",
+      logo: "/payment-logos/bni.png",
       bg: "from-orange-50 to-amber-50 dark:from-orange-950/40 dark:to-amber-950/40",
       border: "border-orange-200 dark:border-orange-700",
     },
     {
       name: "BRI",
-      logo: "https://seeklogo.com/images/B/bri-bank-rakyat-indonesia-logo-093D96D178-seeklogo.com.png",
+      logo: "/payment-logos/bri.png",
       bg: "from-blue-50 to-sky-50 dark:from-blue-950/40 dark:to-sky-950/40",
       border: "border-blue-200 dark:border-blue-700",
     },
@@ -87,17 +87,19 @@ export function PaymentMethodLogos() {
               className={`relative bg-gradient-to-br ${method.bg} rounded-xl p-3 sm:p-4 border-2 ${method.border} shadow-md hover:shadow-xl transition-all duration-300 group cursor-pointer overflow-hidden`}
             >
               {/* Logo */}
-              <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2 h-full">
+              <div className="flex flex-col items-center justify-center gap-2 h-full py-2">
                 {!imageError ? (
                   <>
-                    <div className="relative w-full h-12 sm:h-16 flex items-center justify-center">
+                    {/* Fixed size logo container */}
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center">
                       <Image
                         src={method.logo}
                         alt={method.name}
-                        fill
-                        className="object-contain group-hover:scale-110 transition-transform duration-300"
+                        width={80}
+                        height={80}
+                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                         onError={() => setImageError(true)}
-                        unoptimized
+                        priority={index < 4}
                       />
                     </div>
                     {/* Method Name Below Logo */}
