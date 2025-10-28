@@ -7,20 +7,26 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 
 interface StepBasicsProps {
-  data: Resume;
-  onChange: (data: Resume) => void;
+  resume: Resume;
+  setResume: (resume: Resume) => void;
 }
 
-export function StepBasics({ data, onChange }: StepBasicsProps) {
+export function StepBasics({ resume, setResume }: StepBasicsProps) {
+  // Ensure resume is properly initialized
+  if (!resume || !resume.basics) {
+    console.error("StepBasics: Invalid resume data", resume);
+    return null;
+  }
+
   const handleChange = (field: string, value: string) => {
-    onChange({
-      ...data,
-      basics: { ...data.basics, [field]: value },
+    setResume({
+      ...resume,
+      basics: { ...resume.basics, [field]: value },
     });
   };
 
   const handleTitleChange = (value: string) => {
-    onChange({ ...data, title: value });
+    setResume({ ...resume, title: value });
   };
 
   return (
@@ -40,7 +46,7 @@ export function StepBasics({ data, onChange }: StepBasicsProps) {
             </Label>
             <Input
               id="title"
-              value={data.title || ""}
+              value={resume.title || ""}
               onChange={(e) => handleTitleChange(e.target.value)}
               placeholder="Contoh: Frontend Developer CV"
               className="mt-1.5"
@@ -62,7 +68,7 @@ export function StepBasics({ data, onChange }: StepBasicsProps) {
               </Label>
               <Input
                 id="firstName"
-                value={data.basics.firstName}
+                value={resume.basics.firstName}
                 onChange={(e) => handleChange("firstName", e.target.value)}
                 placeholder="John"
                 className="mt-1.5"
@@ -74,7 +80,7 @@ export function StepBasics({ data, onChange }: StepBasicsProps) {
               </Label>
               <Input
                 id="lastName"
-                value={data.basics.lastName}
+                value={resume.basics.lastName}
                 onChange={(e) => handleChange("lastName", e.target.value)}
                 placeholder="Doe"
                 className="mt-1.5"
