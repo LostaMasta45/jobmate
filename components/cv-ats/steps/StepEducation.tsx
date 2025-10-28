@@ -11,11 +11,11 @@ import { Plus, Trash2, GripVertical } from "lucide-react";
 import { nanoid } from "nanoid";
 
 interface StepEducationProps {
-  resume: Resume;
-  setResume: (resume: Resume) => void;
+  data: Resume;
+  onChange: (data: Resume) => void;
 }
 
-export function StepEducation({ resume, setResume }: StepEducationProps) {
+export function StepEducation({ data, onChange }: StepEducationProps) {
   const addEducation = () => {
     const newEdu: Education = {
       id: nanoid(),
@@ -26,25 +26,25 @@ export function StepEducation({ resume, setResume }: StepEducationProps) {
       endDate: "",
       description: "",
     };
-    setResume({
-      ...resume,
-      education: [...resume.education, newEdu],
+    onChange({
+      ...data,
+      education: [...data.education, newEdu],
     });
   };
 
   const removeEducation = (id: string) => {
     if (confirm("Hapus pendidikan ini?")) {
-      setResume({
-        ...resume,
-        education: resume.education.filter((edu) => edu.id !== id),
+      onChange({
+        ...data,
+        education: data.education.filter((edu) => edu.id !== id),
       });
     }
   };
 
   const updateEducation = (id: string, field: string, value: any) => {
-    setResume({
-      ...resume,
-      education: resume.education.map((edu) =>
+    onChange({
+      ...data,
+      education: data.education.map((edu) =>
         edu.id === id ? { ...edu, [field]: value } : edu
       ),
     });
@@ -65,7 +65,7 @@ export function StepEducation({ resume, setResume }: StepEducationProps) {
         </Button>
       </div>
 
-      {resume.education.length === 0 && (
+      {data.education.length === 0 && (
         <Card className="border-dashed p-12">
           <div className="text-center">
             <p className="text-muted-foreground">Belum ada riwayat pendidikan</p>
@@ -77,7 +77,7 @@ export function StepEducation({ resume, setResume }: StepEducationProps) {
         </Card>
       )}
 
-      {resume.education.map((edu, idx) => (
+      {data.education.map((edu, idx) => (
         <Card key={edu.id} className="p-6">
           <div className="space-y-4">
             {/* Header */}

@@ -10,16 +10,16 @@ import { Sparkles, Loader2 } from "lucide-react";
 import { generateAISummary } from "@/actions/cv-ats";
 
 interface StepSummaryProps {
-  resume: Resume;
-  setResume: (resume: Resume) => void;
+  data: Resume;
+  onChange: (data: Resume) => void;
 }
 
-export function StepSummary({ resume, setResume }: StepSummaryProps) {
+export function StepSummary({ data, onChange }: StepSummaryProps) {
   const [generating, setGenerating] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   const handleChange = (value: string) => {
-    setResume({ ...resume, summary: value });
+    onChange({ ...data, summary: value });
   };
 
   const handleAIGenerate = async () => {
@@ -28,19 +28,19 @@ export function StepSummary({ resume, setResume }: StepSummaryProps) {
 
     try {
       // Validate required fields
-      if (!resume.basics.firstName || !resume.basics.headline) {
+      if (!data.basics.firstName || !data.basics.headline) {
         throw new Error("Lengkapi informasi dasar terlebih dahulu (Step 1)");
       }
 
       const summary = await generateAISummary({
-        firstName: resume.basics.firstName,
-        lastName: resume.basics.lastName,
-        headline: resume.basics.headline,
-        skills: resume.skills,
-        experiences: resume.experiences,
+        firstName: data.basics.firstName,
+        lastName: data.basics.lastName,
+        headline: data.basics.headline,
+        skills: data.skills,
+        experiences: data.experiences,
       });
 
-      setResume({ ...resume, summary });
+      onChange({ ...data, summary });
     } catch (error) {
       console.error("AI generate error:", error);
       setError(error instanceof Error ? error.message : "Gagal generate ringkasan");
@@ -49,7 +49,7 @@ export function StepSummary({ resume, setResume }: StepSummaryProps) {
     }
   };
 
-  const charCount = resume.summary?.length || 0;
+  const charCount = data.summary?.length || 0;
   const charLimit = 600;
   const charPercentage = (charCount / charLimit) * 100;
 
@@ -79,7 +79,7 @@ export function StepSummary({ resume, setResume }: StepSummaryProps) {
             </div>
             <Textarea
               id="summary"
-              value={resume.summary || ""}
+              value={data.summary || ""}
               onChange={(e) => handleChange(e.target.value)}
               placeholder="Contoh: Frontend Developer dengan 5+ tahun pengalaman membangun aplikasi web modern menggunakan React, TypeScript, dan Next.js. Terbukti meningkatkan performa aplikasi hingga 40% dan mengurangi bug produksi sebesar 60%. Passionate dalam menciptakan user experience yang optimal dan code quality yang tinggi."
               className="mt-1.5 min-h-[200px]"

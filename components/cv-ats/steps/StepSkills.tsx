@@ -12,29 +12,29 @@ import { Plus, X, Trash2, GripVertical } from "lucide-react";
 import { nanoid } from "nanoid";
 
 interface StepSkillsProps {
-  resume: Resume;
-  setResume: (resume: Resume) => void;
+  data: Resume;
+  onChange: (data: Resume) => void;
 }
 
-export function StepSkills({ resume, setResume }: StepSkillsProps) {
+export function StepSkills({ data, onChange }: StepSkillsProps) {
   const [skillInput, setSkillInput] = React.useState("");
 
   // Skills Management
   const addSkill = () => {
     const trimmed = skillInput.trim();
-    if (trimmed && !resume.skills.includes(trimmed)) {
-      setResume({
-        ...resume,
-        skills: [...resume.skills, trimmed],
+    if (trimmed && !data.skills.includes(trimmed)) {
+      onChange({
+        ...data,
+        skills: [...data.skills, trimmed],
       });
       setSkillInput("");
     }
   };
 
   const removeSkill = (skill: string) => {
-    setResume({
-      ...resume,
-      skills: resume.skills.filter((s) => s !== skill),
+    onChange({
+      ...data,
+      skills: data.skills.filter((s) => s !== skill),
     });
   };
 
@@ -52,34 +52,34 @@ export function StepSkills({ resume, setResume }: StepSkillsProps) {
       title: "Sertifikasi",
       items: [{ id: nanoid(), label: "", description: "" }],
     };
-    setResume({
-      ...resume,
-      customSections: [...resume.customSections, newSection],
+    onChange({
+      ...data,
+      customSections: [...data.customSections, newSection],
     });
   };
 
   const removeCustomSection = (id: string) => {
     if (confirm("Hapus bagian ini?")) {
-      setResume({
-        ...resume,
-        customSections: resume.customSections.filter((sec) => sec.id !== id),
+      onChange({
+        ...data,
+        customSections: data.customSections.filter((sec) => sec.id !== id),
       });
     }
   };
 
   const updateCustomSection = (id: string, field: string, value: any) => {
-    setResume({
-      ...resume,
-      customSections: resume.customSections.map((sec) =>
+    onChange({
+      ...data,
+      customSections: data.customSections.map((sec) =>
         sec.id === id ? { ...sec, [field]: value } : sec
       ),
     });
   };
 
   const addCustomSectionItem = (sectionId: string) => {
-    setResume({
-      ...resume,
-      customSections: resume.customSections.map((sec) =>
+    onChange({
+      ...data,
+      customSections: data.customSections.map((sec) =>
         sec.id === sectionId
           ? {
               ...sec,
@@ -91,9 +91,9 @@ export function StepSkills({ resume, setResume }: StepSkillsProps) {
   };
 
   const removeCustomSectionItem = (sectionId: string, itemId: string) => {
-    setResume({
-      ...resume,
-      customSections: resume.customSections.map((sec) =>
+    onChange({
+      ...data,
+      customSections: data.customSections.map((sec) =>
         sec.id === sectionId
           ? { ...sec, items: sec.items.filter((item) => item.id !== itemId) }
           : sec
@@ -107,9 +107,9 @@ export function StepSkills({ resume, setResume }: StepSkillsProps) {
     field: string,
     value: string
   ) => {
-    setResume({
-      ...resume,
-      customSections: resume.customSections.map((sec) =>
+    onChange({
+      ...data,
+      customSections: data.customSections.map((sec) =>
         sec.id === sectionId
           ? {
               ...sec,
@@ -156,11 +156,11 @@ export function StepSkills({ resume, setResume }: StepSkillsProps) {
               </p>
             </div>
 
-            {resume.skills.length > 0 && (
+            {data.skills.length > 0 && (
               <div>
-                <Label>Skills Anda ({resume.skills.length})</Label>
+                <Label>Skills Anda ({data.skills.length})</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {resume.skills.map((skill, idx) => (
+                  {data.skills.map((skill, idx) => (
                     <Badge
                       key={idx}
                       variant="secondary"
@@ -179,7 +179,7 @@ export function StepSkills({ resume, setResume }: StepSkillsProps) {
               </div>
             )}
 
-            {resume.skills.length === 0 && (
+            {data.skills.length === 0 && (
               <div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground">
                 Belum ada skill. Ketik dan tekan Enter untuk menambahkan.
               </div>
@@ -233,7 +233,7 @@ export function StepSkills({ resume, setResume }: StepSkillsProps) {
           </Button>
         </div>
 
-        {resume.customSections.length === 0 && (
+        {data.customSections.length === 0 && (
           <Card className="border-dashed p-8">
             <div className="text-center">
               <p className="text-muted-foreground">
@@ -246,7 +246,7 @@ export function StepSkills({ resume, setResume }: StepSkillsProps) {
           </Card>
         )}
 
-        {resume.customSections.map((section, idx) => (
+        {data.customSections.map((section, idx) => (
           <Card key={section.id} className="p-6">
             <div className="space-y-4">
               {/* Section Header */}
