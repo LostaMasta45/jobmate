@@ -12,11 +12,11 @@ import { nanoid } from "nanoid";
 import { rewriteBulletsWithAI } from "@/actions/cv-ats";
 
 interface StepExperienceProps {
-  data: Resume;
-  onChange: (data: Resume) => void;
+  resume: Resume;
+  onChange: (resume: Resume) => void;
 }
 
-export function StepExperience({ data, onChange }: StepExperienceProps) {
+export function StepExperience({ resume, setResume }: StepExperienceProps) {
   const [rewritingId, setRewritingId] = React.useState<string | null>(null);
 
   const addExperience = () => {
@@ -31,43 +31,43 @@ export function StepExperience({ data, onChange }: StepExperienceProps) {
       isCurrent: false,
       bullets: [""],
     };
-    onChange({
-      ...data,
-      experiences: [...data.experiences, newExp],
+    setResume({
+      ...resume,
+      experiences: [...resume.experiences, newExp],
     });
   };
 
   const removeExperience = (id: string) => {
     if (confirm("Hapus pengalaman ini?")) {
-      onChange({
-        ...data,
-        experiences: data.experiences.filter((exp) => exp.id !== id),
+      setResume({
+        ...resume,
+        experiences: resume.experiences.filter((exp) => exp.id !== id),
       });
     }
   };
 
   const updateExperience = (id: string, field: string, value: any) => {
-    onChange({
-      ...data,
-      experiences: data.experiences.map((exp) =>
+    setResume({
+      ...resume,
+      experiences: resume.experiences.map((exp) =>
         exp.id === id ? { ...exp, [field]: value } : exp
       ),
     });
   };
 
   const addBullet = (expId: string) => {
-    onChange({
-      ...data,
-      experiences: data.experiences.map((exp) =>
+    setResume({
+      ...resume,
+      experiences: resume.experiences.map((exp) =>
         exp.id === expId ? { ...exp, bullets: [...exp.bullets, ""] } : exp
       ),
     });
   };
 
   const removeBullet = (expId: string, bulletIdx: number) => {
-    onChange({
-      ...data,
-      experiences: data.experiences.map((exp) =>
+    setResume({
+      ...resume,
+      experiences: resume.experiences.map((exp) =>
         exp.id === expId
           ? { ...exp, bullets: exp.bullets.filter((_, i) => i !== bulletIdx) }
           : exp
@@ -76,9 +76,9 @@ export function StepExperience({ data, onChange }: StepExperienceProps) {
   };
 
   const updateBullet = (expId: string, bulletIdx: number, value: string) => {
-    onChange({
-      ...data,
-      experiences: data.experiences.map((exp) =>
+    setResume({
+      ...resume,
+      experiences: resume.experiences.map((exp) =>
         exp.id === expId
           ? {
               ...exp,
@@ -92,7 +92,7 @@ export function StepExperience({ data, onChange }: StepExperienceProps) {
   const handleAIRewrite = async (expId: string) => {
     setRewritingId(expId);
     try {
-      const experience = data.experiences.find((exp) => exp.id === expId);
+      const experience = resume.experiences.find((exp) => exp.id === expId);
       if (!experience) return;
 
       const rewrittenBullets = await rewriteBulletsWithAI({
@@ -101,9 +101,9 @@ export function StepExperience({ data, onChange }: StepExperienceProps) {
         bullets: experience.bullets,
       });
 
-      onChange({
-        ...data,
-        experiences: data.experiences.map((exp) =>
+      setResume({
+        ...resume,
+        experiences: resume.experiences.map((exp) =>
           exp.id === expId ? { ...exp, bullets: rewrittenBullets } : exp
         ),
       });
@@ -129,7 +129,7 @@ export function StepExperience({ data, onChange }: StepExperienceProps) {
         </Button>
       </div>
 
-      {data.experiences.length === 0 && (
+      {resume.experiences.length === 0 && (
         <Card className="border-dashed p-12">
           <div className="text-center">
             <p className="text-muted-foreground">Belum ada pengalaman profesional</p>
@@ -141,7 +141,7 @@ export function StepExperience({ data, onChange }: StepExperienceProps) {
         </Card>
       )}
 
-      {data.experiences.map((exp, idx) => (
+      {resume.experiences.map((exp, idx) => (
         <Card key={exp.id} className="p-6">
           <div className="space-y-4">
             {/* Header */}
