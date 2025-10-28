@@ -13,7 +13,7 @@ import { rewriteBulletsWithAI } from "@/actions/cv-ats";
 
 interface StepExperienceProps {
   resume: Resume;
-  onChange: (resume: Resume) => void;
+  setResume: (resume: Resume) => void;
 }
 
 export function StepExperience({ resume, setResume }: StepExperienceProps) {

@@ -11,7 +11,7 @@ import { generateAISummary } from "@/actions/cv-ats";
 
 interface StepSummaryProps {
   resume: Resume;
-  onChange: (resume: Resume) => void;
+  setResume: (resume: Resume) => void;
 }
 
 export function StepSummary({ resume, setResume }: StepSummaryProps) {

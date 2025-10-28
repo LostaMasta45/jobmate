@@ -13,7 +13,7 @@ import { nanoid } from "nanoid";
 
 interface StepSkillsProps {
   resume: Resume;
-  onChange: (resume: Resume) => void;
+  setResume: (resume: Resume) => void;
 }
 
 export function StepSkills({ resume, setResume }: StepSkillsProps) {
