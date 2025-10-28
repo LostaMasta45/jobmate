@@ -94,7 +94,7 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
             </Label>
             <Input
               id="headline"
-              value={data.basics.headline}
+              value={resume.basics.headline}
               onChange={(e) => handleChange("headline", e.target.value)}
               placeholder="Frontend Developer | React Specialist"
               className="mt-1.5"
@@ -116,7 +116,7 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
             <Input
               id="email"
               type="email"
-              value={data.basics.email}
+              value={resume.basics.email}
               onChange={(e) => handleChange("email", e.target.value)}
               placeholder="john.doe@email.com"
               className="mt-1.5"
@@ -128,7 +128,7 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
               <Label htmlFor="phone">Telepon</Label>
               <Input
                 id="phone"
-                value={data.basics.phone || ""}
+                value={resume.basics.phone || ""}
                 onChange={(e) => handleChange("phone", e.target.value)}
                 placeholder="+62 812 3456 7890"
                 className="mt-1.5"
@@ -138,7 +138,7 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
               <Label htmlFor="city">Kota</Label>
               <Input
                 id="city"
-                value={data.basics.city || ""}
+                value={resume.basics.city || ""}
                 onChange={(e) => handleChange("city", e.target.value)}
                 placeholder="Jakarta"
                 className="mt-1.5"
@@ -150,7 +150,7 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
             <Label htmlFor="address">Alamat Lengkap</Label>
             <Input
               id="address"
-              value={data.basics.address || ""}
+              value={resume.basics.address || ""}
               onChange={(e) => handleChange("address", e.target.value)}
               placeholder="Jl. Contoh No. 123"
               className="mt-1.5"
@@ -167,7 +167,7 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
             <Input
               id="website"
               type="url"
-              value={data.basics.website || ""}
+              value={resume.basics.website || ""}
               onChange={(e) => handleChange("website", e.target.value)}
               placeholder="https://yourwebsite.com"
               className="mt-1.5"
@@ -179,7 +179,7 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
             <Input
               id="linkedin"
               type="url"
-              value={data.basics.linkedin || ""}
+              value={resume.basics.linkedin || ""}
               onChange={(e) => handleChange("linkedin", e.target.value)}
               placeholder="https://linkedin.com/in/username"
               className="mt-1.5"
