@@ -29,14 +29,16 @@ export function generateAISummaryPrompt(data: {
 - Highlight pengalaman: ${firstExpBullets || "Tidak ada pengalaman"}
 
 **Instruksi:**
-1. Tulis ringkasan profesional dalam Bahasa Indonesia formal
-2. Maksimal 4 kalimat (150-200 kata ideal)
-3. Mulai dengan role/title dan tahun pengalaman (estimasi dari data)
-4. Sertakan teknologi/tools utama dari skill
-5. Gunakan angka dan metrik jika ada di pengalaman (%, Rp, qty)
-6. Hindari kata ganti "saya/kami" - gunakan format orang ketiga atau deskriptif
-7. Fokus pada value yang bisa diberikan untuk perusahaan
-8. Hindari kata klise tanpa bukti ("hardworking", "passionate")
+1. Tulis ringkasan profesional dalam Bahasa Indonesia formal menggunakan kata ganti "saya"
+2. Maksimal 3-4 kalimat (120-180 kata ideal) - ringkas dan powerful
+3. Mulai dengan "Saya adalah [role/title] dengan [X tahun] pengalaman..."
+4. Sertakan teknologi/tools utama dari skill dan achievement terukur
+5. WAJIB gunakan angka dan metrik jika ada di pengalaman (%, Rp, peningkatan, jumlah user, dll)
+6. WAJIB gunakan kata ganti "saya" (bukan nama atau format orang ketiga)
+7. Fokus pada value konkret yang bisa diberikan untuk perusahaan
+8. Hindari kata klise tanpa bukti ("hardworking", "passionate") - ganti dengan pencapaian nyata
+9. Gunakan action words yang kuat: "meningkatkan", "memimpin", "mengembangkan", "mengoptimalkan"
+10. Tutup dengan keahlian unik atau nilai tambah yang membedakan dari kandidat lain
 
 **Output:**
 Tuliskan hanya ringkasan profil, tanpa markup atau penjelasan tambahan. Langsung text saja.`;
@@ -66,15 +68,18 @@ ${bulletsText || "Tidak ada bullet"}
 
 ${jobDesc ? `**Job Description Target (opsional):**\n${jobDesc}\n` : ""}
 
-**Instruksi Penting:**
-1. Gunakan kata kerja aktif di awal (Membangun, Meningkatkan, Mengoptimalkan, Mengurangi, Memimpin)
-2. Sisipkan angka/metrik jika mungkin (%, Rp, waktu, jumlah user)
-   - Jika tidak ada angka di input, estimasi wajar berdasarkan role (contoh: "20%", "5M users", "30 hari")
-3. Hindari kata ganti "saya", "kami", "kita" - langsung action
-4. Maksimal 25 kata per bullet (ideal 15-20 kata)
-5. Format: Action + Object + Result/Impact
-6. Urutkan by impact - yang paling impressive di atas
-7. Gunakan formula STAR jika memungkinkan: Situation, Task, Action, Result
+**Instruksi Penting (WAJIB DIIKUTI):**
+1. Gunakan kata kerja aktif KUAT di awal: Membangun, Meningkatkan, Mengoptimalkan, Mengurangi, Memimpin, Mengembangkan, Merancang, Meluncurkan
+2. WAJIB sisipkan angka/metrik achievement dalam SETIAP bullet (%, Rp, X%, waktu, jumlah user/tim/project)
+   - Jika tidak ada angka di input, buat estimasi REALISTIS berdasarkan role level (junior: 10-30%, senior: 30-60%, lead: 50-100%+)
+   - Contoh angka bagus: "meningkatkan 45%", "mengelola tim 8 orang", "handling 10K+ users", "reduce cost Rp 50jt/bulan"
+3. Hindari kata ganti "saya", "kami", "kita" - LANGSUNG ACTION VERB
+4. Panjang: 15-22 kata per bullet (tidak terlalu pendek, tidak terlalu panjang)
+5. Format WAJIB: [Action Verb] + [What/Object] + [Result/Impact dengan angka]
+6. Urutkan by impact - yang paling WOW & impressive di urutan atas
+7. Gunakan formula CAR: Context + Action + Result (harus ada hasil terukur!)
+8. Fokus pada achievement & impact, bukan task rutin
+9. Setiap bullet harus punya VALUE PROPOSITION yang jelas
 
 **Output Format:**
 Kembalikan sebagai JSON array string. Contoh:
