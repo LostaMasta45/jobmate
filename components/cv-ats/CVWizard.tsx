@@ -21,7 +21,18 @@ interface CVWizardProps {
 
 export function CVWizard({ initialResume, onClose }: CVWizardProps) {
   const [currentStep, setCurrentStep] = React.useState<WizardStep>(1);
-  const [resume, setResume] = React.useState<Resume>(initialResume || emptyResume);
+  
+  // Migrate old resumes without title field
+  const migratedResume = React.useMemo(() => {
+    if (!initialResume) return emptyResume;
+    
+    return {
+      ...initialResume,
+      title: initialResume.title || `CV ${initialResume.basics?.firstName || "Saya"}`,
+    };
+  }, [initialResume]);
+  
+  const [resume, setResume] = React.useState<Resume>(migratedResume);
   const [autosaveStatus, setAutosaveStatus] = React.useState<AutosaveStatus>({
     saved: false,
     timestamp: null,
