@@ -16,7 +16,7 @@ interface ModernLokerListProps {
 
 export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListProps) {
   const [lokerList, setLokerList] = useState<Loker[]>(initialLoker)
-  const [filters, setFilters] = useState({ category: 'all', location: 'Semua Lokasi', search: '' })
+  const [filters, setFilters] = useState({ category: 'all', location: 'Semua Lokasi', search: '', timeFilter: 'all' })
   const [isLoading, setIsLoading] = useState(false)
 
   // Count new jobs posted today
@@ -33,6 +33,39 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   }
 
   const newJobsCount = getNewJobsCount()
+
+  // Helper function to check if date matches time filter
+  const matchesTimeFilter = (publishedAt: string | null | undefined, timeFilter: string): boolean => {
+    if (!publishedAt || timeFilter === 'all') return true
+
+    const publishedDate = new Date(publishedAt)
+    publishedDate.setHours(0, 0, 0, 0)
+    
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
+    
+    const weekStart = new Date(today)
+    weekStart.setDate(weekStart.getDate() - 7)
+    
+    const monthStart = new Date(today)
+    monthStart.setMonth(monthStart.getMonth() - 1)
+
+    switch (timeFilter) {
+      case 'today':
+        return publishedDate.getTime() === today.getTime()
+      case 'yesterday':
+        return publishedDate.getTime() === yesterday.getTime()
+      case 'week':
+        return publishedDate >= weekStart && publishedDate <= today
+      case 'month':
+        return publishedDate >= monthStart && publishedDate <= today
+      default:
+        return true
+    }
+  }
 
   // Client-side filtering
   const filteredLoker = lokerList.filter((loker) => {
@@ -63,6 +96,11 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
       }
       const categories = categoryMap[filters.category] || []
       matches = matches && loker.kategori?.some(k => categories.includes(k))
+    }
+
+    // Time filter
+    if (filters.timeFilter && filters.timeFilter !== 'all') {
+      matches = matches && matchesTimeFilter(loker.published_at, filters.timeFilter)
     }
 
     return matches

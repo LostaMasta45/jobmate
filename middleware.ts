@@ -16,15 +16,51 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Allow admin login page (public access)
+  if (pathname === '/admin-login' || pathname.startsWith('/admin-login/')) {
+    console.log('[MIDDLEWARE] Admin login page, public access');
+    return NextResponse.next();
+  }
+
+  // Define PUBLIC routes (routes that DO NOT require login)
+  const publicRoutes = [
+    '/',
+    '/sign-in',
+    '/login',
+    '/reset',
+    '/verify',
+    '/ajukan-akun',
+    '/cek-status-pengajuan',
+    '/toolsjobmate',
+    '/revisi',
+    '/test-public',
+    '/generate-thumbnails',
+    '/admin-login', // Admin login is public
+  ];
+
+  // Check if current path is public
+  const isPublic = publicRoutes.some(route => {
+    if (route === '/') {
+      return pathname === '/';
+    }
+    return pathname === route || pathname.startsWith(route + '/');
+  });
+
+  // If public, allow access immediately
+  if (isPublic) {
+    console.log('[MIDDLEWARE] Public route, bypassing auth:', pathname);
+    return NextResponse.next();
+  }
+
   // Define PROTECTED routes (routes that REQUIRE login)
   const protectedRoutes = [
     '/vip',           // VIP Career Portal
     '/dashboard',     // User dashboard
     '/tools/',        // JobMate Premium tools (with trailing slash to avoid matching /toolsjobmate)
-    '/admin',         // Admin panel
+    '/admin',         // Admin panel (but NOT /admin-login)
     '/settings',      // User settings
     '/applications',  // Job applications
-    '/surat-lamaran', // Surat lamaran tool
+    '/surat-lamaran-sederhana', // Surat lamaran tool
   ];
 
   // Check if current path is protected
@@ -45,17 +81,27 @@ export async function middleware(request: NextRequest) {
 
   const { supabaseResponse, user, supabase, cachedRole } = await updateSession(request);
 
-  // Get user role & membership
-  // IMPORTANT: Always query for logged-in users to get fresh membership data
+  // Get cached data
   let userRole: string | undefined = cachedRole;
-  let membership: string | undefined;
-  let membershipStatus: string | undefined;
+  let membership: string | undefined = request.cookies.get('user_membership')?.value;
+  let membershipStatus: string | undefined = request.cookies.get('user_membership_status')?.value;
   let membershipExpiry: string | undefined;
 
-  if (user) {
+  // Determine if we need to query database
+  // Query if: accessing protected routes OR cache is missing/incomplete
+  const isProtectedRoute = pathname.startsWith("/vip") || 
+                          pathname.startsWith("/admin/") || 
+                          pathname.startsWith("/dashboard") ||
+                          pathname.startsWith("/tools") ||
+                          pathname.startsWith("/settings");
+  
+  const needsProfileQuery = isProtectedRoute || 
+                           (!userRole && user) ||
+                           (membership && !membershipStatus); // Has membership but missing status
+
+  if (user && needsProfileQuery) {
     try {
-      // Query profile data (including membership) for every request
-      // This ensures membership is always fresh
+      // Query profile data only when needed
       const { data: profile } = await supabase
         .from("profiles")
         .select("role, membership, membership_status, membership_expiry")
@@ -67,31 +113,42 @@ export async function middleware(request: NextRequest) {
       membershipStatus = profile?.membership_status;
       membershipExpiry = profile?.membership_expiry;
       
-      // DEBUG LOG - Remove after testing
-      console.log('[MIDDLEWARE] User:', user.email);
-      console.log('[MIDDLEWARE] Role:', userRole);
-      console.log('[MIDDLEWARE] Membership:', membership);
-      console.log('[MIDDLEWARE] Membership Status:', membershipStatus);
-      console.log('[MIDDLEWARE] Path:', pathname);
-      
-      // Cache role in cookie for 1 hour (optional optimization)
-      if (userRole && !cachedRole) {
+      // Cache role, membership, and status in cookies (1 hour)
+      if (userRole) {
         supabaseResponse.cookies.set('user_role', userRole, {
-          maxAge: 3600, // 1 hour
+          maxAge: 3600,
+          httpOnly: true,
+          sameSite: 'lax',
+          path: '/'
+        });
+      }
+      if (membership) {
+        supabaseResponse.cookies.set('user_membership', membership, {
+          maxAge: 3600,
+          httpOnly: true,
+          sameSite: 'lax',
+          path: '/'
+        });
+      }
+      if (membershipStatus) {
+        supabaseResponse.cookies.set('user_membership_status', membershipStatus, {
+          maxAge: 3600,
           httpOnly: true,
           sameSite: 'lax',
           path: '/'
         });
       }
     } catch (error) {
-      console.error("[MIDDLEWARE] Profile check failed:", error);
+      console.error("[MIDDLEWARE] Profile query error:", error);
       userRole = undefined;
     }
   }
   
-  // Clear role cache if user is logged out
-  if (!user && cachedRole) {
+  // Clear cache if user is logged out
+  if (!user && (cachedRole || membership || membershipStatus)) {
     supabaseResponse.cookies.delete('user_role');
+    supabaseResponse.cookies.delete('user_membership');
+    supabaseResponse.cookies.delete('user_membership_status');
   }
 
   // VIP Career routes - require login & VIP membership (Basic or Premium)
@@ -113,11 +170,19 @@ export async function middleware(request: NextRequest) {
     }
 
     // Check membership status for VIP users
-    const isActive = membershipStatus === 'active' && 
-                     (!membershipExpiry || new Date(membershipExpiry) > new Date());
+    let isActive = false;
+    
+    if (membership === 'vip_premium') {
+      // VIP Premium is LIFETIME - only check status, ignore expiry
+      isActive = membershipStatus === 'active';
+    } else if (membership === 'vip_basic') {
+      // VIP Basic has expiry - check both status and expiry date
+      isActive = membershipStatus === 'active' && 
+                 (!membershipExpiry || new Date(membershipExpiry) > new Date());
+    }
     
     if (!isActive) {
-      console.log('[MIDDLEWARE] VIP membership expired');
+      console.log('[MIDDLEWARE] VIP membership expired or inactive');
       // Membership expired → redirect with message
       return NextResponse.redirect(new URL("/sign-in?message=membership_expired", request.url));
     }
@@ -144,15 +209,14 @@ export async function middleware(request: NextRequest) {
 
     // Only VIP PREMIUM users can access JobMate Tools
     if (membership === 'vip_premium') {
-      // Check if premium is still active
-      const isPremiumActive = membershipStatus === 'active' && 
-                              (!membershipExpiry || new Date(membershipExpiry) > new Date());
+      // VIP Premium is LIFETIME - only check status, ignore expiry
+      const isPremiumActive = membershipStatus === 'active';
       
       if (isPremiumActive) {
         console.log('[MIDDLEWARE] VIP Premium access granted to JobMate');
         return supabaseResponse;
       } else {
-        console.log('[MIDDLEWARE] VIP Premium expired');
+        console.log('[MIDDLEWARE] VIP Premium status is not active');
         return NextResponse.redirect(new URL("/sign-in?message=membership_expired", request.url));
       }
     }
@@ -168,13 +232,22 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/vip?message=premium_required", request.url));
   }
 
-  // AUTH ENABLED - Protect admin routes
+  // AUTH ENABLED - Protect admin routes (but exclude /admin-login)
   if (pathname.startsWith("/admin")) {
+    // Skip auth check if it's admin-login page (already handled as public)
+    if (pathname === "/admin-login" || pathname.startsWith("/admin-login/")) {
+      console.log('[MIDDLEWARE] Admin login page, skipping admin auth check');
+      return NextResponse.next();
+    }
+
+    // For other admin routes, require authentication
     if (!user) {
+      console.log('[MIDDLEWARE] Admin route requires auth, redirecting to admin-login');
       return NextResponse.redirect(new URL("/admin-login", request.url));
     }
 
     if (userRole !== "admin") {
+      console.log('[MIDDLEWARE] User is not admin, access denied');
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }

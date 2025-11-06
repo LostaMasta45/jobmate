@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Search, SlidersHorizontal, MapPin, Tag } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Search, SlidersHorizontal, MapPin, Tag, Clock } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -21,36 +21,71 @@ const LOCATIONS = [
   'Ploso', 'Mojowarno', 'Bareng', 'Gudo'
 ]
 
+const TIME_FILTERS = [
+  { id: 'all', label: 'Semua Waktu' },
+  { id: 'today', label: 'Hari Ini' },
+  { id: 'yesterday', label: 'Kemarin' },
+  { id: 'week', label: 'Minggu Ini' },
+  { id: 'month', label: 'Bulan Ini' },
+]
+
 interface TabFilterNavigationProps {
-  onFilterChange?: (filters: { category: string; location: string; search: string }) => void
+  onFilterChange?: (filters: { category: string; location: string; search: string; timeFilter: string }) => void
 }
 
 export function TabFilterNavigation({ onFilterChange }: TabFilterNavigationProps) {
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeLocation, setActiveLocation] = useState('Semua Lokasi')
   const [searchQuery, setSearchQuery] = useState('')
+  const [activeTimeFilter, setActiveTimeFilter] = useState('all')
   const [showLocationMenu, setShowLocationMenu] = useState(false)
+  const [showTimeMenu, setShowTimeMenu] = useState(false)
+  
+  const locationMenuRef = useRef<HTMLDivElement>(null)
+  const timeMenuRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (locationMenuRef.current && !locationMenuRef.current.contains(event.target as Node)) {
+        setShowLocationMenu(false)
+      }
+      if (timeMenuRef.current && !timeMenuRef.current.contains(event.target as Node)) {
+        setShowTimeMenu(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const handleCategoryChange = (category: string) => {
     setActiveCategory(category)
-    onFilterChange?.({ category, location: activeLocation, search: searchQuery })
+    onFilterChange?.({ category, location: activeLocation, search: searchQuery, timeFilter: activeTimeFilter })
   }
 
   const handleLocationChange = (location: string) => {
     setActiveLocation(location)
     setShowLocationMenu(false)
-    onFilterChange?.({ category: activeCategory, location, search: searchQuery })
+    onFilterChange?.({ category: activeCategory, location, search: searchQuery, timeFilter: activeTimeFilter })
   }
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value)
-    onFilterChange?.({ category: activeCategory, location: activeLocation, search: value })
+    onFilterChange?.({ category: activeCategory, location: activeLocation, search: value, timeFilter: activeTimeFilter })
+  }
+
+  const handleTimeFilterChange = (timeFilter: string) => {
+    setActiveTimeFilter(timeFilter)
+    setShowTimeMenu(false)
+    onFilterChange?.({ category: activeCategory, location: activeLocation, search: searchQuery, timeFilter })
   }
 
   const activeFiltersCount = [
     activeCategory !== 'all' ? 1 : 0,
     activeLocation !== 'Semua Lokasi' ? 1 : 0,
     searchQuery ? 1 : 0,
+    activeTimeFilter !== 'all' ? 1 : 0,
   ].reduce((a, b) => a + b, 0)
 
   return (
@@ -93,10 +128,13 @@ export function TabFilterNavigation({ onFilterChange }: TabFilterNavigationProps
       {/* Location & Advanced Filters */}
       <div className="flex items-center gap-3 flex-wrap">
         {/* Location Dropdown */}
-        <div className="relative">
+        <div className="relative" ref={locationMenuRef}>
           <Button
             variant="outline"
-            onClick={() => setShowLocationMenu(!showLocationMenu)}
+            onClick={() => {
+              setShowLocationMenu(!showLocationMenu)
+              setShowTimeMenu(false)
+            }}
             className="gap-2 rounded-2xl border-2 hover:border-cyan-500 dark:hover:border-cyan-400 transition-colors"
           >
             <MapPin className="w-4 h-4" />
@@ -116,6 +154,39 @@ export function TabFilterNavigation({ onFilterChange }: TabFilterNavigationProps
                   }`}
                 >
                   {location}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Time Filter Dropdown */}
+        <div className="relative" ref={timeMenuRef}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setShowTimeMenu(!showTimeMenu)
+              setShowLocationMenu(false)
+            }}
+            className="gap-2 rounded-2xl border-2 hover:border-purple-500 dark:hover:border-purple-400 transition-colors"
+          >
+            <Clock className="w-4 h-4" />
+            <span>{TIME_FILTERS.find(f => f.id === activeTimeFilter)?.label || 'Semua Waktu'}</span>
+          </Button>
+
+          {showTimeMenu && (
+            <div className="absolute top-full mt-2 left-0 w-56 bg-white dark:bg-card rounded-2xl border-2 border-gray-200 dark:border-gray-800 shadow-2xl p-2 z-50">
+              {TIME_FILTERS.map((filter) => (
+                <button
+                  key={filter.id}
+                  onClick={() => handleTimeFilterChange(filter.id)}
+                  className={`w-full text-left px-4 py-2.5 rounded-xl transition-colors ${
+                    activeTimeFilter === filter.id
+                      ? 'bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 font-medium'
+                      : 'hover:bg-gray-100 dark:hover:bg-gray-900'
+                  }`}
+                >
+                  {filter.label}
                 </button>
               ))}
             </div>
@@ -149,6 +220,16 @@ export function TabFilterNavigation({ onFilterChange }: TabFilterNavigationProps
           >
             <MapPin className="w-3.5 h-3.5" />
             {activeLocation}
+          </Badge>
+        )}
+
+        {activeTimeFilter !== 'all' && (
+          <Badge
+            variant="secondary"
+            className="gap-2 px-4 py-2 rounded-2xl bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-900"
+          >
+            <Clock className="w-3.5 h-3.5" />
+            {TIME_FILTERS.find(f => f.id === activeTimeFilter)?.label}
           </Badge>
         )}
       </div>

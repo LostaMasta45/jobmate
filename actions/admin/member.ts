@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendUpgradeVIPEmail, getUserDisplayName } from "@/lib/email-notifications";
 import { revalidatePath } from "next/cache";
 
 export async function getAllMembers() {
@@ -102,6 +103,28 @@ export async function updateMembership(
     }
 
     console.log('[UPDATE_MEMBERSHIP] Success:', data[0]);
+
+    // Send email notification for VIP upgrades
+    if (membership === 'vip_basic' || membership === 'vip_premium') {
+      try {
+        const profile = data[0];
+        const userName = getUserDisplayName(profile.full_name || profile.name, profile.email);
+        const dashboardUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://jobmate.web.id'}/dashboard`;
+        
+        await sendUpgradeVIPEmail({
+          userName,
+          email: profile.email,
+          membershipType: membership as 'vip_basic' | 'vip_premium',
+          upgradedAt: new Date().toISOString(),
+          dashboardUrl,
+        });
+        
+        console.log(`✅ VIP upgrade email sent to ${profile.email} (${membership})`);
+      } catch (emailError) {
+        console.error('Failed to send VIP upgrade email:', emailError);
+        // Don't throw - upgrade still succeeded even if email fails
+      }
+    }
 
     // Invalidate all admin pages
     revalidatePath("/admin/member");

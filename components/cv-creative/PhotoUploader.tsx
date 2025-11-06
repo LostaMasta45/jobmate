@@ -19,26 +19,88 @@ export function PhotoUploader({ value, options, onChange, onSkip }: PhotoUploade
   const [preview, setPreview] = React.useState<string | null>(value);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
+  // Sync preview with value prop when it changes (e.g., from database)
+  React.useEffect(() => {
+    setPreview(value);
+  }, [value]);
+
+  const compressImage = async (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return reject(new Error("Canvas not supported"));
+
+          // Max dimensions for CV photo
+          const maxWidth = 800;
+          const maxHeight = 800;
+          let { width, height } = img;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) return reject(new Error("Compression failed"));
+              const compressedFile = new File([blob], file.name, {
+                type: "image/jpeg",
+                lastModified: Date.now(),
+              });
+              resolve(compressedFile);
+            },
+            "image/jpeg",
+            0.85 // 85% quality
+          );
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert("File terlalu besar! Maksimal 5MB");
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File terlalu besar! Maksimal 10MB");
       return;
     }
 
     setUploading(true);
     try {
+      // Compress image
+      const compressedFile = await compressImage(file);
+
+      // Show preview
       const reader = new FileReader();
       reader.onload = (e) => setPreview(e.target?.result as string);
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(compressedFile);
 
-      const { url } = await uploadCVPhoto(file);
+      // Upload compressed image
+      const { url } = await uploadCVPhoto(compressedFile);
       onChange(url, options);
     } catch (error) {
       console.error("Upload error:", error);
-      alert("Gagal upload foto");
+      alert("Gagal upload foto: " + (error as Error).message);
     } finally {
       setUploading(false);
     }
@@ -55,6 +117,7 @@ export function PhotoUploader({ value, options, onChange, onSkip }: PhotoUploade
       <div className="text-center">
         <h2 className="text-2xl font-bold">Upload Foto Profesional</h2>
         <p className="text-muted-foreground">Foto akan membuat CV Anda lebih personal</p>
+        <p className="mt-1 text-xs text-muted-foreground">✨ Foto akan dikompres otomatis untuk kualitas optimal</p>
       </div>
 
       <Card>
@@ -66,7 +129,8 @@ export function PhotoUploader({ value, options, onChange, onSkip }: PhotoUploade
             >
               <ImageIcon className="mb-4 h-12 w-12 text-muted-foreground" />
               <p className="mb-2 text-sm font-medium">Click untuk upload foto</p>
-              <p className="text-xs text-muted-foreground">Maksimal 5MB • JPG, PNG, WEBP</p>
+              <p className="text-xs text-muted-foreground">Maksimal 10MB • JPG, PNG, WEBP</p>
+              <p className="mt-1 text-xs text-muted-foreground opacity-70">Auto-compressed untuk kualitas terbaik</p>
               <input
                 ref={fileInputRef}
                 type="file"

@@ -50,7 +50,6 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
                 
                 <div>
                   <p className="text-sm font-semibold">{preset.name}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{preset.description}</p>
                 </div>
               </CardContent>
             </Card>

@@ -198,3 +198,52 @@ FEEDBACK:
   
   return { ats_score: score, feedback, suggestions: feedback };
 }
+
+/**
+ * Extract text from image using GPT-4o Vision
+ */
+export async function extractTextFromImage(
+  imageBase64: string,
+  type: 'cv' | 'job_poster'
+): Promise<string> {
+  try {
+    const prompt = type === 'cv' 
+      ? `Extract ALL text from this CV/Resume image in Indonesian or English. 
+         Include: nama, kontak, pengalaman kerja, pendidikan, skills, sertifikasi.
+         Return as plain text, preserve formatting dengan line breaks.`
+      : `Extract ALL text from this job poster/lowongan kerja image.
+         Include: posisi, perusahaan, requirements, responsibilities, lokasi, gaji, kontak.
+         Return as plain text, preserve formatting dengan line breaks.`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${imageBase64}`,
+                detail: "high"
+              },
+            },
+          ],
+        },
+      ],
+      max_tokens: 2000,
+    });
+
+    const extractedText = response.choices[0]?.message?.content || "";
+    
+    if (!extractedText.trim()) {
+      throw new Error("Tidak ada text yang berhasil di-extract dari gambar");
+    }
+
+    return extractedText;
+  } catch (error: any) {
+    console.error("Vision API Error:", error);
+    throw new Error(`Gagal extract text dari gambar: ${error.message}`);
+  }
+}

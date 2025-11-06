@@ -65,83 +65,176 @@ export function ModernLokerCard({ loker }: ModernLokerCardProps) {
           ? 'shadow-2xl scale-105 -translate-y-2 border-cyan-500 dark:border-cyan-400' 
           : 'shadow-md hover:shadow-xl'
       }`}>
-        {/* Gradient Accent Bar */}
-        <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r transition-all duration-500 ${
-          isHovered
-            ? 'from-cyan-500 via-teal-500 to-emerald-500'
-            : 'from-gray-300 to-gray-300 dark:from-gray-700 dark:to-gray-700'
-        }`} />
-
-        {/* Badges Row */}
-        <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
-          {isNew && (
-            <Badge className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white border-0 shadow-lg animate-pulse">
-              <Zap className="w-3 h-3 mr-1" />
-              Baru
-            </Badge>
-          )}
-          {isTrending && (
-            <Badge className="bg-gradient-to-r from-orange-500 to-rose-500 text-white border-0 shadow-lg">
-              <TrendingUp className="w-3 h-3 mr-1" />
-              Hot
-            </Badge>
-          )}
-          {loker.is_featured && (
-            <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-lg">
-              ⭐ Featured
-            </Badge>
-          )}
-        </div>
-
-        {/* Content */}
-        <div className="p-6">
-          {/* Company Logo & Info */}
-          <div className="flex items-start gap-4 mb-4">
-            {/* Logo with Depth Effect */}
-            <div className="relative flex-shrink-0">
-              <div className={`w-16 h-16 rounded-2xl transition-all duration-500 ${
-                isHovered ? 'shadow-2xl scale-110 rotate-6' : 'shadow-lg'
-              }`}>
-                {loker.perusahaan?.logo_url ? (
-                  <Image
-                    src={loker.perusahaan.logo_url}
-                    alt={loker.perusahaan_name}
-                    width={64}
-                    height={64}
-                    className="w-full h-full object-cover rounded-2xl"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl flex items-center justify-center">
-                    <span className="text-2xl font-bold text-gray-400">
-                      {loker.perusahaan_name.charAt(0)}
-                    </span>
-                  </div>
-                )}
-              </div>
+        {/* Poster Thumbnail */}
+        {loker.poster_url && (
+          <div className="relative w-full h-48 overflow-hidden">
+            <Image
+              src={loker.poster_url}
+              alt={loker.title}
+              fill
+              className={`object-cover transition-all duration-500 ${
+                isHovered ? 'scale-110' : 'scale-100'
+              }`}
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+            {/* Gradient Overlay untuk readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            
+            {/* Badges Row - di atas poster */}
+            <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+              {isNew && (
+                <Badge className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white border-0 shadow-lg animate-pulse backdrop-blur-sm">
+                  <Zap className="w-3 h-3 mr-1" />
+                  Baru
+                </Badge>
+              )}
+              {isTrending && (
+                <Badge className="bg-gradient-to-r from-orange-500 to-rose-500 text-white border-0 shadow-lg backdrop-blur-sm">
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  Hot
+                </Badge>
+              )}
+              {loker.is_featured && (
+                <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-lg backdrop-blur-sm">
+                  ⭐ Featured
+                </Badge>
+              )}
             </div>
 
-            {/* Title & Company */}
-            <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-xl mb-1 line-clamp-2 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+            {/* Title & Company overlay di bawah poster */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+              <h3 className="font-bold text-lg mb-1 line-clamp-2 drop-shadow-lg">
                 {loker.title}
               </h3>
-              <p className="text-sm text-muted-foreground font-medium">
+              <p className="text-sm font-medium opacity-90 drop-shadow-md">
                 {loker.perusahaan_name}
               </p>
             </div>
-
-            {/* Bookmark Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleBookmarkClick}
-              className={`flex-shrink-0 rounded-2xl transition-all ${
-                isBookmarked ? 'text-red-500 bg-red-50 dark:bg-red-950' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
-            >
-              <Heart className={`w-5 h-5 ${isBookmarked ? 'fill-current' : ''}`} />
-            </Button>
           </div>
+        )}
+
+        {/* Gradient Accent Bar (hanya jika tidak ada poster) */}
+        {!loker.poster_url && (
+          <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r transition-all duration-500 ${
+            isHovered
+              ? 'from-cyan-500 via-teal-500 to-emerald-500'
+              : 'from-gray-300 to-gray-300 dark:from-gray-700 dark:to-gray-700'
+          }`} />
+        )}
+
+        {/* Badges Row (jika tidak ada poster, tampilkan di sini) */}
+        {!loker.poster_url && (
+          <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+            {isNew && (
+              <Badge className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white border-0 shadow-lg animate-pulse">
+                <Zap className="w-3 h-3 mr-1" />
+                Baru
+              </Badge>
+            )}
+            {isTrending && (
+              <Badge className="bg-gradient-to-r from-orange-500 to-rose-500 text-white border-0 shadow-lg">
+                <TrendingUp className="w-3 h-3 mr-1" />
+                Hot
+              </Badge>
+            )}
+            {loker.is_featured && (
+              <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-lg">
+                ⭐ Featured
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {/* Content */}
+        <div className="p-6">
+          {/* Company Logo & Info (jika ada poster, simplify. Jika tidak ada, tampilkan full) */}
+          {loker.poster_url ? (
+            /* Simplified header jika ada poster */
+            <div className="flex items-center justify-between mb-4">
+              {/* Company Logo */}
+              <div className="relative flex-shrink-0">
+                <div className={`w-12 h-12 rounded-xl transition-all duration-500 ${
+                  isHovered ? 'shadow-xl scale-110' : 'shadow-md'
+                }`}>
+                  {loker.perusahaan?.logo_url ? (
+                    <Image
+                      src={loker.perusahaan.logo_url}
+                      alt={loker.perusahaan_name}
+                      width={48}
+                      height={48}
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-xl flex items-center justify-center">
+                      <span className="text-lg font-bold text-gray-400">
+                        {loker.perusahaan_name.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Bookmark Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleBookmarkClick}
+                className={`flex-shrink-0 rounded-2xl transition-all ${
+                  isBookmarked ? 'text-red-500 bg-red-50 dark:bg-red-950' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                <Heart className={`w-5 h-5 ${isBookmarked ? 'fill-current' : ''}`} />
+              </Button>
+            </div>
+          ) : (
+            /* Full header jika tidak ada poster */
+            <div className="flex items-start gap-4 mb-4">
+              {/* Logo with Depth Effect */}
+              <div className="relative flex-shrink-0">
+                <div className={`w-16 h-16 rounded-2xl transition-all duration-500 ${
+                  isHovered ? 'shadow-2xl scale-110 rotate-6' : 'shadow-lg'
+                }`}>
+                  {loker.perusahaan?.logo_url ? (
+                    <Image
+                      src={loker.perusahaan.logo_url}
+                      alt={loker.perusahaan_name}
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-cover rounded-2xl"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl flex items-center justify-center">
+                      <span className="text-2xl font-bold text-gray-400">
+                        {loker.perusahaan_name.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Title & Company */}
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-xl mb-1 line-clamp-2 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+                  {loker.title}
+                </h3>
+                <p className="text-sm text-muted-foreground font-medium">
+                  {loker.perusahaan_name}
+                </p>
+              </div>
+
+              {/* Bookmark Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleBookmarkClick}
+                className={`flex-shrink-0 rounded-2xl transition-all ${
+                  isBookmarked ? 'text-red-500 bg-red-50 dark:bg-red-950' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                <Heart className={`w-5 h-5 ${isBookmarked ? 'fill-current' : ''}`} />
+              </Button>
+            </div>
+          )}
 
           {/* Info Grid */}
           <div className="grid grid-cols-2 gap-3 mb-4">

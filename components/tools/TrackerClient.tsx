@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createJobApplication, deleteJobApplication } from "@/actions/tools";
 import { LayoutGrid, List, Plus, Search } from "lucide-react";
+import { PosterUpload } from "./PosterUpload";
 import {
   Dialog,
   DialogContent,
@@ -39,12 +40,13 @@ type Application = {
   source?: string;
   apply_date: string;
   notes?: string;
+  poster_path?: string;
   created_at: string;
 };
 
 type ViewMode = "table" | "kanban";
 
-export function TrackerClient({ applications }: { applications: Application[] }) {
+export function TrackerClient({ applications, userId }: { applications: Application[]; userId: string }) {
   const router = useRouter();
   const [viewMode, setViewMode] = React.useState<ViewMode>("kanban");
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -64,6 +66,7 @@ export function TrackerClient({ applications }: { applications: Application[] })
     source: "",
     apply_date: new Date().toISOString().split("T")[0],
     notes: "",
+    poster_path: undefined as string | undefined,
   });
 
   // Filter applications
@@ -90,6 +93,7 @@ export function TrackerClient({ applications }: { applications: Application[] })
       source: app.source || "",
       apply_date: app.apply_date,
       notes: app.notes || "",
+      poster_path: app.poster_path,
     });
     setShowAddDialog(true);
   };
@@ -133,6 +137,7 @@ export function TrackerClient({ applications }: { applications: Application[] })
         source: "",
         apply_date: new Date().toISOString().split("T")[0],
         notes: "",
+        poster_path: undefined,
       });
       
       router.refresh(); // Refresh instead of reload
@@ -340,6 +345,14 @@ export function TrackerClient({ applications }: { applications: Application[] })
                 }
               />
             </div>
+
+            <PosterUpload
+              value={formData.poster_path}
+              onChange={(path) =>
+                setFormData((prev) => ({ ...prev, poster_path: path }))
+              }
+              userId={userId}
+            />
 
             <DialogFooter>
               <Button

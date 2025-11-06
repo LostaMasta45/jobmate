@@ -28,50 +28,47 @@ export function ThemeProvider({
   storageKey = "jobmate_theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = React.useState<Theme>(() => defaultTheme);
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
+  // Initialize theme from localStorage immediately (sync)
+  const getInitialTheme = (): Theme => {
+    if (typeof window === 'undefined') return defaultTheme;
+    
     try {
       const stored = localStorage.getItem(storageKey) as Theme;
       if (stored && (stored === "light" || stored === "dark" || stored === "system")) {
-        setTheme(stored);
+        return stored;
       }
     } catch (error) {
-      console.error("Error reading theme from localStorage:", error);
+      // localStorage not available
     }
-  }, [storageKey]);
+    return defaultTheme;
+  };
 
+  const [theme, setTheme] = React.useState<Theme>(getInitialTheme);
+
+  // Apply theme to document when it changes (only on client)
   React.useEffect(() => {
-    if (!mounted) return;
-    
     const root = window.document.documentElement;
-
     root.classList.remove("light", "dark");
 
     if (theme === "system") {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light";
-
       root.classList.add(systemTheme);
-      return;
+    } else {
+      root.classList.add(theme);
     }
-
-    root.classList.add(theme);
-  }, [theme, mounted]);
+  }, [theme]);
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
+    setTheme: (newTheme: Theme) => {
       try {
-        localStorage.setItem(storageKey, theme);
-        setTheme(theme);
+        localStorage.setItem(storageKey, newTheme);
       } catch (error) {
         console.error("Error saving theme to localStorage:", error);
-        setTheme(theme);
       }
+      setTheme(newTheme);
     },
   };
 

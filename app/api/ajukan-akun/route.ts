@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateCode } from "@/lib/utils";
 import { notifyNewApplication } from "@/lib/telegram";
+import { sendAccountPendingEmail, getUserDisplayName } from "@/lib/email-notifications";
 
 export async function POST(request: NextRequest) {
   try {
@@ -78,7 +79,21 @@ export async function POST(request: NextRequest) {
     
     console.log("[Ajukan Akun API] Application saved successfully, ID:", data.id);
 
-    // Send notification to admin (don't block on failure)
+    // Send email notification to user (don't block on failure)
+    try {
+      const userName = getUserDisplayName(fullName, email);
+      await sendAccountPendingEmail({
+        userName,
+        email,
+        submittedAt: new Date().toISOString(),
+      });
+      console.log(`✅ Account pending email sent to ${email}`);
+    } catch (emailError) {
+      console.error("Failed to send pending email:", emailError);
+      // Continue anyway - application is saved
+    }
+
+    // Send notification to admin via Telegram (don't block on failure)
     try {
       await notifyNewApplication({
         fullName,

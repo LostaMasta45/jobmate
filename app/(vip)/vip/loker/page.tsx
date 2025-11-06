@@ -37,9 +37,35 @@ export default async function LokerListPage({
       : [params.lokasi]
     : []
   const tipe_kerja = (params.tipe_kerja as string) || ''
+  const timeFilter = (params.timeFilter as string) || 'all'
   const sort = (params.sort as string) || 'terbaru'
   const page = parseInt((params.page as string) || '1')
   const limit = 12
+
+  // Helper function to get date for time filter
+  const getTimeFilterDate = (filter: string): string | null => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    switch (filter) {
+      case 'today':
+        return today.toISOString()
+      case 'yesterday':
+        const yesterday = new Date(today)
+        yesterday.setDate(yesterday.getDate() - 1)
+        return yesterday.toISOString()
+      case 'week':
+        const weekAgo = new Date(today)
+        weekAgo.setDate(weekAgo.getDate() - 7)
+        return weekAgo.toISOString()
+      case 'month':
+        const monthAgo = new Date(today)
+        monthAgo.setMonth(monthAgo.getMonth() - 1)
+        return monthAgo.toISOString()
+      default:
+        return null
+    }
+  }
 
   // Build query
   let query = supabase
@@ -62,6 +88,22 @@ export default async function LokerListPage({
 
   if (tipe_kerja) {
     query = query.eq('tipe_kerja', tipe_kerja)
+  }
+
+  // Apply time filter
+  if (timeFilter && timeFilter !== 'all') {
+    const filterDate = getTimeFilterDate(timeFilter)
+    if (filterDate) {
+      if (timeFilter === 'today' || timeFilter === 'yesterday') {
+        // For specific day, filter by date only
+        const nextDay = new Date(filterDate)
+        nextDay.setDate(nextDay.getDate() + 1)
+        query = query.gte('published_at', filterDate).lt('published_at', nextDay.toISOString())
+      } else {
+        // For week/month, filter from date to now
+        query = query.gte('published_at', filterDate)
+      }
+    }
   }
 
   // Apply sorting

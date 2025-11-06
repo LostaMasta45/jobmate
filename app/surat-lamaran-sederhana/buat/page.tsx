@@ -20,6 +20,7 @@ import { History, ChevronRight, FileText, Home, ArrowLeft, Sparkles } from "luci
 import Link from "next/link"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { AppShell } from "@/components/layout/AppShell"
 
 // Get today's date once to avoid hydration mismatch
 const getTodayDate = () => {
@@ -106,7 +107,7 @@ export default function BuatSuratLamaranPage() {
   }
 
   return (
-    <>
+    <AppShell>
       <Toaster />
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Breadcrumb Navigation */}
@@ -293,6 +294,6 @@ export default function BuatSuratLamaranPage() {
           </div>
         </div>
       </div>
-    </>
+    </AppShell>
   )
 }

@@ -4,7 +4,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { approveApplication, rejectApplication, getProofSignedUrl } from "@/actions/admin";
+import { approveApplication, rejectApplication, deleteApplication, getProofSignedUrl } from "@/actions/admin";
 import { format } from "date-fns";
 import {
   Dialog,
@@ -38,6 +38,8 @@ export function ApplicationsTable({ applications }: { applications: Application[
   const [showProofModal, setShowProofModal] = React.useState(false);
   const [rejectReason, setRejectReason] = React.useState("");
   const [rejectingId, setRejectingId] = React.useState<string | null>(null);
+  const [deleteReason, setDeleteReason] = React.useState("");
+  const [deletingId, setDeletingId] = React.useState<string | null>(null);
 
   const filteredApplications = React.useMemo(() => {
     let filtered = applications;
@@ -92,6 +94,21 @@ export function ApplicationsTable({ applications }: { applications: Application[
       window.location.reload();
     } catch (error) {
       alert("Gagal menolak: " + (error as Error).message);
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    setLoading(id);
+    try {
+      await deleteApplication(id, deleteReason.trim() || undefined);
+      alert("Pengajuan berhasil dihapus!");
+      setDeletingId(null);
+      setDeleteReason("");
+      window.location.reload();
+    } catch (error) {
+      alert("Gagal menghapus: " + (error as Error).message);
     } finally {
       setLoading(null);
     }
@@ -311,6 +328,76 @@ export function ApplicationsTable({ applications }: { applications: Application[
                               Alasan: {app.rejection_reason}
                             </span>
                           )}
+                          {/* Delete Button - Available for ALL statuses */}
+                          <Dialog
+                            open={deletingId === app.id}
+                            onOpenChange={(open) => {
+                              setDeletingId(open ? app.id : null);
+                              if (!open) setDeleteReason("");
+                            }}
+                          >
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                disabled={loading === app.id}
+                              >
+                                🗑️ Hapus
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle className="text-destructive">⚠️ Hapus Pengajuan</DialogTitle>
+                                <DialogDescription>
+                                  Apakah Anda yakin ingin menghapus pengajuan dari <strong>{app.full_name}</strong>?
+                                  <br />
+                                  <br />
+                                  <span className="text-destructive font-semibold">
+                                    Data ini akan dihapus permanen dan tidak dapat dikembalikan!
+                                  </span>
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-4 py-4">
+                                <div className="rounded-lg bg-muted p-4 space-y-1 text-sm">
+                                  <p><strong>Nama:</strong> {app.full_name}</p>
+                                  <p><strong>Email:</strong> {app.email}</p>
+                                  <p><strong>Username:</strong> {app.username}</p>
+                                  <p><strong>WhatsApp:</strong> {app.whatsapp}</p>
+                                  <p><strong>Status:</strong> {app.status}</p>
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor="delete-reason">
+                                    Alasan Penghapusan <span className="text-muted-foreground">(opsional)</span>
+                                  </Label>
+                                  <Input
+                                    id="delete-reason"
+                                    placeholder="Contoh: Data duplikat, spam, dll"
+                                    value={deleteReason}
+                                    onChange={(e) => setDeleteReason(e.target.value)}
+                                  />
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => {
+                                    setDeletingId(null);
+                                    setDeleteReason("");
+                                  }}
+                                >
+                                  Batal
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  onClick={() => handleDelete(app.id)}
+                                  disabled={loading === app.id}
+                                >
+                                  {loading === app.id ? "Menghapus..." : "Ya, Hapus Permanen"}
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                         </div>
                       </td>
                     </tr>

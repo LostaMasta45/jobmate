@@ -8,7 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { Briefcase, Calendar, DollarSign, MapPin, MoreVertical } from "lucide-react";
+import { Briefcase, Calendar, DollarSign, MapPin, MoreVertical, Image as ImageIcon } from "lucide-react";
+import { PosterViewDialog } from "./PosterViewDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,7 @@ type AppCard = {
   source?: string;
   apply_date: string;
   notes?: string;
+  poster_path?: string;
   created_at: string;
 };
 
@@ -77,10 +79,17 @@ export function TrackerKanbanFixed({
   const [columns, setColumns] = useState(grouped);
   const [isPending, startTransition] = useTransition();
   const [mounted, setMounted] = useState(false);
+  const [viewPosterApp, setViewPosterApp] = useState<AppCard | null>(null);
+  const [showPosterDialog, setShowPosterDialog] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleViewPoster = (app: AppCard) => {
+    setViewPosterApp(app);
+    setShowPosterDialog(true);
+  };
 
   useEffect(() => {
     setColumns(grouped);
@@ -290,6 +299,21 @@ export function TrackerKanbanFixed({
                                         <span className="truncate">{app.source}</span>
                                       </div>
                                     )}
+
+                                    {app.poster_path && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 px-2 text-xs w-full justify-start hover:bg-primary/10"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleViewPoster(app);
+                                        }}
+                                      >
+                                        <ImageIcon className="h-3 w-3 mr-1.5 shrink-0" />
+                                        <span className="truncate">Lihat Poster</span>
+                                      </Button>
+                                    )}
                                   </div>
                                 </CardContent>
                               </Card>
@@ -315,6 +339,15 @@ export function TrackerKanbanFixed({
           ))}
         </div>
       </DragDropContext>
+
+      {/* Poster View Dialog */}
+      <PosterViewDialog
+        posterPath={viewPosterApp?.poster_path}
+        company={viewPosterApp?.company || ""}
+        position={viewPosterApp?.position || ""}
+        open={showPosterDialog}
+        onOpenChange={setShowPosterDialog}
+      />
     </div>
   );
 }

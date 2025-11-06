@@ -8,7 +8,7 @@ import html2canvas from "html2canvas";
  * Download Creative CV as PDF
  * Captures the rendered template as image and converts to PDF
  */
-export async function downloadCreativeCVAsPDF(cv: CreativeCV): Promise<void> {
+export async function downloadCreativeCVAsPDF(cv: Partial<CreativeCV>): Promise<void> {
   try {
     // Get the preview element
     const element = document.getElementById("cv-preview-content");
@@ -25,7 +25,7 @@ export async function downloadCreativeCVAsPDF(cv: CreativeCV): Promise<void> {
       useCORS: true,
       logging: false,
       backgroundColor: "#ffffff",
-    });
+    } as any);
 
     // Create PDF (A4 size)
     const pdf = new jsPDF({
@@ -43,9 +43,9 @@ export async function downloadCreativeCVAsPDF(cv: CreativeCV): Promise<void> {
     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
     // Generate filename
-    const firstName = cv.content.basics.firstName || "User";
-    const lastName = cv.content.basics.lastName || "";
-    const filename = `CV_Creative_${firstName}_${lastName}_${cv.templateId}.pdf`
+    const firstName = cv.content?.basics?.firstName || "User";
+    const lastName = cv.content?.basics?.lastName || "";
+    const filename = `CV_Creative_${firstName}_${lastName}_${cv.templateId || "template"}.pdf`
       .replace(/\s+/g, "_");
 
     // Download
@@ -59,7 +59,7 @@ export async function downloadCreativeCVAsPDF(cv: CreativeCV): Promise<void> {
 /**
  * Download Creative CV as PNG image
  */
-export async function downloadCreativeCVAsPNG(cv: CreativeCV): Promise<void> {
+export async function downloadCreativeCVAsPNG(cv: Partial<CreativeCV>): Promise<void> {
   try {
     const element = document.getElementById("cv-preview-content");
     if (!element) {
@@ -71,7 +71,7 @@ export async function downloadCreativeCVAsPNG(cv: CreativeCV): Promise<void> {
       useCORS: true,
       logging: false,
       backgroundColor: "#ffffff",
-    });
+    } as any);
 
     // Convert to blob and download
     canvas.toBlob((blob) => {
@@ -82,8 +82,8 @@ export async function downloadCreativeCVAsPNG(cv: CreativeCV): Promise<void> {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       
-      const firstName = cv.content.basics.firstName || "User";
-      const lastName = cv.content.basics.lastName || "";
+      const firstName = cv.content?.basics?.firstName || "User";
+      const lastName = cv.content?.basics?.lastName || "";
       a.href = url;
       a.download = `CV_Creative_${firstName}_${lastName}.png`.replace(/\s+/g, "_");
       

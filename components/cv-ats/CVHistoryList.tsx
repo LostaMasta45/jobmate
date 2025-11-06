@@ -24,6 +24,7 @@ import {
 import { Resume } from "@/lib/schemas/cv-ats";
 import { deleteResume } from "@/actions/cv-ats";
 import { downloadResumeAsPDF, downloadResumeAsText, downloadResumeAsWord } from "@/lib/cv-download";
+import { CVATSPreview } from "./CVATSPreview";
 
 interface ResumeRecord {
   id: string;
@@ -118,6 +119,171 @@ export function CVHistoryList({ resumes, onEdit, onRefresh }: CVHistoryListProps
     );
   }
 
+  // Render thumbnail preview with proper sizing
+  const renderThumbnail = (resume: Resume) => {
+    const fullName = `${resume.basics?.firstName || ''} ${resume.basics?.lastName || ''}`.trim();
+    const expCount = resume.experiences?.length || 0;
+    const skillCount = resume.skills?.length || 0;
+    
+    return (
+      <div 
+        className="group/thumb relative w-full cursor-pointer overflow-hidden rounded-lg border bg-white shadow-sm transition-all hover:shadow-md"
+        style={{ 
+          paddingBottom: '141.4%', // A4 portrait aspect ratio (297/210)
+        }}
+        onClick={() => setPreviewResume(resume)}
+      >
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundColor: '#ffffff',
+            fontSize: '5px',
+            lineHeight: '1.4',
+          }}
+        >
+          {/* Compact CV Preview */}
+          <div 
+            style={{
+              width: '100%',
+              height: '100%',
+              padding: '6%',
+              fontFamily: 'Arial, sans-serif',
+              color: '#1e293b',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '3px',
+            }}
+          >
+            {/* Header */}
+            <div style={{ marginBottom: '4px', borderBottom: '1px solid #e2e8f0', paddingBottom: '3px' }}>
+              <div style={{ fontSize: '7px', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '1px' }}>
+                {fullName || 'CV ATS'}
+              </div>
+              {resume.basics?.headline && (
+                <div style={{ fontSize: '5px', fontWeight: '600', color: '#475569', marginBottom: '1px' }}>
+                  {resume.basics.headline}
+                </div>
+              )}
+              <div style={{ fontSize: '4px', color: '#64748b', lineHeight: 1.3 }}>
+                {resume.basics?.email && <div>{resume.basics.email}</div>}
+                {resume.basics?.phone && <div>{resume.basics.phone}</div>}
+                {resume.basics?.city && <div>{resume.basics.city}</div>}
+              </div>
+            </div>
+
+            {/* Summary */}
+            {resume.summary && (
+              <div style={{ marginBottom: '3px' }}>
+                <div style={{ 
+                  fontSize: '5px', 
+                  fontWeight: 'bold', 
+                  textTransform: 'uppercase',
+                  marginBottom: '1px',
+                  color: '#0f172a'
+                }}>
+                  PROFESSIONAL SUMMARY
+                </div>
+                <div style={{ fontSize: '4px', color: '#475569', lineHeight: 1.3 }}>
+                  {resume.summary.slice(0, 120)}...
+                </div>
+              </div>
+            )}
+
+            {/* Experience Preview */}
+            {resume.experiences && resume.experiences.length > 0 && (
+              <div style={{ marginBottom: '3px' }}>
+                <div style={{ 
+                  fontSize: '5px', 
+                  fontWeight: 'bold', 
+                  textTransform: 'uppercase',
+                  marginBottom: '1px',
+                  color: '#0f172a'
+                }}>
+                  WORK EXPERIENCE
+                </div>
+                {resume.experiences.slice(0, 2).map((exp, idx) => (
+                  <div key={idx} style={{ marginBottom: '2px' }}>
+                    <div style={{ fontSize: '4.5px', fontWeight: 'bold', color: '#1e293b' }}>
+                      {exp.title}
+                    </div>
+                    <div style={{ fontSize: '4px', color: '#64748b' }}>
+                      {exp.company} • {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
+                    </div>
+                    {exp.bullets && exp.bullets.length > 0 && (
+                      <ul style={{ margin: '1px 0', paddingLeft: '6px', fontSize: '3.5px', color: '#475569' }}>
+                        {exp.bullets.slice(0, 2).map((bullet, bidx) => (
+                          <li key={bidx} style={{ marginBottom: '0.5px' }}>
+                            {bullet.slice(0, 60)}...
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Education Preview */}
+            {resume.education && resume.education.length > 0 && (
+              <div style={{ marginBottom: '3px' }}>
+                <div style={{ 
+                  fontSize: '5px', 
+                  fontWeight: 'bold', 
+                  textTransform: 'uppercase',
+                  marginBottom: '1px',
+                  color: '#0f172a'
+                }}>
+                  EDUCATION
+                </div>
+                {resume.education.slice(0, 1).map((edu, idx) => (
+                  <div key={idx}>
+                    <div style={{ fontSize: '4.5px', fontWeight: 'bold', color: '#1e293b' }}>
+                      {edu.school}
+                    </div>
+                    <div style={{ fontSize: '4px', color: '#64748b' }}>
+                      {edu.degree} {edu.field}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Skills Preview */}
+            {resume.skills && resume.skills.length > 0 && (
+              <div>
+                <div style={{ 
+                  fontSize: '5px', 
+                  fontWeight: 'bold', 
+                  textTransform: 'uppercase',
+                  marginBottom: '1px',
+                  color: '#0f172a'
+                }}>
+                  SKILLS
+                </div>
+                <div style={{ fontSize: '4px', color: '#475569', lineHeight: 1.3 }}>
+                  {resume.skills.slice(0, 8).join(' • ')}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Hover Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover/thumb:opacity-100" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover/thumb:opacity-100">
+          <div className="rounded-full bg-white/95 p-3 shadow-lg backdrop-blur-sm">
+            <Eye className="h-5 w-5 text-gray-900" />
+          </div>
+        </div>
+
+        {/* Bottom Label */}
+        <div className="absolute bottom-0 left-0 right-0 p-2 text-white opacity-0 transition-opacity group-hover/thumb:opacity-100">
+          <p className="truncate text-xs font-semibold drop-shadow-md">ATS Format</p>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -156,12 +322,11 @@ export function CVHistoryList({ resumes, onEdit, onRefresh }: CVHistoryListProps
               </CardHeader>
 
               <CardContent className="space-y-3 pb-4">
+                {/* CV Thumbnail Preview */}
+                {renderThumbnail(resume)}
+
                 {/* Resume Info */}
                 <div className="space-y-1 text-sm">
-                  <p className="text-muted-foreground">
-                    <span className="font-medium">Headline:</span>{" "}
-                    {resume.basics?.headline || "-"}
-                  </p>
                   <div className="flex gap-4 text-xs text-muted-foreground">
                     <span>{expCount} pengalaman</span>
                     <span>•</span>

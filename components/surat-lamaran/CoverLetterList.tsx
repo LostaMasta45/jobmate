@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Trash2, Download, Edit, Calendar, Building2, FileDown } from "lucide-react";
+import { FileText, Trash2, Download, Edit, Calendar, Building2, FileDown, Eye } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +27,7 @@ interface CoverLetter {
 export function CoverLetterList() {
   const [letters, setLetters] = useState<CoverLetter[]>([]);
   const [loading, setLoading] = useState(true);
+  const [previewLetter, setPreviewLetter] = useState<string | null>(null);
 
   useEffect(() => {
     fetchLetters();
@@ -154,6 +155,179 @@ export function CoverLetterList() {
     }
   }
 
+  // Render thumbnail preview - Full A4 Content
+  const renderThumbnail = (letter: CoverLetter) => {
+    const isATS = letter.template_type === "T0";
+    
+    return (
+      <div 
+        className="group/thumb relative w-full cursor-pointer overflow-hidden rounded-lg border bg-white shadow-sm transition-all hover:shadow-md"
+        style={{ 
+          paddingBottom: '141.4%', // A4 portrait aspect ratio (297/210)
+        }}
+        onClick={() => setPreviewLetter(letter.id)}
+      >
+        <div 
+          className="absolute inset-0 overflow-auto"
+          style={{
+            backgroundColor: '#ffffff',
+            fontSize: '5px',
+            lineHeight: '1.3',
+          }}
+        >
+          {/* Full A4 Preview with all sections */}
+          <div 
+            style={{
+              width: '100%',
+              height: '100%',
+              padding: '8%',
+              fontFamily: isATS ? 'Times New Roman, serif' : 'Arial, sans-serif',
+              color: '#1e293b',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+            }}
+          >
+            {/* Header with date */}
+            <div style={{ marginBottom: '6px' }}>
+              <div style={{ textAlign: isATS ? 'left' : 'right', fontSize: '5px', color: '#64748b' }}>
+                Jakarta, {new Date(letter.created_at).toLocaleDateString('id-ID', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </div>
+            </div>
+
+            {/* Recipient */}
+            <div style={{ marginBottom: '5px' }}>
+              <div style={{ fontSize: '5px', marginBottom: '1px' }}>Kepada Yth.</div>
+              <div style={{ fontWeight: 'bold', fontSize: '6px' }}>HRD Manager</div>
+              <div style={{ fontSize: '5px' }}>{letter.company_name}</div>
+              <div style={{ fontSize: '5px' }}>Di tempat</div>
+            </div>
+
+            {/* Subject */}
+            <div style={{ marginBottom: '5px' }}>
+              <div style={{ fontSize: '5px' }}>
+                <strong>Perihal:</strong> Lamaran Kerja - {letter.position}
+              </div>
+            </div>
+
+            {/* Opening */}
+            <div style={{ marginBottom: '5px' }}>
+              <div style={{ fontSize: '5px' }}>Dengan hormat,</div>
+            </div>
+
+            {/* Main content */}
+            <div style={{ fontSize: '5px', lineHeight: 1.4, marginBottom: '5px', textAlign: 'justify' }}>
+              Saya yang bertanda tangan di bawah ini ingin mengajukan permohonan untuk dapat bergabung 
+              dengan perusahaan yang Bapak/Ibu pimpin pada posisi <strong>{letter.position}</strong>.
+            </div>
+
+            {/* Personal Data Box */}
+            <div style={{ 
+              marginBottom: '5px',
+              padding: '4px',
+              backgroundColor: isATS ? '#F8FAFC' : '#F0F9FF',
+              border: `1px solid ${isATS ? '#E2E8F0' : '#BFDBFE'}`,
+              borderRadius: '2px'
+            }}>
+              <div style={{ 
+                fontSize: '6px', 
+                fontWeight: 'bold', 
+                marginBottom: '3px',
+                color: isATS ? '#1e293b' : '#1e40af'
+              }}>
+                DATA PRIBADI
+              </div>
+              <div style={{ fontSize: '4.5px', lineHeight: 1.5 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '40% 5% 55%', gap: '1px', marginBottom: '1px' }}>
+                  <span>Nama</span>
+                  <span>:</span>
+                  <strong>[Nama Pelamar]</strong>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '40% 5% 55%', gap: '1px', marginBottom: '1px' }}>
+                  <span>Pendidikan</span>
+                  <span>:</span>
+                  <span>S1 / D3 / SMA/SMK</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '40% 5% 55%', gap: '1px', marginBottom: '1px' }}>
+                  <span>No. Handphone</span>
+                  <span>:</span>
+                  <span>08xx-xxxx-xxxx</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '40% 5% 55%', gap: '1px', marginBottom: '1px' }}>
+                  <span>Email</span>
+                  <span>:</span>
+                  <span>email@domain.com</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '40% 5% 55%', gap: '1px' }}>
+                  <span>Alamat</span>
+                  <span>:</span>
+                  <span>Jl. Contoh No. 123</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Body content */}
+            <div style={{ fontSize: '5px', lineHeight: 1.4, marginBottom: '5px', textAlign: 'justify' }}>
+              Saya memiliki pengalaman dan keterampilan yang sesuai dengan posisi yang dilamar. 
+              Saya siap bekerja keras dan berkontribusi untuk kemajuan perusahaan.
+            </div>
+
+            {/* Attachments */}
+            <div style={{ marginBottom: '5px' }}>
+              <div style={{ 
+                fontSize: '6px', 
+                fontWeight: 'bold', 
+                marginBottom: '2px',
+                color: isATS ? '#1e293b' : '#1e40af'
+              }}>
+                Lampiran:
+              </div>
+              <ol style={{ paddingLeft: '8px', margin: 0, fontSize: '4.5px', lineHeight: 1.5 }}>
+                <li>Curriculum Vitae (CV)</li>
+                <li>Fotocopy Ijazah & Transkrip</li>
+                <li>Fotocopy KTP</li>
+                <li>Pas Foto 4x6</li>
+                <li>Surat Keterangan Sehat</li>
+              </ol>
+            </div>
+
+            {/* Closing */}
+            <div style={{ fontSize: '5px', lineHeight: 1.4, marginBottom: '5px' }}>
+              Demikian surat lamaran ini saya buat. Besar harapan saya untuk dapat bergabung dengan {letter.company_name}. 
+              Terima kasih atas perhatian dan kesempatan yang diberikan.
+            </div>
+
+            {/* Signature */}
+            <div style={{ marginTop: 'auto', paddingTop: '6px' }}>
+              <div style={{ fontSize: '5px' }}>Hormat saya,</div>
+              <div style={{ height: '10px' }} /> {/* Space for signature */}
+              <div style={{ fontWeight: 'bold', fontSize: '6px' }}>
+                [Nama Pelamar]
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent transition-opacity group-hover/thumb:opacity-80" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover/thumb:opacity-100">
+          <div className="rounded-full bg-white/90 p-3 shadow-lg backdrop-blur-sm">
+            <Eye className="h-5 w-5 text-gray-900" />
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+          <p className="truncate text-sm font-semibold drop-shadow-md">
+            {isATS ? 'ATS Standard' : 'Modern Template'}
+          </p>
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -209,38 +383,25 @@ export function CoverLetterList() {
           }`} />
           
           <div className="relative p-5 space-y-4">
-            {/* Header with Icon and Badges */}
-            <div className="flex items-start gap-3">
-              {/* Icon */}
-              <div className={`rounded-xl p-3 shadow-sm ${
-                letter.template_type === 'T0'
-                  ? 'bg-gradient-to-br from-green-50 to-green-100'
-                  : 'bg-gradient-to-br from-purple-50 to-purple-100'
+            {/* Thumbnail Preview */}
+            {renderThumbnail(letter)}
+
+            {/* Badges */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                letter.status === 'draft' 
+                  ? 'bg-amber-100 text-amber-700 border border-amber-200' 
+                  : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
               }`}>
-                <FileText className={`h-6 w-6 ${
-                  letter.template_type === 'T0' ? 'text-green-600' : 'text-purple-600'
-                }`} />
-              </div>
-              
-              {/* Badges */}
-              <div className="flex flex-col gap-1.5 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                    letter.status === 'draft' 
-                      ? 'bg-amber-100 text-amber-700 border border-amber-200' 
-                      : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
-                  }`}>
-                    {letter.status === 'draft' ? 'Draft' : 'Final'}
-                  </span>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                    letter.template_type === 'T0' 
-                      ? 'bg-green-100 text-green-700 border border-green-300' 
-                      : 'bg-purple-100 text-purple-700 border border-purple-300'
-                  }`}>
-                    {letter.template_type === 'T0' ? 'ATS' : 'Modern'}
-                  </span>
-                </div>
-              </div>
+                {letter.status === 'draft' ? 'Draft' : 'Final'}
+              </span>
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                letter.template_type === 'T0' 
+                  ? 'bg-green-100 text-green-700 border border-green-300' 
+                  : 'bg-purple-100 text-purple-700 border border-purple-300'
+              }`}>
+                {letter.template_type === 'T0' ? 'ATS' : 'Modern'}
+              </span>
             </div>
 
             {/* Content */}

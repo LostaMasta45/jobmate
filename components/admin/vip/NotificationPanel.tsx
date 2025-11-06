@@ -13,20 +13,20 @@ export function NotificationPanel({ draftCount }: NotificationPanelProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
           🔔 Notifikasi Cepat
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-2 sm:space-y-3">
         {draftCount > 0 ? (
-          <div className="p-3 rounded-lg border border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="font-medium text-yellow-900 dark:text-yellow-100">
+          <div className="p-2 sm:p-3 rounded-lg border border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
+            <div className="flex items-start gap-2 sm:gap-3">
+              <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-sm sm:text-base text-yellow-900 dark:text-yellow-100">
                   {draftCount} Loker Draft
                 </p>
-                <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                <p className="text-xs sm:text-sm text-yellow-700 dark:text-yellow-300 mt-1">
                   Ada loker yang belum dipublish
                 </p>
               </div>
@@ -38,14 +38,14 @@ export function NotificationPanel({ draftCount }: NotificationPanelProps) {
             </div>
           </div>
         ) : (
-          <div className="p-3 rounded-lg border border-green-200 bg-green-50 dark:bg-green-950/20">
-            <div className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="font-medium text-green-900 dark:text-green-100">
+          <div className="p-2 sm:p-3 rounded-lg border border-green-200 bg-green-50 dark:bg-green-950/20">
+            <div className="flex items-start gap-2 sm:gap-3">
+              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-sm sm:text-base text-green-900 dark:text-green-100">
                   Semua Lancar! ✨
                 </p>
-                <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                <p className="text-xs sm:text-sm text-green-700 dark:text-green-300 mt-1">
                   Tidak ada notifikasi yang perlu ditinjau
                 </p>
               </div>
@@ -53,8 +53,8 @@ export function NotificationPanel({ draftCount }: NotificationPanelProps) {
           </div>
         )}
 
-        <div className="p-3 rounded-lg border bg-blue-50 dark:bg-blue-950/20 border-blue-200">
-          <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+        <div className="p-2 sm:p-3 rounded-lg border bg-blue-50 dark:bg-blue-950/20 border-blue-200">
+          <p className="text-xs sm:text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
             💡 Tips: Gunakan AI Caption Generator
           </p>
           <p className="text-xs text-blue-700 dark:text-blue-300 mb-3">

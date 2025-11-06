@@ -22,12 +22,13 @@ export default async function AdminLayout({
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Sidebar - Fixed */}
+      {/* Sidebar - Fixed on Desktop, Drawer on Mobile */}
       <AdminSidebar />
       
       {/* Main Content Area - Scrollable */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="container mx-auto p-6 max-w-[1600px]">
+      <main className="flex-1 overflow-y-auto w-full lg:w-auto">
+        {/* Add top padding on mobile to account for fixed header */}
+        <div className="container mx-auto p-4 sm:p-6 lg:p-6 max-w-[1600px] pt-20 lg:pt-6">
           {children}
         </div>
       </main>

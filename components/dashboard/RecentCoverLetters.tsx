@@ -11,9 +11,9 @@ import { id } from "date-fns/locale";
 
 interface CoverLetter {
   id: string;
-  company_name: string;
-  position: string;
-  template_type: string;
+  nama_perusahaan: string;
+  posisi_lowongan: string;
+  template_id: string;
   status: string;
   created_at: string;
   updated_at: string;
@@ -29,16 +29,14 @@ export function RecentCoverLetters() {
 
   async function fetchRecentLetters() {
     try {
-      const { listCoverLetters } = await import("@/actions/surat-lamaran/list");
-      const result = await listCoverLetters();
+      const { getSuratLamaranList } = await import("@/actions/surat-lamaran-sederhana/list");
+      const result = await getSuratLamaranList({ limit: 3 });
       
       if (result.error) {
         console.error("Error fetching cover letters:", result.error);
         setLetters([]);
       } else {
-        // Get only the 3 most recent letters
-        const recent = (result.data || []).slice(0, 3);
-        setLetters(recent);
+        setLetters(result.data || []);
       }
     } catch (error) {
       console.error("Error fetching cover letters:", error);
@@ -73,7 +71,7 @@ export function RecentCoverLetters() {
         <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
           Belum ada surat lamaran dibuat
         </p>
-        <Link href="/surat-lamaran/buat">
+        <Link href="/surat-lamaran-sederhana">
           <Button size="sm" className="gap-1.5 text-xs h-8 px-3">
             <FileText className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Buat Surat</span>
@@ -90,21 +88,21 @@ export function RecentCoverLetters() {
         {letters.map((letter) => (
           <Link 
             key={letter.id} 
-            href={`/surat-lamaran/${letter.id}`}
+            href={`/surat-lamaran-sederhana/view?id=${letter.id}`}
             className="block group"
           >
             <div className="p-2.5 rounded-lg border hover:border-green-300 hover:bg-green-50/50 dark:hover:bg-green-950/20 transition-all">
               {/* Header Row */}
               <div className="flex items-start gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
                 <FileText className={`h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 mt-0.5 ${
-                  letter.template_type === 'T0' ? 'text-green-600' : 'text-purple-600'
+                  letter.template_id.startsWith('template-') ? 'text-green-600' : 'text-purple-600'
                 }`} />
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-xs sm:text-sm leading-tight mb-0.5 sm:mb-1 truncate">
-                    {letter.company_name}
+                    {letter.nama_perusahaan}
                   </h4>
                   <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
-                    {letter.position}
+                    {letter.posisi_lowongan}
                   </p>
                 </div>
               </div>
@@ -112,11 +110,11 @@ export function RecentCoverLetters() {
               {/* Badge & Time */}
               <div className="flex items-center justify-between gap-2">
                 <Badge className={`text-[9px] sm:text-[10px] py-0 px-1 sm:px-1.5 h-4 sm:h-5 flex-shrink-0 ${
-                  letter.template_type === 'T0' 
+                  letter.template_id.startsWith('template-') 
                     ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-100' 
                     : 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-100'
                 }`}>
-                  {letter.template_type === 'T0' ? 'ATS' : 'Modern'}
+                  {letter.template_id.replace('template-', 'Template ')}
                 </Badge>
                 <span className="text-[9px] sm:text-[10px] text-muted-foreground truncate">
                   {formatDistanceToNow(new Date(letter.created_at), {
@@ -133,7 +131,7 @@ export function RecentCoverLetters() {
       {/* View All Link */}
       {letters.length > 0 && (
         <div className="mt-3 pt-3 border-t">
-          <Link href="/surat-lamaran">
+          <Link href="/surat-lamaran-sederhana/history">
             <Button variant="ghost" size="sm" className="w-full gap-1.5 sm:gap-2 text-[10px] sm:text-xs hover:bg-green-50 hover:text-green-700 dark:hover:bg-green-950">
               <span className="hidden sm:inline">Lihat Semua</span>
               <span className="sm:hidden">Lihat</span>

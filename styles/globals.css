@@ -283,6 +283,114 @@
   font-family: 'Calibri', 'Arial', sans-serif;
 }
 
+/* === CV Creative A4 Layout - Improved Responsive === */
+.cv-creative-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: transparent;
+}
+
+.cv-creative-page {
+  /* A4 dimensions - FIXED */
+  width: 210mm;            /* A4 width */
+  min-height: 297mm;       /* A4 height */
+  background: #fff;
+  position: relative;
+  overflow: visible;
+  margin: 0 auto;
+  flex-shrink: 0;
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+    0 4px 6px -2px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+/* Desktop: Full A4 size - FIXED dimensions */
+@media (min-width: 1024px) {
+  .cv-creative-page {
+    width: 210mm !important;
+    min-height: 297mm !important;
+  }
+}
+
+/* Tablet: Keep A4 dimensions - scale via zoom if needed */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .cv-creative-page {
+    width: 210mm !important;
+    min-height: 297mm !important;
+  }
+}
+
+/* Mobile: Keep A4 dimensions - users scroll to see */
+@media (max-width: 767px) {
+  .cv-creative-page {
+    width: 210mm !important;
+    min-height: 297mm !important;
+  }
+  
+  /* Better mobile viewing experience */
+  .cv-creative-wrap {
+    background: transparent;
+    padding: 0;
+  }
+}
+
+/* CV Creative template base styles */
+.cv-template {
+  width: 100%;
+  height: 100%;
+  min-height: 297mm;
+  padding: 18mm;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 11pt;
+  line-height: 1.5;
+  color: #1e293b;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.cv-template h1 {
+  font-size: 26pt;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.cv-template h2 {
+  font-size: 13pt;
+  font-weight: 700;
+  margin: 14pt 0 8pt 0;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cv-template h3 {
+  font-size: 11.5pt;
+  font-weight: 600;
+  margin: 0 0 4pt 0;
+  line-height: 1.3;
+}
+
+.cv-template p {
+  margin: 0 0 8pt 0;
+  font-size: 10pt;
+}
+
+.cv-template ul {
+  margin: 4pt 0;
+  padding-left: 16pt;
+}
+
+.cv-template li {
+  margin: 3pt 0;
+  font-size: 10pt;
+}
+
 .template-corporate {
   font-family: 'Times New Roman', serif;
 }

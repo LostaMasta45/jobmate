@@ -3,11 +3,10 @@
 import * as React from "react";
 import { CreativeCV } from "@/lib/schemas/cv-creative";
 import { ModernGradient } from "./templates/ModernGradient";
-import { BoldMinimalist } from "./templates/BoldMinimalist";
-import { PastelProfessional } from "./templates/PastelProfessional";
-import { DarkModePro } from "./templates/DarkModePro";
-import { MagazineLayout } from "./templates/MagazineLayout";
+import { BoldMinimalist, PastelProfessional, DarkModePro } from "./templates/AllTemplatesNew";
+import { CV075Professional } from "./templates/CV075Professional";
 import { 
+  MagazineLayout,
   ColorfulBlocks, 
   TimelineHero, 
   PortfolioGrid, 
@@ -15,7 +14,7 @@ import {
   SplitScreen, 
   GeometricModern, 
   WatercolorArtist 
-} from "./templates/AllTemplates";
+} from "./templates/RemainingTemplates";
 
 interface CVPreviewProps {
   cv: Partial<CreativeCV>;
@@ -38,6 +37,8 @@ export function CVPreview({ cv }: CVPreviewProps) {
         return <MagazineLayout cv={cv} />;
       case "colorful-blocks":
         return <ColorfulBlocks cv={cv} />;
+      case "cv075-professional":
+        return <CV075Professional cv={cv} />;
       case "timeline-hero":
         return <TimelineHero cv={cv} />;
       case "portfolio-grid":
@@ -56,8 +57,8 @@ export function CVPreview({ cv }: CVPreviewProps) {
   };
 
   return (
-    <div className="a4-wrap">
-      <div id="cv-preview-content" className="bg-white">
+    <div className="cv-creative-wrap">
+      <div id="cv-preview-content" className="cv-creative-page">
         {renderTemplate()}
       </div>
     </div>

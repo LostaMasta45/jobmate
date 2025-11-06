@@ -7,7 +7,7 @@ const tools = [
     title: "Surat Lamaran",
     description: "Buat surat lamaran profesional",
     icon: FileText,
-    href: "/surat-lamaran",
+    href: "/surat-lamaran-sederhana",
     gradient: "from-blue-500/10 to-blue-600/5",
     iconBg: "bg-blue-500/10",
     iconColor: "text-blue-600",

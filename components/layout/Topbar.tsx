@@ -89,21 +89,21 @@ export function Topbar({ user }: TopbarProps) {
           })));
         }
 
-        // Search Cover Letters
+        // Search Cover Letters (surat-lamaran-sederhana)
         const { data: coverLetters } = await supabase
-          .from("cover_letters")
-          .select("id, company, position, created_at")
+          .from("surat_lamaran_sederhana")
+          .select("id, nama_perusahaan, posisi_lowongan, created_at")
           .eq("user_id", currentUser.id)
-          .or(`company.ilike.%${query}%,position.ilike.%${query}%`)
+          .or(`nama_perusahaan.ilike.%${query}%,posisi_lowongan.ilike.%${query}%`)
           .limit(5);
         
         if (coverLetters) {
           results.push(...coverLetters.map(cl => ({
             type: "cover_letter",
             icon: FileText,
-            title: `Surat Lamaran - ${cl.company}`,
-            subtitle: cl.position,
-            href: `/surat-lamaran?id=${cl.id}`,
+            title: `Surat Lamaran - ${cl.nama_perusahaan}`,
+            subtitle: cl.posisi_lowongan,
+            href: `/surat-lamaran-sederhana/view?id=${cl.id}`,
             date: new Date(cl.created_at),
           })));
         }

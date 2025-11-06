@@ -24,22 +24,22 @@ async function DashboardContent() {
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           Dashboard VIP Career
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-muted-foreground mt-2 text-sm sm:text-base">
           Selamat datang kembali, Admin! 👋
         </p>
         {stats.lokerHariIni > 0 && (
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             🎉 {stats.lokerHariIni} loker baru ditambahkan hari ini
           </p>
         )}
       </div>
 
       {/* Statistik Ringkas */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
+      <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-4 sm:mb-6">
         <VipStatsCard
           title="Total Loker Aktif"
           value={stats.lokerAktif}
@@ -78,53 +78,53 @@ async function DashboardContent() {
       </div>
 
       {/* Statistik Tambahan */}
-      <div className="grid gap-6 md:grid-cols-3 mb-6">
+      <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-4 sm:mb-6">
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Views</p>
-                <h2 className="text-2xl font-bold mt-2 text-indigo-600">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Views</p>
+                <h2 className="text-xl sm:text-2xl font-bold mt-2 text-indigo-600">
                   {stats.totalViews.toLocaleString()}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-1">Semua loker VIP</p>
               </div>
-              <div className="rounded-full p-3 bg-indigo-100 dark:bg-indigo-950">
-                <Eye className="h-5 w-5 text-indigo-600" />
+              <div className="rounded-full p-2 sm:p-3 bg-indigo-100 dark:bg-indigo-950">
+                <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Draft Loker</p>
-                <h2 className="text-2xl font-bold mt-2 text-yellow-600">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">Draft Loker</p>
+                <h2 className="text-xl sm:text-2xl font-bold mt-2 text-yellow-600">
                   {stats.lokerDraft}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-1">Belum dipublish</p>
               </div>
-              <div className="rounded-full p-3 bg-yellow-100 dark:bg-yellow-950">
-                <FileText className="h-5 w-5 text-yellow-600" />
+              <div className="rounded-full p-2 sm:p-3 bg-yellow-100 dark:bg-yellow-950">
+                <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Loker</p>
-                <h2 className="text-2xl font-bold mt-2">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Loker</p>
+                <h2 className="text-xl sm:text-2xl font-bold mt-2">
                   {stats.totalLoker}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-1">Semua status</p>
               </div>
-              <div className="rounded-full p-3 bg-gray-100 dark:bg-gray-800">
-                <Briefcase className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <div className="rounded-full p-2 sm:p-3 bg-gray-100 dark:bg-gray-800">
+                <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 dark:text-gray-400" />
               </div>
             </div>
           </CardContent>
@@ -132,7 +132,7 @@ async function DashboardContent() {
       </div>
 
       {/* Grafik & Notifikasi */}
-      <div className="grid gap-6 lg:grid-cols-3 mb-6">
+      <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 lg:grid-cols-3 mb-4 sm:mb-6">
         <div className="lg:col-span-2">
           <LokerWeeklyChart data={weeklyData} />
         </div>
@@ -140,7 +140,7 @@ async function DashboardContent() {
       </div>
 
       {/* Tabel Loker Terbaru & Insights */}
-      <div className="grid gap-6 lg:grid-cols-3 mb-6">
+      <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 lg:grid-cols-3 mb-4 sm:mb-6">
         <div className="lg:col-span-2">
           <RecentLokerTable loker={recentLoker} />
         </div>
@@ -148,21 +148,21 @@ async function DashboardContent() {
         {/* Quick Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle className="text-base sm:text-lg">Quick Actions</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-2 sm:space-y-3">
             <Link href="/admin/vip-loker/tambah">
-              <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+              <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm sm:text-base">
                 ➕ Tambah Loker Baru
               </Button>
             </Link>
             <Link href="/admin/tools-ai">
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full text-sm sm:text-base">
                 🤖 Tools AI
               </Button>
             </Link>
             <Link href="/admin/analytics">
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full text-sm sm:text-base">
                 📊 Lihat Laporan Lengkap
               </Button>
             </Link>
@@ -171,25 +171,25 @@ async function DashboardContent() {
       </div>
 
       {/* Kategori & Lokasi Populer */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>📂 Kategori Terpopuler</CardTitle>
+            <CardTitle className="text-base sm:text-lg">📂 Kategori Terpopuler</CardTitle>
           </CardHeader>
           <CardContent>
             {categoryData.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {categoryData.map((cat, idx) => (
                   <div key={idx} className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{cat.category}</span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-xs sm:text-sm font-medium truncate">{cat.category}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap ml-2">
                       {cat.count} loker
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">
+              <p className="text-xs sm:text-sm text-muted-foreground text-center py-4">
                 Belum ada data
               </p>
             )}
@@ -198,22 +198,22 @@ async function DashboardContent() {
 
         <Card>
           <CardHeader>
-            <CardTitle>📍 Lokasi Terbanyak</CardTitle>
+            <CardTitle className="text-base sm:text-lg">📍 Lokasi Terbanyak</CardTitle>
           </CardHeader>
           <CardContent>
             {locationData.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {locationData.map((loc, idx) => (
                   <div key={idx} className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{loc.location}</span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-xs sm:text-sm font-medium truncate">{loc.location}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap ml-2">
                       {loc.count} loker
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">
+              <p className="text-xs sm:text-sm text-muted-foreground text-center py-4">
                 Belum ada data
               </p>
             )}

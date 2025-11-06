@@ -8,9 +8,13 @@ export const dynamic = "force-dynamic";
 export default async function TrackerPage() {
   let applications = [];
   let error = null;
+  let userId = "";
 
   try {
     applications = await getJobApplications();
+    const { getUser } = await import("@/lib/supabase/server");
+    const user = await getUser();
+    userId = user?.id || "";
   } catch (e) {
     console.error("Error loading applications:", e);
     error = e instanceof Error ? e.message : "Failed to load applications";
@@ -28,7 +32,7 @@ export default async function TrackerPage() {
           <strong>Error:</strong> {error}
         </div>
       )}
-      <TrackerClient applications={applications} />
+      <TrackerClient applications={applications} userId={userId} />
     </AppShell>
   );
 }

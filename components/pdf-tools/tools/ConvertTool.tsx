@@ -7,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { UploadZone } from "../UploadZone";
 import { ResultCard } from "../ResultCard";
-import { wordToPDF, imagesToPDF, pdfToWord } from "@/actions/pdf/convert";
+import { ImageResultCard } from "../ImageResultCard";
+import { wordToPDF, imagesToPDF, pdfToWord, pdfToImage } from "@/actions/pdf/convert";
 import { toast } from "sonner";
 import { FileImage, FileEdit, AlertCircle } from "lucide-react";
 
@@ -111,6 +112,33 @@ export function ConvertTool() {
     }
   };
 
+  const handlePDFToImage = async () => {
+    if (uploadedFiles.length === 0) {
+      toast.error('Upload file PDF');
+      return;
+    }
+
+    setProcessing(true);
+    setResult(null);
+
+    try {
+      const result = await pdfToImage(uploadedFiles[0].fileId);
+
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success('PDF berhasil diconvert ke gambar!');
+        setResult(result);
+        setUploadedFiles([]);
+      }
+    } catch (error: any) {
+      toast.error('Gagal convert PDF ke gambar');
+      console.error(error);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card className="p-6">
@@ -134,10 +162,11 @@ export function ConvertTool() {
         setUploadedFiles([]);
         setResult(null);
       }}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
           <TabsTrigger value="word-to-pdf">Word → PDF</TabsTrigger>
           <TabsTrigger value="image-to-pdf">Image → PDF</TabsTrigger>
           <TabsTrigger value="pdf-to-word">PDF → Word</TabsTrigger>
+          <TabsTrigger value="pdf-to-image">PDF → Image</TabsTrigger>
         </TabsList>
 
         <TabsContent value="word-to-pdf" className="space-y-6">
@@ -285,10 +314,70 @@ export function ConvertTool() {
             </div>
           </Card>
         </TabsContent>
+
+        <TabsContent value="pdf-to-image" className="space-y-6">
+          <Card className="p-6">
+            <Alert className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-sm">
+                <strong>Kapan digunakan:</strong> Extract semua halaman PDF menjadi gambar JPG. 
+                Berguna untuk membagikan dokumen dalam format gambar atau posting ke media sosial. 
+                Hasil berupa file ZIP berisi semua halaman sebagai JPG.
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-4">
+              <h3 className="font-semibold">Upload File PDF</h3>
+              <UploadZone
+                accept={{ 'application/pdf': ['.pdf'] }}
+                maxFiles={1}
+                onFilesUploaded={setUploadedFiles}
+                uploadedFiles={uploadedFiles}
+              />
+
+              {uploadedFiles.length > 0 && (
+                <>
+                  <div className="rounded-lg bg-muted p-4">
+                    <p className="text-sm font-medium">Info:</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Setiap halaman PDF akan diconvert menjadi 1 file JPG. 
+                      Hasil akan di-download sebagai file ZIP.
+                    </p>
+                  </div>
+
+                  <Button 
+                    onClick={handlePDFToImage}
+                    disabled={processing}
+                    className="w-full"
+                    size="lg"
+                  >
+                    {processing ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                        Converting...
+                      </>
+                    ) : (
+                      <>
+                        <FileImage className="h-4 w-4 mr-2" />
+                        Convert ke Gambar (JPG)
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
+            </div>
+          </Card>
+        </TabsContent>
       </Tabs>
 
       {/* Result */}
-      {result && <ResultCard result={result} operation="convert" />}
+      {result && (
+        result.images ? (
+          <ImageResultCard result={result} />
+        ) : (
+          <ResultCard result={result} operation="convert" />
+        )
+      )}
     </div>
   );
 }

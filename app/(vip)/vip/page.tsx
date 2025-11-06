@@ -79,6 +79,7 @@ export default async function VIPDashboardPage() {
   const bookmarkedIds = new Set(bookmarks?.map((b) => b.loker_id) || [])
 
   // Get loker list (trending/recommended)
+  // Fetch more to ensure today's jobs are included
   const { data: lokerList } = await supabase
     .from('vip_loker')
     .select(`
@@ -86,8 +87,8 @@ export default async function VIPDashboardPage() {
       perusahaan:vip_perusahaan(*)
     `)
     .eq('status', 'published')
-    .order('view_count', { ascending: false })
-    .limit(20)
+    .order('created_at', { ascending: false }) // Changed to newest first to catch today's jobs
+    .limit(50) // Increased limit to ensure today's jobs are included
 
   // Get recently viewed loker details
   console.log('[VIP Dashboard] Recently viewed IDs:', recentlyViewedLokerIds)
@@ -134,6 +135,7 @@ export default async function VIPDashboardPage() {
     is_featured: l.is_featured || false,
     view_count: l.view_count || 0,
     published_at: l.published_at,
+    created_at: l.created_at, // Add created_at for "Lowongan Hari Ini" filter
     is_bookmarked: bookmarkedIds.has(l.id),
   })) || []
 
@@ -163,6 +165,7 @@ export default async function VIPDashboardPage() {
     is_featured: l.is_featured || false,
     view_count: l.view_count || 0,
     published_at: l.published_at,
+    created_at: l.created_at, // Add created_at for "Lowongan Hari Ini" filter
     is_bookmarked: bookmarkedIds.has(l.id),
   })) || []
 

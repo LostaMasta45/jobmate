@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { History, Search, FileDown, FileText, Trash2, ArrowLeft, Plus, Eye, Sparkles, Home, ChevronRight } from "lucide-react"
 import { getSuratLamaranList, getSuratLamaranStats } from "@/actions/surat-lamaran-sederhana/list"
 import { deleteSuratLamaran } from "@/actions/surat-lamaran-sederhana/delete"
+import { ThumbnailPreview } from "@/components/surat-lamaran-sederhana/ThumbnailPreview"
+import { AppShell } from "@/components/layout/AppShell"
 import { toast } from "sonner"
 import Link from "next/link"
 
@@ -87,7 +89,8 @@ export default function SuratLamaranHistoryPage() {
   })
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <AppShell>
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* Breadcrumb Navigation */}
       <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
         <Link href="/dashboard" className="hover:text-foreground flex items-center gap-1">
@@ -238,67 +241,61 @@ export default function SuratLamaranHistoryPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredSurat.map((surat) => (
-            <Card key={surat.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg flex items-center gap-2">
+            <Card key={surat.id} className="group relative overflow-hidden hover:shadow-lg transition-all">
+              <CardContent className="p-5 space-y-4">
+                {/* Thumbnail Preview - Full Content A4 */}
+                <ThumbnailPreview surat={surat} />
+
+                {/* Info */}
+                <div className="space-y-3">
+                  <div>
+                    <h3 className="font-bold text-base line-clamp-1">
                       {surat.nama_perusahaan}
-                      <span className="text-muted-foreground">→</span>
+                    </h3>
+                    <p className="text-sm text-muted-foreground line-clamp-1">
                       {surat.posisi_lowongan}
-                    </CardTitle>
-                    <div className="flex flex-wrap items-center gap-2 mt-2">
-                      <Badge variant={surat.status === 'final' ? 'default' : 'outline'}>
-                        {surat.status === 'final' ? '✓ Final' : '📝 Draft'}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant={surat.status === 'final' ? 'default' : 'outline'} className="text-xs">
+                      {surat.status === 'final' ? '✓ Final' : '📝 Draft'}
+                    </Badge>
+                    {surat.jenis_instansi && (
+                      <Badge variant="outline" className="text-xs">
+                        {surat.jenis_instansi}
                       </Badge>
-                      <Badge variant="secondary">
-                        {surat.template_name || 'Template'}
-                      </Badge>
-                      {surat.jenis_instansi && (
-                        <Badge variant="outline" className="text-xs">
-                          {surat.jenis_instansi}
-                        </Badge>
-                      )}
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(surat.created_at).toLocaleDateString('id-ID', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </span>
+                    )}
+                  </div>
+
+                  <div className="text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <span>📅</span>
+                      <span>{new Date(surat.created_at).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                      })}</span>
                     </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Preview */}
-                <div className="bg-muted/30 rounded-lg p-4 border">
-                  <p className="text-sm whitespace-pre-wrap line-clamp-6 font-serif">
-                    {surat.generated_content}
-                  </p>
-                </div>
 
-                {/* Meta Info */}
-                <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                  <div>📊 {surat.word_count || 0} kata</div>
-                  <div>📝 {surat.char_count || 0} karakter</div>
-                  {surat.times_downloaded > 0 && (
-                    <div>⬇️ Diunduh {surat.times_downloaded}x</div>
-                  )}
-                  <div>📧 {surat.email}</div>
-                  <div>📱 {surat.no_handphone}</div>
+                  {/* Meta Info Compact */}
+                  <div className="flex gap-3 text-xs text-muted-foreground">
+                    <div>📊 {surat.word_count || 0} kata</div>
+                    {surat.times_downloaded > 0 && (
+                      <div>⬇️ {surat.times_downloaded}x</div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex flex-wrap gap-2 pt-2 border-t">
+                <div className="grid grid-cols-2 gap-2 pt-3 border-t">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 sm:flex-none"
+                    className="w-full"
                     asChild
                   >
                     <Link href={`/surat-lamaran-sederhana/view?id=${surat.id}`}>
@@ -307,37 +304,21 @@ export default function SuratLamaranHistoryPage() {
                     </Link>
                   </Button>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => handleDelete(surat.id)}
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Hapus
                   </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
-          
-          {/* Quick Action Card at Bottom */}
-          {filteredSurat.length > 0 && (
-            <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-              <CardContent className="py-8 text-center">
-                <h3 className="font-semibold mb-2">Perlu surat baru?</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Buat surat lamaran baru dengan berbagai pilihan template profesional
-                </p>
-                <Link href="/surat-lamaran-sederhana/buat">
-                  <Button className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Buat Surat Baru
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          )}
         </div>
       )}
-    </div>
+      </div>
+    </AppShell>
   )
 }

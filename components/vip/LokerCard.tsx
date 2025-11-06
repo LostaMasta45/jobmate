@@ -62,14 +62,14 @@ export function LokerCard({ loker }: LokerCardProps) {
   const isUrgent = deadlineText && (deadlineText.includes('hari') || deadlineText === 'Besok' || deadlineText === 'Hari ini')
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 hover:shadow-xl hover:border-blue-300 transition-all duration-300 overflow-hidden group hover:-translate-y-1">
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 overflow-hidden group hover:-translate-y-1">
       {/* Header */}
       <div className="p-6 pb-4">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <Link 
               href={`/vip/loker/${loker.id}`}
-              className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 group-hover:text-blue-600"
+              className="text-lg font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400"
             >
               {loker.title}
             </Link>
@@ -81,7 +81,7 @@ export function LokerCard({ loker }: LokerCardProps) {
           )}
         </div>
 
-        <div className="flex items-center gap-2 text-gray-600 mb-4">
+        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300 mb-4">
           <Building className="w-4 h-4" />
           <span className="text-sm font-medium">{loker.perusahaan_name}</span>
         </div>
@@ -92,7 +92,7 @@ export function LokerCard({ loker }: LokerCardProps) {
             <Badge 
               key={kat} 
               variant="outline" 
-              className="text-xs border-blue-200 text-blue-700 bg-blue-50"
+              className="text-xs border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950"
             >
               {kat}
             </Badge>
@@ -100,7 +100,7 @@ export function LokerCard({ loker }: LokerCardProps) {
           {loker.tipe_pekerjaan && (
             <Badge 
               variant="outline" 
-              className="text-xs border-purple-200 text-purple-700 bg-purple-50"
+              className="text-xs border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950"
             >
               {loker.tipe_pekerjaan}
             </Badge>
@@ -110,22 +110,22 @@ export function LokerCard({ loker }: LokerCardProps) {
 
       {/* Details */}
       <div className="px-6 pb-4 space-y-2">
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <MapPin className="w-4 h-4 text-gray-400" />
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+          <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500" />
           <span>{loker.lokasi}</span>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <DollarSign className="w-4 h-4 text-gray-400" />
-          <span className="font-medium text-green-600">
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+          <DollarSign className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+          <span className="font-medium text-green-600 dark:text-green-400">
             {formatSalary(loker.gaji_text, loker.gaji_min, loker.gaji_max)}
           </span>
         </div>
 
         {deadlineText && (
           <div className="flex items-center gap-2 text-sm">
-            <Calendar className="w-4 h-4 text-gray-400" />
-            <span className={isUrgent ? 'text-red-600 font-medium' : 'text-gray-600'}>
+            <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <span className={isUrgent ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-600 dark:text-gray-300'}>
               Deadline: {deadlineText}
             </span>
           </div>
@@ -133,8 +133,8 @@ export function LokerCard({ loker }: LokerCardProps) {
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-        <div className="flex items-center gap-4 text-xs text-gray-500">
+      <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-1">
             <Eye className="w-3.5 h-3.5" />
             <span>{loker.view_count || 0} views</span>

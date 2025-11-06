@@ -45,12 +45,12 @@ export function VipStatsCard({
   const Icon = iconMap[iconName] || Briefcase; // Fallback to Briefcase
   const cardContent = (
     <Card className={href ? "cursor-pointer hover:shadow-lg transition-all" : ""}>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">{title}</p>
             <motion.h2
-              className={`text-3xl font-bold mt-2 ${color}`}
+              className={`text-2xl sm:text-3xl font-bold mt-1 sm:mt-2 ${color}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: delay + 0.2 }}
@@ -58,11 +58,11 @@ export function VipStatsCard({
               {value.toLocaleString()}
             </motion.h2>
             {description && (
-              <p className="text-xs text-muted-foreground mt-1">{description}</p>
+              <p className="text-xs text-muted-foreground mt-1 truncate">{description}</p>
             )}
           </div>
-          <div className={`rounded-full p-3 bg-primary/10`}>
-            <Icon className={`h-6 w-6 ${color}`} />
+          <div className={`rounded-full p-2 sm:p-3 bg-primary/10 flex-shrink-0`}>
+            <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${color}`} />
           </div>
         </div>
       </CardContent>

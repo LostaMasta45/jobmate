@@ -18,6 +18,9 @@ interface ResultCardProps {
     compressedSize?: number;
     reduction?: number;
     metadata?: Record<string, any>;
+    directDownload?: boolean;
+    data?: string; // base64 data for direct download
+    contentType?: string;
   };
   operation: string;
 }
@@ -34,30 +37,49 @@ export function ResultCard({ result, operation }: ResultCardProps) {
   };
 
   const handleDownload = async () => {
-    if (!result.url) return;
-
     setDownloading(true);
     try {
-      const response = await getDownloadURL(result.url);
-      
-      if (response.error) {
-        toast.error(response.error);
-        return;
+      let base64Data: string;
+      let contentType: string;
+      let filename: string;
+
+      // Check if it's a direct download (data already in result)
+      if (result.directDownload && result.data) {
+        base64Data = result.data;
+        contentType = result.contentType || 'application/octet-stream';
+        filename = result.filename || 'download';
+      } else {
+        // Normal download from storage
+        if (!result.url) {
+          toast.error('URL file tidak tersedia');
+          return;
+        }
+
+        const response = await getDownloadURL(result.url);
+        
+        if (response.error) {
+          toast.error(response.error);
+          return;
+        }
+
+        base64Data = response.data!;
+        contentType = response.contentType || 'application/pdf';
+        filename = response.filename || result.filename || 'document.pdf';
       }
 
       // Convert base64 to blob and trigger download
-      const byteCharacters = atob(response.data!);
+      const byteCharacters = atob(base64Data);
       const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
         byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
       const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: response.contentType || 'application/pdf' });
+      const blob = new Blob([byteArray], { type: contentType });
       
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = response.filename || result.filename || 'document.pdf';
+      link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -158,6 +180,22 @@ export function ResultCard({ result, operation }: ResultCardProps) {
               </ul>
             </div>
           )}
+
+          {/* PDF to Image Stats */}
+          {result.directDownload && result.metadata?.convertedFormat === 'images_zip' && (
+            <div className="border-t pt-3">
+              <div className="flex items-center gap-2 text-sm font-semibold mb-2">
+                <FileCheck className="h-4 w-4 text-purple-600" />
+                <span>Info Konversi:</span>
+              </div>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Setiap halaman PDF → 1 file JPG</li>
+                <li>• Semua gambar dalam 1 file ZIP</li>
+                <li>• Kualitas tinggi untuk print/posting</li>
+                <li>• Extract ZIP untuk akses gambar individual</li>
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Download Button */}
@@ -182,7 +220,10 @@ export function ResultCard({ result, operation }: ResultCardProps) {
 
         {/* Info */}
         <p className="text-xs text-center text-muted-foreground">
-          File akan otomatis terhapus setelah 7 hari untuk keamanan data Anda
+          {result.directDownload 
+            ? 'File langsung di-download tanpa disimpan di server (lebih aman & cepat)'
+            : 'File akan otomatis terhapus setelah 7 hari untuk keamanan data Anda'
+          }
         </p>
       </div>
     </Card>

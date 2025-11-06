@@ -27,6 +27,7 @@ import {
   ChevronUp,
   Zap,
   Lock,
+  Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -50,7 +51,7 @@ const navItems: NavItem[] = [
   },
   {
     title: "Lowongan Kerja",
-    href: "/vip/loker",
+    href: "/vip",
     icon: Briefcase,
     vip: true,
   },
@@ -62,16 +63,10 @@ const navItems: NavItem[] = [
   },
   {
     title: "Surat Lamaran",
-    href: "/surat-lamaran",
+    href: "/surat-lamaran-sederhana",
     icon: FileSignature,
     premiumOnly: true,
     divider: true,
-  },
-  {
-    title: "Surat Lamaran Sederhana",
-    href: "/surat-lamaran-sederhana/history",
-    icon: FileText,
-    premiumOnly: true,
   },
   {
     title: "Email Generator",
@@ -83,6 +78,12 @@ const navItems: NavItem[] = [
     title: "CV ATS",
     href: "/tools/cv-ats",
     icon: FileBadge2,
+    premiumOnly: true,
+  },
+  {
+    title: "Interview Prep",
+    href: "/tools/interview-prep",
+    icon: Target,
     premiumOnly: true,
   },
   {

@@ -16,46 +16,39 @@ export function ModernGradient({ cv }: ModernGradientProps) {
   if (!content) return null;
 
   return (
-    <div 
-      className="mx-auto bg-white shadow-lg" 
-      style={{ 
-        width: "210mm",
-        minHeight: "297mm", 
-        padding: "25mm 20mm",
-        color: colors.text,
-        fontFamily: "'Times New Roman', ui-serif, Georgia, serif",
-        fontSize: "11pt",
-        lineHeight: "1.5"
-      }}
-    >
+    <div className="cv-template" style={{ color: colors.text }}>
       {/* Header with gradient */}
       <div 
-        className="mb-6 rounded-lg p-6"
-        style={{ background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})` }}
+        style={{ 
+          background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
+          padding: "16pt",
+          borderRadius: "8pt",
+          marginBottom: "12pt",
+        }}
       >
-        <div className="flex items-center gap-6">
+        <div style={{ display: "flex", alignItems: "center", gap: "16pt" }}>
           {photo && photoOpts && (
             <div
-              className={`flex-shrink-0 overflow-hidden ${
-                photoOpts.shape === "circle" ? "rounded-full" : photoOpts.shape === "rounded-square" ? "rounded-lg" : ""
-              }`}
               style={{
-                width: photoOpts.size === "small" ? 80 : photoOpts.size === "large" ? 150 : 120,
-                height: photoOpts.size === "small" ? 80 : photoOpts.size === "large" ? 150 : 120,
+                flexShrink: 0,
+                width: photoOpts.size === "small" ? "60pt" : photoOpts.size === "large" ? "100pt" : "80pt",
+                height: photoOpts.size === "small" ? "60pt" : photoOpts.size === "large" ? "100pt" : "80pt",
+                borderRadius: photoOpts.shape === "circle" ? "50%" : photoOpts.shape === "rounded-square" ? "8pt" : "0",
                 border: photoOpts.border.style !== "none" ? `${photoOpts.border.width}px ${photoOpts.border.style} white` : "none",
+                overflow: "hidden",
               }}
             >
-              <img src={photo} alt="Profile" className="h-full w-full object-cover" />
+              <img src={photo} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
           )}
-          <div className="flex-1 text-white">
-            <h1 className="text-3xl font-bold">
+          <div style={{ flex: 1, color: "white" }}>
+            <h1 style={{ margin: 0, fontSize: "24pt", fontWeight: 700, lineHeight: 1.2 }}>
               {content.basics.firstName} {content.basics.lastName}
             </h1>
             {content.basics.headline && (
-              <p className="mt-1 text-lg opacity-90">{content.basics.headline}</p>
+              <p style={{ margin: "4pt 0 0 0", fontSize: "13pt", opacity: 0.9 }}>{content.basics.headline}</p>
             )}
-            <div className="mt-3 flex flex-wrap gap-3 text-sm opacity-80">
+            <div style={{ marginTop: "8pt", fontSize: "9pt", opacity: 0.85, display: "flex", flexWrap: "wrap", gap: "8pt" }}>
               {content.basics.email && <span>{content.basics.email}</span>}
               {content.basics.phone && <span>• {content.basics.phone}</span>}
               {content.basics.city && <span>• {content.basics.city}</span>}
@@ -66,37 +59,33 @@ export function ModernGradient({ cv }: ModernGradientProps) {
 
       {/* Summary */}
       {content.summary && (
-        <div className="mb-6">
-          <h2 className="mb-3 text-xl font-bold" style={{ color: colors.primary }}>
-            SUMMARY
-          </h2>
-          <p className="leading-relaxed">{content.summary}</p>
+        <div style={{ marginBottom: "12pt" }}>
+          <h2 style={{ color: colors.primary }}>SUMMARY</h2>
+          <p>{content.summary}</p>
         </div>
       )}
 
       {/* Experience */}
       {content.experiences && content.experiences.length > 0 && (
-        <div className="mb-6">
-          <h2 className="mb-3 text-xl font-bold" style={{ color: colors.primary }}>
-            PROFESSIONAL EXPERIENCE
-          </h2>
-          <div className="space-y-4">
+        <div style={{ marginBottom: "12pt" }}>
+          <h2 style={{ color: colors.primary }}>PROFESSIONAL EXPERIENCE</h2>
+          <div>
             {content.experiences.map((exp, idx) => (
-              <div key={idx}>
-                <div className="flex items-start justify-between">
+              <div key={idx} style={{ marginBottom: "10pt" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
                   <div>
-                    <h3 className="font-bold">{exp.title}</h3>
-                    <p className="text-sm" style={{ color: colors.accent }}>
+                    <h3>{exp.title}</h3>
+                    <p style={{ fontSize: "9pt", color: colors.accent, margin: "2pt 0" }}>
                       {exp.company}
                     </p>
                   </div>
-                  <span className="text-sm text-muted-foreground">
+                  <span style={{ fontSize: "9pt", color: "#64748b", whiteSpace: "nowrap", marginLeft: "8pt" }}>
                     {exp.startDate} - {exp.isCurrent ? "Present" : exp.endDate}
                   </span>
                 </div>
-                <ul className="mt-2 space-y-1 text-sm">
+                <ul style={{ marginTop: "4pt", paddingLeft: "18pt" }}>
                   {exp.bullets.map((bullet, i) => (
-                    bullet.trim() && <li key={i} className="ml-4 list-disc">{bullet}</li>
+                    bullet.trim() && <li key={i} style={{ marginBottom: "2pt", fontSize: "9pt" }}>{bullet}</li>
                   ))}
                 </ul>
               </div>
@@ -107,17 +96,15 @@ export function ModernGradient({ cv }: ModernGradientProps) {
 
       {/* Education */}
       {content.education && content.education.length > 0 && (
-        <div className="mb-6">
-          <h2 className="mb-3 text-xl font-bold" style={{ color: colors.primary }}>
-            EDUCATION
-          </h2>
-          <div className="space-y-3">
+        <div style={{ marginBottom: "12pt" }}>
+          <h2 style={{ color: colors.primary }}>EDUCATION</h2>
+          <div>
             {content.education.map((edu, idx) => (
-              <div key={idx}>
-                <h3 className="font-bold">{edu.school}</h3>
-                {edu.degree && <p className="text-sm">{edu.degree} {edu.field}</p>}
+              <div key={idx} style={{ marginBottom: "8pt" }}>
+                <h3>{edu.school}</h3>
+                {edu.degree && <p style={{ fontSize: "9pt", margin: "2pt 0" }}>{edu.degree} {edu.field}</p>}
                 {edu.startDate && (
-                  <p className="text-sm text-muted-foreground">
+                  <p style={{ fontSize: "9pt", color: "#64748b", margin: "2pt 0" }}>
                     {edu.startDate} - {edu.endDate}
                   </p>
                 )}
@@ -130,15 +117,19 @@ export function ModernGradient({ cv }: ModernGradientProps) {
       {/* Skills */}
       {content.skills && content.skills.length > 0 && (
         <div>
-          <h2 className="mb-3 text-xl font-bold" style={{ color: colors.primary }}>
-            SKILLS
-          </h2>
-          <div className="flex flex-wrap gap-2">
+          <h2 style={{ color: colors.primary }}>SKILLS</h2>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "6pt", marginTop: "8pt" }}>
             {content.skills.map((skill, idx) => (
               <span
                 key={idx}
-                className="rounded-full px-3 py-1 text-sm"
-                style={{ backgroundColor: `${colors.primary}20`, color: colors.primary }}
+                style={{
+                  backgroundColor: `${colors.primary}20`,
+                  color: colors.primary,
+                  padding: "4pt 10pt",
+                  borderRadius: "12pt",
+                  fontSize: "9pt",
+                  fontWeight: 500,
+                }}
               >
                 {skill}
               </span>

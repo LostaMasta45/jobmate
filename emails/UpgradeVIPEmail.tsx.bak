@@ -1,0 +1,311 @@
+// emails/UpgradeVIPEmail.tsx
+import React from 'react';
+
+interface UpgradeVIPEmailProps {
+  userName: string;
+  email: string;
+  membershipType: 'vip_basic' | 'vip_premium';
+  upgradedAt: string;
+  dashboardUrl: string;
+}
+
+export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
+  userName,
+  email,
+  membershipType,
+  upgradedAt,
+  dashboardUrl,
+}) => {
+  const isPremium = membershipType === 'vip_premium';
+  const membershipName = isPremium ? 'VIP Premium' : 'VIP Basic';
+  const gradientColor = isPremium ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
+  const badgeColor = isPremium ? '#fef3c7' : '#dbeafe';
+  const badgeTextColor = isPremium ? '#92400e' : '#1e40af';
+
+  return (
+    <html>
+      <head>
+        <style>{`
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9fafb; }
+          .header { background: ${gradientColor}; color: white; padding: 50px 20px; text-align: center; border-radius: 12px 12px 0 0; position: relative; overflow: hidden; }
+          .logo { font-size: 32px; font-weight: bold; margin-bottom: 10px; }
+          .crown-icon { font-size: 80px; margin: 20px 0; animation: bounce 2s infinite; }
+          @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+          .content { background: white; padding: 40px 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+          .membership-badge { display: inline-block; background: ${badgeColor}; color: ${badgeTextColor}; padding: 12px 24px; border-radius: 25px; font-weight: 700; font-size: 18px; margin: 20px 0; border: 2px solid ${badgeTextColor}; }
+          .cta-button { display: inline-block; background: ${gradientColor}; color: white; padding: 16px 40px; text-decoration: none; border-radius: 10px; margin: 25px 0; font-weight: 600; font-size: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+          .benefit-section { margin: 30px 0; }
+          .benefit-item { display: flex; gap: 15px; padding: 18px; background: #f9fafb; border-radius: 10px; margin: 12px 0; border-left: 4px solid ${isPremium ? '#f59e0b' : '#3b82f6'}; }
+          .benefit-icon { font-size: 28px; flex-shrink: 0; }
+          .premium-feature { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; border-radius: 10px; margin: 15px 0; border: 2px dashed #f59e0b; }
+          .info-box { background: #eff6ff; border: 1px solid #bfdbfe; padding: 20px; margin: 25px 0; border-radius: 8px; }
+          .footer { text-align: center; padding: 30px 20px; color: #6b7280; font-size: 14px; }
+          .divider { height: 1px; background: #e5e7eb; margin: 30px 0; }
+          .sparkle { display: inline-block; animation: sparkle 1.5s infinite; }
+          @keyframes sparkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        `}</style>
+      </head>
+      <body>
+        <div className="container">
+          <div className="header">
+            <div className="logo">🎯 JobMate</div>
+            <div className="crown-icon">${isPremium ? '👑' : '⭐'}</div>
+            <h1 style={{ margin: 0; font-size: 32px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }}>
+              Selamat Upgrade ke<br/>${membershipName}!
+            </h1>
+          </div>
+          
+          <div className="content">
+            <div style={{ textAlign: 'center'; }}>
+              <div className="membership-badge">
+                ${isPremium ? '👑' : '⭐'} ${membershipName.toUpperCase()}
+              </div>
+            </div>
+
+            <p style={{ fontSize: 18px; margin: 30px 0 10px 0; }}>Halo {userName},</p>
+            
+            <p style={{ fontSize: 16px; color: #4b5563; line-height: 1.8; }}>
+              <strong>Luar biasa!</strong> <span className="sparkle">✨</span> Akun Anda telah berhasil di-upgrade ke 
+              <strong style={{ color: ${isPremium ? '#f59e0b' : '#3b82f6'}; }}> ${membershipName}</strong>. 
+              Sekarang Anda memiliki akses penuh ke fitur-fitur premium yang akan mempercepat pencarian kerja Anda!
+            </p>
+
+            <div className="info-box">
+              <h3 style={{ margin: 0 0 15px 0; color: #1e40af; }}>📋 Detail Membership</h3>
+              <p style={{ margin: 8px 0; }}><strong>Nama:</strong> {userName}</p>
+              <p style={{ margin: 8px 0; }}><strong>Email:</strong> {email}</p>
+              <p style={{ margin: 8px 0; }}><strong>Status:</strong> <span style={{ color: ${isPremium ? '#f59e0b' : '#3b82f6'}; font-weight: 600; }}>${membershipName} ${isPremium ? '👑' : '⭐'}</span></p>
+              <p style={{ margin: 8px 0; }}><strong>Di-upgrade pada:</strong> {new Date(upgradedAt).toLocaleString('id-ID', { 
+                dateStyle: 'full',
+                timeStyle: 'short'
+              })}</p>
+            </div>
+
+            <div style={{ textAlign: 'center; margin: 35px 0; }}>
+              <a href={dashboardUrl} className="cta-button">
+                🚀 Mulai Gunakan Fitur ${membershipName}
+              </a>
+              <p style={{ fontSize: 14px; color: #6b7280; margin: 15px 0 0 0; }}>
+                Klik tombol di atas untuk mengakses dashboard Anda
+              </p>
+            </div>
+
+            <div className="divider"></div>
+
+            <h3 style={{ color: #1f2937; margin-bottom: 20px; }}>🎁 Benefit ${membershipName} Anda:</h3>
+            
+            <div className="benefit-section">
+              <div className="benefit-item">
+                <div className="benefit-icon">💼</div>
+                <div>
+                  <strong style={{ color: #1f2937; }}>Akses Penuh Lowongan VIP</strong>
+                  <p style={{ margin: 5px 0 0 0; color: #6b7280; font-size: 14px; }}>
+                    Lihat semua lowongan kerja eksklusif tanpa batas
+                  </p>
+                </div>
+              </div>
+
+              <div className="benefit-item">
+                <div className="benefit-icon">🔖</div>
+                <div>
+                  <strong style={{ color: #1f2937; }}>Unlimited Bookmark</strong>
+                  <p style={{ margin: 5px 0 0 0; color: #6b7280; font-size: 14px; }}>
+                    Simpan sebanyak mungkin lowongan favorit
+                  </p>
+                </div>
+              </div>
+
+              <div className="benefit-item">
+                <div className="benefit-icon">🏢</div>
+                <div>
+                  <strong style={{ color: #1f2937; }}>Database Perusahaan Lengkap</strong>
+                  <p style={{ margin: 5px 0 0 0; color: #6b7280; font-size: 14px; }}>
+                    Info detail perusahaan & budaya kerja
+                  </p>
+                </div>
+              </div>
+
+              <div className="benefit-item">
+                <div className="benefit-icon">🔔</div>
+                <div>
+                  <strong style={{ color: #1f2937; }}>Priority Notifications</strong>
+                  <p style={{ margin: 5px 0 0 0; color: #6b7280; font-size: 14px; }}>
+                    Dapatkan alert lowongan baru paling cepat
+                  </p>
+                </div>
+              </div>
+
+              ${isPremium ? `
+              <div className="premium-feature">
+                <h4 style={{ margin: 0 0 15px 0; color: #92400e; }}>⚡ BONUS FITUR PREMIUM:</h4>
+                
+                <div className="benefit-item" style={{ background: white; }}>
+                  <div className="benefit-icon">📝</div>
+                  <div>
+                    <strong style={{ color: #1f2937; }}>Surat Lamaran AI</strong>
+                    <p style={{ margin: 5px 0 0 0; color: #6b7280; font-size: 14px; }}>
+                      Generate surat lamaran profesional dengan AI
+                    </p>
+                  </div>
+                </div>
+
+                <div className="benefit-item" style={{ background: white; }}>
+                  <div className="benefit-icon">🎨</div>
+                  <div>
+                    <strong style={{ color: #1f2937; }}>CV ATS Optimizer</strong>
+                    <p style={{ margin: 5px 0 0 0; color: #6b7280; font-size: 14px; }}>
+                      Buat CV yang lolos sistem ATS perusahaan
+                    </p>
+                  </div>
+                </div>
+
+                <div className="benefit-item" style={{ background: white; }}>
+                  <div className="benefit-icon">📧</div>
+                  <div>
+                    <strong style={{ color: #1f2937; }}>Email Generator</strong>
+                    <p style={{ margin: 5px 0 0 0; color: #6b7280; font-size: 14px; }}>
+                      Template email follow-up & networking
+                    </p>
+                  </div>
+                </div>
+
+                <div className="benefit-item" style={{ background: white; }}>
+                  <div className="benefit-icon">📊</div>
+                  <div>
+                    <strong style={{ color: #1f2937; }}>Job Tracker</strong>
+                    <p style={{ margin: 5px 0 0 0; color: #6b7280; font-size: 14px; }}>
+                      Kelola semua lamaran Anda dalam satu dashboard
+                    </p>
+                  </div>
+                </div>
+
+                <div className="benefit-item" style={{ background: white; }}>
+                  <div className="benefit-icon">📄</div>
+                  <div>
+                    <strong style={{ color: #1f2937; }}>PDF Tools Premium</strong>
+                    <p style={{ margin: 5px 0 0 0; color: #6b7280; font-size: 14px; }}>
+                      Merge, split, dan edit PDF untuk berkas lamaran
+                    </p>
+                  </div>
+                </div>
+
+                <div className="benefit-item" style={{ background: white; }}>
+                  <div className="benefit-icon">💬</div>
+                  <div>
+                    <strong style={{ color: #1f2937; }}>WA Message Generator</strong>
+                    <p style={{ margin: 5px 0 0 0; color: #6b7280; font-size: 14px; }}>
+                      Template pesan WhatsApp profesional
+                    </p>
+                  </div>
+                </div>
+              </div>
+              ` : ''}
+            </div>
+
+            ${!isPremium ? `
+            <div style={{ background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 25px; border-radius: 10px; margin: 30px 0; text-align: center; border: 2px dashed #f59e0b; }}>
+              <h3 style={{ margin: 0 0 10px 0; color: #92400e; }}>👑 Mau Upgrade ke Premium?</h3>
+              <p style={{ margin: 10px 0; color: #78350f; }}>
+                Dapatkan akses ke <strong>6 Tools JobMate</strong> untuk maksimalkan peluang diterima kerja!
+              </p>
+              <a href="https://t.me/jobmate_support" style={{ display: inline-block; background: #f59e0b; color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; margin-top: 10px; font-weight: 600; box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3); }}>
+                💎 Info Upgrade Premium
+              </a>
+            </div>
+            ` : ''}
+
+            <div style={{ background: #f0fdf4; padding: 20px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #10b981; }}>
+              <h4 style={{ margin: 0 0 10px 0; color: #065f46; }}>💡 Tips Memaksimalkan ${membershipName}:</h4>
+              <ul style={{ margin: 10px 0; padding-left: 20px; color: #047857; }}>
+                <li style={{ margin: 8px 0; }}>Aktifkan notifikasi untuk mendapat update lowongan terbaru</li>
+                <li style={{ margin: 8px 0; }}>Lengkapi profil Anda untuk rekomendasi lowongan yang lebih akurat</li>
+                ${isPremium ? '<li style="margin: 8px 0;">Gunakan CV ATS untuk meningkatkan peluang lolos seleksi</li>' : ''}
+                <li style={{ margin: 8px 0; }}>Bookmark lowongan menarik agar tidak terlewat</li>
+              </ul>
+            </div>
+
+            <p style={{ fontSize: 14px; color: #6b7280; margin: 30px 0 0 0; text-align: center; line-height: 1.8; }}>
+              <strong>Selamat menikmati fitur ${membershipName}!</strong><br/>
+              Semoga segera mendapatkan pekerjaan impian Anda. 🎯💼
+            </p>
+          </div>
+          
+          <div className="footer">
+            <p style={{ margin: 5px 0; }}>📧 Email ini dikirim secara otomatis oleh sistem JobMate</p>
+            <p style={{ margin: 5px 0; }}>Butuh bantuan? Hubungi: <a href="https://t.me/jobmate_support" style={{ color: #3b82f6; }}>@jobmate_support</a></p>
+            <p style={{ margin: 15px 0 0 0; font-size: 12px; color: #9ca3af; }}>
+              © 2025 JobMate - Platform Pencarian Kerja Terpercaya
+            </p>
+          </div>
+        </div>
+      </body>
+    </html>
+  );
+};
+
+// Plain text version
+export const UpgradeVIPEmailText = ({
+  userName,
+  email,
+  membershipType,
+  upgradedAt,
+  dashboardUrl,
+}: UpgradeVIPEmailProps) => {
+  const isPremium = membershipType === 'vip_premium';
+  const membershipName = isPremium ? 'VIP Premium 👑' : 'VIP Basic ⭐';
+
+  return `
+JobMate - Selamat Upgrade ke ${membershipName}!
+=====================================
+
+${isPremium ? '👑' : '⭐'} STATUS: ${membershipName.toUpperCase()}
+
+Halo ${userName},
+
+Luar biasa! ✨ Akun Anda telah berhasil di-upgrade ke ${membershipName}.
+Sekarang Anda memiliki akses penuh ke fitur-fitur premium!
+
+Detail Membership:
+- Nama: ${userName}
+- Email: ${email}
+- Status: ${membershipName}
+- Di-upgrade pada: ${new Date(upgradedAt).toLocaleString('id-ID')}
+
+MULAI GUNAKAN FITUR:
+${dashboardUrl}
+
+Benefit ${membershipName} Anda:
+💼 Akses Penuh Lowongan VIP - Lihat semua lowongan eksklusif
+🔖 Unlimited Bookmark - Simpan lowongan favorit tanpa batas
+🏢 Database Perusahaan Lengkap - Info detail perusahaan
+🔔 Priority Notifications - Alert lowongan baru paling cepat
+
+${isPremium ? `
+⚡ BONUS FITUR PREMIUM:
+📝 Surat Lamaran AI - Generate surat lamaran profesional
+🎨 CV ATS Optimizer - Buat CV yang lolos ATS
+📧 Email Generator - Template email follow-up
+📊 Job Tracker - Kelola semua lamaran Anda
+📄 PDF Tools Premium - Edit PDF untuk berkas lamaran
+💬 WA Message Generator - Template WhatsApp profesional
+` : `
+👑 MAU UPGRADE KE PREMIUM?
+Dapatkan akses ke 6 Tools JobMate untuk maksimalkan peluang diterima!
+Info: https://t.me/jobmate_support
+`}
+
+💡 Tips Memaksimalkan ${membershipName}:
+- Aktifkan notifikasi untuk update lowongan terbaru
+- Lengkapi profil untuk rekomendasi yang akurat
+${isPremium ? '- Gunakan CV ATS untuk tingkatkan peluang lolos\n' : ''}- Bookmark lowongan menarik agar tidak terlewat
+
+Selamat menikmati fitur ${membershipName}!
+Semoga segera mendapatkan pekerjaan impian Anda. 🎯💼
+
+---
+Email ini dikirim secara otomatis oleh sistem JobMate
+Butuh bantuan? Hubungi: @jobmate_support
+© 2025 JobMate - Platform Pencarian Kerja Terpercaya
+`;
+};

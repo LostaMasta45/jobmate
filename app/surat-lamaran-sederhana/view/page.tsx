@@ -22,6 +22,7 @@ import { History, ChevronRight, FileText, Home, ArrowLeft, Loader2, Sparkles } f
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
+import { AppShell } from "@/components/layout/AppShell"
 
 const defaultBiodata: Biodata = {
   namaLengkap: "",
@@ -165,18 +166,21 @@ function ViewSuratLamaranContent() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-            <p className="text-muted-foreground">Memuat data surat...</p>
+      <AppShell>
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+              <p className="text-muted-foreground">Memuat data surat...</p>
+            </div>
           </div>
         </div>
-      </div>
+      </AppShell>
     )
   }
 
   return (
+    <AppShell>
     <>
       <Toaster />
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -364,6 +368,7 @@ function ViewSuratLamaranContent() {
         </div>
       </div>
     </>
+    </AppShell>
   )
 }
 
@@ -371,9 +376,11 @@ function ViewSuratLamaranContent() {
 export default function ViewSuratLamaranPage() {
   return (
     <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
+      <AppShell>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      </AppShell>
     }>
       <ViewSuratLamaranContent />
     </Suspense>

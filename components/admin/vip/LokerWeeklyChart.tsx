@@ -11,12 +11,12 @@ export function LokerWeeklyChart({ data }: LokerWeeklyChartProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
           📊 Aktivitas Mingguan
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+      <CardContent className="px-2 sm:px-6">
+        <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis 

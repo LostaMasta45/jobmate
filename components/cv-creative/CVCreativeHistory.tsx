@@ -1,20 +1,52 @@
 "use client";
 
 import * as React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, Download, Trash2, Loader2, FileDown, Image, MoreVertical } from "lucide-react";
+import {
+  Edit,
+  Download,
+  Trash2,
+  Loader2,
+  FileDown,
+  Image,
+  MoreVertical,
+  Eye,
+  Calendar,
+  Award,
+  Palette,
+} from "lucide-react";
 import { CreativeCV } from "@/lib/schemas/cv-creative";
 import { deleteCreativeCV } from "@/actions/cv-creative";
 import { downloadCreativeCVAsPDF, downloadCreativeCVAsPNG } from "@/lib/cv-creative-download";
 import { ModernGradient } from "./templates/ModernGradient";
+import { BoldMinimalist, PastelProfessional, DarkModePro } from "./templates/AllTemplatesNew";
+import { CV075Professional } from "./templates/CV075Professional";
+import { 
+  MagazineLayout,
+  ColorfulBlocks, 
+  TimelineHero, 
+  PortfolioGrid, 
+  InfographicStyle, 
+  SplitScreen, 
+  GeometricModern, 
+  WatercolorArtist 
+} from "./templates/RemainingTemplates";
+import { CVPreview } from "./CVPreview";
 
 interface CVCreativeHistoryProps {
   cvs: any[];
@@ -25,6 +57,7 @@ interface CVCreativeHistoryProps {
 export function CVCreativeHistory({ cvs, onEdit, onRefresh }: CVCreativeHistoryProps) {
   const [deleting, setDeleting] = React.useState<string | null>(null);
   const [downloading, setDownloading] = React.useState<string | null>(null);
+  const [previewCV, setPreviewCV] = React.useState<any | null>(null);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Yakin hapus CV ini?")) return;
@@ -57,7 +90,7 @@ export function CVCreativeHistory({ cvs, onEdit, onRefresh }: CVCreativeHistoryP
       const { createRoot } = await import("react-dom/client");
       const root = createRoot(tempDiv);
       
-      const cvData: CreativeCV = {
+      const cvData: Partial<CreativeCV> = {
         id: cv.id,
         userId: cv.user_id,
         title: cv.title,
@@ -106,152 +139,362 @@ export function CVCreativeHistory({ cvs, onEdit, onRefresh }: CVCreativeHistoryP
     });
   };
 
+  const getScoreColor = (score: number | null) => {
+    if (!score) return "text-muted-foreground";
+    if (score >= 80) return "text-green-600 dark:text-green-400";
+    if (score >= 60) return "text-yellow-600 dark:text-yellow-400";
+    return "text-red-600 dark:text-red-400";
+  };
+
+  const getScoreLabel = (score: number | null) => {
+    if (!score) return "Belum dihitung";
+    if (score >= 80) return "Excellent";
+    if (score >= 60) return "Good";
+    return "Needs Work";
+  };
+
   if (cvs.length === 0) {
     return (
-      <Card>
+      <Card className="border-dashed">
         <CardContent className="flex h-48 items-center justify-center">
           <div className="text-center text-muted-foreground">
-            <p className="mb-2 text-lg">Belum ada Creative CV</p>
-            <p className="text-sm">Click "Buat CV Baru" untuk memulai</p>
+            <Palette className="mx-auto mb-4 h-16 w-16 opacity-50" />
+            <p className="mb-2 text-lg font-semibold">Belum ada Creative CV</p>
+            <p className="text-sm">Mulai buat CV visual yang eye-catching sekarang!</p>
           </div>
         </CardContent>
       </Card>
     );
   }
 
+  // Render thumbnail preview with A4 portrait ratio
+  const renderThumbnail = (cv: any) => {
+    const cvData: Partial<CreativeCV> = {
+      id: cv.id,
+      userId: cv.user_id,
+      title: cv.title,
+      templateId: cv.template_id,
+      colorScheme: cv.color_scheme,
+      photoUrl: cv.photo_url,
+      photoOptions: cv.photo_options,
+      content: cv.content,
+      atsScore: cv.ats_score,
+      isDefault: cv.is_default,
+    };
+
+    // A4 ratio is 210:297 (approximately 1:1.414)
+    // Calculate scale to fit container perfectly
+    // Container width will be 100%, we need to scale 210mm to fit
+    const scaleValue = 0.35; // Adjusted for better fill
+    
+    return (
+      <div 
+        className="group/thumb relative w-full cursor-pointer overflow-hidden rounded-lg border bg-white shadow-sm transition-all hover:shadow-md"
+        style={{ 
+          paddingBottom: '141.4%', // A4 portrait aspect ratio (297/210 = 1.414)
+        }}
+        onClick={() => setPreviewCV(cv)}
+      >
+        <div 
+          className="absolute inset-0 flex items-start justify-center"
+          style={{
+            overflow: 'hidden',
+            backgroundColor: '#f5f5f5',
+          }}
+        >
+          <div 
+            style={{
+              transform: `scale(${scaleValue})`,
+              transformOrigin: 'top center',
+              width: '210mm',
+              minHeight: '297mm',
+            }}
+            className="pointer-events-none"
+          >
+            <CVPreview cv={cvData} />
+          </div>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent transition-opacity group-hover/thumb:opacity-80" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover/thumb:opacity-100">
+          <div className="rounded-full bg-white/90 p-3 shadow-lg backdrop-blur-sm">
+            <Eye className="h-5 w-5 text-gray-900" />
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+          <p className="truncate text-sm font-semibold drop-shadow-md">{cv.template_id}</p>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="grid gap-4">
-      {cvs.map((cv) => (
-        <Card key={cv.id} className="transition-shadow hover:shadow-md">
-          <CardContent className="flex items-center gap-3 p-3 sm:gap-4 sm:p-4">
-            {/* Thumbnail */}
-            <div 
-              className="h-20 w-14 flex-shrink-0 rounded border sm:h-24 sm:w-16"
-              style={{ 
-                background: `linear-gradient(135deg, ${cv.color_scheme.primary}, ${cv.color_scheme.secondary})` 
-              }}
-            />
+    <>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {cvs.map((cv) => {
+          const content = cv.content;
+          const expCount = content?.experiences?.length || 0;
+          const skillCount = content?.skills?.length || 0;
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <h3 className="truncate font-semibold text-sm sm:text-base">{cv.title}</h3>
-              <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs sm:gap-2 sm:text-sm text-muted-foreground">
-                <Badge variant="outline" className="text-xs">{cv.template_id}</Badge>
-                <span className="hidden sm:inline">•</span>
-                <span className="hidden sm:inline">{formatDate(cv.created_at)}</span>
-                {cv.ats_score && (
-                  <>
-                    <span className="hidden sm:inline">•</span>
-                    <span className="hidden sm:inline">Score: {cv.ats_score}</span>
-                  </>
+          return (
+            <Card key={cv.id} className="group relative overflow-hidden">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="line-clamp-1 text-base">
+                      {cv.title}
+                    </CardTitle>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {content?.basics?.firstName} {content?.basics?.lastName}
+                    </p>
+                  </div>
+                  {cv.ats_score !== null && (
+                    <div className="ml-2 flex flex-col items-center">
+                      <Award
+                        className={`h-5 w-5 ${getScoreColor(cv.ats_score)}`}
+                      />
+                      <span
+                        className={`text-xs font-semibold ${getScoreColor(
+                          cv.ats_score
+                        )}`}
+                      >
+                        {cv.ats_score}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-3 pb-4">
+                {/* CV Thumbnail Preview */}
+                {renderThumbnail(cv)}
+
+                {/* Info */}
+                <div className="flex-1 text-sm">
+                  <p className="text-xs text-muted-foreground">
+                    {expCount} pengalaman • {skillCount} skills
+                  </p>
+                </div>
+
+                {/* ATS Score Badge */}
+                {cv.ats_score !== null && (
+                  <div
+                    className={`rounded-md px-2 py-1 text-xs font-medium ${
+                      cv.ats_score >= 80
+                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                        : cv.ats_score >= 60
+                        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
+                        : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
+                    }`}
+                  >
+                    ATS Score: {getScoreLabel(cv.ats_score)}
+                  </div>
                 )}
-              </div>
-            </div>
 
-            {/* Actions - Responsive */}
-            <div className="flex items-center gap-1 sm:gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onEdit(cv)}
-                className="hidden sm:flex"
-              >
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </Button>
-              
-              {/* Mobile: Edit icon only */}
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8 sm:hidden"
-                onClick={() => onEdit(cv)}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
+                {/* Date */}
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Calendar className="h-3 w-3" />
+                  <span>Dibuat {formatDate(cv.created_at)}</span>
+                </div>
 
-              {/* Download Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                {/* Actions */}
+                <div className="grid grid-cols-2 gap-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={downloading === cv.id}
-                    className="hidden sm:flex"
+                    onClick={() => setPreviewCV(cv)}
+                    className="h-8 text-xs"
                   >
-                    {downloading === cv.id ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Download className="mr-2 h-4 w-4" />
-                    )}
-                    <span className="hidden lg:inline">Download</span>
+                    <Eye className="mr-1 h-3 w-3" />
+                    Preview
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleDownload(cv, "pdf")}>
-                    <FileDown className="mr-2 h-4 w-4" />
-                    Download PDF
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleDownload(cv, "png")}>
-                    <Image className="mr-2 h-4 w-4" />
-                    Download PNG
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Mobile: More menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    size="icon"
-                    className="h-8 w-8 sm:hidden"
-                    disabled={downloading === cv.id || deleting === cv.id}
+                    size="sm"
+                    onClick={() => onEdit(cv)}
+                    className="h-8 text-xs"
                   >
-                    {downloading === cv.id || deleting === cv.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <MoreVertical className="h-4 w-4" />
-                    )}
+                    <Edit className="mr-1 h-3 w-3" />
+                    Edit
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleDownload(cv, "pdf")}>
-                    <FileDown className="mr-2 h-4 w-4" />
-                    PDF
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleDownload(cv, "png")}>
-                    <Image className="mr-2 h-4 w-4" />
-                    PNG
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => handleDelete(cv.id)}
-                    className="text-destructive"
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDownload(cv, "pdf")}
+                    disabled={downloading === cv.id}
+                    className="h-8 text-xs"
                   >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <FileDown className="mr-1 h-3 w-3" />
+                    PDF
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDownload(cv, "png")}
+                    disabled={downloading === cv.id}
+                    className="h-8 text-xs"
+                  >
+                    <Image className="mr-1 h-3 w-3" />
+                    PNG
+                  </Button>
+                </div>
 
-              {/* Desktop: Delete button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleDelete(cv.id)}
-                disabled={deleting === cv.id}
-                className="hidden sm:flex"
-              >
-                {deleting === cv.id ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
-              </Button>
+                {/* Delete Button */}
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDelete(cv.id)}
+                  disabled={deleting === cv.id}
+                  className="w-full h-8 text-xs"
+                >
+                  {deleting === cv.id ? (
+                    "Menghapus..."
+                  ) : (
+                    <>
+                      <Trash2 className="mr-1 h-3 w-3" />
+                      Hapus
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Preview Dialog */}
+      <Dialog open={!!previewCV} onOpenChange={() => setPreviewCV(null)}>
+        <DialogContent className="max-h-[80vh] max-w-3xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Preview CV Creative</DialogTitle>
+          </DialogHeader>
+
+          {previewCV && previewCV.content && (
+            <div className="space-y-6 text-sm">
+              {/* Header */}
+              <div className="border-b pb-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold">
+                      {previewCV.content.basics?.firstName} {previewCV.content.basics?.lastName}
+                    </h2>
+                    <p className="mt-1 text-lg text-muted-foreground">
+                      {previewCV.content.basics?.headline}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                      {previewCV.content.basics?.email && (
+                        <span>{previewCV.content.basics.email}</span>
+                      )}
+                      {previewCV.content.basics?.phone && (
+                        <span>{previewCV.content.basics.phone}</span>
+                      )}
+                      {previewCV.content.basics?.city && (
+                        <span>{previewCV.content.basics.city}</span>
+                      )}
+                    </div>
+                  </div>
+                  <Badge
+                    className="shrink-0"
+                    style={{
+                      background: `linear-gradient(135deg, ${previewCV.color_scheme.primary}, ${previewCV.color_scheme.secondary})`,
+                    }}
+                  >
+                    {previewCV.template_id}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Summary */}
+              {previewCV.content.summary && (
+                <div>
+                  <h3 className="mb-2 font-semibold uppercase text-xs tracking-wide">
+                    Ringkasan
+                  </h3>
+                  <p className="text-muted-foreground">{previewCV.content.summary}</p>
+                </div>
+              )}
+
+              {/* Experience */}
+              {previewCV.content.experiences && previewCV.content.experiences.length > 0 && (
+                <div>
+                  <h3 className="mb-3 font-semibold uppercase text-xs tracking-wide">
+                    Pengalaman Profesional
+                  </h3>
+                  <div className="space-y-4">
+                    {previewCV.content.experiences.map((exp: any, idx: number) => (
+                      <div key={idx}>
+                        <div className="flex justify-between">
+                          <div>
+                            <p className="font-semibold">{exp.title}</p>
+                            <p className="text-muted-foreground">{exp.company}</p>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {exp.startDate} - {exp.isCurrent ? "Sekarang" : exp.endDate}
+                          </p>
+                        </div>
+                        <ul className="mt-2 space-y-1 text-muted-foreground">
+                          {exp.bullets.map((bullet: string, bidx: number) => (
+                            <li key={bidx} className="flex gap-2">
+                              <span>•</span>
+                              <span>{bullet}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Education */}
+              {previewCV.content.education && previewCV.content.education.length > 0 && (
+                <div>
+                  <h3 className="mb-3 font-semibold uppercase text-xs tracking-wide">
+                    Pendidikan
+                  </h3>
+                  <div className="space-y-3">
+                    {previewCV.content.education.map((edu: any, idx: number) => (
+                      <div key={idx}>
+                        <div className="flex justify-between">
+                          <div>
+                            <p className="font-semibold">{edu.school}</p>
+                            <p className="text-muted-foreground">
+                              {edu.degree} {edu.field}
+                            </p>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {edu.startDate} - {edu.endDate}
+                          </p>
+                        </div>
+                        {edu.description && (
+                          <p className="mt-1 text-muted-foreground">{edu.description}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Skills */}
+              {previewCV.content.skills && previewCV.content.skills.length > 0 && (
+                <div>
+                  <h3 className="mb-2 font-semibold uppercase text-xs tracking-wide">
+                    Keterampilan
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {previewCV.content.skills.join(", ")}
+                  </p>
+                </div>
+              )}
             </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreviewCV(null)}>
+              Tutup
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

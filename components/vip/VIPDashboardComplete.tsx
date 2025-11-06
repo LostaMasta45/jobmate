@@ -105,6 +105,25 @@ export function VIPDashboardComplete({
     })
     .slice(0, 3)
 
+  // Get today's loker (posted today - same day)
+  const todayLoker = lokerList
+    .filter(l => {
+      const dateStr = l.published_at || l.created_at
+      if (!dateStr) return false
+      const postDate = new Date(dateStr)
+      const today = new Date()
+      return (
+        postDate.getDate() === today.getDate() &&
+        postDate.getMonth() === today.getMonth() &&
+        postDate.getFullYear() === today.getFullYear()
+      )
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.published_at || a.created_at || 0).getTime()
+      const dateB = new Date(b.published_at || b.created_at || 0).getTime()
+      return dateB - dateA // newest first
+    })
+
   return (
     <div className="min-h-screen space-y-6">
       {/* Upgrade Banner for VIP Basic */}
@@ -346,55 +365,130 @@ export function VIPDashboardComplete({
             )}
           </div>
 
-          {/* Popular Companies */}
+          {/* Today's Jobs - Lowongan Hari Ini */}
           <div className="bg-white dark:bg-gray-900 rounded-3xl border-2 border-gray-200 dark:border-gray-800 p-6 lg:p-8 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-poppins font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg">
-                  <Trophy className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg animate-pulse">
+                  <Calendar className="w-5 h-5 text-white" />
                 </div>
-                Perusahaan Terpopuler
+                <span className="flex items-center gap-2">
+                  Lowongan Hari Ini
+                  <Badge variant="secondary" className="bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300">
+                    {todayLoker.length}
+                  </Badge>
+                </span>
               </h2>
-              <Button
-                asChild
-                variant="ghost"
-                className="text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-xl font-semibold"
-              >
-                <Link href="/vip/perusahaan">
-                  Lihat Semua
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Link>
-              </Button>
+              {todayLoker.length > 6 && (
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-xl font-semibold"
+                >
+                  <Link href="/vip/loker?sort=terbaru">
+                    Lihat Semua
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Link>
+                </Button>
+              )}
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-              {[
-                { name: 'PT Sukses Manufacturing', logo: '🏭', count: 12, color: 'from-blue-500 to-cyan-500' },
-                { name: 'CV Karya Sentosa', logo: '🏢', count: 8, color: 'from-purple-500 to-pink-500' },
-                { name: 'PT Maju Mapan', logo: '🏗️', count: 15, color: 'from-green-500 to-teal-500' },
-                { name: 'CV Jaya Elektronik', logo: '⚡', count: 5, color: 'from-orange-500 to-red-500' },
-                { name: 'PT Sukses Mandiri', logo: '💼', count: 10, color: 'from-indigo-500 to-purple-500' },
-                { name: 'CV Sejahtera Furniture', logo: '🪑', count: 7, color: 'from-yellow-500 to-orange-500' },
-                { name: 'PT Digital Kreatif', logo: '💻', count: 9, color: 'from-cyan-500 to-blue-500' },
-                { name: 'CV Rasa Nusantara', logo: '🍜', count: 6, color: 'from-red-500 to-pink-500' },
-              ].map((company, i) => (
-                <Link
-                  key={i}
-                  href="/vip/perusahaan"
-                  className="group bg-white dark:from-gray-800 dark:to-gray-700 rounded-2xl p-5 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 border-2 border-gray-200 dark:border-gray-600"
+            {todayLoker.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {todayLoker.slice(0, 6).map((loker) => (
+                  <div
+                    key={loker.id}
+                    className="group relative bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 rounded-2xl p-5 hover:shadow-xl transition-all duration-300 border-2 border-orange-200 dark:border-orange-900/30"
+                  >
+                    <Link href={`/vip/loker/${loker.id}`} className="block">
+                      {/* NEW Badge */}
+                      <div className="absolute top-3 right-3">
+                        <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 shadow-lg animate-pulse">
+                          BARU!
+                        </Badge>
+                      </div>
+
+                      {/* Company */}
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-lg shadow-lg flex-shrink-0">
+                          {loker.perusahaan_name.charAt(0)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                            {loker.perusahaan_name}
+                          </div>
+                          <h3 className="font-bold text-gray-900 dark:text-white text-sm line-clamp-2 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                            {loker.title}
+                          </h3>
+                        </div>
+                      </div>
+
+                      {/* Details */}
+                      <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                          <span className="truncate">{loker.lokasi}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                          <span className="truncate">{formatSalary(loker.gaji_text, loker.gaji_min, loker.gaji_max)}</span>
+                        </div>
+                        {loker.kategori && loker.kategori.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {loker.kategori.slice(0, 2).map((cat, idx) => (
+                              <Badge 
+                                key={idx} 
+                                variant="secondary" 
+                                className="text-xs bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"
+                              >
+                                {cat}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Time */}
+                      <div className="mt-3 pt-3 border-t border-orange-200 dark:border-orange-900/30">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {getTimeAgo(loker.published_at || loker.created_at)}
+                          </span>
+                          {loker.view_count && loker.view_count > 0 && (
+                            <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                              <Eye className="w-3 h-3" />
+                              {loker.view_count}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-900/50 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700">
+                <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-950/30 dark:to-red-950/30 flex items-center justify-center">
+                  <Calendar className="w-10 h-10 text-orange-500" />
+                </div>
+                <p className="text-gray-500 dark:text-gray-400 font-medium mb-2">
+                  Belum ada lowongan baru hari ini
+                </p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">
+                  Cek lagi nanti atau lihat lowongan terbaru lainnya
+                </p>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="mt-4 border-orange-300 text-orange-600 hover:bg-orange-50 dark:border-orange-800 dark:text-orange-400 dark:hover:bg-orange-950/30"
                 >
-                  <div className={`w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br ${company.color} flex items-center justify-center text-3xl shadow-lg group-hover:scale-110 transition-transform`}>
-                    {company.logo}
-                  </div>
-                  <div className="text-sm font-bold text-gray-900 dark:text-white mb-1 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {company.name}
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                    {company.count} lowongan
-                  </div>
-                </Link>
-              ))}
-            </div>
+                  <Link href="/vip/loker?sort=terbaru">
+                    Lihat Lowongan Terbaru
+                  </Link>
+                </Button>
+              </div>
+            )}
           </div>
       </div>
     </div>
@@ -425,10 +519,44 @@ function LokerCardCompact({ loker }: { loker: Loker }) {
   return (
     <Link
       href={`/vip/loker/${loker.id}`}
-      className="group relative block bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-5 border-2 border-gray-200 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+      className="group relative block bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
     >
-      {/* Badges - Top Right - Clean Positioning */}
-      {loker.is_featured && (
+      {/* Poster Thumbnail */}
+      {loker.poster_url && (
+        <div className="relative w-full h-32 overflow-hidden">
+          <Image
+            src={loker.poster_url}
+            alt={loker.title}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          
+          {/* Badges on Poster */}
+          {loker.is_featured && (
+            <div className="absolute top-2 right-2 z-10">
+              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-[10px] px-2 py-0.5 shadow-md backdrop-blur-sm">
+                ⭐ Featured
+              </Badge>
+            </div>
+          )}
+          
+          {/* Title Overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+            <h3 className="font-bold text-sm line-clamp-1 drop-shadow-lg">
+              {loker.title}
+            </h3>
+            <p className="text-xs opacity-90 drop-shadow-md truncate">
+              {loker.perusahaan_name}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Badges - Top Right (when NO poster) */}
+      {!loker.poster_url && loker.is_featured && (
         <div className="absolute top-3 right-3 z-10">
           <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-[10px] sm:text-xs px-2 py-0.5 shadow-md">
             ⭐ Featured
@@ -436,16 +564,19 @@ function LokerCardCompact({ loker }: { loker: Loker }) {
         </div>
       )}
 
-      {/* Content - Full Width, No Padding Needed */}
-      <div className="space-y-3 pr-20">
-        <div>
-          <h3 className="font-bold text-sm sm:text-base text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-1">
-            {loker.title}
-          </h3>
-          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
-            {loker.perusahaan_name}
-          </p>
-        </div>
+      {/* Content */}
+      <div className="p-4 sm:p-5 space-y-3 pr-20">
+        {/* Title & Company (only if NO poster) */}
+        {!loker.poster_url && (
+          <div>
+            <h3 className="font-bold text-sm sm:text-base text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-1">
+              {loker.title}
+            </h3>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
+              {loker.perusahaan_name}
+            </p>
+          </div>
+        )}
         
         <button
           onClick={(e) => {
@@ -521,18 +652,18 @@ function LokerCardHorizontal({ loker }: { loker: Loker }) {
   return (
     <Link
       href={`/vip/loker/${loker.id}`}
-      className="group relative flex gap-4 p-5 bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-md transition-all duration-300"
+      className="group relative flex gap-4 p-5 bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-md transition-all duration-300 overflow-hidden"
     >
       {/* Badges - Top Right - Clean Positioning */}
       {(loker.is_featured || isNew) && (
         <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
           {loker.is_featured && (
-            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-xs shadow-md">
+            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-xs shadow-md backdrop-blur-sm">
               ⭐
             </Badge>
           )}
           {isNew && (
-            <Badge className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-0 text-xs animate-pulse shadow-md">
+            <Badge className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-0 text-xs animate-pulse shadow-md backdrop-blur-sm">
               <Zap className="w-3 h-3 mr-1" />
               Baru
             </Badge>
@@ -540,9 +671,19 @@ function LokerCardHorizontal({ loker }: { loker: Loker }) {
         </div>
       )}
 
-      {/* Logo */}
+      {/* Poster or Logo */}
       <div className="flex-shrink-0">
-        {loker.perusahaan?.logo_url ? (
+        {loker.poster_url ? (
+          <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-600 group-hover:scale-110 transition-transform relative">
+            <Image
+              src={loker.poster_url}
+              alt={loker.title}
+              fill
+              className="object-cover"
+              sizes="96px"
+            />
+          </div>
+        ) : loker.perusahaan?.logo_url ? (
           <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-600 group-hover:scale-110 group-hover:rotate-3 transition-transform">
             <Image
               src={loker.perusahaan.logo_url}

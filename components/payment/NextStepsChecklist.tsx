@@ -217,7 +217,7 @@ export function NextStepsChecklist({ email, userName, planType }: NextStepsCheck
                 <Button variant="outline" size="sm" className="text-xs h-9" onClick={() => window.location.href = '/tools/cv-ats'}>
                   <span className="truncate">📄 CV Generator</span>
                 </Button>
-                <Button variant="outline" size="sm" className="text-xs h-9" onClick={() => window.location.href = '/surat-lamaran'}>
+                <Button variant="outline" size="sm" className="text-xs h-9" onClick={() => window.location.href = '/surat-lamaran-sederhana'}>
                   <span className="truncate">✉️ Surat Lamaran</span>
                 </Button>
                 <Button variant="outline" size="sm" className="text-xs h-9" onClick={() => window.location.href = '/tools/tracker'}>

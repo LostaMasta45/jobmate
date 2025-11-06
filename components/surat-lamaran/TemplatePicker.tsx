@@ -12,29 +12,28 @@ type Props = {
   onChange: (id: string) => void
 }
 
-// Map template IDs to image filenames (currently only 1.png exists)
+// Map template IDs to their respective thumbnail images
 const templateImages: Record<string, string> = {
-  "template-1": "/Template/1.png",
-  "template-2": "/Template/1.png",
-  "template-3": "/Template/1.png",
-  "template-4": "/Template/1.png",
-  "template-5": "/Template/1.png",
-  "template-6": "/Template/1.png",
-  "template-7": "/Template/1.png",
-  "template-8": "/Template/1.png",
-  "template-9": "/Template/1.png",
-  "template-10": "/Template/1.png",
-  // Colored templates will show color indicators
-  "template-11": "/Template/1.png",
-  "template-12": "/Template/1.png",
-  "template-13": "/Template/1.png",
-  "template-14": "/Template/1.png",
-  "template-15": "/Template/1.png",
-  "template-16": "/Template/1.png",
-  "template-17": "/Template/1.png",
-  "template-18": "/Template/1.png",
-  "template-19": "/Template/1.png",
-  "template-20": "/Template/1.png",
+  "template-1": "/Template/template-1.png",
+  "template-2": "/Template/template-2.png",
+  "template-3": "/Template/template-3.png",
+  "template-4": "/Template/template-4.png",
+  "template-5": "/Template/template-5.png",
+  "template-6": "/Template/template-6.png",
+  "template-7": "/Template/template-7.png",
+  "template-8": "/Template/template-8.png",
+  "template-9": "/Template/template-9.png",
+  "template-10": "/Template/template-10.png",
+  "template-11": "/Template/template-11.png",
+  "template-12": "/Template/template-12.png",
+  "template-13": "/Template/template-13.png",
+  "template-14": "/Template/template-14.png",
+  "template-15": "/Template/template-15.png",
+  "template-16": "/Template/template-16.png",
+  "template-17": "/Template/template-17.png",
+  "template-18": "/Template/template-18.png",
+  "template-19": "/Template/template-19.png",
+  "template-20": "/Template/template-20.png",
 }
 
 // Color indicators for template 11-20

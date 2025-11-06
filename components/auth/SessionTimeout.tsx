@@ -28,7 +28,7 @@ export function SessionTimeout({
       "/admin",         // Admin panel
       "/settings",      // User settings
       "/applications",  // Job applications
-      "/surat-lamaran", // Surat lamaran tool
+      "/surat-lamaran-sederhana", // Surat lamaran tool
     ];
     
     // Check if current path is protected
@@ -82,30 +82,10 @@ export function SessionTimeout({
   useEffect(() => {
     // Skip session check on public routes
     if (isPublicRoute()) {
-      console.log('[SessionTimeout] Skipping session check for public route:', pathname);
       return;
     }
 
-    // Check if user is authenticated (only for protected routes)
-    const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        // No session on protected route, redirect to login
-        console.log('[SessionTimeout] No session, redirecting to login from:', pathname);
-        if (pathname?.startsWith("/admin")) {
-          window.location.href = "/admin-login";
-        } else {
-          window.location.href = "/sign-in";
-        }
-      }
-    };
-
-    checkSession();
-
-    // Monitor auth state changes
+    // Monitor auth state changes (don't check session immediately, middleware already did)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
