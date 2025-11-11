@@ -201,30 +201,18 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-      {/* Pattern Background */}
-      <div className="absolute inset-0 opacity-40 dark:opacity-20">
-        <div 
-          className="h-full w-full" 
-          style={{
-            backgroundImage: `radial-gradient(circle, currentColor 1px, transparent 1px)`,
-            backgroundSize: '24px 24px',
-            color: 'rgb(59 130 246 / 0.15)'
-          }}
-        />
-      </div>
-      
-      <div className="relative z-10 mx-auto max-w-md space-y-4 p-4 pb-24">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <div className="mx-auto max-w-md space-y-4 p-4 pb-24">
         {/* Hero Card */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 p-6 shadow-xl">
-            {/* Decorative circles */}
-            <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
-            <div className="absolute -left-6 -bottom-6 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
+          <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-600 to-blue-700 p-6 shadow-lg">
+            {/* Subtle decoration */}
+            <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10" />
+            <div className="absolute -left-8 -bottom-8 h-32 w-32 rounded-full bg-white/5" />
             
             <div className="relative z-10 space-y-3">
               {/* Greeting */}
@@ -240,18 +228,18 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
               </h1>
               
               {/* Hero Title */}
-              <div className="mt-4 rounded-2xl bg-white/20 p-4 backdrop-blur-sm">
+              <div className="mt-4 rounded-2xl bg-white/15 p-4 backdrop-blur-xl border border-white/20">
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-xl font-bold text-white">
                       JOB READY 2025 🚀
                     </h2>
-                    <p className="mt-1 text-sm text-white/80">
+                    <p className="mt-1 text-sm text-white/90">
                       Siapkan karir impianmu
                     </p>
                   </div>
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/30">
-                    <Briefcase className="h-8 w-8 text-white" />
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20">
+                    <Briefcase className="h-7 w-7 text-white" strokeWidth={2} />
                   </div>
                 </div>
               </div>
@@ -267,29 +255,35 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
           className="grid grid-cols-3 gap-3"
         >
           {/* Tools Count */}
-          <Card className="border-0 bg-gradient-to-br from-blue-50 to-blue-100 p-4 text-center shadow-md dark:from-blue-950/50 dark:to-blue-900/30">
+          <Card className="border-0 bg-white p-3.5 text-center shadow-sm dark:bg-gray-900">
             <div className="flex flex-col items-center gap-1">
-              <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400" strokeWidth={1.5} />
-              <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">9</p>
-              <p className="text-xs text-blue-700 dark:text-blue-300">Tools</p>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500">
+                <Zap className="h-5 w-5 text-white" strokeWidth={2.5} />
+              </div>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">9</p>
+              <p className="text-[10px] font-medium text-gray-600 dark:text-gray-400">Tools</p>
             </div>
           </Card>
 
           {/* Success Rate */}
-          <Card className="border-0 bg-gradient-to-br from-green-50 to-green-100 p-4 text-center shadow-md dark:from-green-950/50 dark:to-green-900/30">
+          <Card className="border-0 bg-white p-3.5 text-center shadow-sm dark:bg-gray-900">
             <div className="flex flex-col items-center gap-1">
-              <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" strokeWidth={1.5} />
-              <p className="text-2xl font-bold text-green-900 dark:text-green-100">95%</p>
-              <p className="text-xs text-green-700 dark:text-green-300">Success</p>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500">
+                <TrendingUp className="h-5 w-5 text-white" strokeWidth={2.5} />
+              </div>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">95%</p>
+              <p className="text-[10px] font-medium text-gray-600 dark:text-gray-400">Success</p>
             </div>
           </Card>
 
           {/* Users */}
-          <Card className="border-0 bg-gradient-to-br from-amber-50 to-amber-100 p-4 text-center shadow-md dark:from-amber-950/50 dark:to-amber-900/30">
+          <Card className="border-0 bg-white p-3.5 text-center shadow-sm dark:bg-gray-900">
             <div className="flex flex-col items-center gap-1">
-              <Award className="h-5 w-5 text-amber-600 dark:text-amber-400" strokeWidth={1.5} />
-              <p className="text-2xl font-bold text-amber-900 dark:text-amber-100">1K+</p>
-              <p className="text-xs text-amber-700 dark:text-amber-300">Users</p>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500">
+                <Award className="h-5 w-5 text-white" strokeWidth={2.5} />
+              </div>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">1K+</p>
+              <p className="text-[10px] font-medium text-gray-600 dark:text-gray-400">Users</p>
             </div>
           </Card>
         </motion.div>
@@ -323,34 +317,25 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
                   whileTap={{ scale: 0.95 }}
                   className="group"
                 >
-                  <Card className={cn(
-                    "border-0 p-4 shadow-md transition-all duration-300 hover:shadow-xl",
-                    tool.cardBgLight,
-                    tool.cardBgDark
-                  )}>
-                    <div className="flex flex-col items-center gap-2 text-center">
-                      {/* Icon Container - Minimalist Circle Outline */}
+                  <Card className="border-0 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-md dark:bg-gray-900">
+                    <div className="flex flex-col items-center gap-2.5 text-center">
+                      {/* Icon Container - Solid Color */}
                       <motion.div
-                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        whileHover={{ scale: 1.05 }}
                         transition={{ type: "spring", stiffness: 300 }}
                         className={cn(
-                          "flex h-14 w-14 items-center justify-center rounded-full border-2 transition-all",
-                          tool.iconColor.replace('text-', 'border-'),
-                          "bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm"
+                          "flex h-14 w-14 items-center justify-center rounded-2xl transition-all",
+                          tool.bgColor
                         )}
                       >
                         <tool.icon 
-                          className={cn("h-6 w-6", tool.iconColor, "dark:" + tool.iconColor.replace('600', '400'))} 
-                          strokeWidth={1.5}
+                          className="h-7 w-7 text-white" 
+                          strokeWidth={2}
                         />
                       </motion.div>
                       
                       {/* Tool Name */}
-                      <p className={cn(
-                        "text-xs font-semibold",
-                        tool.iconColor.replace('text-', 'text-').replace('600', '900'),
-                        "dark:" + tool.iconColor.replace('600', '100')
-                      )}>
+                      <p className="text-xs font-semibold text-gray-900 dark:text-white">
                         {tool.shortName}
                       </p>
                     </div>
@@ -387,41 +372,28 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 + (index * 0.05), duration: 0.3 }}
               >
-                <Card className={cn(
-                  "border-0 p-3 shadow-sm",
-                  tool.cardBgLight,
-                  tool.cardBgDark
-                )}>
+                <Card className="border-0 bg-white p-3.5 shadow-sm dark:bg-gray-900">
                   <div className="flex items-start gap-3">
-                    {/* Icon */}
+                    {/* Icon - Solid Color */}
                     <div className={cn(
-                      "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border-2",
-                      tool.iconColor.replace('text-', 'border-'),
-                      "bg-white/50 dark:bg-gray-900/50"
+                      "flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl",
+                      tool.bgColor
                     )}>
                       <tool.icon 
-                        className={cn("h-5 w-5", tool.iconColor, "dark:" + tool.iconColor.replace('600', '400'))} 
-                        strokeWidth={1.5}
+                        className="h-6 w-6 text-white" 
+                        strokeWidth={2}
                       />
                     </div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       {/* Tool Name */}
-                      <h4 className={cn(
-                        "text-sm font-bold",
-                        tool.iconColor.replace('text-', 'text-').replace('600', '900'),
-                        "dark:" + tool.iconColor.replace('600', '100')
-                      )}>
+                      <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                         {tool.name}
                       </h4>
                       
                       {/* Description */}
-                      <p className={cn(
-                        "mt-1 text-xs leading-relaxed",
-                        tool.iconColor.replace('text-', 'text-').replace('600', '700'),
-                        "dark:" + tool.iconColor.replace('600', '300')
-                      )}>
+                      <p className="mt-1 text-xs leading-relaxed text-gray-600 dark:text-gray-400">
                         {tool.description}
                       </p>
 
@@ -430,12 +402,7 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
                         {tool.features.map((feature, idx) => (
                           <span
                             key={idx}
-                            className={cn(
-                              "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium",
-                              "bg-white/60 dark:bg-gray-900/60",
-                              tool.iconColor.replace('text-', 'text-').replace('600', '700'),
-                              "dark:" + tool.iconColor.replace('600', '300')
-                            )}
+                            className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300"
                           >
                             • {feature}
                           </span>
@@ -455,16 +422,16 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.95, duration: 0.5 }}
         >
-          <Card className="border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/30">
+          <Card className="border-0 bg-blue-500 p-4 shadow-sm">
             <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500">
-                <Rocket className="h-4 w-4 text-white" />
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/20">
+                <Rocket className="h-5 w-5 text-white" strokeWidth={2} />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-blue-900 dark:text-blue-100">
+                <h3 className="font-bold text-white">
                   💡 Tips Sukses
                 </h3>
-                <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                <p className="mt-1.5 text-sm leading-relaxed text-white/90">
                   Gunakan CV ATS untuk melamar online, CV Creative untuk industri kreatif, dan Interview Prep untuk persiapan wawancara.
                 </p>
               </div>
