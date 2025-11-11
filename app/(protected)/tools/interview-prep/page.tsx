@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
 import { UploadFormNew } from "@/components/interview-prep/UploadFormNew";
 import { getInterviewPrepSessions } from "@/actions/interview-prep";
 import { getProfile } from "@/lib/supabase/server";
@@ -32,12 +33,19 @@ export default async function InterviewPrepPage() {
 
   return (
     <AppShell isAdmin={isAdmin}>
+      {/* Mobile Tool Header */}
+      <MobileToolHeader
+        title="Interview Prep AI"
+        description="Persiapan interview"
+      />
+      
       <div className="space-y-6 pb-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <PageHeader
             title="🎯 Persiapan Interview AI"
             description="Upload CV + Job Poster → Dapatkan 30-40 pertanyaan interview yang dipersonalisasi dengan 3 level jawaban"
+            hideOnMobile
           />
           
           {hasHistory && (

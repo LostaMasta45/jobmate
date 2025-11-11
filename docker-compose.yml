@@ -1,0 +1,190 @@
+# ==============================================================================
+# DOCKER COMPOSE - PENJELASAN LENGKAP
+# ==============================================================================
+# Docker Compose adalah tool untuk menjalankan multi-container Docker apps.
+# File ini mendefinisikan service apa saja yang dibutuhkan dan cara setupnya.
+# Dengan 1 command "docker-compose up", semua service langsung jalan!
+# ==============================================================================
+
+# Versi Docker Compose syntax (gunakan versi 3.8 untuk kompatibilitas)
+version: '3.8'
+
+# ==============================================================================
+# SERVICES - Daftar aplikasi/container yang akan dijalankan
+# ==============================================================================
+services:
+  
+  # ----------------------------------------------------------------------------
+  # SERVICE: jobmate-app
+  # ----------------------------------------------------------------------------
+  # Ini adalah aplikasi Next.js JobMate
+  jobmate-app:
+    # Nama container yang akan dibuat
+    container_name: jobmate-nextjs
+    
+    # Build image dari Dockerfile di folder saat ini
+    build:
+      context: .           # Context = folder yang berisi Dockerfile dan source code
+      dockerfile: Dockerfile  # Nama file Dockerfile yang digunakan
+      # Build args: environment variables yang dipakai saat BUILD time (untuk npm run build)
+      # PENTING: Next.js perlu ini saat compile/build
+      args:
+        - NODE_ENV=production
+        # Supabase (WAJIB untuk build Next.js)
+        - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-https://placeholder.supabase.co}
+        - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-placeholder}
+        - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-placeholder}
+        # API Keys (untuk build)
+        - RESEND_API_KEY=${RESEND_API_KEY:-placeholder}
+        - OPENAI_API_KEY=${OPENAI_API_KEY:-placeholder}
+        - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
+        # ILovePDF (untuk build)
+        - ILOVEPDF_PUBLIC_KEY=${ILOVEPDF_PUBLIC_KEY:-placeholder}
+        - ILOVEPDF_SECRET_KEY=${ILOVEPDF_SECRET_KEY:-placeholder}
+    
+    # Port mapping: [port di komputer lokal]:[port di dalam container]
+    # JobMate selalu di port 3005
+    ports:
+      - "3005:3000"
+    
+    # Environment variables yang dibutuhkan aplikasi saat RUNTIME
+    # Ini variables yang dipakai saat aplikasi jalan (bukan build time)
+    # PENTING: Semua env vars dari .env.local harus di-map disini!
+    environment:
+      # Next.js Configuration
+      - NODE_ENV=production
+      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3005}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3005}
+      
+      # Supabase - Database & Auth
+      # WAJIB diisi dengan nilai ASLI dari Supabase Dashboard!
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      
+      # OpenAI API - AI Features (CV Generator, Cover Letter, dll)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      
+      # Resend - Email Service
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL:-noreply@yourdomain.com}
+      
+      # Telegram Bot - Admin Notifications
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_ADMIN_CHAT_ID=${TELEGRAM_ADMIN_CHAT_ID}
+      
+      # Xendit - Payment Gateway
+      # CATATAN: Nama variable di .env.local adalah XENDIT_SECRET_KEY, bukan XENDIT_API_KEY
+      - XENDIT_SECRET_KEY=${XENDIT_SECRET_KEY}
+      - XENDIT_WEBHOOK_VERIFICATION_TOKEN=${XENDIT_WEBHOOK_VERIFICATION_TOKEN}
+      
+      # ILovePDF - PDF Tools
+      - ILOVEPDF_PUBLIC_KEY=${ILOVEPDF_PUBLIC_KEY}
+      - ILOVEPDF_SECRET_KEY=${ILOVEPDF_SECRET_KEY}
+    
+    # Restart policy: container akan auto restart jika crash
+    # Options: no, always, on-failure, unless-stopped
+    restart: unless-stopped
+    
+    # Health check: Docker akan cek apakah aplikasi masih hidup
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s        # Cek setiap 30 detik
+      timeout: 10s         # Timeout 10 detik
+      retries: 3           # Retry 3x sebelum dianggap unhealthy
+      start_period: 40s    # Tunggu 40 detik setelah start sebelum mulai health check
+    
+    # Volumes: mount folder dari komputer lokal ke dalam container
+    # Format: [folder lokal]:[folder di container]:[mode]
+    # Mode: ro = read-only, rw = read-write (default)
+    volumes:
+      # Mount node_modules agar tidak bentrok dengan lokal
+      - node_modules:/app/node_modules
+      
+      # OPTIONAL: Mount .next untuk development (comment jika production)
+      # - ./.next:/app/.next
+    
+    # Networks: container ini join ke network "jobmate-network"
+    networks:
+      - jobmate-network
+    
+    # Logging configuration untuk monitoring
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"      # Maksimal ukuran file log 10MB
+        max-file: "3"        # Simpan maksimal 3 file log
+
+# ==============================================================================
+# VOLUMES - Named volumes yang bisa dipakai ulang
+# ==============================================================================
+volumes:
+  # Volume untuk node_modules
+  # Ini membuat node_modules persisten dan tidak bentrok dengan lokal
+  node_modules:
+    driver: local
+
+# ==============================================================================
+# NETWORKS - Definisi network untuk komunikasi antar container
+# ==============================================================================
+networks:
+  # Network custom untuk isolasi
+  jobmate-network:
+    driver: bridge      # Bridge = network internal antar container
+
+# ==============================================================================
+# CARA MENGGUNAKAN DOCKER COMPOSE
+# ==============================================================================
+#
+# 1. PERTAMA KALI SETUP:
+#    - Copy .env.local ke .env atau set environment variables
+#    - Pastikan Docker Desktop sudah running
+#    - Jalankan: docker-compose up --build
+#
+# 2. START CONTAINER:
+#    docker-compose up
+#    atau background mode: docker-compose up -d
+#
+# 3. STOP CONTAINER:
+#    docker-compose down
+#    atau dengan hapus volumes: docker-compose down -v
+#
+# 4. LIHAT LOGS:
+#    docker-compose logs
+#    atau follow logs: docker-compose logs -f
+#
+# 5. REBUILD IMAGE:
+#    docker-compose build
+#    atau build + start: docker-compose up --build
+#
+# 6. CEK STATUS:
+#    docker-compose ps
+#
+# 7. MASUK KE CONTAINER (untuk debugging):
+#    docker-compose exec jobmate-app sh
+#
+# ==============================================================================
+# TIPS & TROUBLESHOOTING
+# ==============================================================================
+#
+# 1. Jika port 3000 sudah dipakai:
+#    - Ubah "3000:3000" jadi "3001:3000" (atau port lain)
+#    - Akses via localhost:3001
+#
+# 2. Jika build error:
+#    - Cek apakah Docker Desktop running
+#    - Coba: docker-compose down && docker-compose up --build
+#
+# 3. Jika aplikasi crash:
+#    - Lihat logs: docker-compose logs jobmate-app
+#    - Cek environment variables sudah benar semua
+#
+# 4. Jika perubahan code tidak terupdate:
+#    - Rebuild: docker-compose up --build
+#
+# 5. Jika ingin reset total:
+#    docker-compose down -v
+#    docker system prune -a (hati-hati, ini hapus semua unused images!)
+#
+# ==============================================================================

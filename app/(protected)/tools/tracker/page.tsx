@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
 import { getJobApplications } from "@/actions/tools";
 import { TrackerClient } from "@/components/tools/TrackerClient";
 
@@ -23,9 +24,16 @@ export default async function TrackerPage() {
 
   return (
     <AppShell>
+      {/* Mobile Tool Header */}
+      <MobileToolHeader
+        title="Job Tracker"
+        description="Kelola lamaran kerja"
+      />
+      
       <PageHeader
         title="Job Application Tracker"
         description="Kelola dan pantau semua lamaran kerja Anda"
+        hideOnMobile
       />
       {error && (
         <div className="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-600">

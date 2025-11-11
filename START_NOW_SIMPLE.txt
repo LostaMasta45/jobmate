@@ -1,0 +1,31 @@
+=================================================================
+  COPY COMMAND INI - JALANKAN DI 2 TERMINAL TERPISAH
+=================================================================
+
+TERMINAL 1 (Absensi):
+--------------------
+C:\ngrok\ngrok.exe http 3001 --region=ap
+
+
+TERMINAL 2 (JobMate) - YANG INI PENTING!:
+-----------------------------------------
+C:\ngrok\ngrok.exe http 3005 --region=ap --host-header=localhost:3005
+
+
+=================================================================
+LANGKAH-LANGKAH:
+=================================================================
+
+1. Buka PowerShell window baru (tekan Windows Key, ketik "powershell")
+2. Copy command TERMINAL 1, paste, Enter
+3. Tunggu sampai muncul URL https://xxxxx.ngrok-free.dev
+4. JANGAN CLOSE WINDOW INI!
+
+5. Buka PowerShell window baru lagi (window kedua)
+6. Copy command TERMINAL 2, paste, Enter  
+7. Tunggu sampai muncul URL https://yyyyy.ngrok-free.dev
+8. COPY URL INI untuk test mobile!
+
+9. Buka di HP: https://YOUR-JOBMATE-URL.ngrok-free.dev/dashboard
+
+=================================================================

@@ -1,4 +1,4 @@
-# 03 — Database Supabase (Schema & RLS)
+t# 03 — Database Supabase (Schema & RLS)
 
 Tujuan: mendefinisikan struktur database utama, termasuk tabel pengajuan akun, profil user, pengaturan admin, dan aturan RLS.
 

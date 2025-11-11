@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/layout/AppShell";
+import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
 import { getProfile } from "@/lib/supabase/server";
 import { EmailGeneratorMain } from "@/components/email-generator/EmailGeneratorMain";
 
@@ -10,6 +11,12 @@ export default async function EmailGeneratorPage() {
 
   return (
     <AppShell isAdmin={isAdmin}>
+      {/* Mobile Tool Header */}
+      <MobileToolHeader
+        title="Email Generator"
+        description="Buat email profesional"
+      />
+      
       <EmailGeneratorMain />
     </AppShell>
   );

@@ -83,11 +83,11 @@ export function VIPHeader({ onMenuToggle }: VIPHeaderProps) {
         <div className="flex items-center justify-between h-14 sm:h-16 max-w-screen-2xl mx-auto">
           {/* Logo & Brand */}
           <div className="flex items-center gap-2 sm:gap-4">
-            {/* Mobile Menu Toggle */}
+            {/* Mobile Menu Toggle - HIDDEN on mobile (using bottom bar instead) */}
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors h-9 w-9 sm:h-10 sm:w-10"
+              className="hidden hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors h-9 w-9 sm:h-10 sm:w-10"
               onClick={onMenuToggle}
               aria-label="Open menu"
             >
@@ -179,7 +179,7 @@ export function VIPHeader({ onMenuToggle }: VIPHeaderProps) {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/vip/profile" className="cursor-pointer">
+                  <Link href="/settings" className="cursor-pointer">
                     <User className="w-4 h-4 mr-2" />
                     Profil Saya
                   </Link>

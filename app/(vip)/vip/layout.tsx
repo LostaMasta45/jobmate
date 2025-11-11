@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { VIPSidebarImproved } from '@/components/vip/VIPSidebarImproved'
 import { VIPHeader } from '@/components/vip/VIPHeader'
+import { VIPBottomBar } from '@/components/mobile/VIPBottomBar'
 import { VerificationBanner, VerificationSuccessToast } from '@/components/vip/VerificationBanner'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
@@ -16,16 +17,16 @@ export default function VIPLayout({
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      {/* Header - Fixed Top, z-50 */}
+      {/* Header - Fixed Top, z-50 - Hide hamburger on mobile */}
       <VIPHeader onMenuToggle={() => setSidebarOpen(true)} />
       
       {/* Verification Banner - Below header, z-30 */}
       <VerificationBanner />
       <VerificationSuccessToast />
       
-      {/* Mobile Sidebar - No Overlay */}
+      {/* Mobile Sidebar - Only accessible on desktop when clicking menu */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen} modal={false}>
-        <SheetContent side="left" className="w-[280px] sm:w-80 p-0 border-r z-40">
+        <SheetContent side="left" className="w-[280px] sm:w-80 p-0 border-r z-40 lg:hidden">
           <VisuallyHidden>
             <SheetTitle>Navigation Menu</SheetTitle>
           </VisuallyHidden>
@@ -40,13 +41,16 @@ export default function VIPLayout({
           <VIPSidebarImproved />
         </aside>
         
-        {/* Main Content Area - Proper spacing */}
-        <main className="flex-1 w-full pt-16 lg:ml-72 bg-gray-50 dark:bg-slate-950 min-h-screen">
+        {/* Main Content Area - Proper spacing + bottom padding for mobile nav */}
+        <main className="flex-1 w-full pt-16 pb-24 lg:pb-8 lg:ml-72 bg-gray-50 dark:bg-slate-950 min-h-screen">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {children}
           </div>
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation - Replaces Sidebar on Mobile */}
+      <VIPBottomBar />
     </div>
   )
 }

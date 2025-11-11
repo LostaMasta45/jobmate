@@ -3,6 +3,7 @@
 import * as React from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 import { CVHistoryList } from "@/components/cv-ats/CVHistoryList";
@@ -55,10 +56,17 @@ export default function CVATSPage() {
 
   return (
     <AppShell>
+      {/* Mobile Tool Header - Only on mobile */}
+      <MobileToolHeader
+        title="CV ATS Generator"
+        description="Buat CV ATS-friendly"
+      />
+      
       <div className="space-y-6">
         <PageHeader
           title="CV ATS Generator"
           description="Buat CV yang ATS-friendly dengan wizard 6-langkah dan AI-powered features"
+          hideOnMobile
         />
 
         {/* Create New Button */}

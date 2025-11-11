@@ -56,6 +56,15 @@ export async function updateMembership(
   const supabase = createAdminClient();
 
   try {
+    // Get current membership first for comparison
+    const { data: currentProfile } = await supabase
+      .from("profiles")
+      .select("membership, email, full_name, name")
+      .eq("id", userId)
+      .single();
+
+    const previousMembership = currentProfile?.membership || 'free';
+
     // Calculate expiry based on membership type
     let calculatedExpiry = membershipExpiry;
     
@@ -123,6 +132,41 @@ export async function updateMembership(
       } catch (emailError) {
         console.error('Failed to send VIP upgrade email:', emailError);
         // Don't throw - upgrade still succeeded even if email fails
+      }
+
+      // Send Telegram notification for VIP upgrades
+      try {
+        const { notifyAdminVIPUpgrade } = await import("@/lib/telegram");
+        const profile = data[0];
+
+        // Get admin info
+        const authSupabase = await createClient();
+        const adminUser = await authSupabase.auth.getUser();
+        
+        let upgradedBy = "Admin";
+        if (adminUser.data.user) {
+          const { data: adminProfile } = await supabase
+            .from("profiles")
+            .select("email, full_name")
+            .eq("id", adminUser.data.user.id)
+            .single();
+          
+          upgradedBy = adminProfile?.email || adminUser.data.user.email || "Admin";
+        }
+
+        await notifyAdminVIPUpgrade({
+          fullName: profile.full_name || profile.name || "User",
+          email: profile.email,
+          membershipType: membership as 'vip_basic' | 'vip_premium',
+          previousMembership: previousMembership,
+          membershipExpiry: calculatedExpiry ?? null,
+          upgradedBy: upgradedBy,
+        });
+
+        console.log(`✅ Telegram notification sent for VIP upgrade: ${profile.email}`);
+      } catch (telegramError) {
+        console.error('Failed to send Telegram notification:', telegramError);
+        // Don't throw - upgrade still succeeded even if notification fails
       }
     }
 

@@ -3,6 +3,7 @@
 import * as React from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,16 +47,23 @@ export default function EmailTemplatePage() {
 
   return (
     <AppShell>
-      <PageHeader
-        title="Email Template Generator"
-        description="Buat email lamaran kerja profesional dengan AI"
+      <MobileToolHeader
+        title="Email Template"
+        description="Template email lamaran"
       />
+      
+      <div className="space-y-6">
+        <PageHeader
+          title="Email Template Generator"
+          description="Buat email lamaran kerja profesional dengan AI"
+          hideOnMobile
+        />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Form Input</CardTitle>
-          </CardHeader>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Form Input</CardTitle>
+            </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -214,6 +222,7 @@ export default function EmailTemplatePage() {
             )}
           </CardContent>
         </Card>
+        </div>
       </div>
     </AppShell>
   );

@@ -249,10 +249,28 @@ export async function approveApplication(applicationId: string) {
     );
   }
 
-  // Notify admin via Telegram
-  await sendAdminNotification(
-    `✅ Akun *${application.full_name}* (${application.email}) disetujui!`
-  );
+  // Notify admin via Telegram with detailed info
+  const { notifyAdminAccountApproved } = await import("@/lib/telegram");
+  
+  try {
+    // Get admin profile for "approved by"
+    const { data: adminProfile } = await supabase
+      .from("profiles")
+      .select("email, full_name")
+      .eq("id", user.id)
+      .single();
+
+    await notifyAdminAccountApproved({
+      fullName: application.full_name,
+      email: application.email,
+      username: application.username,
+      whatsapp: application.whatsapp,
+      approvedBy: adminProfile?.email || user.email || "Admin",
+      applicationId: applicationId,
+    });
+  } catch (telegramError) {
+    console.error("Failed to send Telegram notification:", telegramError);
+  }
 
   revalidatePath("/admin/applications");
   return { success: true };
@@ -298,9 +316,27 @@ export async function rejectApplication(applicationId: string, reason: string) {
     );
   }
 
-  await sendAdminNotification(
-    `❌ Pengajuan akun *${application.full_name}* ditolak.\nAlasan: ${reason}`
-  );
+  // Notify admin via Telegram with detailed info
+  const { notifyAdminAccountRejected } = await import("@/lib/telegram");
+  
+  try {
+    // Get admin profile for "rejected by"
+    const { data: adminProfile } = await supabase
+      .from("profiles")
+      .select("email, full_name")
+      .eq("id", user.id)
+      .single();
+
+    await notifyAdminAccountRejected({
+      fullName: application.full_name,
+      email: application.email,
+      reason: reason,
+      rejectedBy: adminProfile?.email || user.email || "Admin",
+      applicationId: applicationId,
+    });
+  } catch (telegramError) {
+    console.error("Failed to send Telegram notification:", telegramError);
+  }
 
   revalidatePath("/admin/applications");
   return { success: true };
@@ -429,16 +465,22 @@ export async function deleteApplication(applicationId: string, reason?: string) 
 
   if (deleteError) throw deleteError;
 
-  // Send Telegram notification
-  const reasonText = reason ? `\nAlasan: ${reason}` : '';
-  await sendAdminNotification(
-    `🗑️ Pengajuan akun *DIHAPUS*!\n\n` +
-    `👤 Nama: ${application.full_name}\n` +
-    `📧 Email: ${application.email}\n` +
-    `📱 WhatsApp: ${application.whatsapp}\n` +
-    `📝 Status sebelumnya: ${application.status}${reasonText}\n` +
-    `🔐 Oleh: ${profile.email}`
-  );
+  // Send Telegram notification with detailed info
+  const { notifyAdminAccountDeleted } = await import("@/lib/telegram");
+  
+  try {
+    await notifyAdminAccountDeleted({
+      fullName: application.full_name,
+      email: application.email,
+      whatsapp: application.whatsapp,
+      status: application.status,
+      reason: reason,
+      deletedBy: profile.email,
+      applicationId: applicationId,
+    });
+  } catch (telegramError) {
+    console.error("Failed to send Telegram notification:", telegramError);
+  }
 
   console.log(`✅ Application ${applicationId} deleted by ${profile.email}`);
 

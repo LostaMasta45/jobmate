@@ -28,6 +28,8 @@ import {
   Zap,
   Lock,
   Target,
+  BookOpen,
+  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -48,6 +50,12 @@ const navItems: NavItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Panduan & Tutorial",
+    href: "/docs",
+    icon: BookOpen,
+    divider: true,
   },
   {
     title: "Lowongan Kerja",

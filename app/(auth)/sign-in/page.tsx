@@ -3,14 +3,53 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingScreen } from "@/components/ui/loading-screen";
+import { AnimatedBackground } from "@/components/auth/AnimatedBackground";
 import { createClient } from "@/lib/supabase/client";
-import { Eye, EyeOff, Lock, CheckCircle2, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Lock, CheckCircle2, AlertCircle, Mail, KeyRound, Sparkles, TrendingUp, Shield } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      delayChildren: 0.2,
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 24,
+    },
+  },
+};
+
+const logoVariants = {
+  hidden: { scale: 0, rotate: -180 },
+  visible: {
+    scale: 1,
+    rotate: 0,
+    transition: {
+      type: "spring",
+      stiffness: 200,
+      damping: 15,
+    },
+  },
+};
 
 export default function SignInPage() {
   const router = useRouter();
@@ -26,6 +65,7 @@ export default function SignInPage() {
   const [loginAttempts, setLoginAttempts] = React.useState(0);
   const [isRateLimited, setIsRateLimited] = React.useState(false);
   const [rateLimitTimer, setRateLimitTimer] = React.useState(0);
+  const [isFocused, setIsFocused] = React.useState<string | null>(null);
   const emailInputRef = React.useRef<HTMLInputElement>(null);
 
   // Auto-focus email field on mount
@@ -98,19 +138,34 @@ export default function SignInPage() {
     setError(null);
 
     try {
+      console.log("🔐 Starting login process...");
+      console.log("📧 Email:", email);
+      console.log("🌐 Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+      
       const supabase = createClient();
       
       // Set session persistence based on remember me
       if (rememberMe) {
+        console.log("💾 Setting remember me...");
         await supabase.auth.updateUser({
           data: { remember_me: true }
         });
       }
 
+      console.log("🔑 Attempting sign in with password...");
       const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
+      if (signInError) {
+        console.error("❌ Sign in error:", signInError);
+      } else {
+        console.log("✅ Sign in successful:", {
+          userId: authData?.user?.id,
+          sessionExists: !!authData?.session,
+        });
+      }
 
       if (signInError) {
         // Increment login attempts
@@ -148,13 +203,23 @@ export default function SignInPage() {
       setLoginAttempts(0);
 
       console.log("✅ Login successful, user ID:", authData.user.id);
+      console.log("🍪 Session:", {
+        hasAccessToken: !!authData.session?.access_token,
+        hasRefreshToken: !!authData.session?.refresh_token,
+        expiresAt: authData.session?.expires_at,
+      });
       
       // Determine redirect based on role & membership
-      const { data: profile } = await supabase
+      console.log("📊 Fetching user profile...");
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("role, membership")
         .eq("id", authData.user.id)
         .single();
+
+      if (profileError) {
+        console.error("❌ Profile fetch error:", profileError);
+      }
 
       console.log("📋 Profile loaded:", { role: profile?.role, membership: profile?.membership });
 
@@ -191,199 +256,338 @@ export default function SignInPage() {
     <>
       {showLoadingScreen && <LoadingScreen message="Memuat dashboard..." />}
       
-      {/* Enhanced background with gradient */}
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4 relative overflow-hidden">
-        {/* Animated background particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-brand/5 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse delay-1000" />
-        </div>
+      {/* Animated Background */}
+      <AnimatedBackground />
 
-        {/* Glassmorphism card */}
-        <Card className="w-full max-w-md relative backdrop-blur-sm bg-card/95 border-border/50 shadow-2xl transition-all duration-300 hover:shadow-brand/5 animate-in fade-in-50 slide-in-from-bottom-4">
-          <CardHeader className="space-y-1 text-center">
-            {/* Logo with animation */}
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-brand text-white shadow-lg shadow-brand/20 transition-transform duration-300 hover:scale-110">
-              <span className="text-2xl font-bold">JM</span>
-            </div>
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-              Welcome Back
-            </CardTitle>
-            <CardDescription>
-              Masuk ke akun JobMate Anda
-            </CardDescription>
-
-            {/* Security indicator */}
-            <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-2">
-              <Lock className="h-3 w-3" />
-              <span>Koneksi Aman | 256-bit SSL Encryption</span>
-            </div>
-          </CardHeader>
-
-          <CardContent>
-            <form onSubmit={handleSignIn} className="space-y-4">
-              {/* Enhanced error display */}
-              {error && (
-                <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive flex items-start gap-2 animate-in slide-in-from-top-2">
-                  <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              {/* Email field with validation */}
-              <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
-                  Email
-                  {email && !emailError && (
-                    <CheckCircle2 className="h-4 w-4 text-green-500 animate-in zoom-in-50" />
-                  )}
-                </Label>
-                <Input
-                  ref={emailInputRef}
-                  id="email"
-                  type="email"
-                  placeholder="nama@email.com"
-                  value={email}
-                  onChange={handleEmailChange}
-                  className={`transition-all duration-200 ${
-                    emailError 
-                      ? 'border-destructive focus-visible:ring-destructive' 
-                      : email && !emailError 
-                        ? 'border-green-500/50 focus-visible:ring-green-500/20'
-                        : ''
-                  }`}
-                  required
-                  aria-label="Alamat Email"
-                  aria-required="true"
-                  aria-invalid={!!emailError}
-                  aria-describedby={emailError ? "email-error" : undefined}
-                />
-                {emailError && (
-                  <p id="email-error" className="text-xs text-destructive flex items-center gap-1 animate-in slide-in-from-top-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {emailError}
-                  </p>
-                )}
-              </div>
-
-              {/* Password field with toggle visibility */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="flex items-center gap-2">
-                    Password
-                    {password && !passwordError && (
-                      <CheckCircle2 className="h-4 w-4 text-green-500 animate-in zoom-in-50" />
-                    )}
-                  </Label>
-                  <Link
-                    href="/auth/reset"
-                    className="text-sm text-brand hover:underline transition-colors"
-                  >
-                    Lupa password?
-                  </Link>
-                </div>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={handlePasswordChange}
-                    className={`pr-10 transition-all duration-200 ${
-                      passwordError 
-                        ? 'border-destructive focus-visible:ring-destructive' 
-                        : password && !passwordError 
-                          ? 'border-green-500/50 focus-visible:ring-green-500/20'
-                          : ''
-                    }`}
-                    required
-                    aria-label="Password"
-                    aria-required="true"
-                    aria-invalid={!!passwordError}
-                    aria-describedby={passwordError ? "password-error" : undefined}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-                {passwordError && (
-                  <p id="password-error" className="text-xs text-destructive flex items-center gap-1 animate-in slide-in-from-top-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {passwordError}
-                  </p>
-                )}
-              </div>
-
-              {/* Remember me checkbox */}
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="remember"
-                  checked={rememberMe}
-                  onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                />
-                <label
-                  htmlFor="remember"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                >
-                  Ingat saya selama 30 hari
-                </label>
-              </div>
-
-              {/* Enhanced submit button */}
-              <Button 
-                type="submit" 
-                className="w-full transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:scale-100" 
-                disabled={loading || isRateLimited || !!emailError || !!passwordError}
-              >
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                    Masuk...
-                  </span>
-                ) : isRateLimited ? (
-                  `Diblokir (${rateLimitTimer}s)`
-                ) : (
-                  "Masuk"
-                )}
-              </Button>
-            </form>
-
-            {/* Account request status */}
-            <div className="mt-6 space-y-3">
-              <div className="text-center text-sm text-muted-foreground">
-                Belum punya akun?{" "}
-                <Link href="/ajukan-akun" className="text-brand hover:underline font-medium transition-colors">
-                  Ajukan akun baru
-                </Link>
-              </div>
+      {/* Main Content */}
+      <div className="flex min-h-screen items-center justify-center p-4 relative">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="w-full max-w-md"
+        >
+          {/* Glassmorphism card with animated border */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <Card className="relative backdrop-blur-xl bg-card/80 border-border/50 shadow-2xl overflow-hidden">
+              {/* Animated gradient border */}
+              <motion.div
+                className="absolute inset-0 rounded-lg opacity-50"
+                style={{
+                  background: "linear-gradient(45deg, hsl(var(--brand)), hsl(220 100% 60%), hsl(280 100% 70%))",
+                  backgroundSize: "300% 300%",
+                }}
+                animate={{
+                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              />
               
-              <div className="text-center">
-                <Link 
-                  href="/cek-status-pengajuan" 
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5 group"
-                >
-                  <span>Sudah ajukan akun?</span>
-                  <span className="text-brand group-hover:underline">Cek Status Pengajuan →</span>
-                </Link>
-              </div>
-            </div>
+              {/* Inner card content */}
+              <div className="relative bg-card/95 backdrop-blur-xl m-[1px] rounded-[calc(0.5rem-1px)]">
+                <CardHeader className="space-y-1 text-center pb-6">
+                  {/* Animated Logo */}
+                  <motion.div
+                    variants={logoVariants}
+                    className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-blue-600 text-white shadow-lg shadow-brand/30 relative overflow-hidden"
+                    whileHover={{ rotate: 360, scale: 1.1 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent"
+                      animate={{
+                        x: ["-100%", "200%"],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    />
+                    <Sparkles className="h-8 w-8 relative z-10" />
+                  </motion.div>
 
-            {/* Social proof */}
-            <div className="mt-6 pt-6 border-t text-center">
-              <p className="text-xs text-muted-foreground">
-                🎯 <span className="font-semibold text-foreground">3,247 orang</span> berhasil dapat kerja bulan ini
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+                  <motion.div variants={itemVariants}>
+                    <CardTitle className="text-3xl font-bold bg-gradient-to-r from-brand via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      Welcome Back
+                    </CardTitle>
+                  </motion.div>
+                  
+                  <motion.div variants={itemVariants}>
+                    <CardDescription className="text-base">
+                      Masuk ke akun JobMate Anda
+                    </CardDescription>
+                  </motion.div>
+
+                  {/* Security indicator with animation */}
+                  <motion.div 
+                    variants={itemVariants}
+                    className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-3"
+                  >
+                    <motion.div
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <Shield className="h-3.5 w-3.5 text-green-500" />
+                    </motion.div>
+                    <span>Koneksi Aman | 256-bit SSL Encryption</span>
+                  </motion.div>
+                </CardHeader>
+
+                <CardContent>
+                  <form onSubmit={handleSignIn} className="space-y-5">
+                    {/* Enhanced error display with animation */}
+                    <AnimatePresence mode="wait">
+                      {error && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10, height: 0 }}
+                          animate={{ opacity: 1, y: 0, height: "auto" }}
+                          exit={{ opacity: 0, y: -10, height: 0 }}
+                          className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive flex items-start gap-2"
+                        >
+                          <motion.div
+                            animate={{ rotate: [0, -10, 10, 0] }}
+                            transition={{ duration: 0.5 }}
+                          >
+                            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          </motion.div>
+                          <span>{error}</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* Email field with enhanced animations */}
+                    <motion.div variants={itemVariants} className="space-y-2">
+                      <Label htmlFor="email" className="flex items-center gap-2 text-sm font-medium">
+                        <Mail className="h-4 w-4 text-muted-foreground" />
+                        Email
+                        <AnimatePresence>
+                          {email && !emailError && (
+                            <motion.div
+                              initial={{ scale: 0, rotate: -180 }}
+                              animate={{ scale: 1, rotate: 0 }}
+                              exit={{ scale: 0, rotate: 180 }}
+                            >
+                              <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </Label>
+                      <motion.div
+                        animate={isFocused === "email" ? { scale: 1.02 } : { scale: 1 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Input
+                          ref={emailInputRef}
+                          id="email"
+                          type="email"
+                          placeholder="nama@email.com"
+                          value={email}
+                          onChange={handleEmailChange}
+                          onFocus={() => setIsFocused("email")}
+                          onBlur={() => setIsFocused(null)}
+                          className={`transition-all duration-200 ${
+                            emailError 
+                              ? 'border-destructive focus-visible:ring-destructive' 
+                              : email && !emailError 
+                                ? 'border-green-500/50 focus-visible:ring-green-500/20'
+                                : ''
+                          }`}
+                          required
+                        />
+                      </motion.div>
+                      <AnimatePresence>
+                        {emailError && (
+                          <motion.p
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                            className="text-xs text-destructive flex items-center gap-1"
+                          >
+                            <AlertCircle className="h-3 w-3" />
+                            {emailError}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+
+                    {/* Password field with enhanced animations */}
+                    <motion.div variants={itemVariants} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="password" className="flex items-center gap-2 text-sm font-medium">
+                          <KeyRound className="h-4 w-4 text-muted-foreground" />
+                          Password
+                          <AnimatePresence>
+                            {password && !passwordError && (
+                              <motion.div
+                                initial={{ scale: 0, rotate: -180 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                exit={{ scale: 0, rotate: 180 }}
+                              >
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </Label>
+                        <Link
+                          href="/auth/reset"
+                          className="text-sm text-brand hover:underline transition-colors"
+                        >
+                          Lupa password?
+                        </Link>
+                      </div>
+                      <motion.div
+                        animate={isFocused === "password" ? { scale: 1.02 } : { scale: 1 }}
+                        transition={{ duration: 0.2 }}
+                        className="relative"
+                      >
+                        <Input
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          value={password}
+                          onChange={handlePasswordChange}
+                          onFocus={() => setIsFocused("password")}
+                          onBlur={() => setIsFocused(null)}
+                          className={`pr-10 transition-all duration-200 ${
+                            passwordError 
+                              ? 'border-destructive focus-visible:ring-destructive' 
+                              : password && !passwordError 
+                                ? 'border-green-500/50 focus-visible:ring-green-500/20'
+                                : ''
+                          }`}
+                          required
+                        />
+                        <motion.button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </motion.button>
+                      </motion.div>
+                      <AnimatePresence>
+                        {passwordError && (
+                          <motion.p
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                            className="text-xs text-destructive flex items-center gap-1"
+                          >
+                            <AlertCircle className="h-3 w-3" />
+                            {passwordError}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+
+                    {/* Remember me checkbox with animation */}
+                    <motion.div variants={itemVariants} className="flex items-center space-x-2">
+                      <Checkbox
+                        id="remember"
+                        checked={rememberMe}
+                        onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                      />
+                      <label
+                        htmlFor="remember"
+                        className="text-sm font-medium leading-none cursor-pointer select-none"
+                      >
+                        Ingat saya selama 30 hari
+                      </label>
+                    </motion.div>
+
+                    {/* Enhanced submit button with animations */}
+                    <motion.div 
+                      variants={itemVariants}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-gradient-to-r from-brand to-blue-600 hover:from-brand/90 hover:to-blue-600/90 shadow-lg shadow-brand/20 transition-all duration-200"
+                        disabled={loading || isRateLimited || !!emailError || !!passwordError}
+                      >
+                        {loading ? (
+                          <span className="flex items-center gap-2">
+                            <motion.div
+                              className="h-4 w-4 rounded-full border-2 border-current border-t-transparent"
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            />
+                            Masuk...
+                          </span>
+                        ) : isRateLimited ? (
+                          `Diblokir (${rateLimitTimer}s)`
+                        ) : (
+                          "Masuk"
+                        )}
+                      </Button>
+                    </motion.div>
+                  </form>
+
+                  {/* Account request status with animations */}
+                  <motion.div variants={itemVariants} className="mt-6 space-y-3">
+                    <div className="text-center text-sm text-muted-foreground">
+                      Belum punya akun?{" "}
+                      <Link href="/ajukan-akun" className="text-brand hover:underline font-medium transition-colors">
+                        Ajukan akun baru
+                      </Link>
+                    </div>
+                    
+                    <div className="text-center">
+                      <Link 
+                        href="/cek-status-pengajuan" 
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5 group"
+                      >
+                        <span>Sudah ajukan akun?</span>
+                        <motion.span 
+                          className="text-brand group-hover:underline"
+                          whileHover={{ x: 5 }}
+                        >
+                          Cek Status Pengajuan →
+                        </motion.span>
+                      </Link>
+                    </div>
+                  </motion.div>
+
+                  {/* Social proof with animation */}
+                  <motion.div 
+                    variants={itemVariants}
+                    className="mt-6 pt-6 border-t"
+                  >
+                    <motion.div
+                      className="flex items-center justify-center gap-2 text-sm"
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      <motion.div
+                        animate={{ y: [0, -5, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                      </motion.div>
+                      <p className="text-muted-foreground">
+                        <span className="font-semibold text-foreground">3,247 orang</span> berhasil dapat kerja bulan ini
+                      </p>
+                    </motion.div>
+                  </motion.div>
+                </CardContent>
+              </div>
+            </Card>
+          </motion.div>
+        </motion.div>
       </div>
     </>
   );

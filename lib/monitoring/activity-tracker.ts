@@ -86,32 +86,31 @@ class ActivityTracker {
         .select()
 
       if (error) {
-        // Extract error properties if they exist
-        const hasProperties = error && typeof error === 'object' && Object.keys(error).length > 0
-        
-        if (hasProperties) {
-          const errorInfo: Record<string, any> = {}
-          if ('message' in error) errorInfo.message = error.message
-          if ('details' in error) errorInfo.details = error.details
-          if ('hint' in error) errorInfo.hint = error.hint
-          if ('code' in error) errorInfo.code = error.code
+        // Only show errors in development mode
+        if (process.env.NODE_ENV === 'development') {
+          const hasProperties = error && typeof error === 'object' && Object.keys(error).length > 0
           
-          console.error('[Activity Tracker] ❌ Session tracking failed:', errorInfo)
-          console.error('[Activity Tracker] Full error:', error)
-        } else {
-          console.warn('[Activity Tracker] ⚠️ Empty error object - monitoring tables may not be set up')
-        }
-        
-        // Provide helpful guidance based on error type
-        const errorCode = typeof error === 'object' && error !== null && 'code' in error ? error.code : null
-        const errorMessage = typeof error === 'object' && error !== null && 'message' in error ? String(error.message) : ''
-        
-        if (errorCode === '42501' || errorMessage.includes('policy')) {
-          console.error('🔒 RLS Policy Error - Run: db/fix-session-tracking-rls.sql')
-        } else if (errorCode === '42P01' || errorMessage.includes('does not exist')) {
-          console.error('📋 Table Missing - Run: db/setup-realtime-monitoring.sql')
-        } else if (errorMessage.includes('JWT')) {
-          console.error('🔑 Auth Error - Check Supabase JWT settings')
+          if (hasProperties) {
+            const errorInfo: Record<string, any> = {}
+            if ('message' in error) errorInfo.message = error.message
+            if ('details' in error) errorInfo.details = error.details
+            if ('hint' in error) errorInfo.hint = error.hint
+            if ('code' in error) errorInfo.code = error.code
+            
+            console.debug('[Activity Tracker] Session tracking failed:', errorInfo)
+          } else {
+            console.debug('[Activity Tracker] Session tracking unavailable')
+          }
+          
+          // Provide helpful guidance based on error type
+          const errorCode = typeof error === 'object' && error !== null && 'code' in error ? error.code : null
+          const errorMessage = typeof error === 'object' && error !== null && 'message' in error ? String(error.message) : ''
+          
+          if (errorCode === '42501' || errorMessage.includes('policy')) {
+            console.debug('ℹ️  Run db/fix-user-session-tracking-complete.sql')
+          } else if (errorCode === '42P01' || errorMessage.includes('does not exist')) {
+            console.debug('ℹ️  Run db/setup-realtime-monitoring.sql')
+          }
         }
         
         // Silently fail - don't break the app

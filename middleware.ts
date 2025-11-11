@@ -118,7 +118,8 @@ export async function middleware(request: NextRequest) {
         supabaseResponse.cookies.set('user_role', userRole, {
           maxAge: 3600,
           httpOnly: true,
-          sameSite: 'lax',
+          sameSite: 'strict',
+          secure: process.env.NODE_ENV === 'production',
           path: '/'
         });
       }
@@ -126,7 +127,8 @@ export async function middleware(request: NextRequest) {
         supabaseResponse.cookies.set('user_membership', membership, {
           maxAge: 3600,
           httpOnly: true,
-          sameSite: 'lax',
+          sameSite: 'strict',
+          secure: process.env.NODE_ENV === 'production',
           path: '/'
         });
       }
@@ -134,7 +136,8 @@ export async function middleware(request: NextRequest) {
         supabaseResponse.cookies.set('user_membership_status', membershipStatus, {
           maxAge: 3600,
           httpOnly: true,
-          sameSite: 'lax',
+          sameSite: 'strict',
+          secure: process.env.NODE_ENV === 'production',
           path: '/'
         });
       }

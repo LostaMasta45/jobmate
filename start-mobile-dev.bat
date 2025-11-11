@@ -1,39 +1,42 @@
 @echo off
 echo ========================================
-echo   VIP Career - Mobile Development Mode
+echo   JOBMATE - MOBILE ACCESS DEV SERVER
 echo ========================================
+echo.
+echo Starting Next.js dev server with network access...
+echo Server akan bisa diakses dari HP/tablet di jaringan yang sama
 echo.
 
 REM Get IP Address
-echo [1/3] Mencari IP Address...
-for /f "tokens=2 delims=:" %%a in ('ipconfig ^| findstr /C:"IPv4"') do (
+echo Checking your IP address...
+for /f "tokens=2 delims=:" %%a in ('ipconfig ^| findstr /c:"IPv4 Address"') do (
     set IP=%%a
+    goto :found
 )
-set IP=%IP:~1%
-echo     IP Address: %IP%
-echo.
 
-REM Check if port 3000 is available
-echo [2/3] Checking port availability...
-netstat -ano | findstr :3000 >nul
-if %errorlevel% equ 0 (
-    echo     Port 3000 sedang digunakan, Next.js akan cari port lain
-) else (
-    echo     Port 3000 tersedia
-)
-echo.
+:found
+REM Trim spaces
+for /f "tokens=* delims= " %%a in ("%IP%") do set IP=%%a
 
-REM Start development server
-echo [3/3] Starting development server...
 echo.
 echo ========================================
-echo   AKSES DARI HP:
-echo   http://%IP%:3000
+echo   SERVER INFO
 echo ========================================
+echo.
+echo [*] Server starting at: http://0.0.0.0:3002
+echo [*] Local access: http://localhost:3002
+echo.
+echo [MOBILE ACCESS] Buka di HP Anda:
+echo.
+echo     http://%IP%:3002
+echo.
+echo ========================================
+echo.
+echo Pastikan HP dan laptop di WiFi yang sama!
 echo.
 echo Tekan Ctrl+C untuk stop server
 echo.
+echo ========================================
+echo.
 
-npm run dev
-
-pause
+npm run dev:mobile

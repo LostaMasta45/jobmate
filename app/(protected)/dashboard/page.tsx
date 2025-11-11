@@ -33,7 +33,14 @@ export default async function DashboardPage() {
   const userEmail = profile?.email || "";
 
   return (
-    <AppShell isAdmin={isAdmin}>
+    <AppShell 
+      isAdmin={isAdmin}
+      user={{
+        name: userName,
+        email: userEmail,
+        avatar: profile?.avatar_url
+      }}
+    >
       <div className="space-y-5 sm:space-y-6">
         {/* Welcome Header */}
         <WelcomeHero 

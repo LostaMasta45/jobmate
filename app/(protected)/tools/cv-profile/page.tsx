@@ -3,6 +3,7 @@
 import * as React from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,9 +44,16 @@ export default function CVProfilePage() {
 
   return (
     <AppShell>
+      {/* Mobile Tool Header */}
+      <MobileToolHeader
+        title="CV Profile Builder"
+        description="Build your profile"
+      />
+      
       <PageHeader
         title="CV Profile Generator"
         description="Buat ringkasan profil profesional untuk CV Anda"
+        hideOnMobile
       />
 
       <div className="grid gap-6 lg:grid-cols-2">

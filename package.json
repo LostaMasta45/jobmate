@@ -3,9 +3,19 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0 -p 3001",
+    "dev:3000": "next dev -H 0.0.0.0 -p 3000",
+    "dev:localhost": "next dev -p 3001",
+    "dev:mobile": "next dev -H 0.0.0.0 -p 3002",
+    "mobile-url": "node show-ip.js",
+    "kill-3000": "powershell -Command \"Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }\"",
+    "kill-3001": "powershell -Command \"Get-NetTCPConnection -LocalPort 3001 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }\"",
+    "kill-3002": "powershell -Command \"Get-NetTCPConnection -LocalPort 3002 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }\"",
+    "kill-all-ports": "npm run kill-3000 && npm run kill-3001 && npm run kill-3002",
+    "clean-start": "npm run kill-all-ports && npm run dev",
     "build": "next build",
     "start": "next start",
+    "start:mobile": "next start -H 0.0.0.0 -p 3002",
     "preview": "npm run build && npm start -- -p 3001"
   },
   "dependencies": {
@@ -59,6 +69,7 @@
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.65.0",
+    "react-qr-code": "^2.0.18",
     "recharts": "^3.3.0",
     "resend": "^6.2.2",
     "sonner": "^2.0.7",

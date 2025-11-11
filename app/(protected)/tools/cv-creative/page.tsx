@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { AppShell } from "@/components/layout/AppShell";
+import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2, Palette } from "lucide-react";
 import { CVCreativeWizard } from "@/components/cv-creative/CVCreativeWizardNew";
@@ -67,9 +68,15 @@ export default function CVCreativePage() {
 
   return (
     <AppShell>
+      {/* Mobile Tool Header */}
+      <MobileToolHeader
+        title="CV Creative"
+        description="Desain CV yang unik"
+      />
+      
       <div className="space-y-6">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-6 hidden lg:block">
           <div className="flex items-center gap-3 mb-2">
             <Palette className="h-8 w-8 text-purple-500" />
             <h1 className="text-3xl font-bold">CV Creative Generator</h1>

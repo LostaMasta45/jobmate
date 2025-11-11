@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, CreditCard, Loader2, ArrowLeft, Sparkles, Shield, Zap, Crown, Mail, User, Phone } from "lucide-react";
 import { TrustBanner } from "@/components/payment/TrustBanner";
 import { BenefitReminder } from "@/components/payment/BenefitReminder";
@@ -35,8 +36,22 @@ function PaymentFormContent() {
   const [whatsappError, setWhatsappError] = React.useState<string | null>(null);
 
   const planDetails = {
-    basic: { name: 'VIP Basic', price: 10000, priceText: 'Rp 10.000', duration: '/bulan' },
-    premium: { name: 'VIP Premium', price: 39000, priceText: 'Rp 39.000', duration: 'Lifetime' },
+    basic: { 
+      name: 'VIP Basic', 
+      price: 10000, 
+      priceText: 'Rp 10.000', 
+      originalPrice: 'Rp 19.000',
+      discount: '47%',
+      duration: '/bulan' 
+    },
+    premium: { 
+      name: 'VIP Premium', 
+      price: 39000, 
+      priceText: 'Rp 39.000',
+      originalPrice: 'Rp 99.000', 
+      discount: '60%',
+      duration: 'Lifetime' 
+    },
   };
 
   const currentPlan = plan && planDetails[plan] ? planDetails[plan] : planDetails.premium;
@@ -256,9 +271,11 @@ function PaymentFormContent() {
               transition={{ delay: 0.4, duration: 0.5 }}
               className="bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50 dark:from-amber-950/30 dark:via-orange-950/30 dark:to-amber-950/30 rounded-2xl p-6 border-2 border-amber-300/50 dark:border-amber-700/50 shadow-lg relative overflow-hidden"
             >
-              {/* Sparkle decoration */}
+              {/* Discount Badge */}
               <div className="absolute top-2 right-2">
-                <Sparkles className="w-5 h-5 text-amber-500 animate-pulse" />
+                <Badge className="bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold px-3 py-1 text-xs shadow-lg border-0">
+                  🔥 DISKON {currentPlan.discount}
+                </Badge>
               </div>
               
               <div className="space-y-3">
@@ -276,16 +293,30 @@ function PaymentFormContent() {
                   </span>
                   <span className="font-semibold">{currentPlan.duration}</span>
                 </div>
+                
+                {/* Price Before Discount */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-muted-foreground">Harga Normal</span>
+                  <span className="text-base font-semibold text-muted-foreground line-through">
+                    {currentPlan.originalPrice}
+                  </span>
+                </div>
+                
                 <div className="flex items-center justify-between pt-4 mt-4 border-t-2 border-amber-300/50 dark:border-amber-700/50">
                   <span className="font-bold text-lg">Total Pembayaran</span>
-                  <motion.span
-                    initial={{ scale: 1 }}
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="text-3xl font-black bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent"
-                  >
-                    {currentPlan.priceText}
-                  </motion.span>
+                  <div className="text-right">
+                    <motion.span
+                      initial={{ scale: 1 }}
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="text-3xl font-black bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent block"
+                    >
+                      {currentPlan.priceText}
+                    </motion.span>
+                    <span className="text-xs text-emerald-600 font-semibold">
+                      💰 Hemat {currentPlan.originalPrice.replace('Rp ', 'Rp ').replace('.000', 'rb').replace(currentPlan.priceText.replace('Rp ', ''), '').replace(' - ', '')}
+                    </span>
+                  </div>
                 </div>
               </div>
             </motion.div>

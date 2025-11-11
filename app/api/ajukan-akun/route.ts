@@ -79,6 +79,21 @@ export async function POST(request: NextRequest) {
     
     console.log("[Ajukan Akun API] Application saved successfully, ID:", data.id);
 
+    // Get public URL for the proof file to send to Telegram
+    let proofPhotoUrl: string | undefined;
+    try {
+      const { data: urlData } = supabase.storage
+        .from("proofs")
+        .getPublicUrl(fileName);
+      
+      if (urlData?.publicUrl) {
+        proofPhotoUrl = urlData.publicUrl;
+        console.log("[Ajukan Akun API] Got public URL for proof:", proofPhotoUrl);
+      }
+    } catch (urlError) {
+      console.error("[Ajukan Akun API] Failed to get proof URL:", urlError);
+    }
+
     // Send email notification to user (don't block on failure)
     try {
       const userName = getUserDisplayName(fullName, email);
@@ -101,6 +116,7 @@ export async function POST(request: NextRequest) {
         email,
         whatsapp,
         applicationId: data.id,
+        proofPhotoUrl,
       });
       console.log("Telegram notification sent successfully");
     } catch (telegramError) {

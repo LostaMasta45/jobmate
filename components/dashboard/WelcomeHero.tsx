@@ -23,8 +23,21 @@ const greetings = [
 export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications }: WelcomeHeroProps) {
   const [greeting, setGreeting] = useState(greetings[0]);
   const [showWelcome, setShowWelcome] = useState(true);
+  // Fix hydration: time greeting generated on client only
+  const [timeGreeting, setTimeGreeting] = useState("Selamat Siang"); // Default fallback
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Generate time-based greeting on client only
+    const hour = new Date().getHours();
+    let greeting = "Selamat Siang";
+    if (hour < 12) greeting = "Selamat Pagi";
+    else if (hour < 15) greeting = "Selamat Siang";
+    else if (hour < 18) greeting = "Selamat Sore";
+    else greeting = "Selamat Malam";
+    setTimeGreeting(greeting);
+    setMounted(true);
+    
     // Random greeting
     const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
     setGreeting(randomGreeting);
@@ -45,14 +58,6 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
       .join("")
       .toUpperCase()
       .slice(0, 2);
-  };
-
-  const getTimeGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Selamat Pagi";
-    if (hour < 15) return "Selamat Siang";
-    if (hour < 18) return "Selamat Sore";
-    return "Selamat Malam";
   };
 
   const GreetingIcon = greeting.icon;
@@ -105,7 +110,7 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
                     className="space-y-2"
                   >
                     <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                      {getTimeGreeting()}! 👋
+                      {timeGreeting}! 👋
                     </h2>
                     <p className="text-2xl font-semibold">{userName}</p>
                     <p className="text-muted-foreground text-sm">{userEmail}</p>
@@ -172,7 +177,7 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
             <div>
               <div className="flex items-center gap-1.5">
                 <h1 className="text-xl sm:text-2xl font-bold">
-                  {getTimeGreeting()}, {userName.split(' ')[0]}!
+                  {timeGreeting}, {userName.split(' ')[0]}!
                 </h1>
                 <motion.span
                   animate={{ rotate: [0, 14, -8, 14, 0] }}

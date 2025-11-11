@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,8 +11,14 @@ import Link from "next/link";
 export default function WAGeneratorPage() {
   return (
     <AppShell>
+      {/* Mobile Tool Header */}
+      <MobileToolHeader
+        title="WhatsApp Generator"
+        description="Template pesan WA"
+      />
+      
       {/* Hero Header */}
-      <div className="relative overflow-hidden mb-6">
+      <div className="relative overflow-hidden mb-6 hidden lg:block">
         <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 via-emerald-500/10 to-teal-500/10 rounded-lg" />
         <Card className="relative p-6 md:p-8 border-2">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">

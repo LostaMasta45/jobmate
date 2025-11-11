@@ -59,17 +59,37 @@ export function PricingSection() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="relative bg-background rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 shadow-lg border-2 hover:border-emerald-200 dark:hover:border-emerald-800 transition-all hover:-translate-y-1 mt-8 sm:mt-10"
           >
+            {/* Discount Badge */}
+            <div className="absolute -top-4 -right-4 z-10">
+              <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm shadow-lg border-0 rotate-6 animate-pulse">
+                HEMAT 47%
+              </Badge>
+            </div>
+
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="w-5 h-5 text-emerald-600 flex-shrink-0" />
                 <h3 className="text-xl sm:text-2xl font-bold">VIP Basic</h3>
               </div>
-              <div className="flex items-baseline gap-2 mb-2 flex-wrap">
-                <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-emerald-600">
-                  Rp 10.000
-                </span>
-                <span className="text-sm sm:text-base text-muted-foreground">/bulan</span>
+              
+              {/* Price with Strikethrough */}
+              <div className="mb-3">
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <span className="text-base sm:text-lg text-muted-foreground line-through">
+                    Rp 19.000
+                  </span>
+                  <Badge variant="destructive" className="text-xs px-2 py-0.5">
+                    -47%
+                  </Badge>
+                </div>
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-emerald-600">
+                    Rp 10.000
+                  </span>
+                  <span className="text-sm sm:text-base text-muted-foreground">/bulan</span>
+                </div>
               </div>
+              
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                 💬 <em>Cocok buat kamu yang baru mulai cari kerja</em>
               </p>
@@ -112,19 +132,45 @@ export function PricingSection() {
               </Badge>
             </div>
 
+            {/* Discount Badge - Top Right */}
+            <div className="absolute -top-4 -right-4 z-10">
+              <Badge className="bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm shadow-lg border-0 -rotate-6">
+                <span className="text-lg sm:text-xl">🔥</span> DISKON 60%!
+              </Badge>
+            </div>
+
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-3">
                 <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600 flex-shrink-0" />
                 <h3 className="text-xl sm:text-2xl font-bold">VIP Premium</h3>
               </div>
-              <div className="flex items-baseline gap-2 mb-2 flex-wrap">
-                <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-amber-600">
-                  Rp 39.000
-                </span>
-                <span className="text-sm sm:text-base text-muted-foreground">Lifetime</span>
+              
+              {/* Price with Strikethrough */}
+              <div className="mb-3">
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <span className="text-lg sm:text-xl text-muted-foreground line-through">
+                    Rp 99.000
+                  </span>
+                  <Badge variant="destructive" className="text-xs sm:text-sm px-2 py-0.5 font-bold">
+                    -60%
+                  </Badge>
+                </div>
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-amber-600">
+                    Rp 39.000
+                  </span>
+                  <span className="text-sm sm:text-base text-muted-foreground">Lifetime</span>
+                </div>
               </div>
+              
+              <div className="bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-xl px-3 py-2 mb-2">
+                <p className="text-xs sm:text-sm font-bold text-amber-900 dark:text-amber-100 text-center">
+                  🎯 Dari Rp 99.000 jadi cuma Rp 39.000!
+                </p>
+              </div>
+              
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                💬 <em>Sekali bayar, selamanya akses!</em>
+                💬 <em>Bayar sekali, akses seumur hidup!</em>
               </p>
             </div>
 

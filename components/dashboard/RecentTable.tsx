@@ -71,7 +71,7 @@ export function RecentTable({ rows }: RecentTableProps) {
                 <div className="flex-1 min-w-0 mr-2">
                   <p className="font-medium text-xs sm:text-sm truncate">{row.company}</p>
                   <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{row.position}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5" suppressHydrationWarning>
                     {format(new Date(row.created_at), "dd MMM yyyy")}
                   </p>
                 </div>

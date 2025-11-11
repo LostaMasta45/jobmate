@@ -15,26 +15,33 @@ import { MergeTool } from "./tools/MergeTool";
 import { CompressTool } from "./tools/CompressTool";
 import { ConvertTool } from "./tools/ConvertTool";
 import { PDFHistory } from "./PDFHistory";
+import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
 
 export function PDFToolsClient() {
   const [activeTab, setActiveTab] = useState("merge");
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <div className="rounded-lg bg-primary/10 p-2">
-            <Sparkles className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold">PDF Tools</h1>
-            <p className="text-muted-foreground">
-              Kelola dokumen PDF untuk lamaran kerja Anda
-            </p>
+    <>
+      <MobileToolHeader
+        title="PDF Tools"
+        description="Kelola dokumen PDF"
+      />
+      
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="space-y-2 hidden lg:block">
+          <div className="flex items-center gap-2">
+            <div className="rounded-lg bg-primary/10 p-2">
+              <Sparkles className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">PDF Tools</h1>
+              <p className="text-muted-foreground">
+                Kelola dokumen PDF untuk lamaran kerja Anda
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
       {/* Info Card */}
       <Card className="p-4 bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
@@ -113,6 +120,7 @@ export function PDFToolsClient() {
           </div>
         </div>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }

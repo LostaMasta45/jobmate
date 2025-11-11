@@ -26,6 +26,8 @@ export function VIPWelcomeBox({ profile }: VIPWelcomeBoxProps) {
   const [showWelcomeDialog, setShowWelcomeDialog] = useState(false)
   const [alertsCount, setAlertsCount] = useState(0)
   const [savedCount, setSavedCount] = useState(0)
+  const [greeting, setGreeting] = useState('Selamat') // Default greeting
+  const [mounted, setMounted] = useState(false)
 
   // Show welcome dialog on first visit
   useEffect(() => {
@@ -33,6 +35,21 @@ export function VIPWelcomeBox({ profile }: VIPWelcomeBoxProps) {
     if (!hasSeenWelcome) {
       setShowWelcomeDialog(true)
       localStorage.setItem('vip_welcome_seen', 'true')
+    }
+  }, [])
+
+  // Get greeting based on time - CLIENT SIDE ONLY
+  useEffect(() => {
+    setMounted(true)
+    const hour = new Date().getHours()
+    if (hour >= 5 && hour < 11) {
+      setGreeting('Selamat Pagi')
+    } else if (hour >= 11 && hour < 15) {
+      setGreeting('Selamat Siang')
+    } else if (hour >= 15 && hour < 18) {
+      setGreeting('Selamat Sore')
+    } else {
+      setGreeting('Selamat Malam')
     }
   }, [])
 
@@ -61,17 +78,6 @@ export function VIPWelcomeBox({ profile }: VIPWelcomeBoxProps) {
     }
     fetchCounts()
   }, [])
-
-  // Get greeting based on time
-  const getGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour >= 5 && hour < 11) return 'Selamat Pagi'
-    if (hour >= 11 && hour < 15) return 'Selamat Siang'
-    if (hour >= 15 && hour < 18) return 'Selamat Sore'
-    return 'Selamat Malam'
-  }
-
-  const greeting = getGreeting()
   const fullName = profile.full_name || profile.email?.split('@')[0] || 'User'
   const firstName = profile.full_name?.split(' ')[0] || profile.email?.split('@')[0] || 'User'
   

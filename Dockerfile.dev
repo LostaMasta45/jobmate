@@ -1,0 +1,76 @@
+# ==============================================================================
+# DOCKERFILE DEVELOPMENT - PENJELASAN LENGKAP
+# ==============================================================================
+# Dockerfile ini untuk DEVELOPMENT dengan HOT RELOAD
+# Tidak perlu multi-stage build karena tidak optimize untuk production
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# BASE IMAGE
+# ------------------------------------------------------------------------------
+# Pakai Node.js 20 Alpine (ringan & cepat)
+FROM node:20-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies yang mungkin dibutuhkan
+# libc6-compat = compatibility library untuk Alpine
+RUN apk add --no-cache libc6-compat
+
+# ------------------------------------------------------------------------------
+# INSTALL DEPENDENCIES
+# ------------------------------------------------------------------------------
+# Copy hanya package files dulu (untuk caching layer)
+# Jika package.json tidak berubah, layer ini di-cache = install cepat!
+COPY package.json package-lock.json ./
+
+# Install dependencies
+# --legacy-peer-deps = handle peer dependency conflicts
+RUN npm ci --legacy-peer-deps
+
+# CATATAN: Source code TIDAK di-copy disini!
+# Source code akan di-mount sebagai volume (untuk hot reload)
+
+# ------------------------------------------------------------------------------
+# EXPOSE PORT
+# ------------------------------------------------------------------------------
+# Development server jalan di port 3000
+EXPOSE 3000
+
+# ------------------------------------------------------------------------------
+# ENVIRONMENT VARIABLES
+# ------------------------------------------------------------------------------
+# Set NODE_ENV ke development
+ENV NODE_ENV=development
+
+# Hostname 0.0.0.0 agar bisa diakses dari luar container
+ENV HOSTNAME="0.0.0.0"
+
+# ------------------------------------------------------------------------------
+# START COMMAND
+# ------------------------------------------------------------------------------
+# Jalankan development server dengan hot reload
+# npm run dev = next dev (dengan hot reload enabled)
+CMD ["npm", "run", "dev"]
+
+# ==============================================================================
+# CARA KERJA HOT RELOAD
+# ==============================================================================
+# 
+# 1. Source code di-MOUNT dari lokal ke /app (bukan di-copy)
+#    Volume mount: ./:/app
+# 
+# 2. Next.js dev server WATCH files di /app
+#    Any changes → auto detect
+# 
+# 3. Recompile HANYA file yang berubah
+#    Fast! Biasanya 1-3 detik
+# 
+# 4. Browser auto refresh via WebSocket
+#    Hot Module Replacement (HMR)
+# 
+# HASIL:
+# Edit file → Save → 2-3 detik → Browser updated! ✨
+# 
+# ==============================================================================

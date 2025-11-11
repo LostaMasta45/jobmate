@@ -3,6 +3,7 @@
 import * as React from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -114,9 +115,16 @@ export default function CoverLetterPage() {
 
   return (
     <AppShell>
+      {/* Mobile Tool Header */}
+      <MobileToolHeader
+        title="Cover Letter"
+        description="Generator cover letter"
+      />
+      
       <PageHeader
         title="Cover Letter Generator"
         description="Buat surat lamaran profesional dengan AI dalam Bahasa Indonesia"
+        hideOnMobile
       />
 
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
