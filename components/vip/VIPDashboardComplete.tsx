@@ -59,6 +59,7 @@ export function VIPDashboardComplete({
   recentlyViewedLoker = [],
 }: VIPDashboardCompleteProps) {
   const [selectedCategory, setSelectedCategory] = useState('Semua')
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid') // Mobile: list, Desktop: grid
   // Support both 'premium' and 'vip_premium'
   const isPremium = memberTier === 'premium' || memberTier === 'vip_premium'
 
@@ -125,10 +126,10 @@ export function VIPDashboardComplete({
     })
 
   return (
-    <div className="min-h-screen space-y-6">
-      {/* Upgrade Banner for VIP Basic */}
+    <div className="min-h-screen space-y-4 lg:space-y-6">
+      {/* Upgrade Banner for VIP Basic - Mobile Optimized */}
       {!isPremium && (
-        <div className="bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-white shadow-2xl animate-in fade-in duration-500">
+        <div className="bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 rounded-2xl lg:rounded-3xl p-4 lg:p-6 text-white shadow-2xl animate-in fade-in duration-500">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div className="flex items-start gap-3 sm:gap-4">
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0 animate-pulse">
@@ -176,50 +177,50 @@ export function VIPDashboardComplete({
         </div>
       )}
 
-      {/* Quick Stats - Horizontal Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      {/* Quick Stats - Mobile: 2 cols, Desktop: 4 cols */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
         {/* Total Loker */}
-        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 rounded-xl sm:rounded-2xl border-2 border-blue-200 dark:border-blue-900/30 p-3 sm:p-5 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between mb-2 sm:mb-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-blue-500 flex items-center justify-center shadow-lg">
-              <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 rounded-xl lg:rounded-2xl border-2 border-blue-200 dark:border-blue-900/30 p-3 lg:p-5 shadow-sm hover:shadow-md transition-shadow active:scale-95">
+          <div className="flex items-start justify-between mb-2 lg:mb-3">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-lg lg:rounded-xl bg-blue-500 flex items-center justify-center shadow-lg">
+              <Briefcase className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
             </div>
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-400 font-medium mb-1">Total Loker</div>
-          <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.totalLoker}</div>
+          <div className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">{stats.totalLoker}</div>
         </div>
 
         {/* Perusahaan */}
-        <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-xl sm:rounded-2xl border-2 border-purple-200 dark:border-purple-900/30 p-3 sm:p-5 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between mb-2 sm:mb-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-purple-500 flex items-center justify-center shadow-lg">
-              <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+        <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-xl lg:rounded-2xl border-2 border-purple-200 dark:border-purple-900/30 p-3 lg:p-5 shadow-sm hover:shadow-md transition-shadow active:scale-95">
+          <div className="flex items-start justify-between mb-2 lg:mb-3">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-lg lg:rounded-xl bg-purple-500 flex items-center justify-center shadow-lg">
+              <Building2 className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
             </div>
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-400 font-medium mb-1">Perusahaan</div>
-          <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.totalPerusahaan}</div>
+          <div className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">{stats.totalPerusahaan}</div>
         </div>
 
         {/* Tersimpan */}
-        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 rounded-xl sm:rounded-2xl border-2 border-yellow-200 dark:border-yellow-900/30 p-3 sm:p-5 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between mb-2 sm:mb-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-yellow-500 flex items-center justify-center shadow-lg">
-              <BookmarkCheck className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 rounded-xl lg:rounded-2xl border-2 border-yellow-200 dark:border-yellow-900/30 p-3 lg:p-5 shadow-sm hover:shadow-md transition-shadow active:scale-95">
+          <div className="flex items-start justify-between mb-2 lg:mb-3">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-lg lg:rounded-xl bg-yellow-500 flex items-center justify-center shadow-lg">
+              <BookmarkCheck className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
             </div>
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-400 font-medium mb-1">Tersimpan</div>
-          <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.saved}</div>
+          <div className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">{stats.saved}</div>
         </div>
 
         {/* Dilihat 7 Hari */}
-        <div className="bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-950/20 dark:to-teal-950/20 rounded-xl sm:rounded-2xl border-2 border-green-200 dark:border-green-900/30 p-3 sm:p-5 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between mb-2 sm:mb-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-green-500 flex items-center justify-center shadow-lg">
-              <Eye className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+        <div className="bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-950/20 dark:to-teal-950/20 rounded-xl lg:rounded-2xl border-2 border-green-200 dark:border-green-900/30 p-3 lg:p-5 shadow-sm hover:shadow-md transition-shadow active:scale-95">
+          <div className="flex items-start justify-between mb-2 lg:mb-3">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-lg lg:rounded-xl bg-green-500 flex items-center justify-center shadow-lg">
+              <Eye className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
             </div>
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-400 font-medium mb-1">Dilihat (7 Hari)</div>
-          <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.viewedLast7Days}</div>
+          <div className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">{stats.viewedLast7Days}</div>
         </div>
       </div>
 

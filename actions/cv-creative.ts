@@ -35,6 +35,19 @@ export async function saveCreativeCV(cv: Partial<CreativeCV>) {
       if (error) throw error;
     }
 
+    // 🆕 MONITORING: Log CV Creative generation
+    try {
+      const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+      const fullName = cv.content?.personalInfo?.fullName || "Unknown";
+      await logToolUsageWithNotification(
+        "CV Creative Generator",
+        cv.title || `${fullName} - Creative CV`,
+        { template: cv.templateId }
+      );
+    } catch (monitorError) {
+      console.error("[Monitoring] Failed to log CV Creative:", monitorError);
+    }
+
     return { success: true };
   } catch (error) {
     console.error("Save Creative CV error:", error);

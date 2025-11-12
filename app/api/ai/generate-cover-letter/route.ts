@@ -136,6 +136,18 @@ export async function POST(req: Request) {
       console.warn('Failed to track generation (table might not exist):', insertError)
     }
 
+    // 🆕 MONITORING: Log AI cover letter generation
+    try {
+      const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+      await logToolUsageWithNotification(
+        "AI Cover Letter Generator (3 Variations)",
+        `${posisi} at ${perusahaan}`,
+        { level, tone }
+      );
+    } catch (monitorError) {
+      console.error("[Monitoring] Failed to log AI cover letter:", monitorError);
+    }
+
     return NextResponse.json({ 
       success: true,
       variations,

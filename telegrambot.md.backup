@@ -1,0 +1,1146 @@
+# 🤖 TELEGRAM BOT - ADMIN MONITORING & LOGGING SYSTEM
+
+## 📋 Executive Summary
+
+Dokumen ini berisi ide lengkap untuk mengoptimalkan Telegram Bot JobMate sebagai **sistem monitoring dan logging real-time untuk admin**. Bot akan berfungsi seperti dashboard monitoring yang mengirimkan alert, log aktivitas, dan metrics penting ke Telegram admin.
+
+---
+
+## ✅ CURRENT IMPLEMENTATION (Already Done)
+
+### 🔔 Admin Notifications
+1. **Pendaftaran Akun Baru** ✅ - Info lengkap + foto bukti pembayaran
+2. **Approve Akun** ✅ - Konfirmasi approval dengan detail user
+3. **Reject Akun** ✅ - Notifikasi penolakan dengan alasan
+4. **Upgrade VIP Basic** ✅ - Info upgrade dengan expiry date
+5. **Upgrade VIP Premium** ✅ - Info upgrade lifetime access
+6. **Hapus Aplikasi** ✅ - Log penghapusan dengan alasan
+
+---
+
+## 🎯 RECOMMENDED NEW MONITORING FEATURES
+
+## 🌟 PRIORITY 1: USER ACTIVITY MONITORING
+
+### 1. **Tool Usage Tracking** 🛠️
+**Trigger:** Setiap kali user menggunakan tool
+**Purpose:** Monitoring penggunaan tools untuk analytics & abuse detection
+**Content:**
+```
+🛠️ TOOL USAGE LOG
+
+━━━━━━━━━━━━━━━━━━━━━
+👤 User: {name} ({email})
+📊 Membership: {membership_type}
+
+🔧 Tool: {tool_name}
+📄 Output: {document_title}
+⏰ Timestamp: {timestamp}
+
+📈 Usage Stats (Today):
+• Total tools used: {count}
+• Same tool: {same_tool_count}x
+• User quota: {used}/{limit}
+
+━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Tools to track:**
+- ✉️ Cover Letter Generator
+- 📄 CV ATS Generator
+- 🎨 CV Creative Generator
+- 📝 Surat Lamaran (10 templates)
+- 📧 Email Template Generator
+- 💼 Interview Prep
+- 💬 WA Generator
+- 📑 PDF Tools (merge, split, compress)
+- 🖼️ PDF to Image
+- 📊 Job Application Tracker (add/update/delete)
+
+### 2. **User Login & Session Activity** 👤
+**Trigger:** User login, logout, atau session events
+**Purpose:** Security monitoring & user behavior tracking
+**Content:**
+```
+👤 USER SESSION LOG
+
+━━━━━━━━━━━━━━━━━━━━━
+📧 User: {email}
+🆔 User ID: {user_id}
+📊 Membership: {membership_type}
+
+🔐 Event: {event_type}
+• LOGIN - User masuk ke sistem
+• LOGOUT - User keluar
+• SESSION_EXPIRED - Session timeout
+• MULTI_DEVICE - Login dari device baru
+
+🌐 Device Info:
+• IP: {ip_address}
+• Location: {location}
+• Browser: {user_agent}
+• Device: {device_type}
+
+⏰ Timestamp: {timestamp}
+⏱️ Session Duration: {duration}
+
+⚠️ Alert: {alert_if_suspicious}
+━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 3. **New User Registration** 🆕
+**Trigger:** User baru berhasil login pertama kali (setelah approved)
+**Purpose:** Track new user onboarding
+**Content:**
+```
+🆕 NEW USER FIRST LOGIN
+
+━━━━━━━━━━━━━━━━━━━━━
+👤 User: {name}
+📧 Email: {email}
+🆔 Username: @{username}
+
+📅 Account Created: {created_date}
+✅ First Login: {login_timestamp}
+⏱️ Time to First Login: {days_since_approval} hari
+
+📊 Initial Status:
+• Membership: {membership_type}
+• Profile Complete: {completion_percentage}%
+
+🎯 Next Expected Actions:
+• Update profile settings
+• Try first tool
+• Explore dashboard
+
+━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 4. **Profile Updates & Changes** 👤
+**Trigger:** User mengubah profile information
+**Purpose:** Track user behavior & detect suspicious changes
+**Content:**
+```
+👤 PROFILE UPDATE LOG
+
+━━━━━━━━━━━━━━━━━━━━━
+📧 User: {email}
+🆔 User ID: {user_id}
+
+🔄 Changed Fields:
+{field_changes_list}
+
+Before → After:
+• Name: {old_name} → {new_name}
+• Phone: {old_phone} → {new_phone}
+• WhatsApp: {old_wa} → {new_wa}
+• Avatar: {changed_or_not}
+
+⏰ Timestamp: {timestamp}
+🌐 Changed From: {ip_address}
+
+━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 5. **Document History Activity** 📄
+**Trigger:** User view, download, atau delete history
+**Purpose:** Monitor document management activity
+**Content:**
+```
+📄 DOCUMENT ACTIVITY LOG
+
+━━━━━━━━━━━━━━━━━━━━━
+👤 User: {email}
+📊 Membership: {membership_type}
+
+🔧 Action: {action_type}
+• VIEW - User lihat preview
+• DOWNLOAD - User download file
+• DELETE - User hapus dari history
+
+📑 Document Details:
+• Type: {document_type}
+• Title: {document_title}
+• Created: {created_date}
+• Size: {file_size}
+
+⏰ Timestamp: {timestamp}
+
+📊 History Stats:
+• Total documents: {total_docs}
+• Downloads today: {today_downloads}
+
+━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 6. **Job Tracker Activity** 📊
+**Trigger:** User add/update/delete lamaran di tracker
+**Purpose:** Monitor user engagement dengan tracker feature
+**Content:**
+```
+📊 TRACKER ACTIVITY LOG
+
+━━━━━━━━━━━━━━━━━━━━━
+👤 User: {email}
+
+🔧 Action: {action_type}
+• ADD - Lamaran baru ditambahkan
+• UPDATE - Status/info diupdate
+• DELETE - Lamaran dihapus
+• STATUS_CHANGE - Status berubah
+
+🏢 Job Details:
+• Company: {company_name}
+• Position: {position}
+• Status: {old_status} → {new_status}
+• Salary: {salary}
+• Apply Date: {apply_date}
+
+⏰ Timestamp: {timestamp}
+
+📊 Tracker Stats:
+• Total applications: {total}
+• Active: {active_count}
+• This week: {weekly_count}
+
+━━━━━━━━━━━━━━━━━━━━━
+```
+
+---
+
+## 🎖️ PRIORITY 2: SYSTEM & ERROR MONITORING
+
+### 7. **System Errors & Exceptions** 🚨
+**Trigger:** Setiap kali terjadi error di sistem
+**Purpose:** Real-time error monitoring untuk quick response
+**Content:**
+```
+🚨 SYSTEM ERROR ALERT
+
+━━━━━━━━━━━━━━━━━━━━━
+⚠️ Error Type: {error_type}
+🔴 Severity: {severity_level} (LOW/MEDIUM/HIGH/CRITICAL)
+
+📍 Location: {file_path}:{line_number}
+🔧 Function: {function_name}
+
+📝 Error Message:
+{error_message}
+
+📊 Stack Trace:
+{stack_trace_summary}
+
+👤 Affected User (if any):
+• Email: {user_email}
+• Action: {user_action}
+
+⏰ Timestamp: {timestamp}
+🔢 Occurrence Count: {count}x (last 1 hour)
+
+🔗 View Full Log: {observability_link}
+
+━━━━━━━━━━━━━━━━━━━━━
+⚡ Investigate immediately if CRITICAL
+```
+
+**Error Types to Monitor:**
+- 500 Internal Server Error
+- Database connection errors
+- OpenAI API failures
+- iLovePDF API failures
+- Supabase Auth errors
+- Storage upload/download errors
+- Payment webhook errors
+- Telegram API send failures
+
+### 8. **API Failures & Timeout** ⚠️
+**Trigger:** External API call failure atau timeout
+**Purpose:** Monitor third-party service issues
+**Content:**
+```
+⚠️ API FAILURE ALERT
+
+━━━━━━━━━━━━━━━━━━━━━
+🔌 Service: {service_name}
+• OpenAI API
+• iLovePDF API
+• Supabase
+• Xendit/Pakasir Payment
+• Telegram Bot API
+
+❌ Error: {error_type}
+• TIMEOUT - Request melebihi batas waktu
+• RATE_LIMIT - Terkena rate limiting
+• AUTH_ERROR - Authentication failed
+• SERVER_ERROR - Provider server error
+• NETWORK_ERROR - Connection issue
+
+📊 Request Details:
+• Endpoint: {endpoint}
+• Method: {http_method}
+• Status Code: {status_code}
+• Response Time: {response_time}ms
+
+👤 User Impact:
+• User: {user_email}
+• Tool Used: {tool_name}
+• Failed Action: {action}
+
+⏰ Timestamp: {timestamp}
+📈 Failure Rate: {failure_rate}% (last hour)
+
+💡 Recommended Action:
+{action_recommendation}
+
+━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 9. **Database Issues** 🗄️
+**Trigger:** Database slow query, connection loss, atau errors
+**Purpose:** Monitor database health & performance
+**Content:**
+```
+🗄️ DATABASE ALERT
+
+━━━━━━━━━━━━━━━━━━━━━
+⚠️ Issue Type: {issue_type}
+
+📊 SLOW QUERY:
+• Query: {query_preview}
+• Execution Time: {execution_time}ms
+• Expected: <100ms
+• Table: {table_name}
+• Rows Affected: {row_count}
+
+🔌 CONNECTION ERROR:
+• Connection Pool: {pool_status}
+• Active Connections: {active}/{max}
+• Failed Attempts: {failed_count}
+
+❌ QUERY ERROR:
+• Error: {error_message}
+• Query: {query}
+• User Action: {user_action}
+
+⏰ Timestamp: {timestamp}
+📈 Query Stats (1h):
+• Total Queries: {total}
+• Slow Queries: {slow_count}
+• Failed Queries: {failed}
+
+🔗 Observability: {dashboard_link}
+
+━━━━━━━━━━━━━━━━━━━━━
+💡 Check for indexes and query optimization
+```
+
+### 10. **Security Alerts** 🔒
+**Trigger:** Suspicious activity terdeteksi
+**Purpose:** Security monitoring & threat detection
+**Content:**
+```
+🔒 SECURITY ALERT
+
+━━━━━━━━━━━━━━━━━━━━━
+⚠️ Threat Type: {threat_type}
+
+🚨 BRUTE FORCE ATTEMPT:
+• Target: {email}
+• Failed Logins: {count}x in {timeframe}
+• IPs: {ip_addresses}
+
+🚨 UNUSUAL ACCESS PATTERN:
+• User: {email}
+• Issue: {pattern_description}
+• Example: Login from {country_1} then {country_2} dalam 5 menit
+
+🚨 QUOTA ABUSE:
+• User: {email}
+• Tool: {tool_name}
+• Usage: {count}x in {timeframe}
+• Quota: {quota_limit}x per day
+
+🚨 SUSPICIOUS FILE UPLOAD:
+• User: {email}
+• File: {filename}
+• Size: {file_size}
+• Type: {file_type}
+• Reason: {suspicious_reason}
+
+🌐 Origin:
+• IP: {ip_address}
+• Location: {location}
+• ISP: {isp}
+
+⏰ Detected: {timestamp}
+
+🔧 Auto Actions Taken:
+{automated_response}
+
+━━━━━━━━━━━━━━━━━━━━━
+⚡ Review immediately and take action
+```
+
+---
+
+## 🎛️ PRIORITY 3: ADMIN ANALYTICS & MONITORING
+
+### 11. **Daily Admin Report** 📈
+**Trigger:** Setiap hari jam 09:00 WIB
+**Content:**
+```
+📊 ADMIN DAILY REPORT - {date}
+
+━━━━━━━━━━━━━━━━━━━━━
+👥 USER STATISTICS:
+• Total Users: {total}
+• New Users: {new_today}
+• Active Users (24h): {active}
+• VIP Basic: {vip_basic}
+• VIP Premium: {vip_premium}
+
+📝 APPLICATIONS:
+• Pending: {pending}
+• Approved Today: {approved}
+• Rejected Today: {rejected}
+
+🛠️ TOOL USAGE (24h):
+• CV Generated: {cv_count}
+• Cover Letters: {cover_count}
+• Email Templates: {email_count}
+• Total Tool Usage: {total_tools}
+
+💰 REVENUE (if any):
+• New Subscriptions: {new_subs}
+• Total Revenue: Rp {revenue}
+
+⚠️ ISSUES:
+• System Errors: {errors}
+• Failed Payments: {failed_payments}
+• Support Tickets: {tickets}
+
+🔗 Admin Dashboard: {dashboard_link}
+━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 12. **Critical System Alerts** 🚨
+**Trigger:** System error/downtime detected
+**Content:**
+```
+🚨 CRITICAL ALERT - IMMEDIATE ACTION REQUIRED
+
+━━━━━━━━━━━━━━━━━━━━━
+⚠️ Issue Type: {error_type}
+📍 Location: {service_name}
+⏰ Detected: {timestamp}
+🔴 Severity: {severity_level}
+
+📋 Error Details:
+{error_message}
+
+📊 Impact:
+• Affected Users: {user_count}
+• Failed Requests: {failed_count}
+• Downtime: {duration}
+
+🔧 Recommended Action:
+{action_steps}
+
+🔗 View Logs: {observability_link}
+
+━━━━━━━━━━━━━━━━━━━━━
+⚡ Respond immediately via: /admin/observability
+```
+
+### 13. **High Activity Alert** 📈
+**Trigger:** Unusual spike in activity
+**Content:**
+```
+📈 HIGH ACTIVITY ALERT
+
+━━━━━━━━━━━━━━━━━━━━━
+🔔 Unusual traffic detected!
+
+📊 Metrics (Last 1 Hour):
+• Active Users: {count} (+{percentage}%)
+• Tool Usage: {tools_count} (+{percentage}%)
+• New Signups: {signups} (+{percentage}%)
+
+🤔 Possible Causes:
+• Viral social media post?
+• Marketing campaign?
+• System issue causing retries?
+
+💡 Recommendation:
+• Monitor server performance
+• Check error logs
+• Prepare for scaling
+
+🔗 View Dashboard: {observability_link}
+━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 14. **Weekly Business Intelligence** 📊
+**Trigger:** Setiap Senin jam 08:00 WIB
+**Content:**
+```
+📊 WEEKLY BUSINESS REPORT
+━━━━━━━━━━━━━━━━━━━━━
+📅 Week of {date_range}
+
+🎯 KEY METRICS:
+
+👥 USER GROWTH:
+• New Users: {new} ({growth_percentage}%)
+• Total Active: {active}
+• Churn Rate: {churn}%
+
+💰 REVENUE:
+• New Subscriptions: {subs}
+• MRR: Rp {mrr}
+• Upgrade Rate: {upgrade_rate}%
+
+🛠️ MOST USED TOOLS:
+1. {tool_1} - {count_1} uses
+2. {tool_2} - {count_2} uses
+3. {tool_3} - {count_3} uses
+
+📈 TRENDS:
+• Peak Usage Time: {peak_time}
+• Most Active Day: {active_day}
+• Avg Session Duration: {duration}
+
+🎯 GOALS PROGRESS:
+• Monthly User Target: {current}/{target}
+• Revenue Target: {current_rev}/{target_rev}
+• Conversion Rate: {conversion}%
+
+💡 INSIGHTS:
+{ai_generated_insights}
+
+🔗 Full Report: {analytics_link}
+━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 15. **Payment Success/Failure** 💳
+**Trigger:** Payment event dari Xendit/Pakasir
+**Content:**
+```
+💳 PAYMENT NOTIFICATION
+
+━━━━━━━━━━━━━━━━━━━━━
+✅ Status: SUCCESSFUL
+
+👤 Customer:
+• Name: {name}
+• Email: {email}
+• Phone: {phone}
+
+💰 Transaction Details:
+• Amount: Rp {amount}
+• Package: {package_name}
+• Method: {payment_method}
+• Invoice: {invoice_id}
+
+⏰ Time: {timestamp}
+
+🎯 Actions Taken:
+✅ User upgraded to {membership}
+✅ Email confirmation sent
+✅ Access granted
+
+🔗 View Details: {payment_link}
+━━━━━━━━━━━━━━━━━━━━━
+```
+
+---
+
+## 🎮 PRIORITY 4: PERFORMANCE & RESOURCE MONITORING
+
+### 16. **Performance Metrics** ⚡
+**Trigger:** Hourly atau saat threshold terlampaui
+**Purpose:** Monitor application performance & response times
+**Content:**
+
+**Basic Commands:**
+```
+/start - Connect bot dengan akun
+/help - Lihat semua command
+/status - Cek status membership
+/stats - Lihat statistik pribadi
+/tools - List tools yang tersedia
+/history - Lihat history documents
+/tracker - Lihat lamaran tracker
+/support - Hubungi support
+```
+
+**VIP Commands:**
+```
+/lowongan - Lihat lowongan terbaru (VIP)
+/search {keyword} - Cari lowongan (VIP)
+/match - Cari lowongan cocok (Premium)
+/alert on/off - Toggle notifikasi
+```
+
+**Admin Commands:**
+```
+/admin - Admin dashboard summary
+/users - User statistics
+/logs - Recent system logs
+/report - Generate report
+/broadcast {message} - Send to all users
+```
+
+### 17. **Quick Actions with Inline Buttons** 🔘
+Notifikasi bisa include inline buttons:
+
+**Example - New Application:**
+```
+🔔 PENDAFTARAN AKUN BARU
+[User details...]
+
+[✅ Approve] [❌ Reject] [👁️ View Details]
+```
+
+**Example - Follow-up Reminder:**
+```
+⏰ REMINDER FOLLOW-UP
+[Job details...]
+
+[✅ Sudah Follow-up] [⏰ Tunda 3 Hari] [📝 Buat Template WA]
+```
+
+**Example - Lowongan Baru:**
+```
+🆕 LOWONGAN BARU
+[Job details...]
+
+[🚀 Quick Apply] [💾 Save] [❌ Not Interested]
+```
+
+### 18. **Smart Reply Suggestions** 💬
+Bot bisa suggest reply:
+```
+💬 Template WA untuk follow-up ke {company}:
+
+1️⃣ Formal:
+"Dengan hormat, saya ingin menindaklanjuti..."
+
+2️⃣ Semi-formal:
+"Halo Bapak/Ibu HRD, saya ingin menanyakan..."
+
+3️⃣ Friendly:
+"Hi! Saya ingin cek progress untuk posisi..."
+
+Pilih template dengan reply: 1, 2, atau 3
+```
+
+### 19. **Conversational AI Assistant** 🤖
+Bot bisa menjawab pertanyaan:
+```
+User: "Bagaimana cara membuat CV ATS yang bagus?"
+
+Bot: 💡 TIPS MEMBUAT CV ATS:
+
+1. Gunakan format sederhana (tanpa tabel/grafik kompleks)
+2. Sertakan keyword dari job description
+3. Gunakan bullet points untuk pengalaman
+4. Hindari header/footer
+5. Save dalam format .docx atau .pdf
+
+🛠️ Buat CV ATS sekarang: /tools/cv-ats
+
+Ada pertanyaan lain? Ketik /help
+```
+
+### 20. **Feedback Collection** 📝
+**Trigger:** Setelah tool usage atau event tertentu
+**Content:**
+```
+💬 FEEDBACK SINGKAT
+
+Seberapa puas Anda dengan {feature/tool}?
+
+[⭐⭐⭐⭐⭐] [⭐⭐⭐⭐] [⭐⭐⭐] [⭐⭐] [⭐]
+
+Komentar tambahan? Reply dengan saran Anda!
+
+Terima kasih membantu kami berkembang 💚
+```
+
+---
+
+## 🎁 PRIORITY 5: ENGAGEMENT & RETENTION
+
+### 21. **Tips & Motivation** 💪
+**Trigger:** Random atau scheduled (3x per week)
+**Content:**
+```
+💡 TIPS HARI INI
+
+━━━━━━━━━━━━━━━━━━
+🎯 {Career Tip}
+
+{Detailed explanation}
+
+💪 Action Step:
+{Actionable advice}
+
+🔗 Related Tool: {tool_link}
+
+━━━━━━━━━━━━━━━━━━
+💚 Share this tip: {share_link}
+```
+
+**Tip Categories:**
+- CV Writing Tips
+- Interview Preparation
+- Networking Strategies
+- Personal Branding
+- Job Search Strategies
+- Salary Negotiation
+- Career Development
+
+### 22. **Challenge/Quest System** 🎮
+**Trigger:** Weekly challenges
+**Content:**
+```
+🎮 WEEKLY CHALLENGE
+
+━━━━━━━━━━━━━━━━━━
+🏆 {Challenge Name}
+
+🎯 Mission:
+{Challenge description}
+
+🎁 Reward:
+{Reward description}
+
+📊 Progress: {current}/{target}
+
+⏰ Deadline: {end_date}
+
+➡️ Start Challenge: {link}
+
+━━━━━━━━━━━━━━━━━━
+💪 Complete challenges untuk unlock rewards!
+```
+
+**Challenge Examples:**
+- 📝 "CV Makeover Week" - Update 3 CV dengan template baru
+- 🎯 "Application Sprint" - Lamar 10 lowongan dalam seminggu
+- 💬 "Follow-up Hero" - Follow-up 5 lamaran lama
+- ✉️ "Email Master" - Buat 5 email template berbeda
+
+### 23. **Referral Program** 👥
+**Trigger:** User share referral link
+**Content:**
+```
+👥 PROGRAM REFERRAL
+
+━━━━━━━━━━━━━━━━━━
+🎁 Ajak teman, dapat reward!
+
+📊 Your Referral Stats:
+• Total Invited: {invited}
+• Successfully Joined: {joined}
+• Active Users: {active}
+
+🎁 Your Rewards:
+• {reward_1}
+• {reward_2}
+• {reward_3}
+
+🔗 Your Referral Link:
+{referral_link}
+
+💡 Share ke:
+[WhatsApp] [Telegram] [Twitter] [Facebook]
+
+━━━━━━━━━━━━━━━━━━
+💰 Reward tiers:
+• 1 referral = 7 hari VIP Basic gratis
+• 5 referral = 1 bulan VIP Basic gratis
+• 10 referral = 3 bulan VIP Premium gratis
+```
+
+### 24. **Content Updates & Blog Posts** 📰
+**Trigger:** New content published
+**Content:**
+```
+📰 ARTIKEL BARU!
+
+━━━━━━━━━━━━━━━━━━
+📝 {Article Title}
+
+{Short excerpt or summary}
+
+🏷️ Category: {category}
+⏱️ Read time: {minutes} min
+
+🔗 Baca Selengkapnya: {article_link}
+
+━━━━━━━━━━━━━━━━━━
+💡 Jangan lewatkan tips dan insight terbaru!
+```
+
+### 25. **Seasonal/Event-based Messages** 🎊
+**Trigger:** Special dates/events
+**Content:**
+```
+🎉 SELAMAT TAHUN BARU!
+
+━━━━━━━━━━━━━━━━━━
+Semoga tahun ini membawa:
+✨ Karir yang cemerlang
+💼 Pekerjaan impian
+📈 Pengembangan diri
+🤝 Networking yang luas
+
+🎁 SPECIAL NEW YEAR GIFT:
+{special_offer}
+
+Valid hingga: {expiry_date}
+
+🔗 Claim Now: {claim_link}
+
+━━━━━━━━━━━━━━━━━━
+💚 Terima kasih telah bersama JobMate!
+```
+
+**Event Ideas:**
+- 🎉 New Year
+- 🎂 User Birthday
+- 📅 App Anniversary
+- 🏆 National Career Days
+- 🎓 Graduation Season
+- 💼 Job Fair Events
+
+---
+
+## 🔧 TECHNICAL IMPLEMENTATION GUIDE
+
+### Database Schema Extensions
+
+```sql
+-- User notification preferences
+CREATE TABLE user_notification_settings (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  telegram_chat_id text,
+  
+  -- Notification toggles
+  tool_usage_notif boolean DEFAULT true,
+  daily_stats_notif boolean DEFAULT true,
+  followup_reminders boolean DEFAULT true,
+  job_alerts boolean DEFAULT false, -- VIP only
+  tips_motivation boolean DEFAULT true,
+  achievement_notif boolean DEFAULT true,
+  inactivity_reminder boolean DEFAULT true,
+  
+  -- Frequency settings
+  stats_frequency text DEFAULT 'weekly', -- daily/weekly/monthly
+  reminder_time time DEFAULT '09:00:00',
+  
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+-- Achievement tracking
+CREATE TABLE user_achievements (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  achievement_type text NOT NULL,
+  achievement_name text NOT NULL,
+  unlocked_at timestamptz DEFAULT now(),
+  notified boolean DEFAULT false
+);
+
+-- Notification queue (for scheduled notifications)
+CREATE TABLE notification_queue (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  notification_type text NOT NULL,
+  message text NOT NULL,
+  scheduled_for timestamptz NOT NULL,
+  sent_at timestamptz,
+  status text DEFAULT 'pending', -- pending/sent/failed
+  retry_count int DEFAULT 0,
+  metadata jsonb,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Bot interaction logs
+CREATE TABLE bot_interactions (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  command text,
+  message_text text,
+  response text,
+  created_at timestamptz DEFAULT now()
+);
+```
+
+### New Functions Needed in lib/telegram.ts
+
+```typescript
+// User Notifications
+export async function notifyToolUsage(userId: string, toolName: string, documentTitle: string, downloadLink: string)
+export async function sendDailyStats(userId: string, stats: UserStats)
+export async function sendWeeklyReport(userId: string, report: WeeklyReport)
+export async function sendFollowupReminder(userId: string, application: Application)
+export async function sendAchievement(userId: string, achievement: Achievement)
+export async function sendInactivityReminder(userId: string, lastActive: Date)
+
+// VIP Notifications
+export async function notifyNewJob(userId: string, job: JobPosting)
+export async function sendJobMatch(userId: string, job: JobPosting, matchScore: number)
+export async function sendInterviewReminder(userId: string, interview: Interview)
+export async function sendSuccessStory(userId: string, application: Application)
+
+// Admin Analytics
+export async function sendDailyAdminReport(report: DailyReport)
+export async function sendCriticalAlert(alert: SystemAlert)
+export async function sendHighActivityAlert(metrics: ActivityMetrics)
+export async function sendWeeklyBusinessReport(report: BusinessReport)
+export async function notifyPaymentEvent(payment: PaymentEvent)
+
+// Interactive Features
+export async function handleBotCommand(userId: string, command: string, args: string[])
+export async function sendInlineKeyboard(chatId: string, message: string, buttons: InlineButton[][])
+export async function handleCallbackQuery(callbackData: string)
+
+// Engagement
+export async function sendTip(userId: string, tip: CareerTip)
+export async function sendChallenge(userId: string, challenge: Challenge)
+export async function sendReferralUpdate(userId: string, referralStats: ReferralStats)
+export async function sendContentUpdate(userId: string, article: Article)
+export async function sendSeasonalMessage(userId: string, event: SpecialEvent)
+```
+
+### Webhook Handler Extensions
+
+```typescript
+// app/api/webhooks/telegram/route.ts
+export async function POST(req: Request) {
+  const update = await req.json();
+  
+  if (update.message) {
+    // Handle commands
+    if (update.message.text.startsWith('/')) {
+      await handleCommand(update.message);
+    } else {
+      // Handle regular messages (AI assistant)
+      await handleConversation(update.message);
+    }
+  }
+  
+  if (update.callback_query) {
+    // Handle inline button clicks
+    await handleCallback(update.callback_query);
+  }
+  
+  return Response.json({ ok: true });
+}
+```
+
+---
+
+## 📊 ANALYTICS TO TRACK
+
+1. **Notification Performance**
+   - Delivery rate
+   - Open rate (if possible)
+   - Click-through rate on links
+   - Interaction rate with buttons
+
+2. **User Engagement**
+   - Commands used frequency
+   - Response to reminders
+   - Follow-up action completion rate
+   - Tool usage after notification
+
+3. **Conversion Metrics**
+   - Notification → Tool usage
+   - Notification → VIP upgrade
+   - Job alert → Application
+   - Reminder → Follow-up completion
+
+4. **A/B Testing**
+   - Message tone (formal vs casual)
+   - Timing (morning vs evening)
+   - Frequency (daily vs weekly)
+   - Content type (tips vs stats)
+
+---
+
+## 🎯 ROLLOUT STRATEGY
+
+### Phase 1: Foundation (Week 1-2)
+- ✅ Tool usage notifications
+- ✅ Follow-up reminders
+- ✅ Achievement system basic
+- ✅ User settings/preferences
+
+### Phase 2: Engagement (Week 3-4)
+- ✅ Daily/weekly stats
+- ✅ Tips & motivation
+- ✅ Inactivity reminders
+- ✅ Welcome messages
+
+### Phase 3: VIP Features (Week 5-6)
+- ✅ Job alerts (VIP)
+- ✅ Job matching (Premium)
+- ✅ Interview reminders
+- ✅ Success story system
+
+### Phase 4: Interactive (Week 7-8)
+- ✅ Bot commands
+- ✅ Inline buttons
+- ✅ Smart replies
+- ✅ AI assistant
+
+### Phase 5: Advanced (Week 9-10)
+- ✅ Challenge system
+- ✅ Referral program
+- ✅ Content updates
+- ✅ Seasonal messages
+
+### Phase 6: Admin Intelligence (Week 11-12)
+- ✅ Daily admin reports
+- ✅ System alerts
+- ✅ Business intelligence
+- ✅ Payment notifications
+
+---
+
+## 💡 BEST PRACTICES
+
+### Do's ✅
+1. **Personalize** - Use user's name and relevant data
+2. **Be Concise** - Keep messages short and scannable
+3. **Add Value** - Every notification should be useful
+4. **Respect Privacy** - Don't share sensitive data
+5. **Allow Control** - Let users customize notifications
+6. **Time Wisely** - Send at appropriate hours (7am-10pm)
+7. **Track Metrics** - Monitor engagement and adjust
+8. **Test First** - A/B test before full rollout
+
+### Don'ts ❌
+1. **Don't Spam** - Max 3-5 notifications per day
+2. **Don't Be Generic** - Avoid one-size-fits-all messages
+3. **Don't Ignore Opt-out** - Respect user preferences
+4. **Don't Send Irrelevant** - Match notification to user tier
+5. **Don't Overuse Emoji** - Use strategically, not excessively
+6. **Don't Send at Night** - Respect sleep hours
+7. **Don't Duplicate** - If email sent, don't repeat on Telegram
+8. **Don't Track Too Much** - Balance analytics with privacy
+
+---
+
+## 🔒 PRIVACY & COMPLIANCE
+
+### Data Protection
+- Store chat IDs securely
+- Encrypt sensitive data in notifications
+- Allow users to disconnect bot anytime
+- Clear data on account deletion
+- Don't share data with third parties
+
+### GDPR Compliance
+- Explicit consent for notifications
+- Easy opt-out mechanism
+- Data portability (export notification history)
+- Right to be forgotten
+- Transparent privacy policy
+
+### User Controls
+- Notification frequency settings
+- Category-based toggles
+- Quiet hours configuration
+- Complete opt-out option
+- Data deletion request
+
+---
+
+## 📈 SUCCESS METRICS
+
+### User Engagement
+- Daily Active Users (DAU) increase
+- Notification engagement rate > 30%
+- Tool usage from notifications > 20%
+- User retention rate > 60%
+
+### Business Impact
+- VIP conversion rate increase
+- User lifetime value increase
+- Support ticket reduction
+- User satisfaction score > 4.5/5
+
+### Technical Health
+- Notification delivery rate > 98%
+- Response time < 2 seconds
+- Failed notification rate < 2%
+- Bot uptime > 99.9%
+
+---
+
+## 🚀 FUTURE ENHANCEMENTS
+
+### AI-Powered Features
+- Personalized job recommendations
+- Smart scheduling based on user behavior
+- Predictive follow-up suggestions
+- Automated response to common questions
+- Sentiment analysis on user feedback
+
+### Advanced Integrations
+- WhatsApp Business integration
+- Email sync for unified notifications
+- Calendar integration for interviews
+- LinkedIn profile sync
+- Job board direct integration
+
+### Gamification
+- Leaderboards
+- Badges and trophies
+- Point system
+- Team challenges
+- Seasonal competitions
+
+---
+
+## 📝 CONCLUSION
+
+Telegram bot adalah powerful tool untuk:
+1. **Meningkatkan Engagement** - Keep users active and motivated
+2. **Mempermudah Admin** - Automated monitoring and alerts
+3. **Menambah Value** - Timely reminders and smart suggestions
+4. **Boosting Revenue** - VIP features dan conversion optimization
+5. **Building Community** - Personal touch via notifications
+
+**Rekomendasi Prioritas:**
+1. Start with **User Tool Notifications** & **Follow-up Reminders** (quick wins)
+2. Add **VIP Job Alerts** (revenue driver)
+3. Implement **Admin Analytics** (operational efficiency)
+4. Build **Interactive Features** (engagement boost)
+5. Launch **Gamification** (retention & virality)
+
+**Next Steps:**
+1. Review dan prioritize features bersama team
+2. Setup database schema extensions
+3. Implement Phase 1 features (Week 1-2)
+4. Beta test dengan selected users
+5. Iterate based on feedback
+6. Full rollout dengan monitoring
+
+---
+
+**Created:** 2025-11-11  
+**Version:** 1.0.0  
+**Status:** 💡 **PROPOSAL - READY FOR IMPLEMENTATION**  
+**Author:** Droid - Factory AI
+
+---
+
+*Semoga dokumen ini membantu! Silakan adjust sesuai prioritas bisnis dan resources yang tersedia. Happy coding! 🚀*

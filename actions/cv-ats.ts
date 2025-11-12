@@ -127,6 +127,18 @@ export async function saveResumeToDatabase(resume: Resume) {
 
     console.log("Save successful! Data:", data);
     
+    // 🆕 MONITORING: Log CV ATS generation
+    try {
+      const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+      await logToolUsageWithNotification(
+        "CV ATS Generator",
+        resume.title || `${resume.firstName} ${resume.lastName} - Resume`,
+        { template: resume.selectedTemplate }
+      );
+    } catch (monitorError) {
+      console.error("[Monitoring] Failed to log CV ATS:", monitorError);
+    }
+    
     revalidatePath("/tools/cv-ats");
     return data;
   } catch (error: any) {

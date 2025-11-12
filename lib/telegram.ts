@@ -88,41 +88,40 @@ export async function sendTelegramPhoto(
 
 export async function sendAdminNotification(message: string): Promise<boolean> {
   try {
-    // Get settings from database instead of env
-    const { createClient } = await import("@/lib/supabase/server");
-    const supabase = await createClient();
-    
-    const { data: settings, error } = await supabase
-      .from("admin_settings")
-      .select("telegram_bot_token, telegram_admin_chat_id")
-      .eq("id", 1)
-      .single();
-
-    if (error || !settings) {
-      console.error("[Telegram] Failed to get settings from database:", error);
-      // Fallback to env
-      const adminChatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
-      const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    // Try to get from database (only works in Next.js request context)
+    try {
+      const { createClient } = await import("@/lib/supabase/server");
+      const supabase = await createClient();
       
-      if (!adminChatId || !botToken) {
-        console.error("[Telegram] Admin chat ID not configured in env or database");
-        return false;
+      const { data: settings, error } = await supabase
+        .from("admin_settings")
+        .select("telegram_bot_token, telegram_admin_chat_id")
+        .eq("id", 1)
+        .single();
+
+      if (!error && settings && settings.telegram_admin_chat_id) {
+        console.log("[Telegram] Using settings from database");
+        return await sendTelegramMessage(
+          settings.telegram_admin_chat_id, 
+          message, 
+          settings.telegram_bot_token
+        );
       }
-      
-      return await sendTelegramMessage(adminChatId, message, botToken);
+    } catch (dbError) {
+      // Ignore database errors (happens in standalone scripts)
+      console.log("[Telegram] Database unavailable, using environment variables");
     }
-
-    if (!settings.telegram_admin_chat_id) {
-      console.error("[Telegram] Admin chat ID not configured in database");
+    
+    // Fallback to env (works everywhere)
+    const adminChatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    
+    if (!adminChatId || !botToken) {
+      console.error("[Telegram] Admin chat ID not configured in env or database");
       return false;
     }
-
-    console.log("[Telegram] Using settings from database");
-    return await sendTelegramMessage(
-      settings.telegram_admin_chat_id, 
-      message, 
-      settings.telegram_bot_token
-    );
+    
+    return await sendTelegramMessage(adminChatId, message, botToken);
   } catch (error) {
     console.error("[Telegram] sendAdminNotification error:", error);
     return false;
@@ -381,4 +380,203 @@ ${data.deletedBy}
 ━━━━━━━━━━━━━━━━━━━━━`;
 
   return await sendAdminNotification(message);
+}
+
+// ================================================
+// 🆕 OPTION B: SIMPLIFIED MONITORING FEATURES
+// ================================================
+
+/**
+ * Tool Usage Tracking
+ * Notifies admin when user uses a tool
+ */
+export async function notifyToolUsage(data: {
+  userName: string;
+  userEmail: string;
+  membershipType: string;
+  toolName: string;
+  documentTitle?: string;
+  usageCount: number;
+  sameToolCount: number;
+  quota?: { used: number; limit: number };
+}): Promise<boolean> {
+  try {
+    // Get membership emoji
+    const membershipEmoji = 
+      data.membershipType === 'vip_premium' ? '👑' :
+      data.membershipType === 'vip_basic' ? '⭐' :
+      '🆓';
+
+    // Format quota info
+    let quotaText = '';
+    if (data.quota) {
+      quotaText = `\n📊 *Quota:* ${data.quota.used}/${data.quota.limit}`;
+    } else {
+      quotaText = '\n♾️ *Quota:* Unlimited';
+    }
+
+    // Warning if high usage
+    let warningText = '';
+    if (data.sameToolCount >= 20) {
+      warningText = '\n\n⚠️ *HIGH USAGE ALERT* - User menggunakan tool yang sama >20x hari ini';
+    }
+
+    // Escape special characters for Telegram Markdown
+    const escapeMarkdown = (text: string) => {
+      return text.replace(/[_*\[\]()~`>#+\-=|{}.!]/g, '\\$&');
+    };
+
+    const message = `🛠️ *TOOL USED*
+
+━━━━━━━━━━━━━━━━━━━━━
+👤 *User*
+${escapeMarkdown(data.userName)}
+📧 ${escapeMarkdown(data.userEmail)}
+${membershipEmoji} ${data.membershipType.toUpperCase().replace(/_/g, ' ')}
+
+🔧 *Tool*
+${escapeMarkdown(data.toolName)}
+
+${data.documentTitle ? `📄 *Document*\n"${escapeMarkdown(data.documentTitle)}"\n` : ''}
+📈 *Usage Today*
+• Total tools: ${data.usageCount}x
+• Same tool: ${data.sameToolCount}x${quotaText}${warningText}
+
+⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
+━━━━━━━━━━━━━━━━━━━━━`;
+
+    return await sendAdminNotification(message);
+  } catch (error) {
+    console.error('[Telegram] Failed to send tool usage notification:', error);
+    return false;
+  }
+}
+
+/**
+ * Daily Admin Summary
+ * Comprehensive daily report sent every morning
+ */
+export async function sendDailyAdminSummary(stats: {
+  date: string;
+  totalUsers: number;
+  newUsers: number;
+  activeUsers24h: number;
+  vipBasic: number;
+  vipPremium: number;
+  pendingApplications: number;
+  approvedToday: number;
+  rejectedToday: number;
+  totalToolUsage: number;
+  cvGenerated: number;
+  coverLetters: number;
+  emailTemplates: number;
+  revenueToday?: number;
+  newSubscriptions?: number;
+  dashboardUrl?: string;
+}): Promise<boolean> {
+  try {
+    // Format numbers with commas
+    const fmt = (num: number) => num.toLocaleString('id-ID');
+
+    // Pending applications alert
+    const pendingAlert = stats.pendingApplications > 0 
+      ? ` ⚠️` 
+      : '';
+
+    // Growth indicators
+    const newUsersIndicator = stats.newUsers > 0 ? ` (+${stats.newUsers})` : '';
+    const subscriptionsIndicator = stats.newSubscriptions ? ` (+${stats.newSubscriptions})` : '';
+
+    // Revenue section (optional)
+    let revenueSection = '';
+    if (stats.revenueToday !== undefined) {
+      revenueSection = `
+💰 *REVENUE*
+• New Subscriptions: ${fmt(stats.newSubscriptions || 0)}${subscriptionsIndicator}
+• Total Revenue: Rp ${fmt(stats.revenueToday)}
+`;
+    }
+
+    // Dashboard link
+    const dashboardLink = stats.dashboardUrl || process.env.NEXT_PUBLIC_APP_URL + '/admin/dashboard';
+
+    const message = `📊 *DAILY ADMIN SUMMARY*
+${stats.date}
+
+━━━━━━━━━━━━━━━━━━━━━
+👥 *USERS*
+• Total Users: ${fmt(stats.totalUsers)}${newUsersIndicator}
+• Active (24h): ${fmt(stats.activeUsers24h)}
+• VIP Basic: ${fmt(stats.vipBasic)}
+• VIP Premium: ${fmt(stats.vipPremium)}
+
+📝 *APPLICATIONS*
+• ⏳ Pending: ${fmt(stats.pendingApplications)}${pendingAlert}
+• ✅ Approved Today: ${fmt(stats.approvedToday)}
+• ❌ Rejected Today: ${fmt(stats.rejectedToday)}
+
+🛠️ *TOOL USAGE (24h)*
+• Total: ${fmt(stats.totalToolUsage)}
+• CV Generated: ${fmt(stats.cvGenerated)}
+• Cover Letters: ${fmt(stats.coverLetters)}
+• Email Templates: ${fmt(stats.emailTemplates)}
+${revenueSection}
+━━━━━━━━━━━━━━━━━━━━━
+🔗 [Admin Dashboard](${dashboardLink})
+
+⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`;
+
+    const success = await sendAdminNotification(message);
+    
+    if (success) {
+      console.log('[Telegram] Daily summary sent successfully');
+    }
+    
+    return success;
+  } catch (error) {
+    console.error('[Telegram] Failed to send daily summary:', error);
+    return false;
+  }
+}
+
+/**
+ * System Error Alert (Bonus - optional)
+ * Simple error notification for critical issues
+ */
+export async function notifySystemError(data: {
+  errorType: string;
+  errorMessage: string;
+  location?: string;
+  affectedUser?: string;
+  severity?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+}): Promise<boolean> {
+  try {
+    const severityEmoji = {
+      'CRITICAL': '🔴',
+      'HIGH': '🟠',
+      'MEDIUM': '🟡',
+      'LOW': '🟢'
+    }[data.severity || 'MEDIUM'];
+
+    const message = `🚨 *SYSTEM ERROR*
+
+━━━━━━━━━━━━━━━━━━━━━
+${severityEmoji} *Severity:* ${data.severity || 'MEDIUM'}
+
+⚠️ *Error Type*
+${data.errorType}
+
+📝 *Message*
+${data.errorMessage}
+
+${data.location ? `📍 *Location*\n${data.location}\n` : ''}
+${data.affectedUser ? `👤 *Affected User*\n${data.affectedUser}\n` : ''}
+⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
+━━━━━━━━━━━━━━━━━━━━━`;
+
+    return await sendAdminNotification(message);
+  } catch (error) {
+    console.error('[Telegram] Failed to send error notification:', error);
+    return false;
+  }
 }

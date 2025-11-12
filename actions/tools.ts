@@ -43,6 +43,19 @@ export async function createCoverLetter(data: {
       } else {
         console.log("[Server] Template saved successfully:", insertedData);
       }
+
+      // 🆕 MONITORING: Log tool usage
+      try {
+        const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+        await logToolUsageWithNotification(
+          "Cover Letter Generator",
+          `${data.position} at ${data.company}`,
+          { tone: data.tone }
+        );
+      } catch (monitorError) {
+        console.error("[Monitoring] Failed to log cover letter usage:", monitorError);
+        // Don't throw - monitoring failure shouldn't break functionality
+      }
     } else {
       console.warn("[Server] No user found, skipping database save");
     }
@@ -80,6 +93,17 @@ export async function createEmailTemplate(data: {
   });
 
   if (error) throw error;
+
+  // 🆕 MONITORING: Log tool usage
+  try {
+    const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+    await logToolUsageWithNotification(
+      "Email Template Generator",
+      `${data.position} at ${data.company}`
+    );
+  } catch (monitorError) {
+    console.error("[Monitoring] Failed to log email template usage:", monitorError);
+  }
 
   revalidatePath("/tools/email-template");
   return { subject, body };

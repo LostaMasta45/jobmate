@@ -2,11 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { ModernLokerCard } from './ModernLokerCard'
+import { JobCardMobile } from '@/components/mobile/JobCardMobile'
+import { FilterBottomSheet, FilterState } from '@/components/mobile/FilterBottomSheet'
 import { TabFilterNavigation } from './TabFilterNavigation'
 import { FloatingActionMenu } from './FloatingActionMenu'
 import { ScrollToTop } from './ScrollToTop'
 import { NewJobsBanner } from './NewJobsBanner'
 import { LokerCardSkeleton } from './LokerCardSkeleton'
+import { Button } from '@/components/ui/button'
+import { SlidersHorizontal } from 'lucide-react'
 import type { Loker } from '@/types/vip'
 
 interface ModernLokerListProps {
@@ -18,6 +22,13 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   const [lokerList, setLokerList] = useState<Loker[]>(initialLoker)
   const [filters, setFilters] = useState({ category: 'all', location: 'Semua Lokasi', search: '', timeFilter: 'all' })
   const [isLoading, setIsLoading] = useState(false)
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [mobileFilters, setMobileFilters] = useState<FilterState>({
+    locations: [],
+    categories: [],
+    jobTypes: [],
+    timeRange: 'all'
+  })
 
   // Count new jobs posted today
   const getNewJobsCount = () => {
@@ -67,11 +78,47 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
     }
   }
 
-  // Client-side filtering
+  // Handle share
+  const handleShare = async (loker: Loker) => {
+    const shareData = {
+      title: loker.title,
+      text: `${loker.title} - ${loker.perusahaan_name}`,
+      url: `${window.location.origin}/vip/loker/${loker.id}`
+    }
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData)
+      } catch (err) {
+        // User cancelled or error
+      }
+    } else {
+      // Fallback: Copy to clipboard
+      navigator.clipboard.writeText(shareData.url)
+      // TODO: Show toast notification
+    }
+  }
+
+  // Handle bookmark
+  const handleBookmark = async (id: string) => {
+    // TODO: Call API to toggle bookmark
+    setLokerList((prev) =>
+      prev.map((l) =>
+        l.id === id ? { ...l, is_bookmarked: !l.is_bookmarked } : l
+      )
+    )
+  }
+
+  // Apply mobile filters
+  const handleApplyMobileFilters = (newFilters: FilterState) => {
+    setMobileFilters(newFilters)
+  }
+
+  // Client-side filtering (combine desktop & mobile filters)
   const filteredLoker = lokerList.filter((loker) => {
     let matches = true
 
-    // Search filter
+    // Desktop search filter
     if (filters.search) {
       const query = filters.search.toLowerCase()
       matches = matches && (
@@ -80,12 +127,17 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
       )
     }
 
-    // Location filter
+    // Desktop location filter
     if (filters.location && filters.location !== 'Semua Lokasi') {
       matches = matches && loker.lokasi === filters.location
     }
 
-    // Category filter
+    // Mobile location filter
+    if (mobileFilters.locations.length > 0) {
+      matches = matches && mobileFilters.locations.includes(loker.lokasi)
+    }
+
+    // Desktop category filter
     if (filters.category && filters.category !== 'all') {
       const categoryMap: { [key: string]: string[] } = {
         it: ['IT', 'Web Development', 'Mobile Development', 'Technology'],
@@ -98,26 +150,57 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
       matches = matches && loker.kategori?.some(k => categories.includes(k))
     }
 
-    // Time filter
-    if (filters.timeFilter && filters.timeFilter !== 'all') {
-      matches = matches && matchesTimeFilter(loker.published_at, filters.timeFilter)
+    // Mobile category filter
+    if (mobileFilters.categories.length > 0) {
+      matches = matches && loker.kategori?.some(k => mobileFilters.categories.includes(k))
+    }
+
+    // Mobile job type filter
+    if (mobileFilters.jobTypes.length > 0) {
+      matches = matches && loker.tipe_pekerjaan && mobileFilters.jobTypes.includes(loker.tipe_pekerjaan)
+    }
+
+    // Time filter (both desktop & mobile)
+    const timeFilter = filters.timeFilter !== 'all' ? filters.timeFilter : mobileFilters.timeRange
+    if (timeFilter && timeFilter !== 'all') {
+      matches = matches && matchesTimeFilter(loker.published_at, timeFilter)
     }
 
     return matches
   })
 
+  const activeFilterCount = mobileFilters.locations.length + mobileFilters.categories.length + mobileFilters.jobTypes.length + (mobileFilters.timeRange !== 'all' ? 1 : 0)
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 lg:space-y-8">
       {/* New Jobs Banner */}
       {newJobsCount > 0 && <NewJobsBanner count={newJobsCount} />}
 
-      {/* Filter Navigation - Sticky */}
-      <div className="sticky top-20 z-40 bg-gray-50 dark:bg-gray-950 py-4 -mx-4 px-4 lg:-mx-8 lg:px-8 shadow-sm">
+      {/* Desktop Filter Navigation - Sticky */}
+      <div className="hidden lg:block sticky top-20 z-40 bg-gray-50 dark:bg-gray-950 py-4 -mx-4 px-4 lg:-mx-8 lg:px-8 shadow-sm">
         <TabFilterNavigation onFilterChange={setFilters} />
       </div>
 
+      {/* Mobile Filter Button - Sticky */}
+      <div className="lg:hidden sticky top-16 z-40 bg-gray-50 dark:bg-gray-950 py-3 -mx-4 px-4 shadow-sm border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={() => setIsFilterOpen(true)}
+            className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl h-11 shadow-lg font-semibold"
+          >
+            <SlidersHorizontal className="w-4.5 h-4.5 mr-2" />
+            Filter Loker
+            {activeFilterCount > 0 && (
+              <span className="ml-2 bg-white/20 px-2 py-0.5 rounded-full text-xs">
+                {activeFilterCount}
+              </span>
+            )}
+          </Button>
+        </div>
+      </div>
+
       {/* Results Summary */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between px-1">
         <div>
           <p className="text-sm text-muted-foreground">
             Menampilkan{' '}
@@ -129,19 +212,34 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         </div>
       </div>
 
-      {/* Loker Grid dengan Bento Layout */}
+      {/* Loker Grid - Mobile: Stack, Desktop: Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <LokerCardSkeleton key={i} />
           ))}
         </div>
       ) : filteredLoker.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredLoker.map((loker) => (
-            <ModernLokerCard key={loker.id} loker={loker} />
-          ))}
-        </div>
+        <>
+          {/* Mobile: Stack with swipe cards */}
+          <div className="lg:hidden space-y-4">
+            {filteredLoker.map((loker) => (
+              <JobCardMobile
+                key={loker.id}
+                loker={loker}
+                onBookmark={handleBookmark}
+                onShare={handleShare}
+              />
+            ))}
+          </div>
+
+          {/* Desktop: Grid layout */}
+          <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {filteredLoker.map((loker) => (
+              <ModernLokerCard key={loker.id} loker={loker} />
+            ))}
+          </div>
+        </>
       ) : (
         /* Empty State */
         <div className="flex flex-col items-center justify-center py-20">
@@ -157,11 +255,21 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         </div>
       )}
 
-      {/* Floating Action Button */}
-      <FloatingActionMenu />
+      {/* Floating Action Button - Desktop only */}
+      <div className="hidden lg:block">
+        <FloatingActionMenu />
+      </div>
 
       {/* Scroll to Top */}
       <ScrollToTop />
+
+      {/* Mobile Filter Bottom Sheet */}
+      <FilterBottomSheet
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        onApply={handleApplyMobileFilters}
+        initialFilters={mobileFilters}
+      />
     </div>
   )
 }
