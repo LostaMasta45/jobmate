@@ -215,20 +215,31 @@ export default function SignInPage() {
         .from("profiles")
         .select("role, membership")
         .eq("id", authData.user.id)
-        .single();
+        .maybeSingle(); // Use maybeSingle instead of single to handle missing profile
 
       if (profileError) {
         console.error("❌ Profile fetch error:", profileError);
+        console.error("Error details:", JSON.stringify(profileError, null, 2));
       }
 
-      console.log("📋 Profile loaded:", { role: profile?.role, membership: profile?.membership });
+      console.log("📋 Profile loaded:", { 
+        exists: !!profile,
+        role: profile?.role, 
+        membership: profile?.membership,
+        userId: authData.user.id
+      });
 
-      let redirectPath = "/dashboard";
-      if (profile?.role === "admin") {
+      let redirectPath = "/";
+      
+      // If no profile found (new user), redirect to landing page
+      if (!profile) {
+        console.log("⚠️ No profile found for user, redirecting to landing page");
+        redirectPath = "/";
+      } else if (profile.role === "admin") {
         redirectPath = "/admin/dashboard";
-      } else if (profile?.membership === "vip_premium") {
+      } else if (profile.membership === "vip_premium") {
         redirectPath = "/dashboard"; // JobMate Premium Tools
-      } else if (profile?.membership === "vip_basic") {
+      } else if (profile.membership === "vip_basic") {
         redirectPath = "/vip"; // VIP Career Portal
       } else {
         // User with no VIP membership (free or null)
