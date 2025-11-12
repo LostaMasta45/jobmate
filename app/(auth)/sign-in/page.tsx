@@ -237,15 +237,20 @@ export default function SignInPage() {
         redirectPath = "/";
       } else if (profile.role === "admin") {
         redirectPath = "/admin/dashboard";
-      } else if (profile.membership === "vip_premium") {
+      } else if (profile.membership === "vip_premium" || profile.membership === "premium") {
+        // Handle both 'vip_premium' and 'premium' for backward compatibility
         redirectPath = "/dashboard"; // JobMate Premium Tools
-      } else if (profile.membership === "vip_basic") {
+        console.log("✅ VIP Premium user, redirecting to dashboard");
+      } else if (profile.membership === "vip_basic" || profile.membership === "basic") {
+        // Handle both 'vip_basic' and 'basic' for backward compatibility
         redirectPath = "/vip"; // VIP Career Portal
+        console.log("✅ VIP Basic user, redirecting to VIP portal");
       } else {
         // User with no VIP membership (free or null)
         // Don't redirect to protected routes to avoid infinite loop
         redirectPath = "/"; // Redirect to landing page
         console.log("⚠️ User has no VIP membership, redirecting to landing page");
+        console.log("⚠️ Membership value:", profile.membership);
       }
 
       console.log("🔄 Redirecting to:", redirectPath);
