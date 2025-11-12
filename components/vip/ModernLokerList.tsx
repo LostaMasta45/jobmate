@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react'
 import { ModernLokerCard } from './ModernLokerCard'
 import { JobCardMobile } from '@/components/mobile/JobCardMobile'
+import { JobCardModern } from '@/components/mobile/JobCardModern'
+import { QuickFilterChips } from '@/components/mobile/QuickFilterChips'
+import { SuggestedJobsCarousel } from '@/components/mobile/SuggestedJobsCarousel'
 import { FilterBottomSheet, FilterState } from '@/components/mobile/FilterBottomSheet'
 import { TabFilterNavigation } from './TabFilterNavigation'
 import { FloatingActionMenu } from './FloatingActionMenu'
@@ -11,7 +14,7 @@ import { NewJobsBanner } from './NewJobsBanner'
 import { LokerCardSkeleton } from './LokerCardSkeleton'
 import { toast } from '@/components/mobile/ToastNotification'
 import { Button } from '@/components/ui/button'
-import { SlidersHorizontal } from 'lucide-react'
+import { SlidersHorizontal, Sparkles } from 'lucide-react'
 import type { Loker } from '@/types/vip'
 
 interface ModernLokerListProps {
@@ -213,17 +216,25 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         <TabFilterNavigation onFilterChange={setFilters} />
       </div>
 
-      {/* Mobile Filter Button - Sticky */}
-      <div className="lg:hidden sticky top-16 z-40 bg-gray-50 dark:bg-gray-950 py-3 -mx-4 px-4 shadow-sm border-b border-gray-200 dark:border-gray-800">
-        <div className="flex items-center gap-3">
+      {/* Mobile: Quick Filter Chips + Filter Button */}
+      <div className="lg:hidden sticky top-16 z-40 bg-gradient-to-b from-gray-50 via-gray-50 to-transparent dark:from-gray-950 dark:via-gray-950 dark:to-transparent py-3 space-y-3">
+        {/* Quick Filter Chips */}
+        <QuickFilterChips onFilterChange={(filterId) => {
+          // Handle quick filter change
+          console.log('Quick filter:', filterId)
+        }} />
+
+        {/* Advanced Filter Button */}
+        <div className="px-4">
           <Button
             onClick={() => setIsFilterOpen(true)}
-            className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl h-11 shadow-lg font-semibold"
+            variant="outline"
+            className="w-full border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-2xl h-11 font-semibold text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all"
           >
             <SlidersHorizontal className="w-4.5 h-4.5 mr-2" />
-            Filter Loker
+            Advanced Filters
             {activeFilterCount > 0 && (
-              <span className="ml-2 bg-white/20 px-2 py-0.5 rounded-full text-xs">
+              <span className="ml-2 bg-emerald-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">
                 {activeFilterCount}
               </span>
             )}
@@ -244,6 +255,16 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         </div>
       </div>
 
+      {/* Suggested Jobs Carousel - Mobile Only */}
+      {!isLoading && filteredLoker.length > 5 && (
+        <div className="lg:hidden">
+          <SuggestedJobsCarousel 
+            jobs={filteredLoker.slice(0, 10)} 
+            title="🔥 Hot Jobs"
+          />
+        </div>
+      )}
+
       {/* Loker Grid - Mobile: Stack, Desktop: Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
@@ -253,10 +274,10 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         </div>
       ) : filteredLoker.length > 0 ? (
         <>
-          {/* Mobile: Stack with swipe cards */}
-          <div className="lg:hidden space-y-4">
+          {/* Mobile: Modern Stack Cards */}
+          <div className="lg:hidden space-y-3">
             {filteredLoker.map((loker) => (
-              <JobCardMobile
+              <JobCardModern
                 key={loker.id}
                 loker={loker}
                 onBookmark={handleBookmark}
