@@ -9,6 +9,7 @@ import { FloatingActionMenu } from './FloatingActionMenu'
 import { ScrollToTop } from './ScrollToTop'
 import { NewJobsBanner } from './NewJobsBanner'
 import { LokerCardSkeleton } from './LokerCardSkeleton'
+import { toast } from '@/components/mobile/ToastNotification'
 import { Button } from '@/components/ui/button'
 import { SlidersHorizontal } from 'lucide-react'
 import type { Loker } from '@/types/vip'
@@ -89,24 +90,55 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
     if (navigator.share) {
       try {
         await navigator.share(shareData)
+        toast.success('Berhasil membagikan lowongan!')
       } catch (err) {
-        // User cancelled or error
+        // User cancelled, don't show error
+        if ((err as Error).name !== 'AbortError') {
+          toast.error('Gagal membagikan lowongan')
+        }
       }
     } else {
       // Fallback: Copy to clipboard
-      navigator.clipboard.writeText(shareData.url)
-      // TODO: Show toast notification
+      try {
+        await navigator.clipboard.writeText(shareData.url)
+        toast.success('Link berhasil disalin ke clipboard!')
+      } catch (err) {
+        toast.error('Gagal menyalin link')
+      }
     }
   }
 
   // Handle bookmark
   const handleBookmark = async (id: string) => {
-    // TODO: Call API to toggle bookmark
+    const loker = lokerList.find((l) => l.id === id)
+    const wasBookmarked = loker?.is_bookmarked
+
+    // Optimistic UI update
     setLokerList((prev) =>
       prev.map((l) =>
         l.id === id ? { ...l, is_bookmarked: !l.is_bookmarked } : l
       )
     )
+
+    // Show toast feedback
+    if (wasBookmarked) {
+      toast.info('Dihapus dari tersimpan')
+    } else {
+      toast.success('Ditambahkan ke tersimpan!')
+    }
+
+    // TODO: Call API to persist bookmark
+    try {
+      // await fetch('/api/vip/bookmark', { method: 'POST', body: JSON.stringify({ loker_id: id }) })
+    } catch (err) {
+      // Revert on error
+      setLokerList((prev) =>
+        prev.map((l) =>
+          l.id === id ? { ...l, is_bookmarked: wasBookmarked } : l
+        )
+      )
+      toast.error('Gagal menyimpan perubahan')
+    }
   }
 
   // Apply mobile filters

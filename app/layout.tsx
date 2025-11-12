@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { ConditionalSessionTimeout } from "@/components/auth/ConditionalSessionTimeout";
 import { ActivityTrackingProvider } from "@/components/providers/ActivityTrackingProvider";
 import { Toaster } from "sonner";
+import { ToastContainer } from "@/components/mobile/ToastNotification";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -68,6 +69,7 @@ export default function RootLayout({
             <ConditionalSessionTimeout />
             {children}
             <Toaster position="top-center" richColors />
+            <ToastContainer />
           </ActivityTrackingProvider>
         </ThemeProvider>
         <div id="dnd-portal" />
