@@ -168,8 +168,9 @@ export async function middleware(request: NextRequest) {
     // Check if user has VIP Basic or VIP Premium
     if (!['vip_basic', 'vip_premium'].includes(membership || '')) {
       console.log('[MIDDLEWARE] No VIP membership, user needs to subscribe');
-      // User doesn't have VIP membership → redirect to sign-in with message
-      return NextResponse.redirect(new URL("/sign-in?message=vip_required", request.url));
+      // User doesn't have VIP membership → redirect to landing page instead of sign-in
+      // to avoid infinite redirect loop (user is already logged in but no VIP)
+      return NextResponse.redirect(new URL("/?message=vip_required", request.url));
     }
 
     // Check membership status for VIP users
@@ -230,9 +231,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/vip?message=premium_only", request.url));
     }
 
-    // Free users or non-members → redirect to VIP home
+    // Free users or non-members → redirect to landing page
     console.log('[MIDDLEWARE] Non-member trying to access JobMate');
-    return NextResponse.redirect(new URL("/vip?message=premium_required", request.url));
+    return NextResponse.redirect(new URL("/?message=premium_required", request.url));
   }
 
   // AUTH ENABLED - Protect admin routes (but exclude /admin-login)

@@ -227,9 +227,14 @@ export default function SignInPage() {
       if (profile?.role === "admin") {
         redirectPath = "/admin/dashboard";
       } else if (profile?.membership === "vip_premium") {
-        redirectPath = "/dashboard";
+        redirectPath = "/dashboard"; // JobMate Premium Tools
       } else if (profile?.membership === "vip_basic") {
-        redirectPath = "/vip";
+        redirectPath = "/vip"; // VIP Career Portal
+      } else {
+        // User with no VIP membership (free or null)
+        // Don't redirect to protected routes to avoid infinite loop
+        redirectPath = "/"; // Redirect to landing page
+        console.log("⚠️ User has no VIP membership, redirecting to landing page");
       }
 
       console.log("🔄 Redirecting to:", redirectPath);
