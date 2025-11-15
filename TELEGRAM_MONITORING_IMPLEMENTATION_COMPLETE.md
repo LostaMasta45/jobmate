@@ -273,8 +273,8 @@ SELECT * FROM daily_summary_logs;
 Add to `.env` (if not already exist):
 ```env
 # Telegram Bot Configuration
-TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz
-TELEGRAM_ADMIN_CHAT_ID=123456789
+TELEGRAM_BOT_TOKEN=your-telegram-bot-token-here
+TELEGRAM_ADMIN_CHAT_ID=your-telegram-chat-id
 
 # Cron Job Security (generate random secret)
 CRON_SECRET=your-random-secret-here-minimum-32-chars
