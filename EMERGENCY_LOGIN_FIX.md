@@ -220,7 +220,7 @@ if (!profile) {
 # 1. Go to /admin-login
 # 2. Use credentials:
 Email: admin@jobmate.com
-Password: Admin123456!
+Password: ************* (Admin credentials - see .env)
 
 # 3. Check console for:
 ✅ User signed in: admin@jobmate.com
