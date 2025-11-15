@@ -83,7 +83,7 @@ export default async function HistoryPage() {
     }) || []
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-20 sm:pb-8">
+    <div className="space-y-4 sm:space-y-6 pb-20 sm:pb-8 overflow-x-hidden">
       {/* Header - Mobile Optimized */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
@@ -104,66 +104,66 @@ export default async function HistoryPage() {
       </div>
 
       {/* Stats Summary - Mobile Optimized */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4 w-full">
+        <Card className="shadow-sm hover:shadow-md transition-shadow overflow-hidden">
           <CardContent className="p-3 sm:p-4 md:pt-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 min-w-0">
               <div className="p-1.5 sm:p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30">
                 <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <div>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+              <div className="min-w-0">
+                <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white truncate">
                   {recentJobs.length}
                 </p>
-                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">Total Dilihat</p>
+                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 truncate">Total Dilihat</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
+        <Card className="shadow-sm hover:shadow-md transition-shadow overflow-hidden">
           <CardContent className="p-3 sm:p-4 md:pt-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 min-w-0">
               <div className="p-1.5 sm:p-2 rounded-lg bg-orange-50 dark:bg-orange-950/30">
                 <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 dark:text-orange-400" />
               </div>
-              <div>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+              <div className="min-w-0">
+                <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white truncate">
                   {recentJobs.filter(j => j.isUrgent).length}
                 </p>
-                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">Mendesak</p>
+                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 truncate">Mendesak</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
+        <Card className="shadow-sm hover:shadow-md transition-shadow overflow-hidden">
           <CardContent className="p-3 sm:p-4 md:pt-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 min-w-0">
               <div className="p-1.5 sm:p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30">
                 <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
               </div>
-              <div>
-                <p className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white">
+              <div className="min-w-0">
+                <p className="text-sm sm:text-base md:text-lg font-bold text-gray-900 dark:text-white truncate">
                   Hari Ini
                 </p>
-                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">Terakhir Buka</p>
+                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 truncate">Terakhir Buka</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
+        <Card className="shadow-sm hover:shadow-md transition-shadow overflow-hidden">
           <CardContent className="p-3 sm:p-4 md:pt-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 min-w-0">
               <div className="p-1.5 sm:p-2 rounded-lg bg-purple-50 dark:bg-purple-950/30">
                 <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400" />
               </div>
-              <div>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+              <div className="min-w-0">
+                <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white truncate">
                   {new Set(recentJobs.map(j => j.company)).size}
                 </p>
-                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">Perusahaan</p>
+                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 truncate">Perusahaan</p>
               </div>
             </div>
           </CardContent>
@@ -197,9 +197,9 @@ export default async function HistoryPage() {
         ) : (
           <div className="grid gap-2 sm:gap-3 md:gap-4">
             {recentJobs.map((job) => (
-              <Card key={job.view_id} className="hover:shadow-lg transition-all hover:border-emerald-300 dark:hover:border-emerald-700 group">
+              <Card key={job.view_id} className="hover:shadow-lg transition-all hover:border-emerald-300 dark:hover:border-emerald-700 group overflow-hidden">
                 <CardContent className="p-3 sm:p-4 md:p-6">
-                  <div className="flex items-start gap-2.5 sm:gap-3 md:gap-4">
+                  <div className="flex items-start gap-2.5 sm:gap-3 md:gap-4 w-full">
                     {/* Company Logo */}
                     <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 rounded-lg sm:rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 flex items-center justify-center border border-emerald-200 dark:border-emerald-800 overflow-hidden">
                       {job.perusahaan_logo ? (
@@ -231,42 +231,42 @@ export default async function HistoryPage() {
                         )}
                       </div>
                       
-                      <div className="flex flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-3">
-                        <span className="flex items-center gap-1">
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-3 max-w-full">
+                        <span className="flex items-center gap-1 min-w-0 max-w-[45%]">
                           <MapPin className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                          <span className="truncate">{job.location}</span>
+                          <span className="truncate text-[11px] sm:text-xs">{job.location}</span>
                         </span>
-                        <span className="flex items-center gap-1">
+                        <span className="flex items-center gap-1 min-w-0 max-w-[45%]">
                           <Briefcase className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                          <span className="truncate">{job.type}</span>
+                          <span className="truncate text-[11px] sm:text-xs">{job.type}</span>
                         </span>
                       </div>
                       
-                      <div className="flex items-center gap-1 text-xs sm:text-sm text-emerald-600 dark:text-emerald-400 font-semibold mb-2 sm:mb-3">
-                        <span>💰</span>
-                        <span className="truncate">{job.salary}</span>
+                      <div className="flex items-center gap-1 text-xs sm:text-sm text-emerald-600 dark:text-emerald-400 font-semibold mb-2 sm:mb-3 max-w-full overflow-hidden">
+                        <span className="flex-shrink-0">💰</span>
+                        <span className="truncate text-[11px] sm:text-xs">{job.salary}</span>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
-                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                          <Badge variant="outline" className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5">
-                            <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
-                            <span className="hidden sm:inline">Diposting </span>{job.postedDate}
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 w-full">
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 overflow-hidden">
+                          <Badge variant="outline" className="text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0.5 whitespace-nowrap">
+                            <Calendar className="w-2 h-2 sm:w-2.5 sm:h-2.5 mr-0.5" />
+                            <span className="truncate max-w-[60px] sm:max-w-none">{job.postedDate}</span>
                           </Badge>
-                          <Badge variant="outline" className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5">
-                            <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
-                            <span className="hidden sm:inline">Dilihat </span>{job.viewedAt}
+                          <Badge variant="outline" className="text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0.5 whitespace-nowrap">
+                            <Clock className="w-2 h-2 sm:w-2.5 sm:h-2.5 mr-0.5" />
+                            <span className="truncate max-w-[60px] sm:max-w-none">{job.viewedAt}</span>
                           </Badge>
                         </div>
                         
-                        <Link href={`/vip/loker/${job.id}`} className="w-full sm:w-auto">
+                        <Link href={`/vip/loker/${job.id}`} className="w-full sm:w-auto flex-shrink-0">
                           <Button 
                             size="sm" 
-                            className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+                            className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 w-full sm:w-auto text-[11px] sm:text-sm h-7 sm:h-9 px-3 sm:px-4"
                           >
-                            <span className="hidden sm:inline">Lihat Detail</span>
                             <span className="sm:hidden">Detail</span>
-                            <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4 group-hover:translate-x-1 transition-transform" />
+                            <span className="hidden sm:inline">Lihat Detail</span>
+                            <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4 group-hover:translate-x-1 transition-transform flex-shrink-0" />
                           </Button>
                         </Link>
                       </div>
