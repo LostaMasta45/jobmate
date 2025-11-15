@@ -39,101 +39,151 @@ export function PerusahaanListClient({
 
   return (
     <div className="space-y-4 lg:space-y-6 overflow-x-hidden">
-      {/* Search - Mobile Optimized */}
-      <div className="sticky top-16 lg:top-20 z-30 bg-gray-50 dark:bg-gray-950 py-3 -mx-4 px-4 lg:-mx-8 lg:px-8 shadow-sm border-b border-gray-200 dark:border-gray-800 lg:border-0 max-w-full">
-        <div className="relative max-w-2xl">
-          <Search className="absolute left-3 lg:left-4 top-1/2 -translate-y-1/2 w-4 h-4 lg:w-5 lg:h-5 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Cari perusahaan, lokasi, industri..."
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="pl-9 lg:pl-11 h-10 lg:h-12 text-sm lg:text-base rounded-xl bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400"
-          />
+      {/* Modern Search Section - Mobile Optimized with Gradient */}
+      <div className="sticky top-16 lg:top-20 z-30 bg-gradient-to-br from-[#00acc7] via-[#00bed1] to-[#00d1dc] dark:from-[#00acc7] dark:to-[#00d1dc] -mx-4 px-4 lg:-mx-8 lg:px-8 py-4 lg:py-5 shadow-xl max-w-full">
+        <div className="relative max-w-2xl mx-auto">
+          <div className="relative group">
+            <Search className="absolute left-3.5 lg:left-4 top-1/2 -translate-y-1/2 w-4 h-4 lg:w-5 lg:h-5 text-gray-400 group-focus-within:text-[#00acc7] transition-colors z-10" />
+            <Input
+              type="text"
+              placeholder="Cari perusahaan, lokasi, industri..."
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="pl-10 lg:pl-12 pr-4 h-11 lg:h-13 text-sm lg:text-base rounded-2xl bg-white dark:bg-gray-900 border-0 shadow-lg focus:shadow-xl focus:ring-2 focus:ring-white/50 dark:focus:ring-white/20 transition-all placeholder:text-gray-400 font-medium"
+            />
+            {search && (
+              <button
+                onClick={() => handleSearch('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center transition-colors"
+              >
+                <span className="text-gray-600 dark:text-gray-300 text-xs">✕</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Results Count */}
-      <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400 px-1">
-        Ditemukan <span className="font-semibold text-gray-900 dark:text-white">{totalResults}</span> perusahaan
-      </p>
+      {/* Results Count - Modern Badge Style */}
+      <div className="flex items-center justify-between px-1">
+        <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-[#00acc7] to-[#00d1dc]"></span>
+            Ditemukan <span className="font-bold text-gray-900 dark:text-white">{totalResults}</span> perusahaan
+          </span>
+        </p>
+        {search && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleSearch('')}
+            className="h-7 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+          >
+            Reset Filter
+          </Button>
+        )}
+      </div>
 
-      {/* Perusahaan Grid - Mobile: 2 cols, Desktop: 3 cols */}
+      {/* Modern Perusahaan Grid - Mobile: 2 cols, Desktop: 3 cols */}
       {perusahaan.length > 0 ? (
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-5">
           {perusahaan.map((company) => (
-            <Card 
-              key={company.id} 
-              className="group hover:shadow-lg active:scale-95 transition-all hover:border-teal-300 dark:hover:border-teal-700 cursor-pointer"
+            <Link 
+              key={company.id}
+              href={`/vip/perusahaan/${company.slug}`}
             >
-              <CardContent className="p-3 lg:p-6">
-                <Link href={`/vip/perusahaan/${company.slug}`} className="block">
-                  {/* Logo - Centered on Mobile */}
-                  <div className="flex flex-col lg:flex-row items-center lg:items-start gap-3 lg:gap-4 mb-3 lg:mb-4">
+              <Card 
+                className="group h-full overflow-hidden bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-[#00acc7] dark:hover:border-[#00d1dc] hover:shadow-2xl hover:shadow-[#00acc7]/20 dark:hover:shadow-[#00d1dc]/10 active:scale-[0.98] transition-all duration-300 cursor-pointer"
+              >
+                <CardContent className="p-4 lg:p-5 flex flex-col h-full">
+                  {/* Logo Section */}
+                  <div className="flex flex-col items-center mb-3 lg:mb-4">
                     {company.logo_url ? (
-                      <div className="flex-shrink-0 w-12 h-12 lg:w-16 lg:h-16 rounded-lg lg:rounded-xl bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-950 dark:to-cyan-950 flex items-center justify-center border border-teal-200 dark:border-teal-800 overflow-hidden">
+                      <div className="relative w-14 h-14 lg:w-16 lg:h-16 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center border-2 border-gray-100 dark:border-gray-700 overflow-hidden group-hover:border-[#00acc7]/30 dark:group-hover:border-[#00d1dc]/30 transition-all shadow-sm group-hover:shadow-md">
                         <img
                           src={company.logo_url}
                           alt={company.name}
-                          className="w-full h-full object-contain p-1.5 lg:p-2"
+                          className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-300"
                         />
                       </div>
                     ) : (
-                      <div className="flex-shrink-0 w-12 h-12 lg:w-16 lg:h-16 rounded-lg lg:rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-md">
-                        <Building2 className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
+                      <div className="relative w-14 h-14 lg:w-16 lg:h-16 rounded-2xl bg-gradient-to-br from-[#00acc7] via-[#00bed1] to-[#00d1dc] flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:shadow-[#00acc7]/50 transition-all">
+                        <Building2 className="w-7 h-7 lg:w-8 lg:h-8 text-white group-hover:scale-110 transition-transform" />
+                        <div className="absolute inset-0 bg-white/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       </div>
                     )}
-                    <div className="flex-1 min-w-0 text-center lg:text-left">
-                      <h3 className="text-sm lg:text-base font-semibold text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors line-clamp-2 mb-1.5 lg:mb-1">
-                        {company.name}
-                      </h3>
-                      {company.industri && (
-                        <Badge variant="outline" className="text-xs bg-teal-50 dark:bg-teal-950/30 border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-400">
-                          {company.industri}
-                        </Badge>
-                      )}
-                    </div>
                   </div>
 
-                  {/* Description - Hidden on Mobile */}
+                  {/* Company Name */}
+                  <h3 className="text-sm lg:text-base font-bold text-gray-900 dark:text-white text-center line-clamp-2 mb-2 lg:mb-2.5 min-h-[2.5rem] lg:min-h-[3rem] group-hover:text-[#00acc7] dark:group-hover:text-[#00d1dc] transition-colors">
+                    {company.name}
+                  </h3>
+
+                  {/* Industry Badge */}
+                  {company.industri && (
+                    <div className="flex justify-center mb-3">
+                      <Badge 
+                        variant="outline" 
+                        className="text-[10px] lg:text-xs px-2 py-0.5 bg-gradient-to-r from-[#00acc7]/10 to-[#00d1dc]/10 border-[#00acc7]/30 dark:border-[#00d1dc]/30 text-[#00acc7] dark:text-[#00d1dc] font-medium"
+                      >
+                        {company.industri}
+                      </Badge>
+                    </div>
+                  )}
+
+                  {/* Description - Hidden on Mobile, visible on desktop */}
                   {company.deskripsi && (
-                    <p className="hidden lg:block text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4">
+                    <p className="hidden lg:block text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-3 text-center">
                       {company.deskripsi}
                     </p>
                   )}
 
-                  {/* Info */}
-                  <div className="space-y-1.5 lg:space-y-2">
+                  {/* Info Section */}
+                  <div className="mt-auto space-y-2 pt-2 border-t border-gray-100 dark:border-gray-700/50">
+                    {/* Location */}
                     {company.lokasi && (
-                      <div className="flex items-center justify-center lg:justify-start gap-1.5 lg:gap-2 text-xs lg:text-sm text-gray-600 dark:text-gray-400">
-                        <MapPin className="w-3 h-3 lg:w-4 lg:h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                        <span className="truncate">{company.lokasi}</span>
+                      <div className="flex items-center justify-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                        <div className="w-5 h-5 rounded-full bg-gray-100 dark:bg-gray-700/50 flex items-center justify-center flex-shrink-0">
+                          <MapPin className="w-2.5 h-2.5 lg:w-3 lg:h-3" />
+                        </div>
+                        <span className="truncate font-medium">{company.lokasi}</span>
                       </div>
                     )}
-                    <div className="flex items-center justify-center lg:justify-start gap-1.5 lg:gap-2 text-xs lg:text-sm">
-                      <Briefcase className="w-3 h-3 lg:w-4 lg:h-4 text-teal-600 dark:text-teal-400 flex-shrink-0" />
-                      <span className="font-medium text-teal-600 dark:text-teal-400">
-                        {company.loker_count} Loker
+                    {/* Job Count */}
+                    <div className="flex items-center justify-center gap-1.5">
+                      <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#00acc7] to-[#00d1dc] flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Briefcase className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-white" />
+                      </div>
+                      <span className="text-xs lg:text-sm font-bold bg-gradient-to-r from-[#00acc7] to-[#00d1dc] bg-clip-text text-transparent">
+                        {company.loker_count} Loker Aktif
                       </span>
                     </div>
                   </div>
-                </Link>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       ) : (
-        // Empty State
-        <Card>
+        // Modern Empty State
+        <Card className="border-dashed border-2 border-gray-300 dark:border-gray-700 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
           <CardContent className="p-8 lg:p-12 text-center">
-            <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3 lg:mb-4">
-              <Building2 className="w-8 h-8 lg:w-10 lg:h-10 text-gray-400 dark:text-gray-500" />
+            <div className="relative w-20 h-20 lg:w-24 lg:h-24 mx-auto mb-4 lg:mb-6">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#00acc7] to-[#00d1dc] rounded-3xl opacity-10 blur-xl"></div>
+              <div className="relative w-full h-full bg-gradient-to-br from-[#00acc7] to-[#00d1dc] rounded-3xl flex items-center justify-center shadow-lg">
+                <Building2 className="w-10 h-10 lg:w-12 lg:h-12 text-white" />
+              </div>
             </div>
-            <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white mb-2">
               Tidak Ada Perusahaan Ditemukan
             </h3>
-            <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 mb-4 lg:mb-6">Coba ubah kata kunci pencarian Anda</p>
-            <Button variant="outline" onClick={() => handleSearch('')} className="h-9 lg:h-10 text-sm lg:text-base">
+            <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+              Coba ubah kata kunci pencarian atau hapus filter untuk melihat semua perusahaan
+            </p>
+            <Button 
+              onClick={() => handleSearch('')} 
+              className="h-10 lg:h-11 px-6 bg-gradient-to-r from-[#00acc7] to-[#00d1dc] hover:from-[#00bed1] hover:to-[#00acc7] text-white shadow-lg hover:shadow-xl transition-all"
+            >
+              <Search className="w-4 h-4 mr-2" />
               Reset Pencarian
             </Button>
           </CardContent>
