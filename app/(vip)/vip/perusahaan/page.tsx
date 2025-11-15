@@ -56,11 +56,11 @@ export default async function PerusahaanListPage({
   )
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-4 sm:space-y-6 pb-20 sm:pb-8 overflow-x-hidden">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Daftar Perusahaan</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Daftar Perusahaan</h1>
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">
           Jelajahi perusahaan yang membuka lowongan kerja di Jombang
         </p>
       </div>

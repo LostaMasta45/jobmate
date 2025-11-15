@@ -45,11 +45,11 @@ export default async function SavedLokerPage() {
     .filter(Boolean) as any[]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 overflow-x-hidden pb-20 sm:pb-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Loker Tersimpan</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Loker Tersimpan</h1>
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">
           Daftar lowongan kerja yang telah Anda simpan untuk dilamar nanti
         </p>
       </div>

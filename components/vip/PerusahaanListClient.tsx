@@ -38,9 +38,9 @@ export function PerusahaanListClient({
   }
 
   return (
-    <div className="space-y-4 lg:space-y-6">
+    <div className="space-y-4 lg:space-y-6 overflow-x-hidden">
       {/* Search - Mobile Optimized */}
-      <div className="sticky top-16 lg:top-20 z-30 bg-gray-50 dark:bg-gray-950 py-3 -mx-4 px-4 lg:-mx-8 lg:px-8 shadow-sm border-b border-gray-200 dark:border-gray-800 lg:border-0">
+      <div className="sticky top-16 lg:top-20 z-30 bg-gray-50 dark:bg-gray-950 py-3 -mx-4 px-4 lg:-mx-8 lg:px-8 shadow-sm border-b border-gray-200 dark:border-gray-800 lg:border-0 max-w-full">
         <div className="relative max-w-2xl">
           <Search className="absolute left-3 lg:left-4 top-1/2 -translate-y-1/2 w-4 h-4 lg:w-5 lg:h-5 text-gray-400" />
           <Input

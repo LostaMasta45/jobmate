@@ -368,9 +368,9 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   const activeFilterCount = mobileFilters.locations.length + mobileFilters.categories.length + mobileFilters.jobTypes.length + (mobileFilters.timeRange !== 'all' ? 1 : 0)
 
   return (
-    <div className="lg:space-y-8 pb-safe">
+    <div className="lg:space-y-8 pb-safe overflow-x-hidden">
       {/* Mobile: Modern Top Section - Location & Search - FULL HEIGHT BLUE BACKGROUND */}
-      <div className="lg:hidden sticky top-0 z-50 bg-gradient-to-br from-[#8e68fd] via-[#5547d0] to-[#3977d3] dark:from-[#5547d0] dark:via-[#3977d3] dark:to-[#00acc7] -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 px-4 pt-[56px] pb-3 shadow-xl">
+      <div className="lg:hidden sticky top-0 z-50 bg-gradient-to-br from-[#8e68fd] via-[#5547d0] to-[#3977d3] dark:from-[#5547d0] dark:via-[#3977d3] dark:to-[#00acc7] -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 px-4 pt-[56px] pb-3 shadow-xl max-w-full">
         {/* Header Row */}
         <div className="flex items-center justify-between mb-2.5">
           {/* Location Selector */}
