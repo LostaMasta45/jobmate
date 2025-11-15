@@ -213,12 +213,12 @@ export function Sidebar({ isAdmin = false, membership: membershipProp = 'free', 
   // Desktop Sidebar Content
   const DesktopSidebarContent = () => (
     <>
-      <div className="flex h-16 items-center justify-center border-b px-4">
+      <div className="flex h-16 items-center justify-center border-b px-4 bg-gradient-to-r from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50">
         {!collapsed ? (
-          <Link href="/dashboard" className="flex items-center justify-center hover:opacity-80 transition-opacity">
-            <div className="relative h-12 w-48 flex-shrink-0">
+          <Link href="/dashboard" className="flex items-center justify-center hover:scale-105 transition-transform duration-200">
+            <div className="relative h-12 w-48 flex-shrink-0 filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_12px_rgba(0,209,220,0.25)]">
               <Image
-                src="/logo.png"
+                src="/Logo/logopanjang.png"
                 alt="JobMate Logo"
                 fill
                 className="object-contain"
@@ -227,10 +227,10 @@ export function Sidebar({ isAdmin = false, membership: membershipProp = 'free', 
             </div>
           </Link>
         ) : (
-          <Link href="/dashboard" className="mx-auto flex items-center hover:opacity-80 transition-opacity">
-            <div className="relative h-10 w-10 flex-shrink-0">
+          <Link href="/dashboard" className="mx-auto flex items-center hover:scale-110 transition-transform duration-200">
+            <div className="relative h-10 w-10 flex-shrink-0 filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_12px_rgba(0,209,220,0.25)]">
               <Image
-                src="/logo.png"
+                src="/Logo/logokecil.png"
                 alt="JobMate Logo"
                 fill
                 className="object-contain"
@@ -408,11 +408,11 @@ export function Sidebar({ isAdmin = false, membership: membershipProp = 'free', 
   // Mobile Sidebar Content
   const MobileSidebarContent = () => (
     <>
-      <div className="flex h-16 items-center justify-between border-b px-4">
+      <div className="flex h-16 items-center justify-between border-b px-4 bg-gradient-to-r from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50">
         <Link href="/dashboard" className="flex items-center justify-center flex-1" onClick={handleLinkClick}>
-          <div className="relative h-12 w-48 flex-shrink-0">
+          <div className="relative h-12 w-48 flex-shrink-0 filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_12px_rgba(0,209,220,0.25)]">
             <Image
-              src="/logo.png"
+              src="/Logo/logopanjang.png"
               alt="JobMate Logo"
               fill
               className="object-contain"

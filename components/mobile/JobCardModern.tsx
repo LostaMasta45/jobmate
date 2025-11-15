@@ -26,23 +26,23 @@ interface JobCardModernProps {
   onShare?: (loker: Loker) => void
 }
 
-// Colorful company logo backgrounds
+// Consistent purple/cyan theme for all company logos
 const logoBackgrounds = [
-  'bg-gradient-to-br from-blue-500 to-blue-600',
-  'bg-gradient-to-br from-purple-500 to-purple-600',
-  'bg-gradient-to-br from-pink-500 to-pink-600',
-  'bg-gradient-to-br from-yellow-500 to-yellow-600',
-  'bg-gradient-to-br from-green-500 to-green-600',
-  'bg-gradient-to-br from-red-500 to-red-600',
-  'bg-gradient-to-br from-indigo-500 to-indigo-600',
-  'bg-gradient-to-br from-teal-500 to-teal-600',
+  'bg-gradient-to-br from-[#8e68fd] to-[#5547d0]',
+  'bg-gradient-to-br from-[#5547d0] to-[#3977d3]',
+  'bg-gradient-to-br from-[#3977d3] to-[#00acc7]',
+  'bg-gradient-to-br from-[#00acc7] to-[#00bed1]',
+  'bg-gradient-to-br from-[#00bed1] to-[#00d1dc]',
+  'bg-gradient-to-br from-[#00d1dc] to-[#00acc7]',
+  'bg-gradient-to-br from-[#8e68fd] to-[#00d1dc]',
+  'bg-gradient-to-br from-[#5547d0] to-[#00bed1]',
 ]
 
 export function JobCardModern({ loker, onBookmark, onShare }: JobCardModernProps) {
   const [isBookmarked, setIsBookmarked] = useState(loker.is_bookmarked || false)
   const [dragX, setDragX] = useState(0)
 
-  // Get random colorful background based on company ID
+  // Get consistent emerald/teal background based on company ID
   const logoColorIndex = loker.perusahaan_id 
     ? parseInt(loker.perusahaan_id.slice(-1), 16) % logoBackgrounds.length 
     : 0
@@ -51,12 +51,12 @@ export function JobCardModern({ loker, onBookmark, onShare }: JobCardModernProps
   const formatSalary = (gaji_text?: string, gaji_min?: number, gaji_max?: number) => {
     if (gaji_text) return gaji_text
     if (gaji_min && gaji_max) {
-      return `$${(gaji_min / 1000000).toFixed(0)}k - $${(gaji_max / 1000000).toFixed(0)}k`
+      return `Rp ${(gaji_min / 1000000).toFixed(1)}jt - ${(gaji_max / 1000000).toFixed(1)}jt`
     }
     if (gaji_min) {
-      return `$${(gaji_min / 1000000).toFixed(0)}k+`
+      return `Rp ${(gaji_min / 1000000).toFixed(1)}jt+`
     }
-    return 'Negotiable'
+    return 'Tidak disebutkan'
   }
 
   const getTimeAgo = (date?: string) => {
@@ -116,52 +116,68 @@ export function JobCardModern({ loker, onBookmark, onShare }: JobCardModernProps
         className="relative bg-white dark:bg-gray-900 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-800"
       >
         {/* Card Content */}
-        <Link href={`/vip/loker/${loker.id}`} className="block p-5">
+        <Link href={`/vip/loker/${loker.id}`} className="block p-4">
+          {/* Poster Thumbnail - If available */}
+          {loker.poster_url && (
+            <div className="mb-3.5 -mx-4 -mt-4 rounded-t-3xl overflow-hidden">
+              <div className="relative w-full h-36">
+                <Image
+                  src={loker.poster_url}
+                  alt={`Poster ${loker.title}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              </div>
+            </div>
+          )}
+
           {/* Header: Company Logo + Info */}
-          <div className="flex items-start gap-4 mb-4">
-            {/* Colorful Company Logo */}
-            <div className={`flex-shrink-0 w-14 h-14 rounded-2xl ${logoBackground} p-0.5 shadow-lg`}>
-              <div className="w-full h-full rounded-[14px] bg-white dark:bg-gray-900 p-2 flex items-center justify-center">
+          <div className="flex items-start gap-3 mb-3.5">
+            {/* Consistent Emerald/Teal Company Logo */}
+            <div className={`flex-shrink-0 w-12 h-12 rounded-2xl ${logoBackground} p-0.5 shadow-md`}>
+              <div className="w-full h-full rounded-[14px] bg-white dark:bg-gray-900 p-1.5 flex items-center justify-center">
                 {loker.perusahaan?.logo_url ? (
                   <Image
                     src={loker.perusahaan.logo_url}
                     alt={loker.perusahaan_name}
-                    width={40}
-                    height={40}
+                    width={36}
+                    height={36}
                     className="object-contain"
                   />
                 ) : (
-                  <Building2 className="w-6 h-6 text-gray-400" />
+                  <Building2 className="w-5 h-5 text-gray-400" />
                 )}
               </div>
             </div>
 
             {/* Job Info */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white line-clamp-1 mb-1">
+              <h3 className="text-base font-bold text-gray-900 dark:text-white line-clamp-1 mb-1.5 leading-tight">
                 {loker.title}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5 mb-2">
-                <Building2 className="w-3.5 h-3.5" />
-                {loker.perusahaan_name}
+              <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5 mb-2.5 font-medium">
+                <Building2 className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="truncate">{loker.perusahaan_name}</span>
               </p>
               
               {/* Quick Badges */}
               <div className="flex flex-wrap gap-1.5">
                 {loker.tipe_pekerjaan && (
-                  <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-0">
+                  <Badge variant="secondary" className="text-[11px] px-2 py-0.5 bg-[#3977d3]/10 dark:bg-[#3977d3]/20 text-[#3977d3] dark:text-[#3977d3] border-0 font-medium">
                     <Briefcase className="w-3 h-3 mr-1" />
                     {loker.tipe_pekerjaan}
                   </Badge>
                 )}
                 {loker.lokasi && (
-                  <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 border-0">
+                  <Badge variant="secondary" className="text-[11px] px-2 py-0.5 bg-[#8e68fd]/10 dark:bg-[#5547d0]/20 text-[#5547d0] dark:text-[#8e68fd] border-0 font-medium">
                     <MapPin className="w-3 h-3 mr-1" />
                     {loker.lokasi}
                   </Badge>
                 )}
                 {isNew && (
-                  <Badge className="text-xs px-2 py-0.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0">
+                  <Badge className="text-[11px] px-2 py-0.5 bg-gradient-to-r from-[#00d1dc] to-[#00acc7] text-white border-0 font-semibold">
                     Baru!
                   </Badge>
                 )}
@@ -175,10 +191,10 @@ export function JobCardModern({ loker, onBookmark, onShare }: JobCardModernProps
                 setIsBookmarked(!isBookmarked)
                 onBookmark?.(loker.id)
               }}
-              className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-95 transition-all"
+              className="flex-shrink-0 w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-95 transition-all"
             >
               <Bookmark
-                className={`w-4.5 h-4.5 transition-colors ${
+                className={`w-4 h-4 transition-colors ${
                   isBookmarked
                     ? 'fill-blue-500 text-blue-500'
                     : 'text-gray-400'
@@ -188,32 +204,32 @@ export function JobCardModern({ loker, onBookmark, onShare }: JobCardModernProps
           </div>
 
           {/* Salary + Meta Info */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-800">
+          <div className="flex items-center justify-between pt-3.5 border-t border-gray-100 dark:border-gray-800">
             {/* Salary - PROMINENT */}
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                <DollarSign className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00d1dc] to-[#00acc7] flex items-center justify-center shadow-md shadow-[#00d1dc]/20">
+                <DollarSign className="w-4.5 h-4.5 text-white" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Salary</p>
-                <p className="text-base font-bold text-gray-900 dark:text-white">
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium mb-0.5">Gaji</p>
+                <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">
                   {formatSalary(loker.gaji_text, loker.gaji_min, loker.gaji_max)}
                 </p>
               </div>
             </div>
 
             {/* Meta Info */}
-            <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-2.5 text-xs text-gray-500 dark:text-gray-400 font-medium">
               {loker.published_at && (
                 <div className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
-                  {getTimeAgo(loker.published_at)}
+                  <span>{getTimeAgo(loker.published_at)}</span>
                 </div>
               )}
               {loker.view_count && loker.view_count > 0 && (
                 <div className="flex items-center gap-1">
                   <TrendingUp className="w-3.5 h-3.5" />
-                  {loker.view_count}
+                  <span>{loker.view_count}</span>
                 </div>
               )}
             </div>
@@ -222,8 +238,8 @@ export function JobCardModern({ loker, onBookmark, onShare }: JobCardModernProps
           {/* Featured Badge Ribbon */}
           {loker.is_featured && (
             <div className="absolute top-0 right-0">
-              <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-bl-2xl rounded-tr-3xl shadow-lg">
-                ⭐ Featured
+              <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-bl-2xl rounded-tr-3xl shadow-md">
+                ⭐ Unggulan
               </div>
             </div>
           )}

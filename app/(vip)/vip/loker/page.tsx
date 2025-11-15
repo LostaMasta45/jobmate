@@ -75,10 +75,12 @@ export default async function LokerListPage({
 
   // Apply filters
   if (search) {
-    query = query.or(`title.ilike.%${search}%,perusahaan_name.ilike.%${search}%`)
+    // Search in multiple fields
+    query = query.or(`title.ilike.%${search}%,perusahaan_name.ilike.%${search}%,deskripsi.ilike.%${search}%,lokasi.ilike.%${search}%`)
   }
 
   if (kategori.length > 0) {
+    // Use overlaps for array fields - check if any kategori matches
     query = query.overlaps('kategori', kategori)
   }
 
@@ -87,7 +89,8 @@ export default async function LokerListPage({
   }
 
   if (tipe_kerja) {
-    query = query.eq('tipe_kerja', tipe_kerja)
+    // Support both exact match and partial match for tipe_kerja
+    query = query.or(`tipe_kerja.eq.${tipe_kerja},tipe_pekerjaan.ilike.%${tipe_kerja}%`)
   }
 
   // Apply time filter

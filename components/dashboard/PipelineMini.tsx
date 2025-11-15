@@ -14,12 +14,12 @@ type PipelineMiniProps = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  Applied: "bg-blue-500",
-  Screening: "bg-purple-500",
-  Interview: "bg-yellow-500",
-  Offer: "bg-orange-500",
-  Hired: "bg-green-500",
-  Rejected: "bg-red-500",
+  Applied: "bg-[#8e68fd]",
+  Screening: "bg-[#5547d0]",
+  Interview: "bg-[#3977d3]",
+  Offer: "bg-[#00acc7]",
+  Hired: "bg-[#00d1dc]",
+  Rejected: "bg-[#00bed1]",
 };
 
 export function PipelineMini({ data }: PipelineMiniProps) {

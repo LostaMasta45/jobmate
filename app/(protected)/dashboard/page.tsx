@@ -76,11 +76,11 @@ export default async function DashboardPage() {
           
           <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full">
             {/* Cover Letters History */}
-            <Card className="group hover:shadow-lg transition-all border-l-4 border-l-green-500 bg-gradient-to-br from-green-50/50 to-transparent dark:from-green-950/20">
+            <Card className="group hover:shadow-lg transition-all border-l-4 border-l-[#8e68fd] bg-gradient-to-br from-[#8e68fd]/10 to-transparent dark:from-[#8e68fd]/20">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-green-500/10">
-                    <FileText className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <div className="p-2 rounded-lg bg-[#8e68fd]/10">
+                    <FileText className="h-4 w-4 text-[#8e68fd] dark:text-[#8e68fd]" />
                   </div>
                   <CardTitle className="text-sm">Surat Lamaran</CardTitle>
                 </div>
@@ -91,11 +91,11 @@ export default async function DashboardPage() {
             </Card>
 
             {/* Emails History */}
-            <Card className="group hover:shadow-lg transition-all border-l-4 border-l-blue-500 bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-950/20">
+            <Card className="group hover:shadow-lg transition-all border-l-4 border-l-[#3977d3] bg-gradient-to-br from-[#3977d3]/10 to-transparent dark:from-[#3977d3]/20">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-blue-500/10">
-                    <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <div className="p-2 rounded-lg bg-[#3977d3]/10">
+                    <Mail className="h-4 w-4 text-[#3977d3] dark:text-[#3977d3]" />
                   </div>
                   <CardTitle className="text-sm">Email</CardTitle>
                 </div>
@@ -106,11 +106,11 @@ export default async function DashboardPage() {
             </Card>
 
             {/* PDF Tools History */}
-            <Card className="group hover:shadow-lg transition-all border-l-4 border-l-orange-500 bg-gradient-to-br from-orange-50/50 to-transparent dark:from-orange-950/20">
+            <Card className="group hover:shadow-lg transition-all border-l-4 border-l-[#00d1dc] bg-gradient-to-br from-[#00d1dc]/10 to-transparent dark:from-[#00d1dc]/20">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-orange-500/10">
-                    <Sparkles className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                  <div className="p-2 rounded-lg bg-[#00d1dc]/10">
+                    <Sparkles className="h-4 w-4 text-[#00d1dc] dark:text-[#00d1dc]" />
                   </div>
                   <CardTitle className="text-sm">PDF Tools</CardTitle>
                 </div>
@@ -121,11 +121,11 @@ export default async function DashboardPage() {
             </Card>
 
             {/* WhatsApp History */}
-            <Card className="group hover:shadow-lg transition-all border-l-4 border-l-teal-500 bg-gradient-to-br from-teal-50/50 to-transparent dark:from-teal-950/20">
+            <Card className="group hover:shadow-lg transition-all border-l-4 border-l-[#00acc7] bg-gradient-to-br from-[#00acc7]/10 to-transparent dark:from-[#00acc7]/20">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-teal-500/10">
-                    <MessageCircle className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                  <div className="p-2 rounded-lg bg-[#00acc7]/10">
+                    <MessageCircle className="h-4 w-4 text-[#00acc7] dark:text-[#00acc7]" />
                   </div>
                   <CardTitle className="text-sm">WhatsApp</CardTitle>
                 </div>

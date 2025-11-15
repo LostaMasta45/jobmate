@@ -172,9 +172,9 @@ export default async function VIPDashboardPage() {
   const displayName = profile?.full_name || user.email?.split('@')[0] || 'Member'
 
   return (
-    <>
-      {/* Welcome Box */}
-      <div className="mb-6">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Welcome Box - With proper spacing */}
+      <div className="w-full mt-2 sm:mt-0">
         <VIPWelcomeBox profile={profile || {}} />
       </div>
 
@@ -197,6 +197,6 @@ export default async function VIPDashboardPage() {
         lokerList={lokerWithBookmarks}
         recentlyViewedLoker={recentlyViewedWithBookmarks}
       />
-    </>
+    </div>
   )
 }

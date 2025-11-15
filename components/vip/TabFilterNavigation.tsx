@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Search, SlidersHorizontal, MapPin, Tag, Clock } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
@@ -34,10 +35,26 @@ interface TabFilterNavigationProps {
 }
 
 export function TabFilterNavigation({ onFilterChange }: TabFilterNavigationProps) {
-  const [activeCategory, setActiveCategory] = useState('all')
-  const [activeLocation, setActiveLocation] = useState('Semua Lokasi')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [activeTimeFilter, setActiveTimeFilter] = useState('all')
+  const searchParams = useSearchParams()
+  
+  // Initialize from URL params
+  const getInitialCategory = () => {
+    const kategori = searchParams.getAll('kategori')
+    if (kategori.length === 0) return 'all'
+    // Map back from category names to filter IDs
+    const firstCategory = kategori[0]
+    if (firstCategory.includes('IT') || firstCategory.includes('Technology')) return 'it'
+    if (firstCategory.includes('Marketing')) return 'marketing'
+    if (firstCategory.includes('Sales')) return 'sales'
+    if (firstCategory.includes('F&B')) return 'fnb'
+    if (firstCategory.includes('Retail')) return 'retail'
+    return 'all'
+  }
+  
+  const [activeCategory, setActiveCategory] = useState(getInitialCategory())
+  const [activeLocation, setActiveLocation] = useState(searchParams.get('lokasi') || 'Semua Lokasi')
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
+  const [activeTimeFilter, setActiveTimeFilter] = useState(searchParams.get('timeFilter') || 'all')
   const [showLocationMenu, setShowLocationMenu] = useState(false)
   const [showTimeMenu, setShowTimeMenu] = useState(false)
   

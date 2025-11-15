@@ -318,12 +318,12 @@ export default function SignInPage() {
                   {/* Animated Logo */}
                   <motion.div
                     variants={logoVariants}
-                    className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-blue-600 text-white shadow-lg shadow-brand/30 relative overflow-hidden"
+                    className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white dark:bg-gray-800 shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,209,220,0.2)] border-2 border-gray-100 dark:border-gray-700 relative overflow-hidden p-2"
                     whileHover={{ rotate: 360, scale: 1.1 }}
                     transition={{ duration: 0.6 }}
                   >
                     <motion.div
-                      className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent"
+                      className="absolute inset-0 bg-gradient-to-tr from-[#8e68fd]/10 via-[#00d1dc]/10 to-transparent"
                       animate={{
                         x: ["-100%", "200%"],
                       }}
@@ -333,7 +333,11 @@ export default function SignInPage() {
                         ease: "easeInOut",
                       }}
                     />
-                    <Sparkles className="h-8 w-8 relative z-10" />
+                    <img 
+                      src="/Logo/logokecil.png" 
+                      alt="JobMate Logo" 
+                      className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.15)] dark:drop-shadow-[0_2px_8px_rgba(0,209,220,0.3)] relative z-10"
+                    />
                   </motion.div>
 
                   <motion.div variants={itemVariants}>

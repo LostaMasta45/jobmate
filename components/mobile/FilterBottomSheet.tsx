@@ -21,8 +21,25 @@ export interface FilterState {
 }
 
 const LOCATIONS = ['Jombang', 'Surabaya', 'Malang', 'Sidoarjo', 'Gresik', 'Remote']
-const CATEGORIES = ['IT', 'Marketing', 'Sales', 'F&B', 'Retail', 'Administrasi', 'Finance', 'Design']
-const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Freelance', 'Internship']
+const CATEGORIES = [
+  'IT', 
+  'Technology',
+  'Web Development',
+  'Mobile Development',
+  'Marketing', 
+  'Sales', 
+  'F&B', 
+  'Retail', 
+  'Administrasi',
+  'Admin',
+  'Finance', 
+  'Design',
+  'Engineer',
+  'Engineering',
+  'HRD',
+  'HR'
+]
+const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Freelance', 'Internship', 'Magang']
 const TIME_RANGES = [
   { value: 'all', label: 'Semua Waktu' },
   { value: 'today', label: 'Hari Ini' },

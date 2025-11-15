@@ -11,42 +11,42 @@ const navItems = [
     icon: Home, 
     label: "Home", 
     href: "/vip",
-    activeColor: "text-emerald-500 dark:text-emerald-400",
-    gradientFrom: "from-emerald-500",
-    gradientTo: "to-emerald-600"
+    activeColor: "text-[#8e68fd] dark:text-[#8e68fd]",
+    gradientFrom: "from-[#8e68fd]",
+    gradientTo: "to-[#5547d0]"
   },
   { 
     icon: Wrench, 
     label: "Tools", 
     href: "/tools",
-    activeColor: "text-amber-500 dark:text-amber-400",
-    gradientFrom: "from-amber-500",
-    gradientTo: "to-amber-600"
+    activeColor: "text-[#3977d3] dark:text-[#3977d3]",
+    gradientFrom: "from-[#3977d3]",
+    gradientTo: "to-[#00acc7]"
   },
   { 
     icon: Search, 
     label: "Cari Loker", 
     href: "/vip/loker",
-    activeColor: "text-emerald-600 dark:text-emerald-500",
-    gradientFrom: "from-emerald-500",
-    gradientTo: "to-teal-600",
+    activeColor: "text-[#00d1dc] dark:text-[#00bed1]",
+    gradientFrom: "from-[#00d1dc]",
+    gradientTo: "to-[#00acc7]",
     isCenter: true // Special center floating button
   },
   { 
     icon: History, 
     label: "History", 
     href: "/vip/history",
-    activeColor: "text-cyan-500 dark:text-cyan-400",
-    gradientFrom: "from-cyan-500",
-    gradientTo: "to-cyan-600"
+    activeColor: "text-[#00acc7] dark:text-[#00bed1]",
+    gradientFrom: "from-[#00acc7]",
+    gradientTo: "to-[#00d1dc]"
   },
   { 
     icon: Building2, 
     label: "Perusahaan", 
     href: "/vip/perusahaan",
-    activeColor: "text-teal-500 dark:text-teal-400",
-    gradientFrom: "from-teal-500",
-    gradientTo: "to-teal-600"
+    activeColor: "text-[#5547d0] dark:text-[#8e68fd]",
+    gradientFrom: "from-[#5547d0]",
+    gradientTo: "to-[#3977d3]"
   }
 ];
 
@@ -60,14 +60,14 @@ export function VIPBottomBar() {
         {/* Extra space for floating button */}
         <div className="h-14" />
         
-        {/* Glassmorphism Container with Curved Top - EMERALD THEME */}
-        <div className="relative mx-4 rounded-[28px] bg-white/70 dark:bg-gray-900/70 backdrop-blur-2xl border border-emerald-200/50 dark:border-emerald-700/50 shadow-[0_-8px_40px_rgba(16,185,129,0.12)] dark:shadow-[0_-8px_40px_rgba(16,185,129,0.5)]">
+        {/* Glassmorphism Container with Curved Top - PURPLE/CYAN THEME */}
+        <div className="relative mx-4 rounded-[28px] bg-white/70 dark:bg-gray-900/70 backdrop-blur-2xl border border-[#8e68fd]/30 dark:border-[#5547d0]/50 shadow-[0_-8px_40px_rgba(142,104,253,0.15)] dark:shadow-[0_-8px_40px_rgba(85,71,208,0.5)]">
           
-          {/* Gradient Overlay for Extra Depth - EMERALD */}
-          <div className="absolute inset-0 rounded-[28px] bg-gradient-to-t from-emerald-50/40 to-transparent dark:from-emerald-900/40 pointer-events-none" />
+          {/* Gradient Overlay for Extra Depth - PURPLE/CYAN */}
+          <div className="absolute inset-0 rounded-[28px] bg-gradient-to-t from-[#8e68fd]/10 to-transparent dark:from-[#5547d0]/30 pointer-events-none" />
           
           {/* Navigation Items Container */}
-          <div className="relative flex items-center justify-around h-20 px-3 safe-area-inset-bottom">
+          <div className="relative flex items-center justify-around h-[72px] px-2 safe-area-inset-bottom">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href || (item.href !== '/vip' && pathname.startsWith(item.href));
@@ -91,11 +91,11 @@ export function VIPBottomBar() {
                       href={item.href}
                       className="group relative mb-2"
                     >
-                      {/* Outer Glow Ring with Rotation - EMERALD */}
+                      {/* Outer Glow Ring with Rotation - CYAN/PURPLE */}
                       <motion.div 
                         className={cn(
                           "absolute -inset-3 rounded-[26px]",
-                          "bg-gradient-to-br from-emerald-500/30 to-teal-600/30 blur-2xl",
+                          "bg-gradient-to-br from-[#00d1dc]/30 to-[#00acc7]/30 blur-2xl",
                         )}
                         style={{ 
                           opacity: isActive ? 0.6 : 0,
@@ -113,30 +113,30 @@ export function VIPBottomBar() {
                         whileHover={{ opacity: 1, scale: 1.1 }}
                       />
                       
-                      {/* Inner Glow - EMERALD */}
+                      {/* Inner Glow - CYAN/PURPLE */}
                       <motion.div 
                         className={cn(
                           "absolute -inset-1 rounded-[25px]",
-                          "bg-gradient-to-br from-emerald-500/60 to-teal-600/60 blur-md",
+                          "bg-gradient-to-br from-[#00d1dc]/60 to-[#00acc7]/60 blur-md",
                         )}
                         animate={isActive ? { opacity: 0.8 } : { opacity: 0 }}
                         whileHover={{ opacity: 1 }}
                         transition={{ duration: 0.3 }}
                       />
                       
-                      {/* Main Button with Interactive Animations - EMERALD */}
+                      {/* Main Button with Interactive Animations - CYAN GRADIENT */}
                       <motion.div 
                         className={cn(
                           "relative flex items-center justify-center",
-                          "w-[76px] h-[76px] rounded-[26px]",
-                          "bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600",
-                          "shadow-[0_12px_48px_rgba(16,185,129,0.5)] dark:shadow-[0_12px_48px_rgba(16,185,129,0.7)]",
-                          "border-[4.5px] border-white dark:border-gray-900",
+                          "w-[70px] h-[70px] rounded-[24px]",
+                          "bg-gradient-to-br from-[#00d1dc] via-[#00bed1] to-[#00acc7]",
+                          "shadow-[0_12px_48px_rgba(0,209,220,0.5)] dark:shadow-[0_12px_48px_rgba(0,190,209,0.7)]",
+                          "border-[4px] border-white dark:border-gray-900",
                         )}
                         whileHover={{ 
                           scale: 1.1,
                           rotate: -3,
-                          boxShadow: "0 20px 64px rgba(16,185,129,0.65)",
+                          boxShadow: "0 20px 64px rgba(0,209,220,0.65)",
                           transition: { duration: 0.3 }
                         }}
                         whileTap={{ 
@@ -147,7 +147,7 @@ export function VIPBottomBar() {
                         animate={isActive ? {
                           scale: 1.05,
                           rotate: -2,
-                          boxShadow: "0 16px 56px rgba(16,185,129,0.6)"
+                          boxShadow: "0 16px 56px rgba(0,209,220,0.6)"
                         } : {
                           scale: 1,
                           rotate: 0
@@ -175,7 +175,7 @@ export function VIPBottomBar() {
                         </div>
                         
                         {/* Inner Highlight */}
-                        <div className="absolute inset-[4.5px] rounded-[21px] bg-gradient-to-t from-transparent to-white/20" />
+                        <div className="absolute inset-[4px] rounded-[20px] bg-gradient-to-t from-transparent to-white/20" />
                         
                         {/* Icon with Continuous Rotation */}
                         <motion.div 
@@ -187,23 +187,23 @@ export function VIPBottomBar() {
                             ease: "linear"
                           }}
                         >
-                          <Icon className="w-9 h-9 text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)] relative z-10" strokeWidth={2.5} />
+                          <Icon className="w-8 h-8 text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)] relative z-10" strokeWidth={2.5} />
                         </motion.div>
                       </motion.div>
                     </Link>
                     
-                    {/* Center Label with Background - EMERALD */}
+                    {/* Center Label with Background - CYAN */}
                     <div className={cn(
-                      "px-3 py-0.5 rounded-full transition-all duration-300",
+                      "px-3 py-1 rounded-full transition-all duration-300 shadow-sm",
                       isActive 
-                        ? "bg-emerald-500/10 dark:bg-emerald-500/20"
-                        : "bg-transparent"
+                        ? "bg-[#00d1dc]/15 dark:bg-[#00bed1]/25 ring-1 ring-[#00d1dc]/20"
+                        : "bg-white/60 dark:bg-gray-800/60"
                     )}>
                       <span className={cn(
-                        "text-[11px] font-bold transition-all duration-300",
+                        "text-xs font-bold transition-all duration-300 whitespace-nowrap",
                         isActive 
-                          ? "text-emerald-600 dark:text-emerald-400 scale-105"
-                          : "text-gray-500 dark:text-gray-400"
+                          ? "text-[#00acc7] dark:text-[#00d1dc] scale-105"
+                          : "text-gray-600 dark:text-gray-400"
                       )}>
                         {item.label}
                       </span>
@@ -217,7 +217,7 @@ export function VIPBottomBar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="relative flex flex-col items-center justify-center flex-1 h-full gap-1.5 group"
+                  className="relative flex flex-col items-center justify-center flex-1 h-full gap-1 group"
                 >
                   {/* Icon Container with Hover Effect */}
                   <motion.div 
@@ -259,18 +259,18 @@ export function VIPBottomBar() {
                     <motion.div 
                       className={cn(
                         "relative flex items-center justify-center",
-                        "w-12 h-12 rounded-2xl",
+                        "w-11 h-11 rounded-xl",
                         isActive ? [
                           "bg-gradient-to-br",
                           item.gradientFrom,
                           item.gradientTo,
-                          "shadow-lg shadow-current/30"
+                          "shadow-md shadow-current/20"
                         ] : [
                           "bg-transparent",
                         ]
                       )}
                       whileHover={{
-                        scale: 1.1,
+                        scale: 1.08,
                         backgroundColor: isActive ? undefined : "rgba(107, 114, 128, 0.1)",
                         transition: { duration: 0.2 }
                       }}
@@ -279,7 +279,7 @@ export function VIPBottomBar() {
                         transition: { duration: 0.1 }
                       }}
                       animate={isActive ? {
-                        scale: 1.05
+                        scale: 1.03
                       } : {}}
                     >
                       <motion.div
@@ -295,12 +295,12 @@ export function VIPBottomBar() {
                       >
                         <Icon 
                           className={cn(
-                            "w-6 h-6",
+                            "w-5.5 h-5.5",
                             isActive 
                               ? "text-white"
-                              : "text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300"
+                              : "text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300"
                           )} 
-                          strokeWidth={isActive ? 2.5 : 2}
+                          strokeWidth={isActive ? 2.5 : 2.2}
                         />
                       </motion.div>
                     </motion.div>
@@ -309,10 +309,10 @@ export function VIPBottomBar() {
                   {/* Label */}
                   <motion.span 
                     className={cn(
-                      "text-[11px] font-medium",
+                      "text-xs font-semibold whitespace-nowrap",
                       isActive 
                         ? [item.activeColor, "font-bold"]
-                        : "text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300"
+                        : "text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300"
                     )}
                     animate={isActive ? {
                       scale: [1, 1.05, 1]

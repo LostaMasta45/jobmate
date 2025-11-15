@@ -119,12 +119,12 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
         <Button 
           variant="ghost" 
           size="icon" 
-          className={`relative h-9 w-9 sm:h-10 sm:w-10 ${className}`}
+          className={`relative h-8 w-8 sm:h-9 sm:w-9 ${className}`}
         >
-          <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
+          <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           {unreadCount > 0 && (
             <Badge 
-              className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white text-[10px] border-2 border-white dark:border-slate-900"
+              className="absolute -top-0.5 -right-0.5 h-4 w-4 sm:h-5 sm:w-5 p-0 flex items-center justify-center bg-red-500 text-white text-[9px] sm:text-[10px] border-2 border-white dark:border-slate-900"
             >
               {unreadCount > 9 ? '9+' : unreadCount}
             </Badge>

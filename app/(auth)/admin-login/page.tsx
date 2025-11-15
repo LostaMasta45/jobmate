@@ -87,7 +87,7 @@ export default function AdminLoginPage() {
           .from("profiles")
           .select("role, full_name, email")
           .eq("id", authData.user.id)
-          .single();
+          .maybeSingle(); // Use maybeSingle instead of single for null-safe fetch
 
         if (data) {
           profile = data;
@@ -136,8 +136,13 @@ export default function AdminLoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-red-600 text-white">
-            <ShieldCheck className="h-6 w-6" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white dark:bg-gray-800 shadow-[0_8px_24px_rgba(220,38,38,0.15)] dark:shadow-[0_8px_24px_rgba(220,38,38,0.25)] border-2 border-red-100 dark:border-red-900 p-2 relative">
+            <img 
+              src="/Logo/logokecil.png" 
+              alt="JobMate Admin" 
+              className="w-full h-full object-contain filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.15)]"
+            />
+            <ShieldCheck className="h-5 w-5 text-red-600 absolute -top-1 -right-1 bg-white dark:bg-gray-800 rounded-full p-0.5 shadow-md" />
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription className="text-red-600 font-medium">

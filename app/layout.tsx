@@ -24,9 +24,9 @@ export const metadata: Metadata = {
   title: "JobMate 2.0 - AI-Powered Job Application Assistant",
   description: "Simplify your job search with AI-powered tools for cover letters, resumes, and application tracking",
   icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
-    apple: "/favicon.png",
+    icon: "/Logo/logokecil.png",
+    shortcut: "/Logo/logokecil.png",
+    apple: "/Logo/logokecil.png",
   },
 };
 

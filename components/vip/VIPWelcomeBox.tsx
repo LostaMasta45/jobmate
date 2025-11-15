@@ -99,11 +99,11 @@ export function VIPWelcomeBox({ profile }: VIPWelcomeBoxProps) {
 
   return (
     <>
-      {/* Welcome Box */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 p-4 sm:p-6 shadow-2xl">
+      {/* Welcome Box - Fixed Padding & Z-index + Max Height for small viewports */}
+      <div className="relative overflow-visible rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 p-4 sm:p-5 md:p-6 shadow-2xl mx-0 max-h-[75vh] overflow-y-auto scroll-smooth">
         {/* Decorative Elements */}
-        <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/10 blur-2xl pointer-events-none" />
         
         <div className="relative">
           {/* Header */}

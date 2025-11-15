@@ -13,28 +13,28 @@ interface SuggestedJobsCarouselProps {
   title?: string
 }
 
-// Colorful gradients for job cards
+// Purple/Cyan gradients for job cards
 const cardGradients = [
-  'from-blue-500/10 to-blue-600/5',
-  'from-purple-500/10 to-purple-600/5',
-  'from-pink-500/10 to-pink-600/5',
-  'from-green-500/10 to-green-600/5',
-  'from-orange-500/10 to-orange-600/5',
-  'from-teal-500/10 to-teal-600/5',
+  'from-[#8e68fd]/10 to-[#5547d0]/5',
+  'from-[#5547d0]/10 to-[#3977d3]/5',
+  'from-[#3977d3]/10 to-[#00acc7]/5',
+  'from-[#00acc7]/10 to-[#00bed1]/5',
+  'from-[#00bed1]/10 to-[#00d1dc]/5',
+  'from-[#00d1dc]/10 to-[#00acc7]/5',
 ]
 
-export function SuggestedJobsCarousel({ jobs, title = 'Suggested Jobs' }: SuggestedJobsCarouselProps) {
+export function SuggestedJobsCarousel({ jobs, title }: SuggestedJobsCarouselProps) {
   const [bookmarked, setBookmarked] = useState<Set<string>>(new Set())
 
   const formatSalary = (gaji_text?: string, gaji_min?: number, gaji_max?: number) => {
     if (gaji_text) return gaji_text
     if (gaji_min && gaji_max) {
-      return `$${(gaji_min / 1000000).toFixed(0)}k-${(gaji_max / 1000000).toFixed(0)}k`
+      return `Rp ${(gaji_min / 1000000).toFixed(1)}jt-${(gaji_max / 1000000).toFixed(1)}jt`
     }
     if (gaji_min) {
-      return `$${(gaji_min / 1000000).toFixed(0)}k+`
+      return `Rp ${(gaji_min / 1000000).toFixed(1)}jt+`
     }
-    return 'Nego'
+    return 'Tidak disebutkan'
   }
 
   const toggleBookmark = (id: string) => {
@@ -50,20 +50,9 @@ export function SuggestedJobsCarousel({ jobs, title = 'Suggested Jobs' }: Sugges
   }
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between px-1">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h2>
-        <Link
-          href="/vip/loker"
-          className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
-        >
-          See all
-        </Link>
-      </div>
-
+    <div>
       {/* Horizontal Scrollable Cards */}
-      <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+      <div className="overflow-x-auto scrollbar-hide px-4">
         <div className="flex gap-4 pb-2">
           {jobs.slice(0, 10).map((job, index) => {
             const gradient = cardGradients[index % cardGradients.length]
@@ -116,34 +105,34 @@ export function SuggestedJobsCarousel({ jobs, title = 'Suggested Jobs' }: Sugges
 
                   {/* Job Info */}
                   <div className="space-y-2">
-                    <h3 className="font-bold text-gray-900 dark:text-white line-clamp-2 leading-snug">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white line-clamp-2 leading-tight">
                       {job.title}
                     </h3>
 
-                    <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5 line-clamp-1">
-                      <Building2 className="w-3.5 h-3.5 flex-shrink-0" />
-                      {job.perusahaan_name}
+                    <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5 line-clamp-1 font-medium">
+                      <Building2 className="w-3 h-3 flex-shrink-0" />
+                      <span className="truncate">{job.perusahaan_name}</span>
                     </p>
 
-                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        {job.lokasi}
+                    <div className="flex items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400 font-medium">
+                      <div className="flex items-center gap-1 min-w-0">
+                        <MapPin className="w-3 h-3 flex-shrink-0" />
+                        <span className="truncate">{job.lokasi}</span>
                       </div>
                       {job.tipe_pekerjaan && (
                         <>
-                          <span>•</span>
-                          <span>{job.tipe_pekerjaan}</span>
+                          <span className="flex-shrink-0">•</span>
+                          <span className="truncate">{job.tipe_pekerjaan}</span>
                         </>
                       )}
                     </div>
 
                     {/* Salary */}
-                    <div className="pt-2 flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-                        <DollarSign className="w-4 h-4 text-white" />
+                    <div className="pt-1.5 flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#00d1dc] to-[#00acc7] flex items-center justify-center shadow-sm flex-shrink-0">
+                        <DollarSign className="w-3.5 h-3.5 text-white" />
                       </div>
-                      <span className="text-sm font-bold text-gray-900 dark:text-white">
+                      <span className="text-xs font-bold text-gray-900 dark:text-white truncate">
                         {formatSalary(job.gaji_text, job.gaji_min, job.gaji_max)}
                       </span>
                     </div>
@@ -151,7 +140,7 @@ export function SuggestedJobsCarousel({ jobs, title = 'Suggested Jobs' }: Sugges
 
                   {/* Featured Badge */}
                   {job.is_featured && (
-                    <Badge className="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-xs">
+                    <Badge className="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-[10px] font-bold px-1.5 py-0.5">
                       ⭐
                     </Badge>
                   )}
