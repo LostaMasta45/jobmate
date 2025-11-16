@@ -404,13 +404,11 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
 
   return (
     <div className="lg:space-y-8 pb-safe overflow-x-hidden -mt-20 sm:-mt-24">
-      {/* Mobile: Dynamic Sticky Header with Island Effect */}
-      <div className={`lg:hidden fixed top-12 sm:top-14 left-0 right-0 z-40 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] shadow-lg transition-all duration-300 ${
-        isHeaderVisible ? 'translate-y-0' : '-translate-y-[40px]'
-      }`}>
+      {/* Mobile: Dynamic Sticky Header with Island Effect - Full to top when scrolled */}
+      <div className="lg:hidden fixed top-12 sm:top-14 left-0 right-0 z-40 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] shadow-lg">
         {/* Header Row - Slides up when scrolling */}
-        <div className={`flex items-center justify-between px-3 pt-1.5 pb-1.5 transition-all duration-300 ${
-          isHeaderVisible ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'
+        <div className={`flex items-center justify-between px-3 transition-all duration-300 ${
+          isHeaderVisible ? 'pt-1.5 pb-1.5 opacity-100 max-h-20' : 'pt-0 pb-0 opacity-0 max-h-0 overflow-hidden'
         }`}>
           {/* Location Selector */}
           <button className="flex items-center gap-1 text-white hover:bg-white/10 active:bg-white/20 rounded-lg px-1.5 py-0.5 -ml-1.5 transition-all">
@@ -432,9 +430,9 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
           </button>
         </div>
 
-        {/* Search Bar - Always visible, slides to top */}
-        <div className={`px-3 pb-1.5 transition-all duration-300 ${
-          isHeaderVisible ? 'pt-0' : 'pt-1.5'
+        {/* Search Bar - Always visible, flush to top when scrolled */}
+        <div className={`px-3 transition-all duration-300 ${
+          isHeaderVisible ? 'pt-0 pb-2' : 'pt-0 pb-1'
         }`}>
           <div className="flex items-center gap-1.5">
             <div className="flex-1 relative">
