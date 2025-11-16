@@ -369,51 +369,51 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
 
   return (
     <div className="lg:space-y-8 pb-safe overflow-x-hidden">
-      {/* Mobile: Modern Top Section - Location & Search - FULL HEIGHT BLUE BACKGROUND */}
-      <div className="lg:hidden sticky top-0 z-50 bg-gradient-to-br from-[#8e68fd] via-[#5547d0] to-[#3977d3] dark:from-[#5547d0] dark:via-[#3977d3] dark:to-[#00acc7] -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 px-4 pt-[56px] pb-3 shadow-xl max-w-full">
+      {/* Mobile: Compact Top Section - Location & Search */}
+      <div className="lg:hidden sticky top-0 z-50 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 px-3 pt-[52px] pb-2.5 shadow-lg max-w-full">
         {/* Header Row */}
-        <div className="flex items-center justify-between mb-2.5">
+        <div className="flex items-center justify-between mb-2">
           {/* Location Selector */}
-          <button className="flex items-center gap-1.5 text-white hover:bg-white/10 active:bg-white/20 rounded-lg px-2 py-1 -ml-2 transition-all">
-            <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
-              <MapPin className="w-3.5 h-3.5" />
+          <button className="flex items-center gap-1 text-white hover:bg-white/10 active:bg-white/20 rounded-lg px-1.5 py-0.5 -ml-1.5 transition-all">
+            <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+              <MapPin className="w-3 h-3" />
             </div>
             <div className="flex items-center gap-0.5 min-w-0">
-              <span className="text-xs font-semibold truncate">
+              <span className="text-[11px] font-semibold truncate">
                 {searchParams.get('lokasi') || 'Jombang, Indonesia'}
               </span>
-              <ChevronDown className="w-3 h-3 flex-shrink-0" />
+              <ChevronDown className="w-2.5 h-2.5 flex-shrink-0" />
             </div>
           </button>
 
           {/* Notification Icon */}
-          <button className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 active:scale-95 transition-all flex-shrink-0 relative">
-            <Bell className="w-4 h-4 text-white" />
-            <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-red-500 rounded-full border-2 border-purple-600" />
+          <button className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 active:scale-95 transition-all flex-shrink-0 relative">
+            <Bell className="w-3.5 h-3.5 text-white" />
+            <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full border border-indigo-600" />
           </button>
         </div>
 
-        {/* Search Bar */}
-        <div className="flex items-center gap-2">
+        {/* Search Bar - Compact */}
+        <div className="flex items-center gap-1.5">
           <div className="flex-1 relative">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10">
-              <Search className="w-4 h-4 text-gray-400" />
+            <div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+              <Search className="w-3.5 h-3.5 text-gray-400" />
             </div>
             <input
               type="text"
               placeholder="Cari pekerjaan, perusahaan..."
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full h-10 pl-10 pr-3 rounded-xl bg-white dark:bg-gray-800 border-0 shadow-md text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all"
+              className="w-full h-9 pl-9 pr-3 rounded-lg bg-white dark:bg-gray-800 border-0 shadow-sm text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
             />
           </div>
           <button 
             onClick={() => setIsFilterOpen(true)}
-            className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#00d1dc] to-[#00acc7] flex items-center justify-center shadow-md hover:shadow-lg active:scale-95 transition-all flex-shrink-0"
+            className="relative w-9 h-9 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 active:scale-95 transition-all flex-shrink-0"
           >
-            <SlidersHorizontal className="w-4 h-4 text-white" />
+            <SlidersHorizontal className="w-3.5 h-3.5 text-white" />
             {activeFilterCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] bg-[#8e68fd] rounded-full flex items-center justify-center text-white text-[9px] font-bold border-2 border-white px-0.5">
+              <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] bg-red-500 rounded-full flex items-center justify-center text-white text-[8px] font-bold border border-white px-0.5">
                 {activeFilterCount}
               </span>
             )}
