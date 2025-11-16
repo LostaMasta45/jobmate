@@ -37,6 +37,10 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [quickFilters, setQuickFilters] = useState<string[]>([])
   
+  // Scroll state for dynamic header
+  const [scrollY, setScrollY] = useState(0)
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true)
+  
   // Initialize mobile filters from URL params
   const [mobileFilters, setMobileFilters] = useState<FilterState>({
     locations: searchParams.getAll('lokasi'),
@@ -49,6 +53,29 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   useEffect(() => {
     setLokerList(initialLoker)
   }, [initialLoker])
+
+  // Handle scroll for dynamic header
+  useEffect(() => {
+    let lastScrollY = 0
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      
+      // Show header when scrolling up or at top
+      if (currentScrollY < lastScrollY || currentScrollY < 10) {
+        setIsHeaderVisible(true)
+      } 
+      // Hide header when scrolling down
+      else if (currentScrollY > lastScrollY && currentScrollY > 60) {
+        setIsHeaderVisible(false)
+      }
+      
+      lastScrollY = currentScrollY
+      setScrollY(currentScrollY)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   // Count new jobs posted today
   const getNewJobsCount = () => {
@@ -369,10 +396,14 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
 
   return (
     <div className="lg:space-y-8 pb-safe overflow-x-hidden">
-      {/* Mobile: Compact Top Section - Location & Search */}
-      <div className="lg:hidden sticky top-0 z-50 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 px-3 pt-[52px] pb-2.5 shadow-lg max-w-full">
-        {/* Header Row */}
-        <div className="flex items-center justify-between mb-2">
+      {/* Mobile: Dynamic Sticky Header with Island Effect */}
+      <div className={`lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] shadow-lg transition-all duration-300 ${
+        isHeaderVisible ? 'translate-y-0' : '-translate-y-[48px]'
+      }`}>
+        {/* Header Row - Slides up when scrolling */}
+        <div className={`flex items-center justify-between px-3 pt-2 pb-2 transition-all duration-300 ${
+          isHeaderVisible ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'
+        }`}>
           {/* Location Selector */}
           <button className="flex items-center gap-1 text-white hover:bg-white/10 active:bg-white/20 rounded-lg px-1.5 py-0.5 -ml-1.5 transition-all">
             <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
@@ -393,33 +424,40 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
           </button>
         </div>
 
-        {/* Search Bar - Compact */}
-        <div className="flex items-center gap-1.5">
-          <div className="flex-1 relative">
-            <div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-10">
-              <Search className="w-3.5 h-3.5 text-gray-400" />
+        {/* Search Bar - Always visible, slides to top */}
+        <div className={`px-3 pb-2 transition-all duration-300 ${
+          isHeaderVisible ? 'pt-0' : 'pt-2'
+        }`}>
+          <div className="flex items-center gap-1.5">
+            <div className="flex-1 relative">
+              <div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+                <Search className="w-3.5 h-3.5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Cari pekerjaan, perusahaan..."
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="w-full h-9 pl-9 pr-3 rounded-lg bg-white dark:bg-gray-800 border-0 shadow-sm text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+              />
             </div>
-            <input
-              type="text"
-              placeholder="Cari pekerjaan, perusahaan..."
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full h-9 pl-9 pr-3 rounded-lg bg-white dark:bg-gray-800 border-0 shadow-sm text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
-            />
+            <button 
+              onClick={() => setIsFilterOpen(true)}
+              className="relative w-9 h-9 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 active:scale-95 transition-all flex-shrink-0"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5 text-white" />
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] bg-red-500 rounded-full flex items-center justify-center text-white text-[8px] font-bold border border-white px-0.5">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
           </div>
-          <button 
-            onClick={() => setIsFilterOpen(true)}
-            className="relative w-9 h-9 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 active:scale-95 transition-all flex-shrink-0"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5 text-white" />
-            {activeFilterCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] bg-red-500 rounded-full flex items-center justify-center text-white text-[8px] font-bold border border-white px-0.5">
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
         </div>
       </div>
+
+      {/* Spacer for fixed header */}
+      <div className="lg:hidden h-[100px]" />
 
       {/* New Jobs Banner */}
       {newJobsCount > 0 && <NewJobsBanner count={newJobsCount} />}
