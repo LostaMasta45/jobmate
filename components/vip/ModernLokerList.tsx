@@ -403,13 +403,13 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   const activeFilterCount = mobileFilters.locations.length + mobileFilters.categories.length + mobileFilters.jobTypes.length + (mobileFilters.timeRange !== 'all' ? 1 : 0)
 
   return (
-    <div className="lg:space-y-8 pb-safe overflow-x-hidden">
+    <div className="lg:space-y-8 pb-safe overflow-x-hidden -mt-20 sm:-mt-24">
       {/* Mobile: Dynamic Sticky Header with Island Effect */}
-      <div className={`lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] shadow-lg transition-all duration-300 ${
-        isHeaderVisible ? 'translate-y-0' : '-translate-y-[48px]'
+      <div className={`lg:hidden fixed top-12 sm:top-14 left-0 right-0 z-40 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] shadow-lg transition-all duration-300 ${
+        isHeaderVisible ? 'translate-y-0' : '-translate-y-[40px]'
       }`}>
         {/* Header Row - Slides up when scrolling */}
-        <div className={`flex items-center justify-between px-3 pt-2 pb-2 transition-all duration-300 ${
+        <div className={`flex items-center justify-between px-3 pt-1.5 pb-1.5 transition-all duration-300 ${
           isHeaderVisible ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'
         }`}>
           {/* Location Selector */}
@@ -433,8 +433,8 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         </div>
 
         {/* Search Bar - Always visible, slides to top */}
-        <div className={`px-3 pb-2 transition-all duration-300 ${
-          isHeaderVisible ? 'pt-0' : 'pt-2'
+        <div className={`px-3 pb-1.5 transition-all duration-300 ${
+          isHeaderVisible ? 'pt-0' : 'pt-1.5'
         }`}>
           <div className="flex items-center gap-1.5">
             <div className="flex-1 relative">
@@ -464,8 +464,8 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         </div>
       </div>
 
-      {/* Spacer for fixed header */}
-      <div className="lg:hidden h-[100px]" />
+      {/* Spacer for fixed header - Matches VIPHeader + ModernLokerList header height */}
+      <div className="lg:hidden h-[130px] sm:h-[134px]" />
 
       {/* New Jobs Banner */}
       {newJobsCount > 0 && <NewJobsBanner count={newJobsCount} />}
