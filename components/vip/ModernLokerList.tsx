@@ -56,22 +56,30 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
 
   // Handle scroll for dynamic header
   useEffect(() => {
-    let lastScrollY = 0
+    let lastScrollY = window.scrollY
+    
     const handleScroll = () => {
       const currentScrollY = window.scrollY
       
-      // Show header when scrolling up or at top
-      if (currentScrollY < lastScrollY || currentScrollY < 10) {
+      // Always show header at the top of page
+      if (currentScrollY < 20) {
         setIsHeaderVisible(true)
       } 
-      // Hide header when scrolling down
-      else if (currentScrollY > lastScrollY && currentScrollY > 60) {
+      // Show header when scrolling up
+      else if (currentScrollY < lastScrollY) {
+        setIsHeaderVisible(true)
+      } 
+      // Hide header when scrolling down past threshold
+      else if (currentScrollY > lastScrollY && currentScrollY > 80) {
         setIsHeaderVisible(false)
       }
       
       lastScrollY = currentScrollY
       setScrollY(currentScrollY)
     }
+
+    // Initial check
+    handleScroll()
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
