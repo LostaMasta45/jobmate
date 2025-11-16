@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useTransition } from 'react'
+import { useState, useEffect, useTransition, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ModernLokerCard } from './ModernLokerCard'
 import { JobCardMobile } from '@/components/mobile/JobCardMobile'
@@ -40,6 +40,8 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   // Scroll state for dynamic header
   const [scrollY, setScrollY] = useState(0)
   const [isHeaderVisible, setIsHeaderVisible] = useState(true)
+  const lastScrollY = useRef(0)
+  const ticking = useRef(false)
   
   // Initialize mobile filters from URL params
   const [mobileFilters, setMobileFilters] = useState<FilterState>({
@@ -54,35 +56,46 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
     setLokerList(initialLoker)
   }, [initialLoker])
 
-  // Handle scroll for dynamic header
+  // Handle scroll for dynamic header with RAF throttling
   useEffect(() => {
-    let lastScrollY = window.scrollY
+    lastScrollY.current = window.scrollY
     
-    const handleScroll = () => {
+    const updateHeader = () => {
       const currentScrollY = window.scrollY
+      const scrollDifference = currentScrollY - lastScrollY.current
       
-      // Always show header at the top of page
-      if (currentScrollY < 20) {
+      // Always show header at the very top
+      if (currentScrollY < 10) {
         setIsHeaderVisible(true)
-      } 
-      // Show header when scrolling up
-      else if (currentScrollY < lastScrollY) {
+      }
+      // Show header when scrolling up (any amount)
+      else if (scrollDifference < -5) {
         setIsHeaderVisible(true)
-      } 
+      }
       // Hide header when scrolling down past threshold
-      else if (currentScrollY > lastScrollY && currentScrollY > 80) {
+      else if (scrollDifference > 10 && currentScrollY > 100) {
         setIsHeaderVisible(false)
       }
       
-      lastScrollY = currentScrollY
+      lastScrollY.current = currentScrollY
       setScrollY(currentScrollY)
+      ticking.current = false
+    }
+
+    const handleScroll = () => {
+      if (!ticking.current) {
+        window.requestAnimationFrame(updateHeader)
+        ticking.current = true
+      }
     }
 
     // Initial check
-    handleScroll()
+    updateHeader()
 
     window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
   }, [])
 
   // Count new jobs posted today
@@ -405,9 +418,9 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   return (
     <div className="lg:space-y-8 pb-safe overflow-x-hidden -mt-20 sm:-mt-24">
       {/* Mobile: Dynamic Sticky Header with Island Effect - Full to top when scrolled */}
-      <div className="lg:hidden fixed top-12 sm:top-14 left-0 right-0 z-40 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] shadow-lg">
+      <div className="lg:hidden fixed top-12 sm:top-14 left-0 right-0 z-40 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] shadow-lg transition-shadow duration-300">
         {/* Header Row - Slides up when scrolling */}
-        <div className={`flex items-center justify-between px-3 transition-all duration-300 ${
+        <div className={`flex items-center justify-between px-3 transition-all duration-300 ease-in-out ${
           isHeaderVisible ? 'pt-1.5 pb-1.5 opacity-100 max-h-20' : 'pt-0 pb-0 opacity-0 max-h-0 overflow-hidden'
         }`}>
           {/* Location Selector */}
@@ -431,7 +444,7 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         </div>
 
         {/* Search Bar - Always visible, flush to top when scrolled */}
-        <div className={`px-3 transition-all duration-300 ${
+        <div className={`px-3 transition-all duration-300 ease-in-out ${
           isHeaderVisible ? 'pt-0 pb-2' : 'pt-0 pb-1'
         }`}>
           <div className="flex items-center gap-1.5">
