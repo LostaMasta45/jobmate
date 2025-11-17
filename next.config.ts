@@ -63,12 +63,17 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-select',
       '@radix-ui/react-tabs',
     ],
-    // Prevent Supabase from being bundled in Edge Runtime (middleware uses Node.js APIs)
-    serverComponentsExternalPackages: ['@supabase/supabase-js'],
   },
   
   // Webpack optimizations
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config, { dev, isServer, webpack }) => {
+    // Polyfill process.version for Edge Runtime (required by @supabase/supabase-js)
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        'process.version': JSON.stringify(process.version || 'v18.0.0'),
+      })
+    );
+    
     // Production optimizations only
     if (!dev && !isServer) {
       config.optimization = {
