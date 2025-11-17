@@ -63,6 +63,8 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-select',
       '@radix-ui/react-tabs',
     ],
+    // Prevent Supabase from being bundled in Edge Runtime (middleware uses Node.js APIs)
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
   },
   
   // Webpack optimizations
