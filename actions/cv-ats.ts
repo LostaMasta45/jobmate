@@ -132,7 +132,7 @@ export async function saveResumeToDatabase(resume: Resume) {
       const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
       await logToolUsageWithNotification(
         "CV ATS Generator",
-        resume.title || `${resume.firstName} ${resume.lastName} - Resume`,
+        resume.title || `${resume.basics.firstName} ${resume.basics.lastName} - Resume`,
         { template: resume.selectedTemplate }
       );
     } catch (monitorError) {
