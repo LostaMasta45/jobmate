@@ -52,8 +52,6 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "10mb", // Increased from default 1mb for CV with photos
     },
-    // Enable optimizeCss for production
-    optimizeCss: true,
     // Optimize package imports
     optimizePackageImports: [
       'lucide-react',
