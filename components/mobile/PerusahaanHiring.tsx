@@ -28,7 +28,7 @@ export function PerusahaanHiring({ companies }: PerusahaanHiringProps) {
         </h3>
         <Link 
           href="/vip/perusahaan"
-          className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
+          className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-all active:scale-95"
         >
           Lihat Semua
         </Link>

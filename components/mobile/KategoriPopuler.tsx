@@ -89,6 +89,14 @@ export function KategoriPopuler({ onKategoriSelect, counts }: KategoriPopulerPro
   
   const categories = getCategories(counts)
   
+  // Scroll to all jobs section
+  const scrollToAllJobs = () => {
+    const allJobsSection = document.getElementById('semua-lowongan')
+    if (allJobsSection) {
+      allJobsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   return (
     <div className="lg:hidden px-4 py-4">
       {/* Header */}
@@ -96,7 +104,10 @@ export function KategoriPopuler({ onKategoriSelect, counts }: KategoriPopulerPro
         <h3 className="text-base font-bold text-gray-900 dark:text-white">
           Kategori Populer
         </h3>
-        <button className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
+        <button 
+          onClick={scrollToAllJobs}
+          className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors active:scale-95"
+        >
           Lihat Semua
         </button>
       </div>

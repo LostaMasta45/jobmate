@@ -573,7 +573,15 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         <h2 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
           Lowongan Disarankan
         </h2>
-        <button className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
+        <button 
+          onClick={() => {
+            const allJobsSection = document.getElementById('semua-lowongan')
+            if (allJobsSection) {
+              allJobsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }
+          }}
+          className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors active:scale-95"
+        >
           Lihat semua
         </button>
       </div>
@@ -588,7 +596,7 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
       )}
 
       {/* 7. Semua Lowongan Header - Mobile Only - REDUCED SPACING */}
-      <div className="lg:hidden px-4 py-2 mt-2">
+      <div id="semua-lowongan" className="lg:hidden px-4 py-2 mt-2 scroll-mt-16">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-bold text-gray-900 dark:text-white">
             Semua Lowongan
