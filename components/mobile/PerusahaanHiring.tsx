@@ -34,15 +34,20 @@ export function PerusahaanHiring({ companies }: PerusahaanHiringProps) {
         </Link>
       </div>
 
-      {/* Horizontal Scrollable */}
-      <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-        <div className="flex gap-3 pb-2">
+      {/* Horizontal Scrollable with Fade Edge */}
+      <div className="relative -mx-4">
+        {/* Fade Edge Overlay - Right side */}
+        <div className="absolute top-0 right-0 bottom-0 w-12 bg-gradient-to-l from-gray-50 dark:from-slate-950 to-transparent pointer-events-none z-[5]" />
+        
+        <div className="overflow-x-auto scrollbar-hide px-4 snap-x snap-mandatory" style={{ scrollBehavior: 'smooth' }}>
+          <div className="flex gap-3 pb-2">
           {companies.slice(0, 10).map((company, index) => (
             <motion.div
               key={company.id}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
+              className="snap-start"
             >
               <Link
                 href={`/vip/perusahaan?company=${company.id}`}
@@ -77,6 +82,7 @@ export function PerusahaanHiring({ companies }: PerusahaanHiringProps) {
               </Link>
             </motion.div>
           ))}
+          </div>
         </div>
       </div>
     </div>
