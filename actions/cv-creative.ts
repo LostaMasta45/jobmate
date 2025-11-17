@@ -38,7 +38,9 @@ export async function saveCreativeCV(cv: Partial<CreativeCV>) {
     // 🆕 MONITORING: Log CV Creative generation
     try {
       const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
-      const fullName = cv.content?.personalInfo?.fullName || "Unknown";
+      const firstName = cv.content?.basics?.firstName || "";
+      const lastName = cv.content?.basics?.lastName || "";
+      const fullName = firstName && lastName ? `${firstName} ${lastName}` : "Unknown";
       await logToolUsageWithNotification(
         "CV Creative Generator",
         cv.title || `${fullName} - Creative CV`,
