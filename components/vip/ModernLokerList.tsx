@@ -575,10 +575,15 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         </h2>
         <button 
           onClick={() => {
-            const allJobsSection = document.getElementById('semua-lowongan')
-            if (allJobsSection) {
-              allJobsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-            }
+            // Navigate to all loker with recommended sorting
+            updateFilters({ sort: 'paling_dilihat', timeFilter: 'week' })
+            // Then scroll to the section
+            setTimeout(() => {
+              const allJobsSection = document.getElementById('semua-lowongan')
+              if (allJobsSection) {
+                allJobsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }
+            }, 100)
           }}
           className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors active:scale-95"
         >

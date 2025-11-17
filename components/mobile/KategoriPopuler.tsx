@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion'
 import { Code, Megaphone, TrendingUp, Coffee, ShoppingBag, FileText, Wrench, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useState } from 'react'
+import { AllCategoriesBottomSheet } from './AllCategoriesBottomSheet'
 
 interface KategoriItem {
   id: string
@@ -86,31 +88,24 @@ const getCategories = (counts?: KategoriPopulerProps['counts']): KategoriItem[] 
 ]
 
 export function KategoriPopuler({ onKategoriSelect, counts }: KategoriPopulerProps) {
-  
+  const [showAllCategories, setShowAllCategories] = useState(false)
   const categories = getCategories(counts)
-  
-  // Scroll to all jobs section
-  const scrollToAllJobs = () => {
-    const allJobsSection = document.getElementById('semua-lowongan')
-    if (allJobsSection) {
-      allJobsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
-  }
 
   return (
-    <div className="lg:hidden px-4 py-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-base font-bold text-gray-900 dark:text-white">
-          Kategori Populer
-        </h3>
-        <button 
-          onClick={scrollToAllJobs}
-          className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors active:scale-95"
-        >
-          Lihat Semua
-        </button>
-      </div>
+    <>
+      <div className="lg:hidden px-4 py-4">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-bold text-gray-900 dark:text-white">
+            Kategori Populer
+          </h3>
+          <button 
+            onClick={() => setShowAllCategories(true)}
+            className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors active:scale-95"
+          >
+            Lihat Semua
+          </button>
+        </div>
 
       {/* Grid */}
       <div className="grid grid-cols-4 gap-2">
@@ -156,5 +151,14 @@ export function KategoriPopuler({ onKategoriSelect, counts }: KategoriPopulerPro
         })}
       </div>
     </div>
+
+      {/* All Categories Bottom Sheet */}
+      <AllCategoriesBottomSheet
+        isOpen={showAllCategories}
+        onClose={() => setShowAllCategories(false)}
+        onCategorySelect={onKategoriSelect}
+        counts={counts}
+      />
+    </>
   )
 }
