@@ -1,12 +1,35 @@
 'use client'
 
 import { useState } from 'react'
-import { VIPSidebarImproved } from '@/components/vip/VIPSidebarImproved'
-import { VIPHeader } from '@/components/vip/VIPHeader'
-import { VIPBottomBar } from '@/components/mobile/VIPBottomBar'
-import { VerificationBanner, VerificationSuccessToast } from '@/components/vip/VerificationBanner'
+import dynamic from 'next/dynamic'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+
+// Lazy load heavy components for better initial load performance
+const VIPSidebarImproved = dynamic(
+  () => import('@/components/vip/VIPSidebarImproved').then(mod => ({ default: mod.VIPSidebarImproved })),
+  { ssr: false } // Sidebar not needed for SSR
+)
+
+const VIPHeader = dynamic(
+  () => import('@/components/vip/VIPHeader').then(mod => ({ default: mod.VIPHeader })),
+  { ssr: true } // Header needed for SEO
+)
+
+const VIPBottomBar = dynamic(
+  () => import('@/components/mobile/VIPBottomBar').then(mod => ({ default: mod.VIPBottomBar })),
+  { ssr: false } // Bottom bar not needed for SSR
+)
+
+const VerificationBanner = dynamic(
+  () => import('@/components/vip/VerificationBanner').then(mod => ({ default: mod.VerificationBanner })),
+  { ssr: false }
+)
+
+const VerificationSuccessToast = dynamic(
+  () => import('@/components/vip/VerificationBanner').then(mod => ({ default: mod.VerificationSuccessToast })),
+  { ssr: false }
+)
 
 export default function VIPLayout({
   children,
