@@ -132,8 +132,7 @@ export async function saveResumeToDatabase(resume: Resume) {
       const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
       await logToolUsageWithNotification(
         "CV ATS Generator",
-        resume.title || `${resume.basics.firstName} ${resume.basics.lastName} - Resume`,
-        { template: resume.selectedTemplate }
+        resume.title || `${resume.basics.firstName} ${resume.basics.lastName} - Resume`
       );
     } catch (monitorError) {
       console.error("[Monitoring] Failed to log CV ATS:", monitorError);
