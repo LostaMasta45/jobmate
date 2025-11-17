@@ -56,7 +56,7 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
     setLokerList(initialLoker)
   }, [initialLoker])
 
-  // Handle scroll for dynamic header with RAF throttling
+  // Handle scroll for dynamic header with RAF throttling - Improved for mobile app feel
   useEffect(() => {
     lastScrollY.current = window.scrollY
     
@@ -64,16 +64,16 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
       const currentScrollY = window.scrollY
       const scrollDifference = currentScrollY - lastScrollY.current
       
-      // Always show header at the very top
-      if (currentScrollY < 10) {
+      // Always show header at the very top (within 50px)
+      if (currentScrollY < 50) {
         setIsHeaderVisible(true)
       }
-      // Show header when scrolling up (any amount)
-      else if (scrollDifference < -5) {
+      // Show header when scrolling up (sensitive for mobile)
+      else if (scrollDifference < -3) {
         setIsHeaderVisible(true)
       }
-      // Hide header when scrolling down past threshold
-      else if (scrollDifference > 10 && currentScrollY > 100) {
+      // Hide header when scrolling down past threshold (more aggressive)
+      else if (scrollDifference > 5 && currentScrollY > 80) {
         setIsHeaderVisible(false)
       }
       
@@ -417,11 +417,15 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
 
   return (
     <div className="lg:space-y-8 pb-safe overflow-x-hidden -mt-20 sm:-mt-24">
-      {/* Mobile: Dynamic Sticky Header with Island Effect - Full to top when scrolled */}
-      <div className="lg:hidden fixed top-12 sm:top-14 left-0 right-0 z-40 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] shadow-lg transition-shadow duration-300">
+      {/* Mobile: Dynamic Sticky Search Bar - Full to top when scrolled */}
+      <div className={`lg:hidden fixed left-0 right-0 z-40 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] transition-all duration-300 ease-in-out ${
+        scrollY > 50 
+          ? 'top-0 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl' 
+          : 'top-12 sm:top-14 shadow-lg'
+      }`}>
         {/* Header Row - Slides up when scrolling */}
         <div className={`flex items-center justify-between px-3 transition-all duration-300 ease-in-out ${
-          isHeaderVisible ? 'pt-1.5 pb-1.5 opacity-100 max-h-20' : 'pt-0 pb-0 opacity-0 max-h-0 overflow-hidden'
+          isHeaderVisible ? 'pt-1.5 pb-1.5 opacity-100 max-h-20' : 'pt-0 pb-0 opacity-0 max-h-0 overflow-hidden pointer-events-none'
         }`}>
           {/* Location Selector */}
           <button className="flex items-center gap-1 text-white hover:bg-white/10 active:bg-white/20 rounded-lg px-1.5 py-0.5 -ml-1.5 transition-all">
@@ -443,28 +447,38 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
           </button>
         </div>
 
-        {/* Search Bar - Always visible, flush to top when scrolled */}
+        {/* Search Bar - Always visible, ultra compact when scrolled to top */}
         <div className={`px-3 transition-all duration-300 ease-in-out ${
-          isHeaderVisible ? 'pt-0 pb-2' : 'pt-0 pb-1'
+          scrollY > 50 ? 'pt-safe py-2.5' : (isHeaderVisible ? 'pt-0 pb-2' : 'py-2')
         }`}>
           <div className="flex items-center gap-1.5">
             <div className="flex-1 relative">
               <div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-10">
-                <Search className="w-3.5 h-3.5 text-gray-400" />
+                <Search className={`transition-all duration-300 text-gray-400 ${
+                  scrollY > 50 ? 'w-4 h-4' : 'w-3.5 h-3.5'
+                }`} />
               </div>
               <input
                 type="text"
                 placeholder="Cari pekerjaan, perusahaan..."
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="w-full h-9 pl-9 pr-3 rounded-lg bg-white dark:bg-gray-800 border-0 shadow-sm text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+                className={`w-full pr-3 rounded-lg bg-white dark:bg-gray-800 border-0 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300 ${
+                  scrollY > 50 
+                    ? 'h-10 pl-10 shadow-md font-medium' 
+                    : 'h-9 pl-9 shadow-sm'
+                }`}
               />
             </div>
             <button 
               onClick={() => setIsFilterOpen(true)}
-              className="relative w-9 h-9 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 active:scale-95 transition-all flex-shrink-0"
+              className={`relative rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 active:scale-95 transition-all duration-300 flex-shrink-0 ${
+                scrollY > 50 ? 'w-10 h-10' : 'w-9 h-9'
+              }`}
             >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-white" />
+              <SlidersHorizontal className={`text-white transition-all duration-300 ${
+                scrollY > 50 ? 'w-4 h-4' : 'w-3.5 h-3.5'
+              }`} />
               {activeFilterCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] bg-red-500 rounded-full flex items-center justify-center text-white text-[8px] font-bold border border-white px-0.5">
                   {activeFilterCount}
@@ -475,8 +489,10 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         </div>
       </div>
 
-      {/* Spacer for fixed header - Matches VIPHeader + ModernLokerList header height */}
-      <div className="lg:hidden h-[130px] sm:h-[134px]" />
+      {/* Dynamic Spacer - Adjusts based on scroll position */}
+      <div className={`lg:hidden transition-all duration-300 ${
+        scrollY > 50 ? 'h-[60px] sm:h-[60px]' : 'h-[130px] sm:h-[134px]'
+      }`} />
 
       {/* New Jobs Banner */}
       {newJobsCount > 0 && <NewJobsBanner count={newJobsCount} />}
