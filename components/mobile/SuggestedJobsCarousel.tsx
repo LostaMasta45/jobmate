@@ -205,6 +205,7 @@ export function SuggestedJobsCarousel({ jobs, title }: SuggestedJobsCarouselProp
               </motion.div>
             )
           })}
+          </div>
         </div>
       </div>
 
