@@ -67,12 +67,26 @@ const nextConfig: NextConfig = {
   
   // Webpack optimizations
   webpack: (config, { dev, isServer, webpack }) => {
-    // Polyfill process.version for Edge Runtime (required by @supabase/supabase-js)
+    // Polyfill for Edge Runtime (required by @supabase/supabase-js and realtime-js)
     config.plugins.push(
       new webpack.DefinePlugin({
         'process.version': JSON.stringify(process.version || 'v18.0.0'),
+        'global': 'globalThis',
       })
     );
+    
+    // Add fallbacks for Node.js modules not available in Edge Runtime
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      ws: false,
+      crypto: false,
+      stream: false,
+      http: false,
+      https: false,
+      zlib: false,
+      net: false,
+      tls: false,
+    };
     
     // Production optimizations only
     if (!dev && !isServer) {

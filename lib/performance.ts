@@ -159,7 +159,7 @@ export function getImageQuality(): number {
 export function preloadFonts() {
   if (typeof document === 'undefined') return
 
-  const fonts = [
+  const fonts: string[] = [
     // Add your critical fonts here
     // '/fonts/inter-var.woff2',
   ]
