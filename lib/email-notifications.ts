@@ -37,12 +37,15 @@ export async function sendAccountPendingEmail({
     console.log('[Email Debug] HTML type:', typeof emailHtml);
     console.log('[Email Debug] HTML length:', emailHtml?.length || 0);
 
-    const { data, error } = await resend.emails.send({
+    const { data, error} = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
-      subject: '⏳ Pengajuan Akun JobMate Sedang Diproses',
+      subject: 'Status Pengajuan Akun Anda - Jobmate X infolokerjombang',
       html: String(emailHtml),
       text: emailText,
+      tags: [
+        { name: 'category', value: 'account-pending' },
+      ],
     });
 
     if (error) {
@@ -82,9 +85,12 @@ export async function sendAccountApprovedEmail({
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
-      subject: '🎉 Selamat! Akun JobMate Anda Telah Disetujui',
+      subject: 'Akun Anda Telah Disetujui - Jobmate X infolokerjombang',
       html: String(emailHtml),
       text: emailText,
+      tags: [
+        { name: 'category', value: 'account-approved' },
+      ],
     });
 
     if (error) {
@@ -129,9 +135,13 @@ export async function sendUpgradeVIPEmail({
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
-      subject: `${emoji} Selamat! Anda Sekarang ${membershipName}`,
+      subject: `Akun ${membershipName} Anda Aktif - Jobmate X infolokerjombang`,
       html: String(emailHtml),
       text: emailText,
+      tags: [
+        { name: 'category', value: 'vip-upgrade' },
+        { name: 'membership', value: membershipType },
+      ],
     });
 
     if (error) {

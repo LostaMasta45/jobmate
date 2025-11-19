@@ -65,17 +65,21 @@ export function ModernLokerCard({ loker }: ModernLokerCardProps) {
           ? 'shadow-2xl scale-105 -translate-y-2 border-cyan-500 dark:border-cyan-400' 
           : 'shadow-md hover:shadow-xl'
       }`}>
-        {/* Poster Thumbnail */}
+        {/* Poster Thumbnail - Optimized */}
         {loker.poster_url && (
-          <div className="relative w-full h-48 overflow-hidden">
+          <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
             <Image
               src={loker.poster_url}
               alt={loker.title}
               fill
+              loading="lazy"
+              quality={65}
               className={`object-cover transition-all duration-500 ${
                 isHovered ? 'scale-110' : 'scale-100'
               }`}
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y1ZjVmNSIvPjwvc3ZnPg=="
             />
             {/* Gradient Overlay untuk readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />

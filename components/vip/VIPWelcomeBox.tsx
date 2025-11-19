@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Bookmark, Bell, Briefcase, Crown, X, CheckCircle, Sparkles, ChevronRight } from 'lucide-react'
+import { Bookmark, Bell, Briefcase, Crown, X, CheckCircle, Sparkles, ChevronRight, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
@@ -99,129 +99,161 @@ export function VIPWelcomeBox({ profile }: VIPWelcomeBoxProps) {
 
   return (
     <>
-      {/* Welcome Box - Fixed Padding & Z-index + Max Height for small viewports */}
-      <div className="relative overflow-visible rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 p-4 sm:p-5 md:p-6 shadow-2xl mx-0 max-h-[75vh] overflow-y-auto scroll-smooth">
-        {/* Decorative Elements */}
-        <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-        
-        <div className="relative">
-          {/* Header */}
-          <div className="mb-4 flex flex-col sm:flex-row items-start justify-between gap-3">
-            <div className="flex-1">
-              <div className="mb-2 flex flex-wrap items-center gap-2 sm:gap-3">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
-                  {greeting}, {firstName}! 👋
-                </h1>
+      {/* Welcome Box - Enhanced Desktop Design with Brand Color Palette */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#5547d0] via-[#3977d3] to-[#00acc7] shadow-[0_20px_60px_-15px_rgba(85,71,208,0.4)] border border-white/10">
+        {/* Premium Decorative Background with Color Palette */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -right-32 -top-32 h-80 w-80 rounded-full bg-[#8e68fd]/20 blur-[100px]" />
+          <div className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-[#00d1dc]/20 blur-[100px]" />
+          <div className="absolute top-1/2 left-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#00bed1]/10 blur-[80px]" />
+          
+          {/* Subtle Pattern Overlay */}
+          <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5" />
+        </div>
+
+        {/* Content Container - Better padding for desktop */}
+        <div className="relative p-6 sm:p-8 lg:p-12">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-12 items-center">
+            {/* Left Section - Greeting & Info */}
+            <div className="space-y-6">
+              {/* Greeting Header with Badge */}
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white drop-shadow-2xl leading-tight">
+                    {greeting}, {firstName}! 👋
+                  </h1>
+                </div>
                 <Badge 
                   variant={isPremium ? "default" : "secondary"}
-                  className={`px-3 py-1 ${
+                  className={`px-5 py-2 text-base font-bold inline-flex items-center gap-2 ${
                     isPremium 
-                      ? 'bg-yellow-400 text-yellow-950 hover:bg-yellow-500'
-                      : 'bg-white/20 text-white hover:bg-white/30'
+                      ? 'bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 text-yellow-950 hover:from-yellow-400 hover:to-orange-500 shadow-xl border-2 border-yellow-200'
+                      : 'bg-white/25 text-white hover:bg-white/35 backdrop-blur-md border-2 border-white/30'
                   }`}
                 >
                   {isPremium ? (
                     <>
-                      <Crown className="mr-1 h-3 w-3" />
+                      <Crown className="h-5 w-5" />
                       VIP Premium
                     </>
                   ) : (
                     <>
-                      <Sparkles className="mr-1 h-3 w-3" />
+                      <Sparkles className="h-5 w-5" />
                       VIP Basic
                     </>
                   )}
                 </Badge>
               </div>
 
-              {/* Description */}
-              <p className="mb-1 text-sm sm:text-base text-white/90">
+              {/* Description - Better typography */}
+              <p className="text-xl text-white/95 leading-relaxed font-medium">
                 {isPremium 
-                  ? 'Akses penuh ke semua loker eksklusif tanpa batas'
-                  : 'Akses penuh ke loker eksklusif Jombang (Rp 10K/bulan)'
+                  ? 'Nikmati akses penuh ke semua loker eksklusif tanpa batas waktu'
+                  : 'Akses penuh ke loker eksklusif Jombang — Hanya Rp 10K/bulan'
                 }
               </p>
 
-              {/* Expiry Info */}
+              {/* Membership Info Card - Glassmorphism */}
               {expiryText && (
-                <div className="space-y-1">
-                  <p className="text-sm text-white/90">
-                    {expiryText}
+                <div className="inline-flex items-start gap-3 bg-white/20 backdrop-blur-xl rounded-2xl px-6 py-4 border-2 border-white/30 shadow-xl max-w-md">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/30">
+                    <Calendar className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-base font-bold text-white mb-1">
+                      {expiryText}
+                    </p>
                     {isBasic && (
-                      <span className="ml-1 text-xs text-white/70">(perpanjang otomatis)</span>
+                      <p className="text-sm text-white/80 font-medium">
+                        Perpanjang otomatis setiap bulan
+                      </p>
                     )}
-                  </p>
-                  {daysUntilExpiry !== null && (
-                    <p className="text-xs text-white/80">
-                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold text-white ${
+                    {daysUntilExpiry !== null && (
+                      <p className={`text-sm font-bold mt-2 inline-flex items-center gap-1.5 ${
                         daysUntilExpiry <= 7 
-                          ? 'bg-red-500 animate-pulse' 
+                          ? 'text-red-100' 
                           : daysUntilExpiry <= 14 
-                          ? 'bg-orange-500' 
-                          : 'bg-white/20'
+                          ? 'text-orange-100' 
+                          : 'text-white/90'
                       }`}>
                         ⏰ Sisa {daysUntilExpiry} hari lagi
-                      </span>
-                    </p>
-                  )}
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* Upgrade Button (Only for Basic) */}
+            {/* Right Section - Upgrade CTA Card (Only for Basic) */}
             {isBasic && (
-              <a 
-                href="https://t.me/jobmate_support"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button 
-                  size="sm"
-                  className="bg-white text-purple-600 hover:bg-white/90 hover:scale-105 transition-all shadow-lg animate-pulse"
-                >
-                  <Crown className="mr-2 h-4 w-4" />
-                  Upgrade Premium
-                </Button>
-              </a>
+              <div className="flex items-center justify-center lg:justify-end">
+                <div className="relative group">
+                  {/* Glow effect */}
+                  <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-400 rounded-2xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity" />
+                  
+                  <a 
+                    href="https://t.me/jobmate_support"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative block"
+                  >
+                    <Button 
+                      size="lg"
+                      className="relative bg-gradient-to-br from-white via-white to-gray-50 text-[#5547d0] hover:from-yellow-50 hover:to-orange-50 hover:scale-105 transition-all duration-300 shadow-2xl font-extrabold text-lg px-10 py-7 rounded-2xl border-4 border-white/50"
+                    >
+                      <Crown className="mr-2.5 h-6 w-6 text-yellow-500 group-hover:rotate-12 transition-transform" />
+                      Upgrade Premium
+                      <ChevronRight className="ml-2.5 h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </a>
+                </div>
+              </div>
             )}
           </div>
 
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 gap-2 sm:gap-3 sm:grid-cols-3">
-            {/* Cari Loker */}
-            <Link href="/vip/loker">
-              <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 backdrop-blur-sm transition-all hover:bg-white/20 hover:scale-105">
-                <Briefcase className="h-5 w-5 text-white" />
-                <span className="font-semibold text-white">Cari Loker</span>
-              </button>
-            </Link>
+          {/* Quick Actions - Enhanced Grid with Better Hover States */}
+          <div className="mt-10 pt-8 border-t-2 border-white/20">
+            <div className="grid grid-cols-3 gap-4 lg:gap-6">
+              {/* Cari Loker */}
+              <Link href="/vip/loker" className="group">
+                <div className="relative overflow-hidden flex flex-col items-center gap-3 rounded-2xl bg-white/10 backdrop-blur-md px-6 py-6 lg:py-8 transition-all duration-300 hover:bg-white/25 hover:scale-105 hover:shadow-2xl border-2 border-white/20 hover:border-white/40">
+                  <div className="flex h-14 w-14 lg:h-16 lg:w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-white/30 to-white/20 group-hover:from-white/40 group-hover:to-white/30 transition-all duration-300 shadow-lg">
+                    <Briefcase className="h-7 w-7 lg:h-8 lg:w-8 text-white" />
+                  </div>
+                  <span className="font-bold text-white text-sm lg:text-base text-center leading-tight">Cari Loker</span>
+                </div>
+              </Link>
 
-            {/* Tersimpan */}
-            <Link href="/vip/saved">
-              <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 backdrop-blur-sm transition-all hover:bg-white/20 hover:scale-105">
-                <Bookmark className="h-5 w-5 text-white" />
-                <span className="font-semibold text-white">Tersimpan</span>
-                {savedCount > 0 && (
-                  <Badge variant="secondary" className="bg-white text-purple-600">
-                    {savedCount}
-                  </Badge>
-                )}
-              </button>
-            </Link>
+              {/* Tersimpan */}
+              <Link href="/vip/saved" className="group">
+                <div className="relative overflow-hidden flex flex-col items-center gap-3 rounded-2xl bg-white/10 backdrop-blur-md px-6 py-6 lg:py-8 transition-all duration-300 hover:bg-white/25 hover:scale-105 hover:shadow-2xl border-2 border-white/20 hover:border-white/40">
+                  <div className="relative flex h-14 w-14 lg:h-16 lg:w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-white/30 to-white/20 group-hover:from-white/40 group-hover:to-white/30 transition-all duration-300 shadow-lg">
+                    <Bookmark className="h-7 w-7 lg:h-8 lg:w-8 text-white" />
+                    {savedCount > 0 && (
+                      <Badge className="absolute -top-2 -right-2 h-6 w-6 flex items-center justify-center p-0 bg-[#00d1dc] text-white text-xs font-bold border-2 border-white shadow-lg">
+                        {savedCount}
+                      </Badge>
+                    )}
+                  </div>
+                  <span className="font-bold text-white text-sm lg:text-base text-center leading-tight">Tersimpan</span>
+                </div>
+              </Link>
 
-            {/* Alerts */}
-            <Link href="/vip/alerts">
-              <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 backdrop-blur-sm transition-all hover:bg-white/20 hover:scale-105">
-                <Bell className="h-5 w-5 text-white" />
-                <span className="font-semibold text-white">Alerts</span>
-                {alertsCount > 0 && (
-                  <Badge variant="secondary" className="bg-white text-purple-600">
-                    {alertsCount}
-                  </Badge>
-                )}
-              </button>
-            </Link>
+              {/* Alerts */}
+              <Link href="/vip/alerts" className="group">
+                <div className="relative overflow-hidden flex flex-col items-center gap-3 rounded-2xl bg-white/10 backdrop-blur-md px-6 py-6 lg:py-8 transition-all duration-300 hover:bg-white/25 hover:scale-105 hover:shadow-2xl border-2 border-white/20 hover:border-white/40">
+                  <div className="relative flex h-14 w-14 lg:h-16 lg:w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-white/30 to-white/20 group-hover:from-white/40 group-hover:to-white/30 transition-all duration-300 shadow-lg">
+                    <Bell className="h-7 w-7 lg:h-8 lg:w-8 text-white" />
+                    {alertsCount > 0 && (
+                      <Badge className="absolute -top-2 -right-2 h-6 w-6 flex items-center justify-center p-0 bg-[#00d1dc] text-white text-xs font-bold border-2 border-white shadow-lg">
+                        {alertsCount}
+                      </Badge>
+                    )}
+                  </div>
+                  <span className="font-bold text-white text-sm lg:text-base text-center leading-tight">Alerts</span>
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
       </div>

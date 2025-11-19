@@ -163,10 +163,37 @@ const config: Config = {
   			'accordion-up': 'accordion-up 0.2s ease-out',
   			'loading-bar': 'loading-bar 1.5s ease-in-out infinite',
   			'pulse-delayed': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) 1s infinite'
+  		},
+  		animationDelay: {
+  			'75': '75ms',
+  			'100': '100ms',
+  			'150': '150ms',
+  			'200': '200ms',
+  			'300': '300ms',
+  			'500': '500ms',
+  			'700': '700ms',
+  			'1000': '1000ms',
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+  	require("tailwindcss-animate"),
+  	// Plugin for animation delay utilities
+  	function({ matchUtilities, theme }: any) {
+  		matchUtilities(
+  			{
+  				'animation-delay': (value: string) => {
+  					return {
+  						'animation-delay': value,
+  					}
+  				},
+  			},
+  			{
+  				values: theme('animationDelay'),
+  			}
+  		)
+  	}
+  ],
 };
 
 export default config;

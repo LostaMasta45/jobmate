@@ -215,27 +215,37 @@ export function Sidebar({ isAdmin = false, membership: membershipProp = 'free', 
     <>
       <div className="flex h-16 items-center justify-center border-b px-4 bg-gradient-to-r from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50">
         {!collapsed ? (
-          <Link href="/dashboard" className="flex items-center justify-center hover:scale-105 transition-transform duration-200">
-            <div className="relative h-12 w-48 flex-shrink-0 filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_12px_rgba(0,209,220,0.25)]">
-              <Image
-                src="/Logo/logopanjang.png"
-                alt="JobMate Logo"
-                fill
-                className="object-contain"
-                priority
-              />
+          <Link href="/dashboard" className="flex items-center justify-center hover:scale-105 transition-transform duration-200 group">
+            <div className="relative h-12 w-48 flex-shrink-0">
+              {/* Dark background for light mode to make logo visible */}
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 dark:from-transparent dark:via-transparent dark:to-transparent border border-gray-700 dark:border-transparent group-hover:border-[#8e68fd] dark:group-hover:border-transparent group-hover:shadow-lg group-hover:shadow-[#8e68fd]/20 transition-all duration-300" />
+              
+              <div className="relative h-full w-full filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_12px_rgba(0,209,220,0.25)] group-hover:drop-shadow-[0_4px_12px_rgba(142,104,253,0.3)] dark:group-hover:drop-shadow-[0_4px_16px_rgba(0,209,220,0.35)] transition-all duration-300">
+                <Image
+                  src="/Logo/logopanjang.png"
+                  alt="JobMate Logo"
+                  fill
+                  className="object-contain p-2"
+                  priority
+                />
+              </div>
             </div>
           </Link>
         ) : (
-          <Link href="/dashboard" className="mx-auto flex items-center hover:scale-110 transition-transform duration-200">
-            <div className="relative h-10 w-10 flex-shrink-0 filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_12px_rgba(0,209,220,0.25)]">
-              <Image
-                src="/Logo/logokecil.png"
-                alt="JobMate Logo"
-                fill
-                className="object-contain"
-                priority
-              />
+          <Link href="/dashboard" className="mx-auto flex items-center hover:scale-110 transition-transform duration-200 group">
+            <div className="relative h-10 w-10 flex-shrink-0">
+              {/* Dark background for light mode - circular */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 dark:from-transparent dark:via-transparent dark:to-transparent border border-gray-700 dark:border-transparent group-hover:border-[#8e68fd] dark:group-hover:border-transparent group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-[#8e68fd]/20 transition-all duration-300" />
+              
+              <div className="relative h-full w-full filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_12px_rgba(0,209,220,0.25)] group-hover:drop-shadow-[0_4px_12px_rgba(142,104,253,0.3)] dark:group-hover:drop-shadow-[0_4px_16px_rgba(0,209,220,0.35)] transition-all duration-300">
+                <Image
+                  src="/Logo/logokecil.png"
+                  alt="JobMate Logo"
+                  fill
+                  className="object-contain p-1"
+                  priority
+                />
+              </div>
             </div>
           </Link>
         )}

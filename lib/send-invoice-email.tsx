@@ -1,4 +1,5 @@
 // lib/send-invoice-email.ts
+import React from 'react';
 import { resend, FROM_EMAIL } from './resend';
 import { InvoiceEmail, InvoiceEmailText } from '@/emails/InvoiceEmail';
 import { render } from '@react-email/render';
@@ -21,7 +22,7 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams) {
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: params.toEmail,
-      subject: `Invoice Pembayaran - ${params.description}`,
+      subject: `Invoice Pembayaran ${params.description} - Jobmate X infolokerjombang`,
       html: emailHtml,
       text: emailText,
       // Optional: tags untuk tracking

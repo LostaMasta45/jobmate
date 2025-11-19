@@ -39,13 +39,15 @@ const nextConfig: NextConfig = {
       },
     ],
     unoptimized: process.env.NODE_ENV === 'development',
-    minimumCacheTTL: 3600, // Increased from 60 to 1 hour for better caching
+    minimumCacheTTL: 7200, // 2 hours for aggressive caching
     deviceSizes: [640, 750, 828, 1080, 1200], // Reduced sizes for mobile-first
-    imageSizes: [16, 32, 48, 64, 96, 128, 256], // Removed larger sizes
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384], // Added 384 for better thumbnail sizing
     formats: ['image/webp'], // Force WebP for better compression
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Loader config for better optimization
+    loader: 'default',
   },
   
   experimental: {

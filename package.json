@@ -16,7 +16,12 @@
     "build": "next build",
     "start": "next start",
     "start:mobile": "next start -H 0.0.0.0 -p 3002",
-    "preview": "npm run build && npm start -- -p 3001"
+    "preview": "npm run build && npm start -- -p 3001",
+    "test-email": "tsx scripts/test-email-send.ts",
+    "test-email-simple": "tsx scripts/test-email-simple.ts",
+    "test-all-emails": "tsx scripts/test-all-emails.ts",
+    "test-all-direct": "tsx scripts/test-all-emails-direct.ts",
+    "test-invoice": "tsx scripts/test-invoice-email.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
