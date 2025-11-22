@@ -38,7 +38,7 @@ export async function sendAccountPendingEmail({
     console.log('[Email Debug] HTML length:', emailHtml?.length || 0);
 
     const { data, error} = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>',
       to: email,
       subject: 'Status Pengajuan Akun Anda - Jobmate X infolokerjombang',
       html: String(emailHtml),
@@ -83,7 +83,7 @@ export async function sendAccountApprovedEmail({
     const emailText = AccountApprovedEmailText({ userName, email, approvedAt, loginUrl });
 
     const { data, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>',
       to: email,
       subject: 'Akun Anda Telah Disetujui - Jobmate X infolokerjombang',
       html: String(emailHtml),
@@ -123,8 +123,9 @@ export async function sendUpgradeVIPEmail({
   dashboardUrl?: string;
 }) {
   try {
-    const membershipName = membershipType === 'vip_premium' ? 'VIP Premium' : 'VIP Basic';
-    const emoji = membershipType === 'vip_premium' ? '👑' : '⭐';
+    const isPremium = membershipType === 'vip_premium';
+    const membershipName = isPremium ? 'VIP Premium' : 'VIP Basic';
+    const emoji = isPremium ? '👑' : '⭐';
     
     const emailHtml = await render(
       React.createElement(UpgradeVIPEmail, { userName, email, membershipType, upgradedAt, dashboardUrl })
@@ -133,9 +134,11 @@ export async function sendUpgradeVIPEmail({
     const emailText = UpgradeVIPEmailText({ userName, email, membershipType, upgradedAt, dashboardUrl });
 
     const { data, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>',
       to: email,
-      subject: `Akun ${membershipName} Anda Aktif - Jobmate X infolokerjombang`,
+      subject: isPremium 
+        ? '👑 Selamat! Upgrade VIP Premium Berhasil - JOBMATE'
+        : '⭐ Selamat! Upgrade VIP Basic Berhasil - JOBMATE',
       html: String(emailHtml),
       text: emailText,
       tags: [

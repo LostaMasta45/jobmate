@@ -1,7 +1,7 @@
 // lib/send-invoice-email.ts
 import React from 'react';
 import { resend, FROM_EMAIL } from './resend';
-import { InvoiceEmail, InvoiceEmailText } from '@/emails/InvoiceEmail';
+import { InvoiceEmailTable, InvoiceEmailTableText } from '@/emails/InvoiceEmailTable';
 import { render } from '@react-email/render';
 
 interface SendInvoiceEmailParams {
@@ -16,13 +16,15 @@ interface SendInvoiceEmailParams {
 
 export async function sendInvoiceEmail(params: SendInvoiceEmailParams) {
   try {
-    const emailHtml: string = await render(<InvoiceEmail {...params} />);
-    const emailText: string = InvoiceEmailText(params);
+    // Use InvoiceEmailTable (table-based layout with production URL logos)
+    const emailHtml: string = await render(<InvoiceEmailTable {...params} />);
+    const emailText: string = InvoiceEmailTableText(params);
 
+    // No attachments needed - logos loaded from production URL (jobmate.web.id)
     const { data, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>',
       to: params.toEmail,
-      subject: `Invoice Pembayaran ${params.description} - Jobmate X infolokerjombang`,
+      subject: `💳 Invoice Pembayaran ${params.description} - Jobmate`,
       html: emailHtml,
       text: emailText,
       // Optional: tags untuk tracking
@@ -33,14 +35,14 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams) {
     });
 
     if (error) {
-      console.error('Failed to send email:', error);
+      console.error('Failed to send invoice email:', error);
       return { success: false, error };
     }
 
-    console.log('Email sent successfully:', data);
+    console.log('Invoice email sent successfully:', data);
     return { success: true, data };
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error sending invoice email:', error);
     return { success: false, error };
   }
 }

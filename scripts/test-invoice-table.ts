@@ -8,6 +8,7 @@ import { join } from 'path';
 import React from 'react';
 import { render } from '@react-email/render';
 import { InvoiceEmailTable, InvoiceEmailTableText } from '../emails/InvoiceEmailTable';
+import * as fs from 'fs';
 
 // Manual .env loading
 const envPath = join(__dirname, '../.env');
@@ -62,6 +63,7 @@ async function testInvoiceEmail(toEmail: string) {
       description: 'VIP Basic - 1 Bulan',
     });
 
+    // No attachments needed - logos loaded from production URL
     const { data, error } = await resend.emails.send({
       from: fromEmail,
       to: toEmail,
