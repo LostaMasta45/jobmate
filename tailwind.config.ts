@@ -12,11 +12,35 @@ const config: Config = {
   	extend: {
   		colors: {
   			brand: {
-  				DEFAULT: '#00acc7',
-  				dark: '#00bed1',
-  				light: '#00d1dc'
+  				DEFAULT: '#00acc7', // pacific-blue
+  				dark: '#00bed1',    // robin's-egg-blue (darker variant in file)
+  				light: '#00d1dc'    // robin's-egg-blue (lighter)
   			},
-  			// Custom VIP Color Palette
+            // Palette from colorpallate.md
+            heliotrope: {
+                DEFAULT: '#8e68fd',
+                50: '#f5f3ff',
+                100: '#ede9fe',
+                200: '#ddd6fe',
+                300: '#c4b5fd',
+                400: '#a78bfa',
+                500: '#8e68fd',
+                600: '#7c3aed',
+                700: '#6d28d9',
+                800: '#5b21b6',
+                900: '#4c1d95',
+            },
+            'purple-heart': {
+                DEFAULT: '#5547d0',
+                50: '#eff6ff',
+                500: '#5547d0',
+                900: '#1e1b4b', // estimated dark
+            },
+            'pacific-blue': '#00acc7',
+            'mariner': '#3977d3',
+            'alto': '#dfdfdf',
+            
+  			// Custom VIP Color Palette (Older definitions, keeping for compatibility but overriding where needed)
   			heliotrope: {
   				DEFAULT: '#8e68fd',
   				50: '#f5f3ff',
@@ -133,6 +157,33 @@ const config: Config = {
   			card: '0 10px 30px rgba(0,0,0,0.06)'
   		},
   		keyframes: {
+        spotlight: {
+          "0%": {
+            opacity: "0",
+            transform: "translate(-72%, -62%) scale(0.5)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translate(-50%,-40%) scale(1)",
+          },
+        },
+        marquee: {
+          "0%": {
+            transform: "translateX(0%)",
+          },
+          "100%": {
+            transform: "translateX(-100%)",
+          },
+        },
+        meteor: {
+          "0%": { transform: "rotate(215deg) translateX(0)", opacity: "1" },
+          "70%": { opacity: "1" },
+          "100%": { transform: "rotate(215deg) translateX(-500px)", opacity: "0" },
+        },
+        shine: {
+          "0%": { left: "-100%" },
+          "100%": { left: "100%" },
+        },
   			'accordion-down': {
   				from: {
   					height: '0'
@@ -159,6 +210,11 @@ const config: Config = {
   			}
   		},
   		animation: {
+        spotlight: "spotlight 2s ease .75s 1 forwards",
+        marquee: "marquee 40s linear infinite",
+        "meteor-effect": "meteor 5s linear infinite",
+        "spin-slow": "spin 5s linear infinite",
+        shine: "shine 3s ease-in-out infinite",
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
   			'loading-bar': 'loading-bar 1.5s ease-in-out infinite',

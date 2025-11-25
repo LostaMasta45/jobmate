@@ -16,22 +16,13 @@ const VIPHeader = dynamic(
   { ssr: true } // Header needed for SEO
 )
 
+// Use the NEW V2 Bottom Bar here
 const VIPBottomBar = dynamic(
   () => import('@/components/mobile/VIPBottomBarV2').then(mod => ({ default: mod.VIPBottomBarV2 })),
   { ssr: false } // Bottom bar not needed for SSR
 )
 
-const VerificationBanner = dynamic(
-  () => import('@/components/vip/VerificationBanner').then(mod => ({ default: mod.VerificationBanner })),
-  { ssr: false }
-)
-
-const VerificationSuccessToast = dynamic(
-  () => import('@/components/vip/VerificationBanner').then(mod => ({ default: mod.VerificationSuccessToast })),
-  { ssr: false }
-)
-
-export default function VIPLayout({
+export default function VIPLokerLayout({
   children,
 }: {
   children: React.ReactNode
@@ -42,10 +33,6 @@ export default function VIPLayout({
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       {/* Header - Fixed Top, z-50 - Hide hamburger on mobile */}
       <VIPHeader onMenuToggle={() => setSidebarOpen(true)} />
-      
-      {/* Verification Banner - Below header, z-30 */}
-      <VerificationBanner />
-      <VerificationSuccessToast />
       
       {/* Mobile Sidebar - Only accessible on desktop when clicking menu */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen} modal={false}>
@@ -65,7 +52,7 @@ export default function VIPLayout({
         </aside>
         
         {/* Main Content Area - Proper spacing + bottom padding for mobile nav + overflow handling */}
-        <main className="flex-1 w-full pt-20 sm:pt-24 pb-24 lg:pb-8 lg:ml-72 bg-gray-50 dark:bg-slate-950 min-h-screen overflow-y-auto">
+        <main className="flex-1 w-full pt-20 sm:pt-24 pb-24 lg:pb-8 lg:ml-72 bg-gray-50 dark:bg-slate-900 min-h-screen overflow-y-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
             {children}
           </div>
