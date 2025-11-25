@@ -31,20 +31,20 @@ export const NavbarDynamic = () => {
     >
       <div
         className={cn(
-          "flex items-center justify-between px-4 py-3 rounded-full border transition-all duration-500 backdrop-blur-xl",
+          "flex items-center justify-between px-4 py-2 rounded-full border transition-all duration-500 backdrop-blur-xl",
           scrolled
-            ? "bg-black/80 border-white/10 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] pl-6 pr-3"
-            : "bg-transparent border-transparent pl-4 pr-4"
+            ? "bg-black/80 border-white/10 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] pl-12 pr-3"
+            : "bg-transparent border-transparent pl-10 pr-4"
         )}
       >
         {/* Logo */}
-        <Link href="/lp" className="flex items-center gap-3 group">
-             <div className="relative h-8 w-32 overflow-hidden">
+        <Link href="/" className="flex items-center gap-3 group relative ml-2">
+             <div className="relative h-28 w-28 -my-10 overflow-visible">
                 <Image 
-                    src="/Logo/logopanjang.png" 
+                    src="/Logo/x.png" 
                     alt="JobMate Logo" 
                     fill
-                    className="object-contain object-left"
+                    className="object-contain scale-150"
                     priority
                 />
              </div>

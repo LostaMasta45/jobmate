@@ -1,26 +1,42 @@
+// Add export const config with runtime: 'nodejs' or 'experimental-edge' removed or default
+// The issue is usually importing Node.js modules in Edge Runtime.
+// However, supabase-ssr should be Edge compatible.
+// Let's explicitly set runtime to experimental-edge if needed, OR check if we are importing node modules.
+// The error says: Import trace for requested module: .../websocket-factory.js
+
+// Let's try to simplify the middleware imports if possible or just rely on standard Next.js middleware patterns.
+// Since the user is getting an error about Edge Runtime and websocket, it might be related to Supabase client usage in middleware.
+
 import { NextResponse, type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+import { createServerClient } from "@supabase/ssr";
 
 export async function middleware(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({
+    request,
+  });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value));
+          supabaseResponse = NextResponse.next({
+            request,
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
   const { pathname } = request.nextUrl;
-
-  // Allow webhook endpoints (no auth required)
-  if (pathname.startsWith('/api/webhooks/')) {
-    console.log('[MIDDLEWARE] Webhook endpoint, bypassing auth:', pathname);
-    return NextResponse.next();
-  }
-
-  // Allow payment routes (public access for checkout)
-  if (pathname.startsWith('/payment') || pathname.startsWith('/api/payment/')) {
-    console.log('[MIDDLEWARE] Payment route, public access:', pathname);
-    return NextResponse.next();
-  }
-
-  // Allow admin login page (public access)
-  if (pathname === '/admin-login' || pathname.startsWith('/admin-login/')) {
-    console.log('[MIDDLEWARE] Admin login page, public access');
-    return NextResponse.next();
-  }
 
   // Define PUBLIC routes (routes that DO NOT require login)
   const publicRoutes = [
@@ -46,12 +62,24 @@ export async function middleware(request: NextRequest) {
     return pathname === route || pathname.startsWith(route + '/');
   });
 
-  // If public, allow access immediately
-  if (isPublic) {
-    console.log('[MIDDLEWARE] Public route, bypassing auth:', pathname);
+  // Allow webhook endpoints (no auth required)
+  if (pathname.startsWith('/api/webhooks/')) {
+    console.log('[MIDDLEWARE] Webhook endpoint, bypassing auth:', pathname);
     return NextResponse.next();
   }
 
+  // Allow payment routes (public access for checkout)
+  if (pathname.startsWith('/payment') || pathname.startsWith('/api/payment/')) {
+    console.log('[MIDDLEWARE] Payment route, public access:', pathname);
+    return NextResponse.next();
+  }
+
+  // Allow admin login page (public access)
+  if (pathname === '/admin-login' || pathname.startsWith('/admin-login/')) {
+    console.log('[MIDDLEWARE] Admin login page, public access');
+    return NextResponse.next();
+  }
+  
   // Define PROTECTED routes (routes that REQUIRE login)
   const protectedRoutes = [
     '/vip',           // VIP Career Portal
@@ -72,14 +100,32 @@ export async function middleware(request: NextRequest) {
     }
     return pathname.startsWith(route);
   });
+
+  // If public and not explicitly protected (to be safe), allow access immediately
+  if (isPublic && !isProtected) {
+    console.log('[MIDDLEWARE] Public route, bypassing auth:', pathname);
+    return NextResponse.next();
+  }
   
   // If NOT protected, allow public access
   if (!isProtected) {
-    console.log('[MIDDLEWARE] Public route detected:', pathname);
+    console.log('[MIDDLEWARE] Public route detected (implicitly):', pathname);
     return NextResponse.next();
   }
+  
+  // --- AUTHENTICATION LOGIC STARTS HERE ---
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const { supabaseResponse, user, supabase, cachedRole } = await updateSession(request);
+  // Helper for logic below
+  const updateSession = async (request: NextRequest) => {
+      // This is now integrated into the main flow
+      return { supabaseResponse, user, supabase, cachedRole: request.cookies.get('user_role')?.value };
+  }
+
+  const { cachedRole } = await updateSession(request);
+
 
   // Get cached data
   let userRole: string | undefined = cachedRole;

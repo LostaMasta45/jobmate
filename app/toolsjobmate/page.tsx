@@ -1,11 +1,12 @@
 import { Metadata } from "next";
-import { LandingNavbar } from "@/components/landing/LandingNavbar";
-import { ToolsHero } from "@/components/landing/tools/ToolsHero";
-import { ProblemSection } from "@/components/landing/tools/ProblemSection";
-import { AvailableTools } from "@/components/landing/tools/AvailableTools";
-import { ComingSoonTools } from "@/components/landing/tools/ComingSoonTools";
-import { ToolsComparison } from "@/components/landing/tools/ToolsComparison";
-import { ToolsPricingCTA } from "@/components/landing/tools/ToolsPricingCTA";
+import { NavbarDynamic } from "@/components/landing-v2/NavbarDynamic";
+import { SimpleFooter } from "@/components/landing-v2/SimpleFooter";
+import { ToolsHeroCosmic } from "@/components/landing-v2/tools/ToolsHeroCosmic";
+import { ProblemSectionCosmic } from "@/components/landing-v2/tools/ProblemSectionCosmic";
+import { AvailableToolsCosmic } from "@/components/landing-v2/tools/AvailableToolsCosmic";
+import { ComingSoonToolsCosmic } from "@/components/landing-v2/tools/ComingSoonToolsCosmic";
+import { ToolsComparisonCosmic } from "@/components/landing-v2/tools/ToolsComparisonCosmic";
+import { ToolsPricingCTACosmic } from "@/components/landing-v2/tools/ToolsPricingCTACosmic";
 
 export const metadata: Metadata = {
   title: "6 Tools JobMate Premium — Autopilot Mode Cari Kerja",
@@ -20,14 +21,16 @@ export const metadata: Metadata = {
 
 export default function ToolsJobMatePage() {
   return (
-    <main className="min-h-screen bg-background">
-      <LandingNavbar />
-      <ToolsHero />
-      <ProblemSection />
-      <AvailableTools />
-      <ComingSoonTools />
-      <ToolsComparison />
-      <ToolsPricingCTA />
+    <main className="min-h-screen bg-black text-white font-sans selection:bg-brand selection:text-white overflow-x-hidden">
+      <NavbarDynamic />
+      <ToolsHeroCosmic />
+      <ProblemSectionCosmic />
+      <AvailableToolsCosmic />
+      <ComingSoonToolsCosmic />
+      <ToolsComparisonCosmic />
+      <ToolsPricingCTACosmic />
+      <SimpleFooter />
     </main>
   );
 }
+

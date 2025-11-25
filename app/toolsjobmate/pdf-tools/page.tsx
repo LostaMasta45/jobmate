@@ -2,8 +2,10 @@ import { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Minimize2, FileImage, Sparkles, CheckCircle2, Shield, ArrowRight, Zap } from "lucide-react";
+import { FileText, Minimize2, FileImage, Sparkles, CheckCircle2, Shield, ArrowRight, Zap, Lock } from "lucide-react";
 import Link from "next/link";
+import { NavbarDynamic } from "@/components/landing-v2/NavbarDynamic";
+import { SimpleFooter } from "@/components/landing-v2/SimpleFooter";
 
 export const metadata: Metadata = {
   title: "PDF Tools — Merge, Compress, Convert | JobMate",
@@ -13,32 +15,39 @@ export const metadata: Metadata = {
 
 export default function PDFToolsDetailPage() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-black text-white font-sans selection:bg-brand selection:text-white">
+      <NavbarDynamic />
+
       {/* Hero Section */}
-      <section className="border-b bg-gradient-to-b from-background to-muted/20">
-        <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="mx-auto max-w-4xl text-center space-y-6">
-            <Badge variant="secondary" className="mb-2">
-              <Zap className="h-3 w-3 mr-1" />
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-slate-600/20 blur-[120px] rounded-full pointer-events-none" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
+            <Badge className="bg-slate-500/10 text-slate-400 border-slate-500/20 mb-4 px-4 py-1.5">
+              <Zap className="h-3 w-3 mr-2" />
               3 Tools in 1
             </Badge>
+            
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-              PDF Tools
+              PDF Tools Suite
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            
+            <p className="text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed">
               3 tools PDF essential untuk job seeker: Merge (gabung CV+Portfolio), 
               Compress (meet job portal limit), Convert (Word/Image to PDF). File aman, auto-delete 7 hari.
             </p>
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Link href="/tools/pdf-tools">
-                <Button size="lg" className="gap-2">
+                <Button size="lg" className="bg-slate-600 hover:bg-slate-700 text-white rounded-full px-8 h-12 gap-2 shadow-[0_0_20px_rgba(71,85,105,0.3)]">
                   <FileText className="h-5 w-5" />
                   Gunakan PDF Tools
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/sign-in">
-                <Button size="lg" variant="outline" className="gap-2">
+                <Button size="lg" variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10 text-white rounded-full px-8 h-12 gap-2">
                   Lihat Demo
                 </Button>
               </Link>
@@ -48,384 +57,148 @@ export default function PDFToolsDetailPage() {
       </section>
 
       {/* 3 Main Tools */}
-      <section className="py-16 md:py-24 bg-muted/30">
+      <section className="py-20 bg-neutral-950">
         <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-4xl text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">3 Tools Essential</h2>
-            <p className="text-muted-foreground text-lg">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">3 Tools Essential</h2>
+            <p className="text-neutral-400 text-lg">
               Solve semua kebutuhan PDF untuk job application
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            <Card className="p-6 border-2 border-blue-200 dark:border-blue-800">
-              <div className="space-y-4">
-                <div className="flex items-center justify-center">
-                  <div className="rounded-full bg-blue-100 dark:bg-blue-900 p-4">
-                    <FileText className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                  </div>
-                </div>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold mb-2">Merge PDF</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Gabung multiple PDFs jadi 1 file profesional
-                  </p>
-                  <Badge variant="secondary">Most Used</Badge>
-                </div>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Gabung CV + Portfolio + Sertifikat</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Unlimited files, drag & drop order</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Jadi 1 PDF profesional siap kirim</span>
-                  </li>
-                </ul>
-              </div>
-            </Card>
-
-            <Card className="p-6 border-2 border-purple-200 dark:border-purple-800">
-              <div className="space-y-4">
-                <div className="flex items-center justify-center">
-                  <div className="rounded-full bg-purple-100 dark:bg-purple-900 p-4">
-                    <Minimize2 className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-                  </div>
-                </div>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold mb-2">Compress PDF</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Kompres file untuk meet job portal limit
-                  </p>
-                  <Badge variant="secondary">Max 2MB</Badge>
-                </div>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Reduce size 50-80% tanpa quality loss</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Perfect untuk job portal limit 2MB</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Tetap readable & professional</span>
-                  </li>
-                </ul>
-              </div>
-            </Card>
-
-            <Card className="p-6 border-2 border-amber-200 dark:border-amber-800">
-              <div className="space-y-4">
-                <div className="flex items-center justify-center">
-                  <div className="rounded-full bg-amber-100 dark:bg-amber-900 p-4">
-                    <FileImage className="h-8 w-8 text-amber-600 dark:text-amber-400" />
-                  </div>
-                </div>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold mb-2">Convert to PDF</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Convert Word/Image ke PDF format
-                  </p>
-                  <Badge variant="secondary">Universal</Badge>
-                </div>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Word/DOCX to PDF conversion</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Image (JPG/PNG) to PDF</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Best quality, formatting preserved</span>
-                  </li>
-                </ul>
-              </div>
-            </Card>
+            {[
+              {
+                icon: FileText,
+                title: "Merge PDF",
+                desc: "Gabung multiple PDFs jadi 1 file profesional.",
+                color: "text-blue-400",
+                bg: "bg-blue-500/10",
+                features: ["Gabung CV + Portfolio", "Unlimited files", "Drag & drop order"]
+              },
+              {
+                icon: Minimize2,
+                title: "Compress PDF",
+                desc: "Kompres file untuk meet job portal limit.",
+                color: "text-purple-400",
+                bg: "bg-purple-500/10",
+                features: ["Reduce size 50-80%", "Max quality", "Under 2MB limit"]
+              },
+              {
+                icon: FileImage,
+                title: "Convert to PDF",
+                desc: "Convert Word/Image ke PDF format.",
+                color: "text-amber-400",
+                bg: "bg-amber-500/10",
+                features: ["Word to PDF", "Image to PDF", "Best formatting"]
+              }
+            ].map((tool, i) => (
+              <Card key={i} className="p-8 bg-neutral-900/50 border-white/5 hover:border-slate-500/30 transition-colors text-center">
+                 <div className="flex justify-center mb-6">
+                    <div className={`rounded-full p-4 ${tool.bg}`}>
+                        <tool.icon className={`h-8 w-8 ${tool.color}`} />
+                    </div>
+                 </div>
+                 <h3 className="text-2xl font-bold text-white mb-2">{tool.title}</h3>
+                 <p className="text-sm text-neutral-400 mb-6">{tool.desc}</p>
+                 <ul className="space-y-3 text-left">
+                    {tool.features.map((f, idx) => (
+                        <li key={idx} className="flex items-center gap-2 text-sm text-neutral-300">
+                            <CheckCircle2 className="h-4 w-4 text-slate-500" />
+                            {f}
+                        </li>
+                    ))}
+                 </ul>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Use Cases */}
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-4xl text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Perfect Untuk Job Seeker</h2>
-            <p className="text-muted-foreground text-lg">
-              Real scenarios yang sering dialami saat apply kerja
+      <section className="py-20 bg-black relative">
+        <div className="absolute inset-0 bg-grid-white/[0.02]" />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Real Scenarios</h2>
+            <p className="text-neutral-400 text-lg">
+              Solusi untuk masalah yang sering dihadapi job seeker
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            <Card className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="text-3xl">📁</div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold mb-2">Scenario 1: Gabung Dokumen</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    HRD minta: "Kirim 1 PDF yang berisi CV, portfolio, dan sertifikat"
-                  </p>
-                  <div className="text-xs bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg">
-                    <strong>Solution:</strong> Use Merge PDF → Upload semua file → Drag & drop urutan → Download 1 PDF complete!
+            {[
+              { icon: "📁", title: "Scenario 1: Gabung Dokumen", problem: 'HRD minta: "Kirim 1 PDF isi CV, portfolio, sertifikat"', sol: "Use Merge PDF → Upload semua → Download 1 PDF complete!" },
+              { icon: "⚡", title: "Scenario 2: File Terlalu Besar", problem: "Job portal limit 2MB, file Anda 5MB", sol: "Use Compress PDF → Kompres 70% → Jadi 1.5MB (aman)!" },
+              { icon: "🔄", title: "Scenario 3: Format Salah", problem: "Portal hanya terima PDF, file Anda Word/JPG", sol: "Use Convert to PDF → Instant convert → Download PDF!" },
+              { icon: "🎯", title: "Scenario 4: Paket Lengkap", problem: "Kirim CV (Word) + Project (JPG) + Sertifikat (PDF)", sol: "Convert all → Merge jadi 1 → Compress → Perfect!" }
+            ].map((item, i) => (
+              <div key={i} className="p-6 rounded-2xl border border-white/10 bg-neutral-900/30 backdrop-blur-sm hover:bg-neutral-900/50 transition-all">
+                <div className="flex items-start gap-4">
+                  <div className="text-3xl">{item.icon}</div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                    <p className="text-sm text-neutral-400 mb-3 italic">"{item.problem}"</p>
+                    <div className="text-xs bg-slate-500/20 text-slate-300 p-3 rounded-lg border border-slate-500/20">
+                        <strong>Solution:</strong> {item.sol}
+                    </div>
                   </div>
                 </div>
               </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="text-3xl">⚡</div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold mb-2">Scenario 2: File Terlalu Besar</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Job portal limit 2MB, tapi CV+Portfolio Anda 5MB
-                  </p>
-                  <div className="text-xs bg-purple-50 dark:bg-purple-950/20 p-3 rounded-lg">
-                    <strong>Solution:</strong> Use Compress PDF → Upload file 5MB → Kompres 70% → Jadi 1.5MB (under limit)!
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="text-3xl">🔄</div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold mb-2">Scenario 3: Format Salah</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Portal hanya accept PDF, tapi CV Anda .docx atau .jpg
-                  </p>
-                  <div className="text-xs bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg">
-                    <strong>Solution:</strong> Use Convert to PDF → Upload Word/Image → Instant convert → Download PDF professional!
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="text-3xl">🎯</div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold mb-2">Scenario 4: Paket Lengkap</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Apply startup, kirim 1 PDF: CV (Word) + 3 project screenshot (JPG) + sertifikat (PDF)
-                  </p>
-                  <div className="text-xs bg-green-50 dark:bg-green-950/20 p-3 rounded-lg">
-                    <strong>Solution:</strong> Convert all to PDF → Merge jadi 1 → Compress jika {'>'} 2MB → Perfect submission!
-                  </div>
-                </div>
-              </div>
-            </Card>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Features & Security */}
-      <section className="py-16 md:py-24 bg-muted/30">
+      {/* Security Features */}
+      <section className="py-20 bg-neutral-950">
         <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-4xl text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Fitur & Keamanan</h2>
-            <p className="text-muted-foreground text-lg">
-              Fast, secure, dan user-friendly
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            <Card className="p-6">
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-blue-100 dark:bg-blue-900 p-2">
-                    <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <h3 className="text-xl font-semibold">Instant Processing</h3>
-                </div>
-                <p className="text-muted-foreground pl-11">
-                  Merge, compress, convert dalam hitungan detik. Tidak perlu waiting time lama.
-                </p>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-green-100 dark:bg-green-900 p-2">
-                    <Shield className="h-5 w-5 text-green-600 dark:text-green-400" />
-                  </div>
-                  <h3 className="text-xl font-semibold">Auto-Delete 7 Hari</h3>
-                </div>
-                <p className="text-muted-foreground pl-11">
-                  File Anda aman & privacy terjaga. Auto-delete dari server setelah 7 hari.
-                </p>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-purple-100 dark:bg-purple-900 p-2">
-                    <CheckCircle2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <h3 className="text-xl font-semibold">Best Quality</h3>
-                </div>
-                <p className="text-muted-foreground pl-11">
-                  Compression smart yang balance antara size reduction & quality preservation.
-                </p>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-amber-100 dark:bg-amber-900 p-2">
-                    <FileText className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                  </div>
-                  <h3 className="text-xl font-semibold">Unlimited Usage</h3>
-                </div>
-                <p className="text-muted-foreground pl-11">
-                  Merge, compress, convert sebanyak yang Anda mau. Tidak ada limit harian.
-                </p>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-red-100 dark:bg-red-900 p-2">
-                    <Sparkles className="h-5 w-5 text-red-600 dark:text-red-400" />
-                  </div>
-                  <h3 className="text-xl font-semibold">History Tersimpan</h3>
-                </div>
-                <p className="text-muted-foreground pl-11">
-                  Semua operasi tersimpan di history. Re-download file kapan saja dalam 7 hari.
-                </p>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-teal-100 dark:bg-teal-900 p-2">
-                    <FileImage className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-                  </div>
-                  <h3 className="text-xl font-semibold">Multiple Formats</h3>
-                </div>
-                <p className="text-muted-foreground pl-11">
-                  Support: PDF, DOCX, DOC, JPG, JPEG, PNG, GIF. Cover semua kebutuhan.
-                </p>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-4xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-              Cara Menggunakan
-            </h2>
-
-            <Card className="p-8">
-              <ol className="space-y-6">
-                <li className="flex items-start gap-4">
-                  <div className="rounded-full bg-primary text-primary-foreground w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
-                    1
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-1">Pilih Tool</h3>
-                    <p className="text-muted-foreground">
-                      Pilih tab: Merge PDF (gabung), Compress (kompres), atau Convert (ubah format).
-                    </p>
-                  </div>
-                </li>
-
-                <li className="flex items-start gap-4">
-                  <div className="rounded-full bg-primary text-primary-foreground w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
-                    2
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-1">Upload File</h3>
-                    <p className="text-muted-foreground">
-                      Drag & drop file atau click to browse. Multiple files OK untuk Merge.
-                    </p>
-                  </div>
-                </li>
-
-                <li className="flex items-start gap-4">
-                  <div className="rounded-full bg-primary text-primary-foreground w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
-                    3
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-1">Process & Preview</h3>
-                    <p className="text-muted-foreground">
-                      Tool akan process instant. Preview result sebelum download.
-                    </p>
-                  </div>
-                </li>
-
-                <li className="flex items-start gap-4">
-                  <div className="rounded-full bg-primary text-primary-foreground w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
-                    4
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-1">Download Result</h3>
-                    <p className="text-muted-foreground">
-                      Download PDF hasil. File tersimpan di history (auto-delete after 7 days).
-                    </p>
-                  </div>
-                </li>
-              </ol>
-
-              <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200">
-                <p className="text-sm flex items-start gap-2">
-                  <Sparkles className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>
-                    <strong>Pro Tip:</strong> Combine tools! Convert Word to PDF → Merge dengan portfolio PDFs → Compress jika {'>'} 2MB. Perfect submission!
-                  </span>
-                </p>
-              </div>
-            </Card>
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto text-center">
+             <div className="p-6">
+                <Zap className="h-10 w-10 text-slate-400 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-white mb-2">Instant Processing</h3>
+                <p className="text-sm text-neutral-400">Merge, compress, convert dalam detik.</p>
+             </div>
+             <div className="p-6">
+                <Shield className="h-10 w-10 text-green-400 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-white mb-2">Auto-Delete 7 Hari</h3>
+                <p className="text-sm text-neutral-400">Privacy terjaga. File otomatis dihapus.</p>
+             </div>
+             <div className="p-6">
+                <Lock className="h-10 w-10 text-amber-400 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-white mb-2">Secure Encryption</h3>
+                <p className="text-sm text-neutral-400">Transfer data aman dengan enkripsi.</p>
+             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <Card className="max-w-4xl mx-auto p-8 md:p-12 text-center bg-gradient-to-br from-primary/5 via-background to-primary/5 border-2">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-slate-600/5" />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto p-8 md:p-12 text-center rounded-3xl bg-gradient-to-br from-neutral-900 to-black border border-white/10">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">
               Siap Manage PDF Dokumen?
             </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-lg text-neutral-400 mb-8 max-w-2xl mx-auto">
               3 tools in 1: Merge, Compress, Convert. 
               Fast, secure, unlimited usage. Auto-delete 7 hari!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/tools/pdf-tools">
-                <Button size="lg" className="gap-2">
+                <Button size="lg" className="bg-slate-600 hover:bg-slate-700 text-white rounded-full px-8 h-12 gap-2 shadow-lg shadow-slate-600/20">
                   <Sparkles className="h-5 w-5" />
                   Gunakan PDF Tools
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/sign-in">
-                <Button size="lg" variant="outline">
-                  Login untuk Mulai
-                </Button>
-              </Link>
             </div>
-          </Card>
+          </div>
         </div>
       </section>
+
+      <SimpleFooter />
     </main>
   );
 }

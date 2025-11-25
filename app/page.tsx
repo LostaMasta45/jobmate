@@ -1,17 +1,22 @@
-import { LandingHero } from "@/components/landing/LandingHero";
-import { PainPoints } from "@/components/landing/PainPoints";
-import { AboutSection } from "@/components/landing/AboutSection";
-import { WhyInfoLokerSection } from "@/components/landing/WhyInfoLokerSection";
-import { MotivationSection } from "@/components/landing/MotivationSection";
-import { ComparisonSection } from "@/components/landing/ComparisonSection";
-import { PricingSection } from "@/components/landing/PricingSection";
-import { ToolsSection } from "@/components/landing/ToolsSection";
-import { TestimonialSection } from "@/components/landing/TestimonialSection";
-import { FAQSection } from "@/components/landing/FAQSection";
-import { CTASection } from "@/components/landing/CTASection";
-import { LandingNavbar } from "@/components/landing/LandingNavbar";
-import { SalesPopup } from "@/components/landing/SalesPopup";
 import { Metadata } from "next";
+import { LandingHeroCosmic } from "@/components/landing-v2/LandingHeroCosmic";
+import { PainPointsMeteor } from "@/components/landing-v2/PainPointsMeteor";
+import { BentoGridPro } from "@/components/landing-v2/BentoGridPro";
+import { AboutSectionV2 } from "@/components/landing-v2/AboutSectionV2";
+import { WhyInfoLokerSectionV2 } from "@/components/landing-v2/WhyInfoLokerSectionV2";
+import { MotivationCosmic } from "@/components/landing-v2/MotivationCosmic";
+import { NavbarDynamic } from "@/components/landing-v2/NavbarDynamic";
+import { SimpleFooter } from "@/components/landing-v2/SimpleFooter";
+import { ComparisonSticky } from "@/components/landing-v2/ComparisonSticky";
+import { PricingBeams } from "@/components/landing-v2/PricingBeams";
+import { TestimonialMarquee } from "@/components/landing-v2/TestimonialMarquee";
+import { FAQGlass } from "@/components/landing-v2/FAQGlass";
+import { CTAExplosion } from "@/components/landing-v2/CTAExplosion";
+
+import { StickyNotification } from "@/components/landing-v2/StickyNotification";
+import { UserSegmentation } from "@/components/landing-v2/UserSegmentation";
+import { WallOfLove } from "@/components/landing-v2/WallOfLove";
+import { StickyBottomCTA } from "@/components/landing-v2/StickyBottomCTA";
 
 export const metadata: Metadata = {
   title: "Career VIP InfoLokerJombang — Siap Kerja Setiap Hari",
@@ -26,20 +31,31 @@ export const metadata: Metadata = {
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-background">
-      <LandingNavbar />
-      <LandingHero />
-      <PainPoints />
-      <AboutSection />
-      <WhyInfoLokerSection />
-      <MotivationSection />
-      <ComparisonSection />
-      <PricingSection />
-      <ToolsSection />
-      <TestimonialSection />
-      <FAQSection />
-      <CTASection />
-      <SalesPopup />
+    <main className="min-h-screen bg-black text-white overflow-x-hidden selection:bg-brand selection:text-white font-sans">
+       <StickyNotification />
+       <NavbarDynamic />
+       
+       {/* Background Global Effects */}
+       <div className="fixed inset-0 z-[-1] bg-black pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]" />
+       </div>
+
+       <LandingHeroCosmic />
+       <UserSegmentation />
+       <PainPointsMeteor />
+       <AboutSectionV2 />
+       <WhyInfoLokerSectionV2 />
+       <MotivationCosmic />
+       <WallOfLove />
+       <ComparisonSticky />
+       <PricingBeams />
+       <BentoGridPro />
+       <TestimonialMarquee />
+       <FAQGlass />
+       <CTAExplosion />
+
+       <SimpleFooter />
+       <StickyBottomCTA />
     </main>
   );
 }
