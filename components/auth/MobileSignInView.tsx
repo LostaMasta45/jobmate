@@ -314,31 +314,6 @@ export default function MobileSignInView() {
                   >
                     Platform pencari kerja berbasis AI untuk masa depan yang lebih cerah.
                   </motion.p>
-                  
-                  {/* Tiny Animated Login Illustration */}
-                  <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.3, type: "spring" }}
-                    className="absolute right-0 bottom-0 w-24 h-24 -mb-4 opacity-20 pointer-events-none"
-                  >
-                     <div className="relative w-full h-full">
-                       <motion.div 
-                         animate={{ y: [0, -5, 0] }}
-                         transition={{ duration: 3, repeat: Infinity }}
-                         className="absolute inset-0 flex items-center justify-center"
-                       >
-                         <div className="w-16 h-16 bg-[#00acc7] rounded-2xl rotate-12 shadow-lg" />
-                       </motion.div>
-                       <motion.div 
-                         animate={{ y: [0, 5, 0] }}
-                         transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
-                         className="absolute inset-0 flex items-center justify-center"
-                       >
-                         <div className="w-16 h-16 bg-[#8e68fd] rounded-2xl -rotate-6 mix-blend-multiply opacity-80" />
-                       </motion.div>
-                     </div>
-                  </motion.div>
                 </div>
               </div>
 
