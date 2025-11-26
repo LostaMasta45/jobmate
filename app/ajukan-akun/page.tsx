@@ -36,8 +36,11 @@ import {
   Sparkles,
   Shield
 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-is-mobile";
+import MobileAjukanAkunView from "@/components/auth/MobileAjukanAkunView";
 
 export default function AjukanAkunPage() {
+  const isMobile = useIsMobile();
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -50,6 +53,11 @@ export default function AjukanAkunPage() {
     password: "",
   });
   const [proofFile, setProofFile] = React.useState<File | null>(null);
+
+  // If mobile, render the mobile view immediately
+  if (isMobile) {
+    return <MobileAjukanAkunView />;
+  }
 
   // Validation helpers
   const isValidEmail = (email: string) => {

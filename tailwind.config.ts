@@ -149,6 +149,14 @@ const config: Config = {
             transform: "translateX(-100%)",
           },
         },
+        "marquee-reverse": {
+          "0%": {
+            transform: "translateX(-100%)",
+          },
+          "100%": {
+            transform: "translateX(0%)",
+          },
+        },
         meteor: {
           "0%": { transform: "rotate(215deg) translateX(0)", opacity: "1" },
           "70%": { opacity: "1" },
@@ -186,6 +194,7 @@ const config: Config = {
   		animation: {
         spotlight: "spotlight 2s ease .75s 1 forwards",
         marquee: "marquee 40s linear infinite",
+        "marquee-reverse": "marquee-reverse 40s linear infinite",
         "meteor-effect": "meteor 5s linear infinite",
         "spin-slow": "spin 5s linear infinite",
         shine: "shine 3s ease-in-out infinite",

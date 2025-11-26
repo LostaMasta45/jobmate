@@ -69,12 +69,6 @@ export const NavbarDynamic = () => {
 
         {/* Right Actions */}
         <div className="flex items-center gap-2">
-            <Link href="/login" className={cn(
-                "text-sm font-medium text-white hover:text-brand transition-colors px-4 hidden md:block",
-                scrolled ? "hidden" : "block"
-            )}>
-                Masuk
-            </Link>
             <Button size="sm" className="rounded-full bg-white text-black hover:bg-neutral-200 font-medium px-5 h-9">
                 Mulai
             </Button>
@@ -106,14 +100,6 @@ export const NavbarDynamic = () => {
                         {link.label}
                     </Link>
                 ))}
-                <div className="h-px bg-white/10 my-2" />
-                <Link 
-                    href="/login"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-4 py-3 text-neutral-300 hover:text-white transition-colors"
-                >
-                    Masuk
-                </Link>
             </div>
         </div>
     )}

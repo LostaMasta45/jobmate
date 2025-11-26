@@ -13,6 +13,8 @@ import { AnimatedBackground } from "@/components/auth/AnimatedBackground";
 import { createClient } from "@/lib/supabase/client";
 import { Eye, EyeOff, Lock, CheckCircle2, AlertCircle, Mail, KeyRound, Sparkles, TrendingUp, Shield } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useIsMobile } from "@/hooks/use-is-mobile";
+import MobileSignInView from "@/components/auth/MobileSignInView";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -52,6 +54,7 @@ const logoVariants = {
 };
 
 export default function SignInPage() {
+  const isMobile = useIsMobile();
   const router = useRouter();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -272,6 +275,11 @@ export default function SignInPage() {
       setShowLoadingScreen(false);
     }
   };
+
+  // If mobile, render the mobile view immediately
+  if (isMobile) {
+    return <MobileSignInView />;
+  }
 
   return (
     <>

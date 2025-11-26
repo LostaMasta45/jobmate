@@ -4,8 +4,10 @@ import { PainPointsMeteor } from "@/components/landing-v2/PainPointsMeteor";
 import { BentoGridPro } from "@/components/landing-v2/BentoGridPro";
 import { AboutSectionV2 } from "@/components/landing-v2/AboutSectionV2";
 import { WhyInfoLokerSectionV2 } from "@/components/landing-v2/WhyInfoLokerSectionV2";
+import { WhyInfoLokerOriginal } from "@/components/landing-v2/WhyInfoLokerOriginal";
 import { MotivationCosmic } from "@/components/landing-v2/MotivationCosmic";
 import { NavbarDynamic } from "@/components/landing-v2/NavbarDynamic";
+import { CompanyLogoMarquee } from "@/components/landing-v2/CompanyLogoMarquee";
 import { SimpleFooter } from "@/components/landing-v2/SimpleFooter";
 import { ComparisonSticky } from "@/components/landing-v2/ComparisonSticky";
 import { PricingBeams } from "@/components/landing-v2/PricingBeams";
@@ -41,9 +43,11 @@ export default function LandingPage() {
        </div>
 
        <LandingHeroCosmic />
+       <CompanyLogoMarquee />
        <UserSegmentation />
        <PainPointsMeteor />
        <AboutSectionV2 />
+       <WhyInfoLokerOriginal />
        <WhyInfoLokerSectionV2 />
        <MotivationCosmic />
        <WallOfLove />
