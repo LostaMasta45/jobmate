@@ -320,7 +320,7 @@ export default function SignInPageV2() {
                           <div className="flex items-center justify-between ml-1">
                             <Label htmlFor="password" className="text-xs font-medium text-gray-400">Password</Label>
                             <Link
-                              href="/auth/reset"
+                              href="/reset"
                               className="text-[10px] font-medium text-[#00acc7] hover:text-[#00bed1] transition-colors"
                             >
                               Forgot password?

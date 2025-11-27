@@ -420,7 +420,7 @@ export default function MobileSignInPage() {
                           Ingat saya
                         </label>
                       </div>
-                      <Link href="/auth/reset" className="text-sm font-bold text-[#00acc7] hover:text-[#009eb5]">
+                      <Link href="/reset" className="text-sm font-bold text-[#00acc7] hover:text-[#009eb5]">
                         Lupa Password?
                       </Link>
                     </div>

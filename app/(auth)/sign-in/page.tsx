@@ -196,7 +196,7 @@ export default function SignInPage() {
           {/* Brand Logo */}
           <div className="absolute top-8 left-8 sm:left-12">
              <Link href="/" className="flex items-center gap-3 group">
-               <div className="relative h-12 w-12 transition-transform group-hover:scale-105">
+               <div className="relative h-60 w-60 transition-transform group-hover:scale-105">
                   <Image 
                     src="/Logo/x.png" 
                     alt="JobMate Logo" 
@@ -205,7 +205,6 @@ export default function SignInPage() {
                     priority 
                   />
                </div>
-               <span className="text-xl font-bold tracking-tight text-foreground group-hover:text-brand transition-colors">JobMate</span>
              </Link>
           </div>
 
@@ -288,7 +287,7 @@ export default function SignInPage() {
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
                     <Link 
-                      href="/auth/reset" 
+                      href="/reset" 
                       className="text-xs font-medium text-brand hover:text-brand/80 hover:underline"
                     >
                       Lupa password?

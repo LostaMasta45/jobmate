@@ -233,7 +233,7 @@ export default function MobileSignInView() {
                       animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.3, 0.5] }}
                       transition={{ duration: 3, repeat: Infinity }}
                     />
-                    <img src="/Logo/x.png" alt="JobMate" className="w-64 h-64 object-contain relative z-10 drop-shadow-2xl opacity-90" />
+                    <img src="/Logo/x.png" alt="JobMate" className="w-64 h-64 object-contain relative z-10 drop-shadow-2xl" />
                   </div>
                </motion.div>
 
@@ -535,7 +535,7 @@ export default function MobileSignInView() {
                     <div className="space-y-2">
                       <div className="flex justify-between items-center px-1">
                         <Label className="text-xs font-semibold text-slate-600">Password</Label>
-                        <Link href="/auth/reset" className="text-xs font-bold text-[#00acc7] hover:text-[#8e68fd] transition-colors">
+                        <Link href="/reset" className="text-xs font-bold text-[#00acc7] hover:text-[#8e68fd] transition-colors">
                           Lupa Password?
                         </Link>
                       </div>
