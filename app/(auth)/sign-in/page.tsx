@@ -194,14 +194,14 @@ export default function SignInPage() {
         <div className="relative flex w-full flex-col justify-center px-8 sm:px-12 lg:w-[45%] xl:w-[40%] h-screen border-r border-border/40 shadow-xl z-20 bg-background/80 backdrop-blur-md">
           
           {/* Brand Logo */}
-          <div className="absolute top-8 left-8 sm:left-12">
-             <Link href="/" className="flex items-center gap-3 group">
-               <div className="relative h-60 w-60 transition-transform group-hover:scale-105">
+          <div className="absolute top-8 left-8 sm:left-12 z-50">
+             <Link href="/" className="block group">
+               <div className="relative h-32 w-32 transition-transform group-hover:scale-105">
                   <Image 
                     src="/Logo/x.png" 
                     alt="JobMate Logo" 
                     fill 
-                    className="object-contain" 
+                    className="object-contain object-left" 
                     priority 
                   />
                </div>
