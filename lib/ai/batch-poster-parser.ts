@@ -43,68 +43,36 @@ export async function parsePosterMultiPosition(
   imageMimeType: string,
   filename: string
 ): Promise<BatchPosterResult> {
-  const prompt = `Kamu adalah AI expert dalam membaca poster lowongan kerja di Indonesia.
+  const prompt = `Extract job posting data from this Indonesian job poster. Return VALID JSON ONLY.
 
-TUGAS: Extract SEMUA informasi lowongan dari poster ini. PENTING: Satu poster bisa berisi BEBERAPA POSISI!
+DETECT MULTIPLE POSITIONS:
+- If poster lists multiple positions (e.g., "1. Admin, 2. Sales, 3. Driver"), create separate entries
+- Company, location, deadline, contact → SAME for all positions
+- Title, category, salary → CAN DIFFER per position
 
-DETEKSI MULTIPLE POSISI:
-- Jika poster mencantumkan beberapa posisi (contoh: "Dibutuhkan: 1. Staff Admin, 2. Sales Marketing, 3. Driver")
-- Atau list posisi dalam bentuk bullet/numbered list
-- Atau beberapa job title terpisah
-- Maka buat ARRAY dengan detail masing-masing posisi
-
-OUTPUT FORMAT (JSON):
+OUTPUT (JSON):
 {
-  "has_multiple_positions": true/false,
-  "positions": [
-    {
-      "title": "Posisi 1",
-      "perusahaan_name": "Nama perusahaan (SAMA untuk semua posisi di poster ini)",
-      "lokasi": "Lokasi kerja (SAMA untuk semua posisi)",
-      "kategori": ["Kategori sesuai posisi"],
-      "tipe_kerja": "Full-time | Part-time | Contract | Freelance | Remote",
-      "gaji_text": "Format gaji untuk posisi ini (bisa beda per posisi)",
-      "gaji_min": 5000000,
-      "gaji_max": 7000000,
-      "deskripsi": "Deskripsi spesifik untuk posisi ini (jika ada)",
-      "persyaratan": "Persyaratan untuk posisi ini",
-      "kualifikasi": ["Kualifikasi 1", "Kualifikasi 2"],
-      "deadline": "YYYY-MM-DD",
-      "kontak_wa": "081234567890",
-      "kontak_email": "email@example.com"
-    },
-    {
-      "title": "Posisi 2",
-      ... (dst untuk posisi lain)
-    }
-  ],
+  "has_multiple_positions": true|false,
+  "positions": [{
+    "title": "Job Title",
+    "perusahaan_name": "Company Name",
+    "lokasi": "Location",
+    "kategori": ["Category1"],
+    "tipe_kerja": "Full-time|Part-time|Contract|Freelance|Remote",
+    "gaji_text": "Salary text",
+    "gaji_min": 5000000,
+    "gaji_max": 7000000,
+    "kualifikasi": ["Qualification 1"],
+    "deadline": "YYYY-MM-DD",
+    "kontak_wa": "08123456789",
+    "kontak_email": "email@company.com"
+  }],
   "confidence_score": 85
 }
 
-CONTOH KASUS:
+Categories: IT, Web Development, Marketing, Sales, Finance, Accounting, Administrasi, Customer Service, F&B, Retail, Design, Manufacturing, Healthcare, Logistik, Education, Security, Driver, Warehouse, Operator, Teknisi
 
-POSTER 1 POSISI:
-"Dibutuhkan Staff Admin - PT Maju Jaya, Lokasi: Jombang"
-→ has_multiple_positions: false, positions: [1 job object]
-
-POSTER MULTIPLE POSISI:
-"Kami Membuka Lowongan:
-1. Staff Admin (Gaji 4jt)
-2. Sales Marketing (Gaji 5jt + komisi)
-3. Driver (Gaji 3.5jt)
-PT Sukses Mandiri - Jombang"
-→ has_multiple_positions: true, positions: [3 job objects]
-
-RULES:
-1. Perusahaan, Lokasi, Deadline, Kontak → SAMA untuk semua posisi di 1 poster
-2. Title, Kategori, Gaji, Kualifikasi → Bisa BEDA per posisi
-3. Jika tidak jelas berapa posisi, treat as 1 posisi
-4. Kategori: IT, Web Development, Marketing, Sales, Finance, Accounting, Administrasi, Customer Service, F&B, Retail, Design, Content Creator, Manufacturing, Healthcare, Logistik, Education, Security, Driver, Warehouse, Operator, Teknisi
-5. Response HARUS valid JSON
-6. Jika ada kesalahan minor, tetap extract yang bisa dibaca
-7. Confidence: 0-100, seberapa yakin hasil parsing
-
-EXTRACT DATA:`;
+Return JSON only. No markdown, no explanation.`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -117,6 +85,7 @@ EXTRACT DATA:`;
               type: 'image_url',
               image_url: {
                 url: `data:${imageMimeType};base64,${imageBase64}`,
+                detail: 'high', // Use high detail for better OCR
               },
             },
             {
@@ -126,8 +95,9 @@ EXTRACT DATA:`;
           ],
         },
       ],
-      max_tokens: 3000, // More tokens for multiple positions
-      temperature: 0.3,
+      max_tokens: 2000, // Reduced from 3000 for faster response
+      temperature: 0.2, // Lower temperature for more consistent JSON
+      response_format: { type: 'json_object' }, // Force JSON response
     });
 
     const content = response.choices[0]?.message?.content?.trim() || '';
@@ -136,15 +106,20 @@ EXTRACT DATA:`;
       throw new Error('No content generated from AI');
     }
 
-    // Extract JSON
-    let jsonText = content;
-    if (jsonText.startsWith('```json')) {
-      jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-    } else if (jsonText.startsWith('```')) {
-      jsonText = jsonText.replace(/```\n?/g, '');
+    // Parse JSON (response_format ensures it's already JSON)
+    let parsed: any;
+    try {
+      parsed = JSON.parse(content);
+    } catch (parseError) {
+      // Fallback: Try to extract JSON if wrapped in markdown
+      let jsonText = content;
+      if (jsonText.includes('```json')) {
+        jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+      } else if (jsonText.includes('```')) {
+        jsonText = jsonText.replace(/```\n?/g, '');
+      }
+      parsed = JSON.parse(jsonText);
     }
-
-    const parsed: any = JSON.parse(jsonText);
     
     // Validate
     if (!parsed.positions || !Array.isArray(parsed.positions) || parsed.positions.length === 0) {
@@ -201,42 +176,67 @@ EXTRACT DATA:`;
 }
 
 /**
- * Parse multiple posters in batch
+ * Parse multiple posters in batch - PARALLEL PROCESSING
+ * Process in batches of 5 concurrent requests for optimal speed
  */
 export async function parseBatchPosters(
   images: Array<{ base64: string; mimeType: string; filename: string }>
 ): Promise<BatchPosterResult[]> {
+  const BATCH_SIZE = 5; // Process 5 posters at a time
   const results: BatchPosterResult[] = [];
 
-  for (let i = 0; i < images.length; i++) {
-    const img = images[i];
-    console.log(`[Batch] Processing ${i + 1}/${images.length}: ${img.filename}`);
+  console.log(`[Batch] Starting parallel processing of ${images.length} posters (${BATCH_SIZE} concurrent)`);
 
-    try {
-      const result = await parsePosterMultiPosition(
-        img.base64,
-        img.mimeType,
-        img.filename
-      );
-      result.poster_index = i;
-      results.push(result);
+  // Process in chunks to avoid overwhelming the API
+  for (let chunkStart = 0; chunkStart < images.length; chunkStart += BATCH_SIZE) {
+    const chunk = images.slice(chunkStart, chunkStart + BATCH_SIZE);
+    const chunkPromises = chunk.map(async (img, localIndex) => {
+      const globalIndex = chunkStart + localIndex;
+      console.log(`[Batch] Processing ${globalIndex + 1}/${images.length}: ${img.filename}`);
 
-      // Small delay between requests to avoid rate limits
-      if (i < images.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+      try {
+        const result = await parsePosterMultiPosition(
+          img.base64,
+          img.mimeType,
+          img.filename
+        );
+        result.poster_index = globalIndex;
+        return result;
+      } catch (error) {
+        console.error(`[Batch] Failed to parse ${img.filename}:`, error);
+        return {
+          poster_index: globalIndex,
+          poster_filename: img.filename,
+          positions: [],
+          has_multiple_positions: false,
+          confidence_score: 0,
+          error: 'Parsing failed',
+        };
       }
-    } catch (error) {
-      console.error(`[Batch] Failed to parse ${img.filename}:`, error);
-      results.push({
-        poster_index: i,
-        poster_filename: img.filename,
-        positions: [],
-        has_multiple_positions: false,
-        confidence_score: 0,
-        error: 'Parsing failed',
-      });
+    });
+
+    // Wait for current chunk to complete
+    const chunkResults = await Promise.allSettled(chunkPromises);
+    
+    // Extract results from settled promises
+    chunkResults.forEach((settledResult) => {
+      if (settledResult.status === 'fulfilled') {
+        results.push(settledResult.value);
+      }
+    });
+
+    console.log(`[Batch] Chunk ${Math.floor(chunkStart / BATCH_SIZE) + 1} complete. Progress: ${results.length}/${images.length}`);
+
+    // Small delay between chunks only (not between individual requests)
+    if (chunkStart + BATCH_SIZE < images.length) {
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
   }
+
+  // Sort by poster_index to maintain order
+  results.sort((a, b) => a.poster_index - b.poster_index);
+
+  console.log(`[Batch] All ${images.length} posters processed. Total positions: ${results.reduce((sum, r) => sum + r.positions.length, 0)}`);
 
   return results;
 }
