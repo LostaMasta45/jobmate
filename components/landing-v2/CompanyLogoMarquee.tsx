@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
@@ -127,6 +127,27 @@ const companyLogos = [
     'WULING INDONESIA_20251126_165633.png'
 ];
 
+const LogoItem = ({ logo, className }: { logo: string, className?: string }) => {
+  const [error, setError] = useState(false);
+
+  if (error) return null;
+
+  return (
+    <div className={`relative w-full h-full ${className}`}>
+      <Image
+        src={`/Logo/LogoPerusahaan/${logo}`}
+        alt={logo.replace(/_\d+\.png$/, "").replace(/_/g, " ")}
+        fill
+        className="object-contain"
+        sizes="(max-width: 768px) 120px, 160px"
+        quality={40}
+        loading="lazy"
+        onError={() => setError(true)}
+      />
+    </div>
+  );
+};
+
 export const CompanyLogoMarquee = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
@@ -214,17 +235,7 @@ export const CompanyLogoMarquee = () => {
                   key={`grid-${logo}-${idx}`}
                   className="aspect-[3/2] bg-white rounded-xl p-4 flex items-center justify-center hover:scale-105 transition-transform duration-200 shadow-sm"
                 >
-                   <div className="relative w-full h-full">
-                    <Image
-                      src={`/Logo/LogoPerusahaan/${logo}`}
-                      alt={logo.replace(/_\d+\.png$/, "").replace(/_/g, " ")}
-                      fill
-                      className="object-contain"
-                      sizes="(max-width: 768px) 150px, 200px"
-                      quality={60}
-                      loading="lazy"
-                    />
-                  </div>
+                   <LogoItem logo={logo} />
                 </div>
               ))}
             </div>
@@ -247,17 +258,7 @@ const LogoRow = ({ logos, direction, speed, className = "" }: { logos: string[],
             key={`${logo}-${idx}`}
             className="flex-shrink-0 w-40 h-24 bg-white rounded-xl p-4 flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
           >
-            <div className="relative w-full h-full">
-              <Image
-                src={`/Logo/LogoPerusahaan/${logo}`}
-                alt={logo.replace(/_\d+\.png$/, "").replace(/_/g, " ")}
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 120px, 160px"
-                quality={60}
-                loading="lazy"
-              />
-            </div>
+            <LogoItem logo={logo} />
           </div>
         ))}
       </div>

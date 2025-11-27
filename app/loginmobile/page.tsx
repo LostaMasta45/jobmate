@@ -136,7 +136,7 @@ export default function MobileSignInPage() {
       else if (["vip_basic", "basic"].includes(profile?.membership)) redirectPath = "/vip";
 
       setShowLoadingScreen(true);
-      setTimeout(() => window.location.replace(redirectPath), 800);
+      setTimeout(() => window.location.replace(redirectPath), 2000);
       
     } catch (err) {
       console.error("Login error:", err);
@@ -180,16 +180,30 @@ export default function MobileSignInPage() {
                 />
               </div>
 
-              {/* Header Logo */}
-              <div className="relative z-10 pt-12 flex justify-center">
-                <div className="bg-white/10 backdrop-blur-md border border-white/20 px-5 py-2.5 rounded-full shadow-xl flex items-center gap-3">
-                  <img src="/Logo/x.png" alt="JobMate" className="w-8 h-8 object-contain" />
-                  <span className="text-white font-bold text-lg tracking-tight">JobMate</span>
-                </div>
-              </div>
+              {/* Fixed Logo at Top */}
+               <motion.div 
+                  initial={{ opacity: 0, y: -50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 20,
+                    delay: 0.2
+                  }}
+                  className="absolute -top-20 left-0 right-0 z-0 flex justify-center pointer-events-none"
+               >
+                  <div className="relative">
+                    <motion.div
+                      className="absolute inset-0 bg-white/20 rounded-full blur-xl"
+                      animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.3, 0.5] }}
+                      transition={{ duration: 3, repeat: Infinity }}
+                    />
+                    <img src="/Logo/x.png" alt="JobMate" className="w-64 h-64 object-contain relative z-10 drop-shadow-2xl opacity-90" />
+                  </div>
+               </motion.div>
 
               {/* Main Content Area */}
-              <div className="flex-1 relative z-10 flex flex-col items-center justify-center px-8 -mt-10">
+              <div className="flex-1 relative z-10 flex flex-col items-center justify-center px-8 pt-48">
                 
                 {/* JOB SEEKER ILLUSTRATION */}
                 <motion.div 
@@ -261,9 +275,9 @@ export default function MobileSignInPage() {
                     transition={{ delay: 0.4 }}
                     className="text-4xl font-extrabold text-white leading-tight drop-shadow-md"
                   >
-                    Raih Karir <br />
+                    Jemput Masa Depan <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00d1dc] to-white">
-                      Impianmu
+                      Cemerlang
                     </span>
                   </motion.h1>
                   <motion.p 
@@ -272,7 +286,7 @@ export default function MobileSignInPage() {
                     transition={{ delay: 0.5 }}
                     className="text-white/80 text-base leading-relaxed max-w-[280px] mx-auto font-medium tracking-wide"
                   >
-                    Platform pencari kerja berbasis AI untuk masa depan yang lebih cerah.
+                    Platform karir modern yang menghubungkan potensimu dengan perusahaan impian.
                   </motion.p>
                 </div>
               </div>
@@ -310,15 +324,20 @@ export default function MobileSignInPage() {
               className="absolute inset-0 flex flex-col bg-white text-slate-900"
             >
               {/* Header Bar */}
-              <div className="pt-6 px-6 pb-4 flex items-center">
+              <div className="pt-6 px-6 pb-4 flex items-center relative">
                 <Button 
                   variant="ghost" 
                   size="icon" 
                   onClick={backToWelcome}
-                  className="rounded-full -ml-2 hover:bg-slate-100 text-slate-600"
+                  className="rounded-full hover:bg-slate-100 text-slate-600 relative z-10"
                 >
                   <ArrowLeft className="w-6 h-6" />
                 </Button>
+                
+                {/* Centered Logo for Page 2 */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                   <img src="/Logo/x.png" alt="JobMate" className="w-64 h-64 object-contain drop-shadow-xl opacity-20" />
+                </div>
               </div>
 
               {/* Scrollable Content */}

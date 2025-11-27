@@ -158,17 +158,6 @@ export function VIPBottomBarV2() {
                     >
                       {item.label}
                     </span>
-
-                    {/* Active Indicator - Small Glow Dot in Cyan - Moved below text */}
-                    {/* HIDDEN to keep it clean with text, or we can enable it if desired. 
-                        With text, the color change is usually enough indication. */}
-                    {/* {active && (
-                      <motion.div 
-                        layoutId="activeDot"
-                        className="w-1 h-1 rounded-full absolute -bottom-2"
-                        style={{ backgroundColor: COLORS.robinsEggBlue }}
-                      />
-                    )} */}
                   </div>
                 </Link>
               );

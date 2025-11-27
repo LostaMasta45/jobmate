@@ -93,6 +93,7 @@ export default function MobileSignInView() {
   const [error, setError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
   const [showLoadingScreen, setShowLoadingScreen] = React.useState(false);
+  const [capsLock, setCapsLock] = React.useState(false);
   
   const emailInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -164,12 +165,20 @@ export default function MobileSignInView() {
       else if (["vip_basic", "basic"].includes(profile?.membership)) redirectPath = "/vip";
 
       setShowLoadingScreen(true);
-      setTimeout(() => window.location.replace(redirectPath), 800);
+      setTimeout(() => window.location.replace(redirectPath), 2000);
       
     } catch (err) {
       console.error("Login error:", err);
       setError("Terjadi kesalahan sistem.");
       setLoading(false);
+    }
+  };
+
+  const checkCapsLock = (e: React.KeyboardEvent | React.MouseEvent) => {
+    if (e.getModifierState("CapsLock")) {
+      setCapsLock(true);
+    } else {
+      setCapsLock(false);
     }
   };
 
@@ -216,7 +225,7 @@ export default function MobileSignInView() {
                   variants={logoVariants}
                   initial="hidden"
                   animate="visible"
-                  className="absolute top-8 left-0 right-0 z-20 flex justify-center"
+                  className="absolute -top-20 left-0 right-0 z-0 flex justify-center pointer-events-none"
                >
                   <div className="relative">
                     <motion.div
@@ -224,12 +233,12 @@ export default function MobileSignInView() {
                       animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.3, 0.5] }}
                       transition={{ duration: 3, repeat: Infinity }}
                     />
-                    <img src="/Logo/x.png" alt="JobMate" className="w-32 h-32 object-contain relative z-10 drop-shadow-2xl" />
+                    <img src="/Logo/x.png" alt="JobMate" className="w-64 h-64 object-contain relative z-10 drop-shadow-2xl opacity-90" />
                   </div>
                </motion.div>
 
               {/* Main Content Area */}
-              <div className="flex-1 relative z-10 flex flex-col items-center justify-center px-8 pt-24">
+              <div className="flex-1 relative z-10 flex flex-col items-center justify-center px-8 pt-48">
                 
                 {/* JOB SEEKER ILLUSTRATION */}
                 <motion.div 
@@ -301,9 +310,9 @@ export default function MobileSignInView() {
                     transition={{ delay: 0.4 }}
                     className="text-4xl font-extrabold text-white leading-tight drop-shadow-md"
                   >
-                    Raih Karir <br />
+                    Jemput Masa Depan <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00d1dc] to-white">
-                      Impianmu
+                      Cemerlang
                     </span>
                   </motion.h1>
                   <motion.p 
@@ -312,7 +321,7 @@ export default function MobileSignInView() {
                     transition={{ delay: 0.5 }}
                     className="text-white/80 text-base leading-relaxed max-w-[280px] mx-auto font-medium tracking-wide"
                   >
-                    Platform pencari kerja berbasis AI untuk masa depan yang lebih cerah.
+                    Platform karir modern yang menghubungkan potensimu dengan perusahaan impian.
                   </motion.p>
                 </div>
               </div>
@@ -515,6 +524,7 @@ export default function MobileSignInView() {
                           type="email"
                           value={email}
                           onChange={(e) => { setEmail(e.target.value); setError(null); }}
+                          onBlur={() => setEmail(prev => prev.trim())}
                           placeholder="nama@email.com"
                           className="h-14 pl-12 rounded-2xl bg-slate-50 border-slate-100 focus:bg-white focus:border-[#00acc7] focus:ring-4 focus:ring-[#00acc7]/10 transition-all font-medium text-base"
                         />
@@ -537,6 +547,8 @@ export default function MobileSignInView() {
                           type={showPassword ? "text" : "password"}
                           value={password}
                           onChange={(e) => { setPassword(e.target.value); setError(null); }}
+                          onKeyDown={checkCapsLock}
+                          onBlur={() => setCapsLock(false)}
                           placeholder="••••••••"
                           className="h-14 pl-12 pr-12 rounded-2xl bg-slate-50 border-slate-100 focus:bg-white focus:border-[#00acc7] focus:ring-4 focus:ring-[#00acc7]/10 transition-all font-medium text-base"
                         />
@@ -548,6 +560,19 @@ export default function MobileSignInView() {
                           {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
                       </div>
+                      <AnimatePresence>
+                        {capsLock && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="flex items-center gap-2 text-xs text-yellow-600 mt-1 font-medium ml-1"
+                          >
+                            <AlertCircle className="h-3 w-3" />
+                            Caps Lock aktif
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
 
                     {/* Remember Me */}

@@ -31,6 +31,36 @@ export default function MobileAjukanAkunView() {
     password: "",
   });
   const [proofFile, setProofFile] = React.useState<File | null>(null);
+  const [capsLock, setCapsLock] = React.useState(false);
+
+  // Password Strength Logic
+  const getPasswordStrength = (pass: string) => {
+    let strength = 0;
+    if (pass.length > 5) strength += 20;
+    if (pass.length > 8) strength += 20;
+    if (/[0-9]/.test(pass)) strength += 20;
+    if (/[A-Z]/.test(pass)) strength += 20;
+    if (/[^a-zA-Z0-9]/.test(pass)) strength += 20;
+    return strength;
+  };
+
+  const passwordStrength = getPasswordStrength(formData.password);
+  
+  const getStrengthColor = (score: number) => {
+    if (score <= 20) return "bg-red-500";
+    if (score <= 40) return "bg-orange-500";
+    if (score <= 60) return "bg-yellow-500";
+    if (score <= 80) return "bg-lime-500";
+    return "bg-green-500";
+  };
+
+  const getStrengthLabel = (score: number) => {
+    if (score <= 20) return "Lemah";
+    if (score <= 40) return "Cukup";
+    if (score <= 60) return "Baik";
+    if (score <= 80) return "Kuat";
+    return "Sangat Kuat";
+  };
 
   // Validation Logic
   const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -48,6 +78,14 @@ export default function MobileAjukanAkunView() {
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setError(null);
+  };
+
+  const checkCapsLock = (e: React.KeyboardEvent | React.MouseEvent) => {
+    if (e.getModifierState("CapsLock")) {
+      setCapsLock(true);
+    } else {
+      setCapsLock(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -85,7 +123,7 @@ export default function MobileAjukanAkunView() {
       // Simulate loading for UX then redirect
       setTimeout(() => {
          router.push(`/ajukan-akun/terima-kasih?code=${result.telegramLinkCode}&email=${encodeURIComponent(formData.email)}`);
-      }, 1500);
+      }, 2000);
 
     } catch (err) {
       setError("Gagal menghubungi server.");
@@ -119,7 +157,7 @@ export default function MobileAjukanAkunView() {
           {/* Header - Fixed at Top */}
           <div className="relative z-10 pt-6 px-6 pb-4 flex-none">
             <div className="flex items-center justify-between mb-4">
-              <Link href="/">
+              <Link href="/sign-in">
                 <Button 
                   variant="ghost" 
                   size="icon" 
@@ -257,6 +295,7 @@ export default function MobileAjukanAkunView() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleInputChange("email", e.target.value)}
+                      onBlur={() => handleInputChange("email", formData.email.trim())}
                       placeholder="nama@email.com"
                       className="h-14 pl-12 rounded-2xl bg-slate-50 border-slate-100 focus:bg-white focus:border-[#00acc7] focus:ring-4 focus:ring-[#00acc7]/10 transition-all font-medium"
                     />
@@ -292,6 +331,8 @@ export default function MobileAjukanAkunView() {
                       type={showPassword ? "text" : "password"}
                       value={formData.password}
                       onChange={(e) => handleInputChange("password", e.target.value)}
+                      onKeyDown={checkCapsLock}
+                      onBlur={() => setCapsLock(false)}
                       placeholder="••••••••"
                       className="h-14 pl-12 pr-12 rounded-2xl bg-slate-50 border-slate-100 focus:bg-white focus:border-[#00acc7] focus:ring-4 focus:ring-[#00acc7]/10 transition-all font-medium"
                     />
@@ -303,6 +344,30 @@ export default function MobileAjukanAkunView() {
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
+                  
+                  {/* Password Strength Meter */}
+                  {formData.password && (
+                    <div className="space-y-1 px-1">
+                      <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <motion.div 
+                          className={`h-full ${getStrengthColor(passwordStrength)}`}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${passwordStrength}%` }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-[10px] font-medium">
+                        <span className={passwordStrength <= 40 ? "text-red-500" : "text-green-600"}>
+                          Kekuatan: {getStrengthLabel(passwordStrength)}
+                        </span>
+                        {capsLock && (
+                          <span className="text-yellow-600 flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3" /> Caps Lock Aktif
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Proof of Payment */}

@@ -206,7 +206,7 @@ export default function SignInPageV2() {
       }
 
       setShowLoadingScreen(true);
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 2000));
       window.location.replace(redirectPath);
       
     } catch (err) {
