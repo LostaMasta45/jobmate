@@ -1,7 +1,8 @@
 export async function sendTelegramMessage(
   chatId: string,
   message: string,
-  botToken?: string
+  botToken?: string,
+  retries: number = 2
 ): Promise<boolean> {
   try {
     const token = botToken || process.env.TELEGRAM_BOT_TOKEN;
@@ -10,33 +11,80 @@ export async function sendTelegramMessage(
       return false;
     }
 
-    console.log("[Telegram] Sending message to chat:", chatId);
-    console.log("[Telegram] Message preview:", message.substring(0, 100));
-
-    const url = `https://api.telegram.org/bot${token}/sendMessage`;
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-        parse_mode: "Markdown",
-      }),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.error("[Telegram] API Error:", result);
-      return false;
+    // Validate message length (Telegram limit: 4096 chars)
+    if (message.length > 4096) {
+      console.warn("[Telegram] Message too long, truncating...");
+      message = message.substring(0, 4090) + "...";
     }
 
-    console.log("[Telegram] Message sent successfully:", result);
-    return true;
-  } catch (error) {
-    console.error("[Telegram] Failed to send message:", error);
+    console.log("[Telegram] Sending message to chat:", chatId);
+    console.log("[Telegram] Message length:", message.length);
+    console.log("[Telegram] Message preview:", message.substring(0, 150));
+
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+    
+    // Attempt with retry logic
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: message,
+            parse_mode: "Markdown",
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        // Try to parse response
+        let result;
+        try {
+          result = await response.json();
+        } catch (jsonError) {
+          console.error("[Telegram] Failed to parse response JSON:", jsonError);
+          result = { error: "Invalid JSON response" };
+        }
+
+        if (!response.ok) {
+          console.error(`[Telegram] API Error (attempt ${attempt + 1}/${retries + 1}):`, result);
+          
+          // Retry on server errors (5xx)
+          if (response.status >= 500 && attempt < retries) {
+            console.log(`[Telegram] Retrying in ${(attempt + 1) * 1000}ms...`);
+            await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 1000));
+            continue;
+          }
+          
+          return false;
+        }
+
+        console.log("[Telegram] Message sent successfully");
+        return true;
+      } catch (fetchError: any) {
+        console.error(`[Telegram] Fetch error (attempt ${attempt + 1}/${retries + 1}):`, fetchError.message);
+        
+        // Retry on network errors
+        if (attempt < retries) {
+          console.log(`[Telegram] Retrying in ${(attempt + 1) * 1000}ms...`);
+          await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 1000));
+          continue;
+        }
+        
+        throw fetchError;
+      }
+    }
+
+    return false;
+  } catch (error: any) {
+    console.error("[Telegram] Failed to send message after retries:", error.message || error);
     return false;
   }
 }
@@ -719,50 +767,57 @@ export async function notifyBatchJobsPosted(data: {
   dashboardUrl?: string;
 }): Promise<boolean> {
   try {
-    const escapeMarkdown = (text: string) => {
-      return text.replace(/[_*\[\]()~`>#+\-=|{}.!]/g, '\\$&');
+    // Simple markdown escape - only escape critical characters
+    const cleanText = (text: string) => {
+      return text
+        .replace(/[_*[\]()~`>#+=|{}.!]/g, '') // Remove special chars instead of escaping
+        .trim();
     };
 
     // Success rate indicator
     const successRate = Math.round((data.successCount / data.totalJobs) * 100);
     const successEmoji = successRate === 100 ? '🎉' : successRate >= 80 ? '✅' : '⚠️';
 
-    // Format top jobs (max 5)
+    // Format top jobs (max 5, simplified)
     const topJobsList = data.topJobs.slice(0, 5).map((job, index) => 
-      `${index + 1}\\. ${escapeMarkdown(job.title)}\n   🏢 ${escapeMarkdown(job.company)} \\| 📍 ${escapeMarkdown(job.location)}`
-    ).join('\n');
+      `${index + 1}. ${cleanText(job.title)}\n   🏢 ${cleanText(job.company)} | 📍 ${cleanText(job.location)}`
+    ).join('\n\n');
 
     const moreJobsText = data.topJobs.length > 5 
-      ? `\n_\\.\\.\\. dan ${data.topJobs.length - 5} lowongan lainnya_` 
+      ? `\n... dan ${data.topJobs.length - 5} lowongan lainnya` 
       : '';
 
     // Dashboard link
-    const dashboardLink = data.dashboardUrl || process.env.NEXT_PUBLIC_APP_URL + '/admin/vip';
+    const dashboardLink = data.dashboardUrl || process.env.NEXT_PUBLIC_APP_URL + '/admin/vip-loker';
 
-    const message = `📦 *BATCH UPLOAD LOWONGAN*
+    // Build message without complex markdown
+    let message = `📦 *BATCH UPLOAD LOWONGAN*\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `${successEmoji} *Upload Summary*\n\n`;
+    message += `📊 Total Processed: ${data.totalJobs}\n`;
+    message += `✅ Berhasil: ${data.successCount}\n`;
+    
+    if (data.failedCount > 0) {
+      message += `❌ Gagal: ${data.failedCount}\n`;
+    }
+    
+    message += `🏢 Perusahaan Baru: ${data.newCompanies}\n`;
+    message += `📈 Success Rate: ${successRate}%\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `🌟 *Lowongan Terbaru:*\n\n`;
+    message += topJobsList;
+    message += moreJobsText;
+    message += `\n\n━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `🔗 Lihat Dashboard: ${dashboardLink}\n\n`;
+    message += `👨‍💼 Uploaded by: ${cleanText(data.addedBy)}\n`;
+    message += `⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━\n`;
+    
+    if (data.successCount > 0) {
+      message += `🎊 Lowongan siap dilihat member VIP!`;
+    }
 
-━━━━━━━━━━━━━━━━━━━━━
-${successEmoji} *Upload Summary*
-
-📊 *Total Processed:* ${data.totalJobs}
-✅ *Berhasil:* ${data.successCount}
-${data.failedCount > 0 ? `❌ *Gagal:* ${data.failedCount}` : ''}
-🏢 *Perusahaan Baru:* ${data.newCompanies}
-📈 *Success Rate:* ${successRate}%
-
-━━━━━━━━━━━━━━━━━━━━━
-🌟 *Lowongan Terbaru:*
-
-${topJobsList}${moreJobsText}
-
-━━━━━━━━━━━━━━━━━━━━━
-🔗 [Lihat Semua di Dashboard](${dashboardLink})
-
-👨‍💼 *Uploaded by:* ${escapeMarkdown(data.addedBy)}
-⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
-
-━━━━━━━━━━━━━━━━━━━━━
-${data.successCount > 0 ? '🎊 Lowongan siap dilihat member VIP!' : ''}`;
+    console.log('[Telegram] Batch notification message prepared, length:', message.length);
 
     const success = await sendAdminNotification(message);
     
