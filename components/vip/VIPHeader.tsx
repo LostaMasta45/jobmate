@@ -126,17 +126,14 @@ export function VIPHeader({ onMenuToggle }: VIPHeaderProps) {
             </Button>
 
             <Link href="/vip" className="flex items-center group">
-              <div className="relative">
-                {/* Logo - Enhanced for Desktop, No BG in Dark Mode */}
-                <div className="relative h-8 sm:h-10 lg:h-12 w-32 sm:w-40 lg:w-48 rounded-lg sm:rounded-xl lg:rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 dark:bg-transparent border border-gray-700 dark:border-transparent shadow-[0_3px_16px_rgba(0,0,0,0.12)] dark:shadow-none lg:shadow-[0_4px_20px_rgba(0,0,0,0.15)] dark:lg:shadow-none px-2 sm:px-2.5 lg:px-3 py-1 sm:py-1.5 lg:py-2 flex items-center justify-center group-hover:shadow-[0_4px_20px_rgba(0,0,0,0.16)] dark:group-hover:shadow-none group-hover:scale-105 transition-all duration-300">
-                  <img 
-                    src="/Logo/logopanjang.png" 
-                    alt="JobMate Logo" 
-                    className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)] dark:drop-shadow-none"
-                  />
-                </div>
+              <div className="relative h-8 sm:h-9 lg:h-10 w-32 sm:w-36 lg:w-40">
+                <img 
+                  src="/Logo/x.png" 
+                  alt="JobMate Logo" 
+                  className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.08)] dark:drop-shadow-[0_2px_8px_rgba(142,104,253,0.2)] group-hover:drop-shadow-[0_3px_8px_rgba(142,104,253,0.25)] dark:group-hover:drop-shadow-[0_3px_12px_rgba(142,104,253,0.35)] transition-all duration-300 group-hover:scale-105"
+                />
                 {isPremium && (
-                  <Crown className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-yellow-400 absolute -top-0.5 -right-0.5 lg:-top-1 lg:-right-1 drop-shadow-[0_2px_8px_rgba(250,204,21,0.6)] lg:drop-shadow-[0_3px_12px_rgba(250,204,21,0.8)] animate-pulse bg-gray-900 dark:bg-transparent rounded-full p-0.5 lg:p-1 border border-yellow-300 dark:border-yellow-400/50" />
+                  <Crown className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-yellow-400 absolute -top-1 -right-1 drop-shadow-[0_2px_8px_rgba(250,204,21,0.6)] lg:drop-shadow-[0_3px_12px_rgba(250,204,21,0.8)] animate-pulse rounded-full p-0.5 bg-white dark:bg-gray-900 border border-yellow-300 dark:border-yellow-400/50" />
                 )}
               </div>
             </Link>

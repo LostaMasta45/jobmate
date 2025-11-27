@@ -125,6 +125,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('[API] Loker created successfully:', loker.id);
+
+    // Send Telegram notification (async, don't wait)
+    try {
+      const { notifyNewJobPosting } = await import('@/lib/telegram');
+      const { data: adminProfile } = await supabase
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', user.id)
+        .single();
+
+      const adminName = adminProfile?.full_name || adminProfile?.email || 'Admin';
+      const viewUrl = `${process.env.NEXT_PUBLIC_APP_URL}/vip/loker/${loker.id}`;
+
+      // Fire and forget - don't block response
+      notifyNewJobPosting({
+        jobTitle: loker.title,
+        companyName: loker.perusahaan_name,
+        location: loker.lokasi,
+        jobType: loker.tipe_kerja || undefined,
+        categories: loker.kategori || undefined,
+        salary: loker.gaji_text || undefined,
+        deadline: loker.deadline || undefined,
+        posterUrl: loker.poster_url || undefined,
+        viewUrl,
+        addedBy: adminName,
+      }).catch(err => console.error('[Telegram] Failed to send job notification:', err));
+      
+      console.log('[API] Telegram notification triggered');
+    } catch (error) {
+      console.error('[API] Error triggering Telegram notification:', error);
+      // Continue anyway, job is already created
+    }
+
     return NextResponse.json({
       success: true,
       data: loker,

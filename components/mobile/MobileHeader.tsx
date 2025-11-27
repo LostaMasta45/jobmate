@@ -46,11 +46,11 @@ export function MobileHeader({ user, notificationCount = 0 }: MobileHeaderProps)
       <div className="flex items-center justify-between h-16 px-4">
         {/* Left: Logo/Brand */}
         <Link href="/dashboard" className="flex items-center space-x-2 group">
-          <div className="w-8 h-8 bg-white dark:bg-gray-800 rounded-lg flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_12px_rgba(0,209,220,0.2)] border border-gray-100 dark:border-gray-700 p-1 group-hover:scale-105 transition-transform duration-200">
+          <div className="w-8 h-8 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
             <img 
-              src="/Logo/logokecil.png" 
+              src="/Logo/x.png" 
               alt="JobMate Logo" 
-              className="w-full h-full object-contain filter drop-shadow-[0_1px_4px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_1px_4px_rgba(0,209,220,0.2)]"
+              className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.08)] dark:drop-shadow-[0_2px_8px_rgba(142,104,253,0.2)]"
             />
           </div>
           <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">

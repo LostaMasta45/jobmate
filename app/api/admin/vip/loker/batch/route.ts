@@ -176,6 +176,44 @@ export async function POST(request: NextRequest) {
 
     console.log('[Batch Save] Complete:', summary);
 
+    // Send Telegram batch summary notification (async, don't wait)
+    if (results.success.length > 0) {
+      try {
+        const { notifyBatchJobsPosted } = await import('@/lib/telegram');
+        const { data: adminProfile } = await supabase
+          .from('profiles')
+          .select('full_name, email')
+          .eq('id', user.id)
+          .single();
+
+        const adminName = adminProfile?.full_name || adminProfile?.email || 'Admin';
+        const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/vip`;
+
+        // Prepare top jobs list
+        const topJobs = results.success.map(job => ({
+          title: job.title,
+          company: job.perusahaan,
+          location: jobs.find(j => j.title === job.title)?.lokasi || 'N/A',
+        }));
+
+        // Fire and forget - don't block response
+        notifyBatchJobsPosted({
+          totalJobs: summary.total,
+          successCount: summary.success,
+          failedCount: summary.failed,
+          newCompanies: summary.perusahaan_created,
+          topJobs,
+          addedBy: adminName,
+          dashboardUrl,
+        }).catch(err => console.error('[Telegram] Failed to send batch summary:', err));
+
+        console.log('[Batch Save] Telegram notification triggered');
+      } catch (error) {
+        console.error('[Batch Save] Error triggering Telegram notification:', error);
+        // Continue anyway, jobs are already created
+      }
+    }
+
     return NextResponse.json({
       success: true,
       summary,

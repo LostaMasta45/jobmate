@@ -580,3 +580,199 @@ ${data.affectedUser ? `👤 *Affected User*\n${data.affectedUser}\n` : ''}
     return false;
   }
 }
+
+/**
+ * New Job Posting Alert
+ * Notifikasi menarik saat admin menambahkan lowongan baru
+ */
+export async function notifyNewJobPosting(data: {
+  jobTitle: string;
+  companyName: string;
+  location: string;
+  jobType?: string;
+  categories?: string[];
+  salary?: string;
+  deadline?: string;
+  posterUrl?: string;
+  viewUrl: string;
+  addedBy: string;
+}): Promise<boolean> {
+  try {
+    // Escape special characters for Telegram Markdown
+    const escapeMarkdown = (text: string) => {
+      return text.replace(/[_*\[\]()~`>#+\-=|{}.!]/g, '\\$&');
+    };
+
+    // Format salary
+    const salaryText = data.salary 
+      ? `\n💰 *Gaji:* ${escapeMarkdown(data.salary)}`
+      : '';
+
+    // Format deadline with countdown
+    let deadlineText = '';
+    if (data.deadline) {
+      try {
+        const deadlineDate = new Date(data.deadline);
+        const today = new Date();
+        const diffDays = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays > 0) {
+          const urgencyEmoji = diffDays <= 3 ? '🔥' : diffDays <= 7 ? '⏰' : '📅';
+          deadlineText = `\n${urgencyEmoji} *Deadline:* ${diffDays} hari lagi (${deadlineDate.toLocaleDateString('id-ID')})`;
+        }
+      } catch (e) {
+        // Ignore date parsing errors
+      }
+    }
+
+    // Format categories (max 3)
+    let categoriesText = '';
+    if (data.categories && data.categories.length > 0) {
+      const displayCategories = data.categories.slice(0, 3);
+      const categoryTags = displayCategories.map(cat => `#${cat.replace(/\s+/g, '')}`).join(' ');
+      const moreText = data.categories.length > 3 ? ` +${data.categories.length - 3}` : '';
+      categoriesText = `\n🏷️ ${categoryTags}${moreText}`;
+    }
+
+    // Job type emoji
+    const jobTypeEmoji = data.jobType?.toLowerCase().includes('remote') 
+      ? '🏠' 
+      : data.jobType?.toLowerCase().includes('hybrid')
+      ? '🔄'
+      : '🏢';
+
+    const jobTypeText = data.jobType 
+      ? `\n${jobTypeEmoji} *Tipe:* ${escapeMarkdown(data.jobType)}`
+      : '';
+
+    // Main message
+    const message = `🚀 *LOWONGAN BARU DIPUBLIKASIKAN!*
+
+━━━━━━━━━━━━━━━━━━━━━
+💼 *${escapeMarkdown(data.jobTitle)}*
+
+🏢 *Perusahaan*
+${escapeMarkdown(data.companyName)}
+
+📍 *Lokasi*
+${escapeMarkdown(data.location)}${jobTypeText}${salaryText}${deadlineText}${categoriesText}
+
+━━━━━━━━━━━━━━━━━━━━━
+👀 *[Lihat Detail Lowongan](${data.viewUrl})*
+
+👨‍💼 *Ditambahkan oleh:* ${escapeMarkdown(data.addedBy)}
+⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
+
+━━━━━━━━━━━━━━━━━━━━━
+✨ *Tips Sukses Melamar:*
+• Baca deskripsi dengan teliti
+• Siapkan CV & portfolio terbaik
+• Kirim lamaran sebelum deadline
+• Follow up jika perlu
+
+💪 Semangat mencari kerja!`;
+
+    // Send poster photo first if available
+    if (data.posterUrl) {
+      try {
+        const caption = `🚀 *LOWONGAN BARU!*\n\n💼 ${escapeMarkdown(data.jobTitle)}\n🏢 ${escapeMarkdown(data.companyName)}\n📍 ${escapeMarkdown(data.location)}\n\n[Lihat Detail](${data.viewUrl})`;
+        
+        await sendTelegramPhoto(
+          process.env.TELEGRAM_ADMIN_CHAT_ID || "",
+          data.posterUrl,
+          caption
+        );
+        console.log("[Telegram] Job poster sent successfully");
+        
+        // Wait a bit before sending detailed message
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error("[Telegram] Failed to send job poster:", error);
+      }
+    }
+
+    // Send detailed message
+    const success = await sendAdminNotification(message);
+    
+    if (success) {
+      console.log('[Telegram] New job notification sent successfully');
+    }
+    
+    return success;
+  } catch (error) {
+    console.error('[Telegram] Failed to send new job notification:', error);
+    return false;
+  }
+}
+
+/**
+ * Batch Jobs Posting Summary
+ * Notifikasi ringkasan saat admin upload multiple lowongan sekaligus
+ */
+export async function notifyBatchJobsPosted(data: {
+  totalJobs: number;
+  successCount: number;
+  failedCount: number;
+  newCompanies: number;
+  topJobs: Array<{ title: string; company: string; location: string }>;
+  addedBy: string;
+  dashboardUrl?: string;
+}): Promise<boolean> {
+  try {
+    const escapeMarkdown = (text: string) => {
+      return text.replace(/[_*\[\]()~`>#+\-=|{}.!]/g, '\\$&');
+    };
+
+    // Success rate indicator
+    const successRate = Math.round((data.successCount / data.totalJobs) * 100);
+    const successEmoji = successRate === 100 ? '🎉' : successRate >= 80 ? '✅' : '⚠️';
+
+    // Format top jobs (max 5)
+    const topJobsList = data.topJobs.slice(0, 5).map((job, index) => 
+      `${index + 1}\\. ${escapeMarkdown(job.title)}\n   🏢 ${escapeMarkdown(job.company)} \\| 📍 ${escapeMarkdown(job.location)}`
+    ).join('\n');
+
+    const moreJobsText = data.topJobs.length > 5 
+      ? `\n_\\.\\.\\. dan ${data.topJobs.length - 5} lowongan lainnya_` 
+      : '';
+
+    // Dashboard link
+    const dashboardLink = data.dashboardUrl || process.env.NEXT_PUBLIC_APP_URL + '/admin/vip';
+
+    const message = `📦 *BATCH UPLOAD LOWONGAN*
+
+━━━━━━━━━━━━━━━━━━━━━
+${successEmoji} *Upload Summary*
+
+📊 *Total Processed:* ${data.totalJobs}
+✅ *Berhasil:* ${data.successCount}
+${data.failedCount > 0 ? `❌ *Gagal:* ${data.failedCount}` : ''}
+🏢 *Perusahaan Baru:* ${data.newCompanies}
+📈 *Success Rate:* ${successRate}%
+
+━━━━━━━━━━━━━━━━━━━━━
+🌟 *Lowongan Terbaru:*
+
+${topJobsList}${moreJobsText}
+
+━━━━━━━━━━━━━━━━━━━━━
+🔗 [Lihat Semua di Dashboard](${dashboardLink})
+
+👨‍💼 *Uploaded by:* ${escapeMarkdown(data.addedBy)}
+⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
+
+━━━━━━━━━━━━━━━━━━━━━
+${data.successCount > 0 ? '🎊 Lowongan siap dilihat member VIP!' : ''}`;
+
+    const success = await sendAdminNotification(message);
+    
+    if (success) {
+      console.log('[Telegram] Batch jobs summary sent successfully');
+    }
+    
+    return success;
+  } catch (error) {
+    console.error('[Telegram] Failed to send batch jobs summary:', error);
+    return false;
+  }
+}

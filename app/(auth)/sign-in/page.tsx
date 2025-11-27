@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,7 @@ import { LoadingScreen } from "@/components/ui/loading-screen";
 import { createClient } from "@/lib/supabase/client";
 import { 
   Eye, EyeOff, AlertCircle, Mail, KeyRound, 
-  Shield, CheckCircle2, Star, Briefcase, Users, TrendingUp, ArrowRight
+  Shield, CheckCircle2, Star, Briefcase, Users, TrendingUp, ArrowRight, Rocket
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useIsMobile } from "@/hooks/use-is-mobile";
@@ -194,9 +195,15 @@ export default function SignInPage() {
           
           {/* Brand Logo */}
           <div className="absolute top-8 left-8 sm:left-12">
-             <Link href="/" className="flex items-center gap-2 group">
-               <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-brand to-blue-600 text-white shadow-lg shadow-brand/20 transition-transform group-hover:scale-105 group-hover:rotate-3">
-                  <span className="font-bold text-xl">J</span>
+             <Link href="/" className="flex items-center gap-3 group">
+               <div className="relative h-12 w-12 transition-transform group-hover:scale-105">
+                  <Image 
+                    src="/Logo/x.png" 
+                    alt="JobMate Logo" 
+                    fill 
+                    className="object-contain" 
+                    priority 
+                  />
                </div>
                <span className="text-xl font-bold tracking-tight text-foreground group-hover:text-brand transition-colors">JobMate</span>
              </Link>
@@ -444,7 +451,7 @@ export default function SignInPage() {
                     className="absolute inset-0 bg-gradient-to-r from-brand to-blue-500 rounded-full blur-3xl opacity-50"
                   />
                   <div className="relative h-32 w-32 bg-black/40 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center shadow-[0_0_50px_-12px_rgba(255,255,255,0.3)] z-10">
-                     <Briefcase className="h-12 w-12 text-white" />
+                     <Rocket className="h-12 w-12 text-white" />
                   </div>
 
                   {/* Orbiting Rings */}
@@ -514,7 +521,7 @@ export default function SignInPage() {
 
             </div>
 
-            {/* Bottom Quote */}
+            {/* Bottom Quote - Encouraging Copywriting */}
             <div className="max-w-md">
                <motion.div 
                  initial={{ opacity: 0, y: 20 }}
@@ -522,16 +529,24 @@ export default function SignInPage() {
                  transition={{ delay: 0.8 }}
                  className="relative"
                >
-                 <div className="absolute -left-4 -top-4 text-6xl text-white/10 font-serif">"</div>
-                 <blockquote className="text-xl font-light leading-relaxed text-white/90 relative z-10">
-                   Bergabung dengan JobMate mengubah pencarian kerja saya. Saya mendapatkan <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand to-blue-400 font-semibold">3 tawaran kerja</span> dalam minggu pertama.
+                 <div className="mb-4">
+                    <h3 className="text-2xl font-bold text-white mb-2">
+                      Wujudkan Karir Impianmu
+                    </h3>
+                    <div className="h-1 w-16 bg-gradient-to-r from-brand to-blue-500 rounded-full"></div>
+                 </div>
+                 
+                 <blockquote className="text-lg font-light leading-relaxed text-white/90 relative z-10">
+                   "Jangan menunggu peluang datang, tapi ciptakanlah. Setiap lamaran adalah langkah menuju masa depan yang lebih cerah. Tetap semangat dan percayalah pada prosesnya."
                  </blockquote>
-                 <div className="mt-6 flex items-center gap-3">
-                   <div className="h-10 w-10 rounded-full border border-white/20 bg-[url('https://i.pravatar.cc/150?u=a042581f4e29026024d')] bg-cover" />
-                   <div>
-                     <div className="font-semibold text-sm">Rizky Ramadhan</div>
-                     <div className="text-xs text-white/50">Software Engineer at Unicorn</div>
-                   </div>
+                 
+                 <div className="mt-6 flex items-center gap-2">
+                    <div className="px-3 py-1 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-white/80">
+                      #PejuangKarir
+                    </div>
+                    <div className="px-3 py-1 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-white/80">
+                      #SuksesBersamaJobMate
+                    </div>
                  </div>
                </motion.div>
             </div>

@@ -49,8 +49,12 @@ export function BottomBar() {
   
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
-      {/* Main Bar Background */}
-      <div className="relative bg-white dark:bg-[#1A1A1A] border-t border-gray-100 dark:border-gray-800 pb-safe-area-bottom shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)]">
+      {/* Main Bar Background - Glassmorphism Style */}
+      <div className="relative bg-white/80 dark:bg-[#121212]/85 backdrop-blur-xl border-t border-[#8e68fd]/20 pb-safe-area-bottom shadow-[0_-8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.5)]">
+        
+        {/* Top Highlight Line using Gradient */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#8e68fd]/50 to-transparent opacity-70" />
+
         <div className="flex items-end justify-between px-2 h-[80px] pb-3">
         
         {navItems.map((item, index) => {
@@ -67,25 +71,21 @@ export function BottomBar() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    {/* Shadow/Glow for the floating button */}
+                    {/* Shadow/Glow for the floating button - Always visible/active style */}
                     <div className={cn(
-                      "absolute inset-2 rounded-full blur-md transition-all duration-300",
-                      isActive 
-                        ? "bg-[#8e68fd]/60 scale-110" 
-                        : "bg-gray-300/50 dark:bg-black/50"
+                      "absolute inset-2 rounded-full blur-xl transition-all duration-300",
+                      "bg-[#8e68fd]/60 scale-125"
                     )} />
 
-                    {/* Main Button Circle */}
+                    {/* Main Button Circle - Always Gradient */}
                     <div className={cn(
                       "relative flex items-center justify-center w-[64px] h-[64px] rounded-full transition-all duration-300",
-                      isActive 
-                        ? "bg-gradient-to-br from-[#8e68fd] to-[#5547d0]" 
-                        : "bg-white dark:bg-[#1A1A1A]",
-                      "border-[4px] border-white dark:border-[#1A1A1A]", // Matches background to look integrated
+                      "bg-gradient-to-br from-[#8e68fd] to-[#5547d0]",
+                      "border-[4px] border-white dark:border-[#121212]", // Matches glass bg roughly
                       "shadow-lg"
                     )}>
                       
-                      {/* Icon with Rotation */}
+                      {/* Icon with Rotation - Always White */}
                       <motion.div
                         animate={{ rotate: isActive ? 360 : 0 }}
                         transition={isActive ? { duration: 4, repeat: Infinity, ease: "linear" } : { duration: 0.3 }}
@@ -93,10 +93,7 @@ export function BottomBar() {
                       >
                         <Icon 
                           className={cn(
-                            "w-7 h-7 transition-colors duration-300",
-                            isActive 
-                              ? "text-white" 
-                              : "text-gray-400 dark:text-gray-400"
+                            "w-7 h-7 transition-colors duration-300 text-white"
                           )} 
                           strokeWidth={2}
                         />
@@ -104,12 +101,12 @@ export function BottomBar() {
                     </div>
                   </motion.div>
                   
-                  {/* Label */}
+                  {/* Label - Color changes based on active state to show selection */}
                   <span className={cn(
                     "text-[10px] font-medium transition-all duration-300",
                     isActive 
                       ? "text-[#8e68fd] dark:text-[#8e68fd] font-bold" 
-                      : "text-gray-400 dark:text-gray-500"
+                      : "text-gray-500 dark:text-gray-400"
                   )}>
                     {item.label}
                   </span>
