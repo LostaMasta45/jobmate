@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
-  title: 'Tools AI - Admin VIP Career',
+  title: 'AI Tools - Admin VIP Career',
   description: 'Kumpulan tools AI untuk admin',
 };
 
@@ -37,7 +37,7 @@ export default async function AdminToolsAIPage() {
       icon: FileText,
       href: '/admin/vip-loker/tambah',
       color: 'from-blue-500 to-cyan-500',
-      badge: 'Tersedia',
+      badge: 'Available',
     },
     {
       title: 'AI Caption Generator',
@@ -45,7 +45,7 @@ export default async function AdminToolsAIPage() {
       icon: Sparkles,
       href: '/admin/tools-ai/caption',
       color: 'from-purple-500 to-pink-500',
-      badge: 'Baru',
+      badge: 'New',
     },
     {
       title: 'AI Text Cleaner',
@@ -68,15 +68,15 @@ export default async function AdminToolsAIPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-8 animate-in fade-in duration-500">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
             <Bot className="w-8 h-8 text-blue-600" />
-            Tools AI Admin
+            Admin AI Tools
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Kumpulan tools AI untuk membantu pekerjaan admin lebih efisien
+          <p className="text-muted-foreground mt-2">
+            Suite of AI-powered tools to automate admin tasks and boost productivity.
           </p>
         </div>
 
@@ -89,41 +89,41 @@ export default async function AdminToolsAIPage() {
             return (
               <Card
                 key={tool.title}
-                className={`hover:shadow-lg transition-all ${
+                className={`border-none shadow-sm hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm group ${
                   isDisabled ? 'opacity-60' : 'cursor-pointer'
                 }`}
               >
                 <CardHeader>
                   <div className="flex items-start justify-between mb-4">
                     <div
-                      className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${tool.color} flex items-center justify-center`}
+                      className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${tool.color} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}
                     >
                       <Icon className="w-8 h-8 text-white" />
                     </div>
                     <span
-                      className={`text-xs px-3 py-1 rounded-full font-semibold ${
-                        tool.badge === 'Baru'
+                      className={`text-xs px-3 py-1 rounded-full font-semibold shadow-sm ${
+                        tool.badge === 'New'
                           ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
                           : tool.badge === 'Coming Soon'
-                          ? 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
-                          : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                          ? 'bg-muted text-muted-foreground'
+                          : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                       }`}
                     >
                       {tool.badge}
                     </span>
                   </div>
-                  <CardTitle>{tool.title}</CardTitle>
+                  <CardTitle className="text-xl">{tool.title}</CardTitle>
                   <CardDescription>{tool.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {isDisabled ? (
-                    <Button disabled className="w-full">
-                      Segera Hadir
+                    <Button disabled className="w-full" variant="secondary">
+                      Coming Soon
                     </Button>
                   ) : (
-                    <Link href={tool.href}>
-                      <Button className={`w-full bg-gradient-to-r ${tool.color}`}>
-                        Buka Tool
+                    <Link href={tool.href} className="w-full block">
+                      <Button className={`w-full bg-gradient-to-r ${tool.color} shadow-md hover:shadow-lg transition-all`}>
+                        Launch Tool
                       </Button>
                     </Link>
                   )}
@@ -134,45 +134,45 @@ export default async function AdminToolsAIPage() {
         </div>
 
         {/* Tips Section */}
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-200 dark:border-blue-800">
+        <Card className="border-none shadow-sm bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-950/10 dark:to-purple-950/10">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              💡 Tips Penggunaan
+            <CardTitle className="flex items-center gap-2 text-lg">
+              💡 Usage Tips
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+          <CardContent className="space-y-4">
+            <div className="flex items-start gap-4 p-3 rounded-lg bg-background/50 hover:bg-background/80 transition-colors">
+              <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm font-bold flex-shrink-0">
                 1
               </div>
               <div>
-                <p className="font-medium">AI Parser Poster</p>
-                <p className="text-sm text-muted-foreground">
-                  Upload gambar poster dengan kualitas baik untuk hasil parsing optimal. Format yang disupport: JPG, PNG, WebP
+                <p className="font-medium text-sm">AI Parser Poster</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Upload high-quality images (JPG, PNG, WebP) for best results. The AI extracts company name, role, and requirements automatically.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+            <div className="flex items-start gap-4 p-3 rounded-lg bg-background/50 hover:bg-background/80 transition-colors">
+              <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center text-sm font-bold flex-shrink-0">
                 2
               </div>
               <div>
-                <p className="font-medium">Caption Generator</p>
-                <p className="text-sm text-muted-foreground">
-                  Masukkan informasi dasar loker, AI akan generate caption menarik lengkap dengan emoji dan hashtag siap posting
+                <p className="font-medium text-sm">Caption Generator</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Input basic job details and let AI generate engaging captions with optimized hashtags for social media reach.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-green-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+            <div className="flex items-start gap-4 p-3 rounded-lg bg-background/50 hover:bg-background/80 transition-colors">
+              <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center text-sm font-bold flex-shrink-0">
                 3
               </div>
               <div>
-                <p className="font-medium">Produktivitas</p>
-                <p className="text-sm text-muted-foreground">
-                  Tools ini dapat menghemat waktu hingga 70% dalam proses input loker. Gunakan secara maksimal!
+                <p className="font-medium text-sm">Productivity Boost</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  These tools are designed to cut down manual data entry by up to 70%. Use them to focus on verification and quality control.
                 </p>
               </div>
             </div>

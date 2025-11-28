@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,10 +29,23 @@ import {
   Filter,
   Calendar,
   RefreshCw,
-  XCircle,
+  MoreVertical,
+  ShieldAlert,
+  Sparkles,
+  Clock,
+  Mail,
 } from "lucide-react";
 import { updateMembership, deactivateMember, extendMembership } from "@/actions/admin/member";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Member {
   id: string;
@@ -50,6 +63,7 @@ export function MemberTable({ memberList }: { memberList: Member[] }) {
   const [filterType, setFilterType] = useState<string>("all"); // all, free, vip_basic, vip_premium
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [extendDays, setExtendDays] = useState<string>("30");
+  const [isExtendDialogOpen, setIsExtendDialogOpen] = useState(false);
 
   // Filter data
   const filteredData = memberList.filter((m) => {
@@ -72,13 +86,13 @@ export function MemberTable({ memberList }: { memberList: Member[] }) {
   });
 
   const handleDeactivate = async (userId: string) => {
-    if (!confirm("Yakin ingin menonaktifkan member ini?")) return;
+    if (!confirm("Are you sure you want to deactivate this member?")) return;
 
     const result = await deactivateMember(userId);
     if (result.success) {
-      toast.success("Member berhasil dinonaktifkan");
+      toast.success("Member deactivated successfully");
     } else {
-      toast.error("Gagal menonaktifkan member");
+      toast.error("Failed to deactivate member");
     }
   };
 
@@ -87,16 +101,17 @@ export function MemberTable({ memberList }: { memberList: Member[] }) {
 
     const days = parseInt(extendDays);
     if (isNaN(days) || days <= 0) {
-      toast.error("Jumlah hari tidak valid");
+      toast.error("Invalid days");
       return;
     }
 
     const result = await extendMembership(selectedMember.id, days);
     if (result.success) {
-      toast.success(`Membership diperpanjang ${days} hari`);
+      toast.success(`Membership extended for ${days} days`);
       setSelectedMember(null);
+      setIsExtendDialogOpen(false);
     } else {
-      toast.error("Gagal memperpanjang membership");
+      toast.error("Failed to extend membership");
     }
   };
 
@@ -112,38 +127,36 @@ export function MemberTable({ memberList }: { memberList: Member[] }) {
     console.log('[MEMBER_TABLE] Upgrade result:', result);
     
     if (result.success) {
-      toast.success("Membership berhasil diupdate! Refresh halaman jika perlu.");
-      // Force refresh page to show updated data
+      toast.success("Membership updated successfully! Refreshing...");
       window.location.reload();
     } else {
       console.error('[MEMBER_TABLE] Upgrade failed:', result.error);
       const errorMessage = result.error && typeof result.error === 'object' && 'message' in result.error 
         ? String(result.error.message) 
         : 'Unknown error';
-      toast.error(`Gagal mengupdate membership: ${errorMessage}`);
+      toast.error(`Failed to update membership: ${errorMessage}`);
     }
   };
 
   const getMembershipBadge = (membership: string) => {
     if (membership === "vip_premium") {
       return (
-        <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
-          <Star className="w-3 h-3 mr-1" />
+        <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-sm">
+          <Star className="w-3 h-3 mr-1 fill-current" />
           VIP Premium
         </Badge>
       );
     }
     if (membership === "vip_basic") {
       return (
-        <Badge className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900 dark:text-blue-300">
+        <Badge className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/50 dark:text-blue-300 shadow-sm">
           <Crown className="w-3 h-3 mr-1" />
           VIP Basic
         </Badge>
       );
     }
-    // Free user
     return (
-      <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-900 dark:text-gray-300">
+      <Badge variant="outline" className="bg-muted/50 text-muted-foreground">
         <Users className="w-3 h-3 mr-1" />
         Free User
       </Badge>
@@ -153,9 +166,9 @@ export function MemberTable({ memberList }: { memberList: Member[] }) {
   const getExpiryStatus = (expiry: string | null | undefined) => {
     if (!expiry) {
       return (
-        <Badge className="bg-green-100 text-green-700 border-green-200">
-          Lifetime ♾️
-        </Badge>
+        <div className="flex items-center text-xs font-medium text-green-600 dark:text-green-400 bg-green-100/50 dark:bg-green-900/20 px-2 py-1 rounded-md">
+          Lifetime Access ♾️
+        </div>
       );
     }
 
@@ -169,227 +182,201 @@ export function MemberTable({ memberList }: { memberList: Member[] }) {
 
     if (daysLeft <= 7) {
       return (
-        <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
-          {daysLeft} hari lagi ⚠️
+        <Badge className="bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400">
+          {daysLeft} days left ⚠️
         </Badge>
       );
     }
 
     return (
-      <Badge className="bg-green-100 text-green-700 border-green-200">
-        {daysLeft} hari lagi
+      <Badge variant="secondary" className="text-green-600 bg-green-100/50 dark:text-green-400 dark:bg-green-900/20">
+        {daysLeft} days left
       </Badge>
     );
   };
 
   return (
-    <Card className="p-6">
-      {/* Filters */}
-      <div className="mb-6 space-y-4">
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <Filter className="w-4 h-4" />
-          <span>Filter & Pencarian</span>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Cari email atau nama..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10"
-            />
+    <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+      <CardHeader className="pb-4 border-b border-border/50">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <CardTitle className="text-xl font-semibold">User Management</CardTitle>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search users..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 bg-background/50"
+              />
+            </div>
+            <Select value={filterType} onValueChange={setFilterType}>
+              <SelectTrigger className="w-full sm:w-40 bg-background/50">
+                <SelectValue placeholder="Membership" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Users</SelectItem>
+                <SelectItem value="free">Free Users</SelectItem>
+                <SelectItem value="vip_basic">VIP Basic</SelectItem>
+                <SelectItem value="vip_premium">VIP Premium</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-
-          <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger>
-              <SelectValue placeholder="Jenis Membership" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">🔍 Semua Users</SelectItem>
-              <SelectItem value="free">👤 Free Users</SelectItem>
-              <SelectItem value="vip_basic">👑 VIP Basic</SelectItem>
-              <SelectItem value="vip_premium">⭐ VIP Premium</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
+      </CardHeader>
 
-        <div className="text-sm text-muted-foreground">
-          Menampilkan {filteredData.length} dari {memberList.length} member
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="space-y-4">
-        {filteredData.length > 0 ? (
-          filteredData.map((member) => (
-            <Card key={member.id} className="p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
-                      <Crown className="w-5 h-5 text-white" />
+      <CardContent className="p-0">
+        <div className="space-y-1">
+          {filteredData.length > 0 ? (
+            filteredData.map((member) => (
+              <div 
+                key={member.id} 
+                className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-accent/40 transition-colors border-b border-border/40 last:border-0"
+              >
+                <div className="flex items-start gap-4 mb-4 sm:mb-0">
+                  <Avatar className="h-10 w-10 border bg-muted">
+                    <AvatarFallback className="font-semibold text-primary">
+                      {(member.full_name || member.email || "U").charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-semibold text-sm">
+                        {member.full_name || member.email || "No Name"}
+                      </h3>
+                      {getMembershipBadge(member.membership || "free")}
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-bold">
-                          {member.full_name || member.email || "No Name"}
-                        </h3>
-                        {getMembershipBadge(member.membership || "free")}
+                    
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Mail className="w-3 h-3" />
+                        <span>{member.email}</span>
                       </div>
-                      {member.full_name && member.email && (
-                        <p className="text-sm text-muted-foreground">{member.email}</p>
-                      )}
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        <span>Joined {new Date(member.created_at).toLocaleDateString("id-ID")}</span>
+                      </div>
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 ml-13">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      <span>
-                        Bergabung: {new Date(member.created_at).toLocaleDateString("id-ID")}
-                      </span>
-                    </div>
+                <div className="flex items-center gap-4 self-end sm:self-center">
+                  <div className="hidden sm:block">
                     {getExpiryStatus(member.membership_expiry)}
                   </div>
-                </div>
 
-                <div className="flex flex-col gap-2">
-                  {/* Show different actions based on membership */}
-                  {(member.membership === "free" || !member.membership) ? (
-                    // Free User - Show Upgrade Options
-                    <div className="flex flex-col gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => handleUpgrade(member.id, "vip_basic")}
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        <Crown className="w-4 h-4 mr-1" />
-                        Upgrade ke Basic
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreVertical className="h-4 w-4" />
                       </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => handleUpgrade(member.id, "vip_premium")}
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                      >
-                        <Star className="w-4 h-4 mr-1" />
-                        Upgrade ke Premium
-                      </Button>
-                    </div>
-                  ) : (
-                    // VIP User - Show Management Options
-                    <>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setSelectedMember(member)}
-                          >
-                            <RefreshCw className="w-4 h-4 mr-1" />
-                            Perpanjang
-                          </Button>
-                        </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Perpanjang Membership</DialogTitle>
-                        <DialogDescription>
-                          Perpanjang membership untuk {member.full_name || member.email || "User"}
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div>
-                          <Label>Jumlah Hari</Label>
-                          <Input
-                            type="number"
-                            value={extendDays}
-                            onChange={(e) => setExtendDays(e.target.value)}
-                            min="1"
-                          />
-                        </div>
-                        <div className="flex gap-2">
-                          <Button onClick={() => setExtendDays("30")} variant="outline" size="sm">
-                            30 Hari
-                          </Button>
-                          <Button onClick={() => setExtendDays("90")} variant="outline" size="sm">
-                            90 Hari
-                          </Button>
-                          <Button onClick={() => setExtendDays("365")} variant="outline" size="sm">
-                            1 Tahun
-                          </Button>
-                        </div>
-                        <Button onClick={handleExtend} className="w-full">
-                          Perpanjang
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-
-                  {member.membership === "vip_basic" ? (
-                    <Button
-                      size="sm"
-                      onClick={() => handleUpgrade(member.id, "vip_premium")}
-                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                    >
-                      <Star className="w-4 h-4 mr-1" />
-                      Upgrade Premium
-                    </Button>
-                  ) : (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleUpgrade(member.id, "vip_basic")}
-                    >
-                      Downgrade ke Basic
-                    </Button>
-                  )}
-
-                      {member.membership === "vip_basic" ? (
-                        <Button
-                          size="sm"
-                          onClick={() => handleUpgrade(member.id, "vip_premium")}
-                          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                        >
-                          <Star className="w-4 h-4 mr-1" />
-                          Upgrade Premium
-                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      
+                      {member.membership === "free" || !member.membership ? (
+                        <>
+                          <DropdownMenuItem onClick={() => handleUpgrade(member.id, "vip_basic")}>
+                            <Crown className="w-4 h-4 mr-2 text-blue-500" />
+                            Upgrade to Basic
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleUpgrade(member.id, "vip_premium")}>
+                            <Sparkles className="w-4 h-4 mr-2 text-purple-500" />
+                            Upgrade to Premium
+                          </DropdownMenuItem>
+                        </>
                       ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleUpgrade(member.id, "vip_basic")}
-                        >
-                          Downgrade ke Basic
-                        </Button>
-                      )}
+                        <>
+                          <DropdownMenuItem onClick={() => {
+                            setSelectedMember(member);
+                            setIsExtendDialogOpen(true);
+                          }}>
+                            <Clock className="w-4 h-4 mr-2" />
+                            Extend Access
+                          </DropdownMenuItem>
+                          
+                          {member.membership === "vip_basic" ? (
+                            <DropdownMenuItem onClick={() => handleUpgrade(member.id, "vip_premium")}>
+                              <Sparkles className="w-4 h-4 mr-2 text-purple-500" />
+                              Upgrade to Premium
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem onClick={() => handleUpgrade(member.id, "vip_basic")}>
+                              <Crown className="w-4 h-4 mr-2" />
+                              Downgrade to Basic
+                            </DropdownMenuItem>
+                          )}
 
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDeactivate(member.id)}
-                        className="border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
-                      >
-                        <XCircle className="w-4 h-4 mr-1" />
-                        {member.membership !== "free" ? "Turunkan ke Free" : "Nonaktifkan"}
-                      </Button>
-                    </>
-                  )}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            onClick={() => handleDeactivate(member.id)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <ShieldAlert className="w-4 h-4 mr-2" />
+                            Deactivate
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
-            </Card>
-          ))
-        ) : (
-          <div className="text-center py-12">
-            <Crown className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-            <h3 className="text-xl font-bold mb-2">Tidak Ada Member</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              {search || filterType !== "all"
-                ? "Tidak ditemukan member dengan filter yang dipilih"
-                : "Belum ada member VIP yang terdaftar"}
-            </p>
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16 text-center px-4">
+              <div className="h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+                <Users className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold">No members found</h3>
+              <p className="text-muted-foreground text-sm max-w-sm mt-1">
+                {search || filterType !== "all"
+                  ? "Try adjusting your filters or search terms."
+                  : "Users will appear here once they register."}
+              </p>
+            </div>
+          )}
+        </div>
+      </CardContent>
+
+      {/* Extend Membership Dialog */}
+      <Dialog open={isExtendDialogOpen} onOpenChange={setIsExtendDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Extend Membership</DialogTitle>
+            <DialogDescription>
+              Add days to membership for <span className="font-medium text-foreground">{selectedMember?.full_name || selectedMember?.email}</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Duration (Days)</Label>
+              <Input
+                type="number"
+                value={extendDays}
+                onChange={(e) => setExtendDays(e.target.value)}
+                min="1"
+                placeholder="e.g. 30"
+              />
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <Button variant="outline" size="sm" onClick={() => setExtendDays("7")} className="flex-1">
+                +7 Days
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setExtendDays("30")} className="flex-1">
+                +30 Days
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setExtendDays("90")} className="flex-1">
+                +90 Days
+              </Button>
+            </div>
+            <Button onClick={handleExtend} className="w-full mt-4">
+              Confirm Extension
+            </Button>
           </div>
-        )}
-      </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

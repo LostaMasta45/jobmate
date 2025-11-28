@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,10 +26,17 @@ import {
   Trash2,
   Plus,
   Minus,
+  Sparkles,
+  ArrowRight,
+  FileText,
+  Image as ImageIcon
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
+// --- Interfaces ---
 interface JobPosition {
   title: string;
   perusahaan_name: string;
@@ -37,12 +44,8 @@ interface JobPosition {
   kategori: string[];
   tipe_kerja?: string;
   gaji_text?: string;
-  gaji_min?: number;
-  gaji_max?: number;
   deskripsi?: string;
   persyaratan?: string;
-  kualifikasi: string[];
-  deadline?: string;
   kontak_wa?: string;
   kontak_email?: string;
 }
@@ -59,6 +62,12 @@ interface PosterResult {
 
 type StepType = 'upload' | 'review' | 'done';
 
+const STEPS = [
+  { id: 'upload', label: 'Upload Posters', icon: Upload },
+  { id: 'review', label: 'Review Data', icon: FileText },
+  { id: 'done', label: 'Published', icon: Check },
+];
+
 export function BatchPosterUpload() {
   const router = useRouter();
   const [step, setStep] = useState<StepType>('upload');
@@ -68,11 +77,21 @@ export function BatchPosterUpload() {
   const [isSaving, setIsSaving] = useState(false);
   const [parseResults, setParseResults] = useState<PosterResult[]>([]);
   const [editedJobs, setEditedJobs] = useState<(JobPosition & { poster_url?: string; poster_filename?: string })[]>([]);
+  const [dragActive, setDragActive] = useState(false);
 
-  // Handle file selection
-  const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(e.target.files || []);
+  // --- Handlers ---
 
+  const handleDrag = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  }, []);
+
+  const processFiles = (selectedFiles: File[]) => {
     if (selectedFiles.length === 0) return;
 
     if (selectedFiles.length > 10) {
@@ -80,20 +99,19 @@ export function BatchPosterUpload() {
       return;
     }
 
-    // Validate each file
-    const invalidFiles = selectedFiles.filter(
-      (file) => !file.type.startsWith('image/') || file.size > 5 * 1024 * 1024
+    const validFiles = selectedFiles.filter(
+      (file) => file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024
     );
 
-    if (invalidFiles.length > 0) {
-      toast.error('Beberapa file tidak valid (harus gambar, max 5MB)');
-      return;
+    if (validFiles.length !== selectedFiles.length) {
+      toast.warning('Beberapa file diabaikan (bukan gambar atau > 5MB)');
     }
 
-    setFiles(selectedFiles);
+    if (validFiles.length === 0) return;
 
-    // Generate previews
-    const previewPromises = selectedFiles.map((file) => {
+    setFiles(validFiles);
+
+    const previewPromises = validFiles.map((file) => {
       return new Promise<string>((resolve) => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result as string);
@@ -104,10 +122,23 @@ export function BatchPosterUpload() {
     Promise.all(previewPromises).then(setPreviews);
   };
 
-  // Parse posters with AI
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processFiles(Array.from(e.dataTransfer.files));
+    }
+  }, []);
+
+  const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      processFiles(Array.from(e.target.files));
+    }
+  };
+
   const handleParse = async () => {
     setIsParsing(true);
-
     try {
       const formData = new FormData();
       files.forEach((file, index) => {
@@ -126,10 +157,8 @@ export function BatchPosterUpload() {
       }
 
       const result = await response.json();
-      
       setParseResults(result.results);
 
-      // Flatten all positions from all posters for editing
       const allJobs: (JobPosition & { poster_url?: string; poster_filename?: string })[] = [];
       result.results.forEach((posterResult: PosterResult) => {
         posterResult.positions.forEach((position) => {
@@ -143,10 +172,7 @@ export function BatchPosterUpload() {
 
       setEditedJobs(allJobs);
       setStep('review');
-
-      toast.success(
-        `✨ ${result.summary.parsed_successfully}/${result.summary.total_posters} poster berhasil di-parse! ${result.summary.total_positions} posisi ditemukan.`
-      );
+      toast.success(`✨ Berhasil parse! ${result.summary.total_positions} posisi ditemukan.`);
     } catch (error: any) {
       console.error('Parse error:', error);
       toast.error(error.message || 'Gagal parse posters');
@@ -155,7 +181,6 @@ export function BatchPosterUpload() {
     }
   };
 
-  // Update job field
   const updateJob = (index: number, field: keyof JobPosition, value: any) => {
     setEditedJobs((prev) => {
       const updated = [...prev];
@@ -164,12 +189,10 @@ export function BatchPosterUpload() {
     });
   };
 
-  // Remove job
   const removeJob = (index: number) => {
     setEditedJobs((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Duplicate job
   const duplicateJob = (index: number) => {
     setEditedJobs((prev) => {
       const updated = [...prev];
@@ -179,25 +202,19 @@ export function BatchPosterUpload() {
     });
   };
 
-  // Save all jobs
   const handleSaveAll = async () => {
     if (editedJobs.length === 0) {
       toast.error('Tidak ada job untuk disimpan');
       return;
     }
 
-    // Validate
-    const invalid = editedJobs.some(
-      (job) => !job.title || !job.perusahaan_name || !job.lokasi
-    );
-
+    const invalid = editedJobs.some((job) => !job.title || !job.perusahaan_name || !job.lokasi);
     if (invalid) {
-      toast.error('Semua job harus punya Title, Perusahaan, dan Lokasi');
+      toast.error('Title, Perusahaan, dan Lokasi wajib diisi untuk semua job.');
       return;
     }
 
     setIsSaving(true);
-
     try {
       const response = await fetch('/api/admin/vip/loker/batch', {
         method: 'POST',
@@ -211,18 +228,9 @@ export function BatchPosterUpload() {
       }
 
       const result = await response.json();
-
       setStep('done');
+      toast.success(`🎉 ${result.summary.success} job berhasil dipublish!`);
 
-      toast.success(
-        `🎉 ${result.summary.success}/${result.summary.total} job berhasil dipublish!`
-      );
-
-      if (result.summary.failed > 0) {
-        toast.warning(`${result.summary.failed} job gagal disimpan`);
-      }
-
-      // Redirect after 3 seconds
       setTimeout(() => {
         router.push('/admin/vip-loker');
         router.refresh();
@@ -235,264 +243,347 @@ export function BatchPosterUpload() {
     }
   };
 
-  // Upload Step
+  // --- Render Helper: Progress Steps ---
+  const renderSteps = () => (
+    <div className="flex justify-center mb-8">
+      <div className="flex items-center gap-2 md:gap-4 bg-background/60 backdrop-blur px-4 py-2 rounded-full border shadow-sm">
+        {STEPS.map((s, idx) => {
+          const isActive = s.id === step;
+          const isCompleted = STEPS.findIndex(stp => stp.id === step) > idx;
+          const Icon = s.icon;
+          
+          return (
+            <div key={s.id} className="flex items-center gap-2">
+              <div className={cn(
+                "flex items-center justify-center h-8 w-8 rounded-full transition-colors",
+                isActive ? "bg-primary text-primary-foreground" : 
+                isCompleted ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"
+              )}>
+                <Icon className="h-4 w-4" />
+              </div>
+              <span className={cn(
+                "text-sm font-medium hidden md:block",
+                isActive ? "text-foreground" : "text-muted-foreground"
+              )}>{s.label}</span>
+              {idx < STEPS.length - 1 && <div className="w-8 h-[1px] bg-border hidden md:block" />}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  // --- Upload Step Render ---
   if (step === 'upload') {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5" />
-            Batch Upload Poster Loker
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Upload hingga 10 poster sekaligus. AI akan otomatis extract data dan detect multiple posisi per poster.
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="posters">Pilih Poster (Max 10 files)</Label>
-            <Input
-              id="posters"
+      <div className="max-w-4xl mx-auto">
+        {renderSteps()}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          <div 
+            className={cn(
+              "relative group border-2 border-dashed rounded-xl p-10 transition-all duration-200 text-center cursor-pointer overflow-hidden",
+              dragActive ? "border-primary bg-primary/5 scale-[1.01]" : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/30",
+              files.length > 0 ? "bg-muted/20" : ""
+            )}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            onClick={() => document.getElementById('file-upload')?.click()}
+          >
+            <input
+              id="file-upload"
               type="file"
               accept="image/*"
               multiple
+              className="hidden"
               onChange={handleFilesChange}
               disabled={isParsing}
             />
-            <p className="text-xs text-muted-foreground">
-              Format: JPG, PNG, WebP | Max 5MB per file
-            </p>
+            
+            <div className="flex flex-col items-center gap-4 z-10 relative">
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <Upload className="h-8 w-8 text-primary" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-xl font-semibold tracking-tight">Drag & Drop Poster Loker</h3>
+                <p className="text-muted-foreground max-w-sm mx-auto">
+                  Atau klik area ini untuk memilih file. Max 10 poster sekaligus. Support JPG, PNG.
+                </p>
+              </div>
+              <Button variant="outline" className="mt-4">
+                Pilih File
+              </Button>
+            </div>
           </div>
 
-          {/* Preview */}
-          {previews.length > 0 && (
-            <div className="space-y-3">
-              <Label>{previews.length} poster dipilih</Label>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {previews.map((preview, index) => (
-                  <div key={index} className="relative aspect-square rounded-lg border overflow-hidden bg-muted">
-                    <Image
-                      src={preview}
-                      alt={`Poster ${index + 1}`}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-2 py-1">
-                      <p className="text-xs text-white truncate">{files[index]?.name}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Preview Section */}
+          <AnimatePresence>
+            {files.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }} 
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4"
+              >
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold text-sm text-muted-foreground">Selected Files ({files.length})</h4>
+                  <Button variant="ghost" size="sm" onClick={() => { setFiles([]); setPreviews([]); }} className="text-destructive hover:bg-destructive/10">
+                    Clear All
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {previews.map((preview, index) => (
+                    <motion.div 
+                      key={index}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="group relative aspect-[3/4] rounded-lg overflow-hidden border bg-muted shadow-sm"
+                    >
+                      <Image
+                        src={preview}
+                        alt="Preview"
+                        fill
+                        className="object-cover transition-transform group-hover:scale-105"
+                        unoptimized
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <Button 
+                          variant="destructive" 
+                          size="icon" 
+                          className="h-8 w-8"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const newFiles = [...files];
+                            newFiles.splice(index, 1);
+                            const newPreviews = [...previews];
+                            newPreviews.splice(index, 1);
+                            setFiles(newFiles);
+                            setPreviews(newPreviews);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                         <p className="text-[10px] text-white truncate font-medium">{files[index].name}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
 
-          {/* Actions */}
-          <div className="flex gap-2">
-            <Button
-              onClick={handleParse}
-              disabled={files.length === 0 || isParsing}
-              className="flex-1"
-            >
-              {isParsing ? (
+                <div className="flex justify-end pt-4">
+                  <Button 
+                    size="lg" 
+                    onClick={handleParse} 
+                    disabled={isParsing}
+                    className="w-full md:w-auto bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/25"
+                  >
+                    {isParsing ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Parsing with AI...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="mr-2 h-5 w-5" />
+                        Parse {files.length} Posters
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // --- Review Step Render ---
+  if (step === 'review') {
+    return (
+      <div className="max-w-7xl mx-auto">
+        {renderSteps()}
+        
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Review Results</h2>
+            <p className="text-muted-foreground">Found {editedJobs.length} positions from your posters.</p>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => setStep('upload')}>
+              <X className="mr-2 h-4 w-4" />
+              Cancel
+            </Button>
+            <Button onClick={handleSaveAll} disabled={isSaving} className="min-w-[140px]">
+              {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Parsing {files.length} poster...
-                </>
-              ) : (
-                <>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Parse dengan AI
+                  <Save className="mr-2 h-4 w-4" />
+                  Publish All
                 </>
               )}
             </Button>
           </div>
-        </CardContent>
-      </Card>
-    );
-  }
+        </div>
 
-  // Review Step
-  if (step === 'review') {
-    return (
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Review & Edit</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              {editedJobs.length} posisi ditemukan dari {parseResults.length} poster. Review dan edit sebelum publish.
-            </p>
-          </CardHeader>
-        </Card>
+        <div className="grid lg:grid-cols-12 gap-8">
+          {/* Main List */}
+          <div className="lg:col-span-12 space-y-4">
+            {editedJobs.map((job, index) => (
+              <motion.div 
+                key={index}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <Card className="overflow-hidden border-l-4 border-l-primary shadow-sm hover:shadow-md transition-shadow">
+                  <CardContent className="p-0">
+                    <div className="flex flex-col md:flex-row">
+                      {/* Left: Poster Preview Mini */}
+                      <div className="relative w-full md:w-48 bg-muted min-h-[200px] md:min-h-full border-r">
+                        {job.poster_url ? (
+                          <Image 
+                            src={job.poster_url} 
+                            alt="Source" 
+                            fill 
+                            className="object-cover"
+                            unoptimized 
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-full text-muted-foreground">
+                            <FileImage className="h-8 w-8" />
+                          </div>
+                        )}
+                        <div className="absolute top-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded">
+                          #{index + 1}
+                        </div>
+                      </div>
 
-        {editedJobs.map((job, index) => (
-          <Card key={index} className="relative">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline">{index + 1}</Badge>
-                    <Badge variant="secondary">{job.poster_filename}</Badge>
-                  </div>
-                  <Input
-                    value={job.title}
-                    onChange={(e) => updateJob(index, 'title', e.target.value)}
-                    placeholder="Judul Posisi *"
-                    className="font-semibold text-lg"
-                  />
-                </div>
-                <div className="flex gap-1">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => duplicateJob(index)}
-                    title="Duplicate"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeJob(index)}
-                    title="Hapus"
-                  >
-                    <Trash2 className="h-4 w-4 text-red-600" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Perusahaan *</Label>
-                  <Input
-                    value={job.perusahaan_name}
-                    onChange={(e) => updateJob(index, 'perusahaan_name', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Lokasi *</Label>
-                  <Input
-                    value={job.lokasi}
-                    onChange={(e) => updateJob(index, 'lokasi', e.target.value)}
-                  />
-                </div>
-              </div>
+                      {/* Right: Form */}
+                      <div className="flex-1 p-6 space-y-4">
+                        <div className="flex justify-between items-start gap-4">
+                           <div className="flex-1 space-y-4">
+                             <div className="grid md:grid-cols-2 gap-4">
+                               <div className="space-y-2">
+                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">Judul Posisi</Label>
+                                 <Input 
+                                   value={job.title} 
+                                   onChange={(e) => updateJob(index, 'title', e.target.value)}
+                                   className="font-semibold text-lg"
+                                 />
+                               </div>
+                               <div className="space-y-2">
+                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">Perusahaan</Label>
+                                 <Input 
+                                   value={job.perusahaan_name} 
+                                   onChange={(e) => updateJob(index, 'perusahaan_name', e.target.value)}
+                                 />
+                               </div>
+                             </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Gaji</Label>
-                  <Input
-                    value={job.gaji_text || ''}
-                    onChange={(e) => updateJob(index, 'gaji_text', e.target.value)}
-                    placeholder="Contoh: Rp 5-7 juta"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Tipe Kerja</Label>
-                  <Select
-                    value={job.tipe_kerja || ''}
-                    onValueChange={(value) => updateJob(index, 'tipe_kerja', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih tipe" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Full-time">Full-time</SelectItem>
-                      <SelectItem value="Part-time">Part-time</SelectItem>
-                      <SelectItem value="Contract">Contract</SelectItem>
-                      <SelectItem value="Freelance">Freelance</SelectItem>
-                      <SelectItem value="Remote">Remote</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+                             <div className="grid md:grid-cols-3 gap-4">
+                               <div className="space-y-2">
+                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">Lokasi</Label>
+                                 <Input 
+                                   value={job.lokasi} 
+                                   onChange={(e) => updateJob(index, 'lokasi', e.target.value)}
+                                 />
+                               </div>
+                               <div className="space-y-2">
+                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">Gaji (Text)</Label>
+                                 <Input 
+                                   value={job.gaji_text || ''} 
+                                   placeholder="e.g. Rp 5-10 Juta"
+                                   onChange={(e) => updateJob(index, 'gaji_text', e.target.value)}
+                                 />
+                               </div>
+                               <div className="space-y-2">
+                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">Tipe</Label>
+                                 <Select
+                                    value={job.tipe_kerja || ''}
+                                    onValueChange={(value) => updateJob(index, 'tipe_kerja', value)}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="Full-time">Full-time</SelectItem>
+                                      <SelectItem value="Part-time">Part-time</SelectItem>
+                                      <SelectItem value="Contract">Contract</SelectItem>
+                                      <SelectItem value="Freelance">Freelance</SelectItem>
+                                      <SelectItem value="Remote">Remote</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                               </div>
+                             </div>
 
-              <div className="space-y-2">
-                <Label>Kategori</Label>
-                <Input
-                  value={job.kategori.join(', ')}
-                  onChange={(e) =>
-                    updateJob(
-                      index,
-                      'kategori',
-                      e.target.value.split(',').map((k) => k.trim())
-                    )
-                  }
-                  placeholder="Pisahkan dengan koma"
-                />
-              </div>
+                             <div className="grid md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <Label className="text-xs font-semibold uppercase text-muted-foreground">Kategori</Label>
+                                  <Input 
+                                    value={job.kategori.join(', ')}
+                                    onChange={(e) => updateJob(index, 'kategori', e.target.value.split(',').map(k=>k.trim()))}
+                                    placeholder="IT, Marketing, etc"
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label className="text-xs font-semibold uppercase text-muted-foreground">Kontak WA</Label>
+                                  <Input 
+                                    value={job.kontak_wa || ''}
+                                    onChange={(e) => updateJob(index, 'kontak_wa', e.target.value)}
+                                    placeholder="08xxx"
+                                  />
+                                </div>
+                             </div>
+                           </div>
 
-              <div className="space-y-2">
-                <Label>Kontak WA</Label>
-                <Input
-                  value={job.kontak_wa || ''}
-                  onChange={(e) => updateJob(index, 'kontak_wa', e.target.value)}
-                  placeholder="081234567890"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-
-        {/* Save Button */}
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => {
-              setStep('upload');
-              setFiles([]);
-              setPreviews([]);
-              setParseResults([]);
-              setEditedJobs([]);
-            }}
-          >
-            <X className="mr-2 h-4 w-4" />
-            Batal
-          </Button>
-          <Button
-            onClick={handleSaveAll}
-            disabled={isSaving || editedJobs.length === 0}
-            className="flex-1"
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Menyimpan {editedJobs.length} job...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" />
-                Publish {editedJobs.length} Job
-              </>
-            )}
-          </Button>
+                           {/* Action Buttons */}
+                           <div className="flex flex-col gap-2">
+                              <Button variant="ghost" size="icon" onClick={() => duplicateJob(index)} title="Duplicate">
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon" onClick={() => removeJob(index)} className="text-destructive hover:text-destructive hover:bg-destructive/10" title="Delete">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                           </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
-  // Done Step
+  // --- Done Step Render ---
   return (
-    <Card>
-      <CardContent className="py-12 text-center space-y-4">
-        <div className="flex justify-center">
-          <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
-            <Check className="h-8 w-8 text-green-600" />
+    <div className="max-w-2xl mx-auto text-center pt-10">
+       <motion.div 
+          initial={{ scale: 0.8, opacity: 0 }} 
+          animate={{ scale: 1, opacity: 1 }}
+          className="bg-card rounded-2xl shadow-lg p-12 border"
+       >
+          <div className="h-20 w-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+            <Check className="h-10 w-10 text-green-600" />
           </div>
-        </div>
-        <div>
-          <h3 className="text-xl font-semibold mb-2">Batch Upload Berhasil!</h3>
-          <p className="text-muted-foreground">
-            Lowongan sudah dipublish di VIP Career Portal
+          <h2 className="text-3xl font-bold mb-4">Upload Successful!</h2>
+          <p className="text-muted-foreground mb-8">
+            Semua lowongan berhasil dipublish ke portal VIP. Anda akan dialihkan dalam beberapa detik...
           </p>
-        </div>
-        <Button onClick={() => router.push('/admin/vip-loker')}>
-          Lihat Semua Loker
-        </Button>
-      </CardContent>
-    </Card>
+          <Button size="lg" onClick={() => router.push('/admin/vip-loker')} className="w-full md:w-auto">
+            Kembali ke Dashboard
+          </Button>
+       </motion.div>
+    </div>
   );
 }

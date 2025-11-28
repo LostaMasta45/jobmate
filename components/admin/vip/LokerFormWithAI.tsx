@@ -212,7 +212,7 @@ export function LokerFormWithAI() {
 
       {/* STEP 1: Upload Poster */}
       {step === 'upload' && (
-        <Card className="p-8">
+        <Card className="p-8 border-none shadow-sm bg-card/50 backdrop-blur-sm">
           <div className="text-center space-y-4">
             <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
               <Upload className="w-10 h-10 text-white" />
@@ -295,7 +295,7 @@ export function LokerFormWithAI() {
 
       {/* STEP 2: Review & Edit */}
       {step === 'review' && editedData && (
-        <Card className="p-6">
+        <Card className="p-6 border-none shadow-sm bg-card/50 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold">Review & Edit Data</h2>
@@ -537,7 +537,7 @@ export function LokerFormWithAI() {
 
       {/* STEP 3: Done */}
       {step === 'done' && (
-        <Card className="p-12 text-center">
+        <Card className="p-12 text-center border-none shadow-sm bg-card/50 backdrop-blur-sm">
           <div className="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-6">
             <Check className="w-10 h-10 text-green-600" />
           </div>

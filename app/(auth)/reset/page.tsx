@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import MobileResetView from "@/components/auth/MobileResetView";
+import MobileResetPasswordView from "@/components/auth/MobileResetPasswordView";
+import { EmailSentAnimation } from "@/components/auth/EmailSentAnimation";
 
 export default function ResetPasswordPage() {
   const isMobile = useIsMobile();
@@ -42,13 +44,20 @@ export default function ResetPasswordPage() {
     }
   }, [isMobile, isMounted, success]);
 
+  // Pure validation function (no state updates)
+  const isValidEmail = (value: string) => {
+    if (!value) return false;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(value);
+  };
+
+  // Validation with state updates (for onBlur and form submit)
   const validateEmail = (value: string) => {
     if (!value) {
       setEmailError(null);
       return false;
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(value)) {
+    if (!isValidEmail(value)) {
       setEmailError("Format email tidak valid");
       return false;
     }
@@ -82,16 +91,22 @@ export default function ResetPasswordPage() {
       // Redirect URL should be the full path to the verify page
       const redirectUrl = `${window.location.origin}/auth/verify?type=recovery`;
       
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      console.log('🔍 Debug Info:');
+      console.log('  Email:', email);
+      console.log('  Redirect URL:', redirectUrl);
+      
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl,
       });
 
       if (error) {
+        console.error('❌ Reset failed:', error);
         setError(error.message);
         setLoading(false);
         return;
       }
 
+      console.log('✅ Reset request successful! Check email (and spam folder)');
       setSuccess(true);
       setLoading(false);
     } catch (err) {
@@ -108,7 +123,7 @@ export default function ResetPasswordPage() {
 
   // Mobile View
   if (isMobile) {
-    return <MobileResetView />;
+    return <MobileResetPasswordView />;
   }
 
   // Desktop Split Layout
@@ -120,18 +135,17 @@ export default function ResetPasswordPage() {
         <div className="relative flex w-full flex-col justify-center px-8 sm:px-12 lg:w-[45%] xl:w-[40%] h-screen border-r border-border/40 shadow-xl z-20 bg-background/80 backdrop-blur-md">
           
           {/* Brand Logo */}
-          <div className="absolute top-8 left-8 sm:left-12">
-             <Link href="/" className="flex items-center gap-3 group">
-               <div className="relative h-12 w-12 transition-transform group-hover:scale-105">
+          <div className="absolute top-8 left-8 sm:left-12 z-50">
+             <Link href="/" className="block group">
+               <div className="relative h-32 w-32 transition-transform group-hover:scale-105">
                   <Image 
                     src="/Logo/x.png" 
                     alt="JobMate Logo" 
                     fill 
-                    className="object-contain" 
+                    className="object-contain object-left" 
                     priority 
                   />
                </div>
-               <span className="text-xl font-bold tracking-tight text-foreground group-hover:text-brand transition-colors">JobMate</span>
              </Link>
           </div>
 
@@ -142,42 +156,51 @@ export default function ResetPasswordPage() {
                 // SUCCESS STATE
                 <motion.div 
                   key="success"
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="text-center space-y-6"
+                  className="space-y-6"
                 >
-                  <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle2 className="w-10 h-10" />
-                  </div>
+                  <EmailSentAnimation />
                   
-                  <div className="space-y-2">
+                  <div className="space-y-2 text-center sm:text-left">
                     <h2 className="text-3xl font-bold tracking-tight">Email Terkirim!</h2>
                     <p className="text-muted-foreground">
-                      Kami telah mengirimkan tautan untuk mereset kata sandi ke <strong>{email}</strong>.
+                      Kami telah mengirimkan tautan untuk mereset kata sandi ke <strong className="text-foreground">{email}</strong>.
                     </p>
                   </div>
 
                   <div className="rounded-lg bg-muted/50 p-4 text-sm text-left border border-border/50">
-                    <p className="font-medium mb-2">Langkah selanjutnya:</p>
-                    <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                      <li>Cek kotak masuk (atau folder spam)</li>
-                      <li>Klik tautan yang diberikan</li>
-                      <li>Buat password baru yang aman</li>
+                    <p className="font-medium mb-2 text-foreground">Langkah selanjutnya:</p>
+                    <ul className="space-y-2 text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-brand mt-1.5 shrink-0" />
+                        <span>Cek kotak masuk (atau folder spam)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-brand mt-1.5 shrink-0" />
+                        <span>Klik tautan yang diberikan</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-brand mt-1.5 shrink-0" />
+                        <span>Buat password baru yang aman</span>
+                      </li>
                     </ul>
                   </div>
 
                   <div className="pt-4 space-y-3">
                     <Link href="/sign-in">
-                      <Button className="w-full h-11 bg-brand hover:bg-brand/90 text-base">
+                      <Button className="w-full h-11 bg-brand hover:bg-brand/90 text-base shadow-lg shadow-brand/20 transition-all hover:-translate-y-0.5 active:translate-y-0">
                         Kembali ke Halaman Masuk
                       </Button>
                     </Link>
-                    <button 
-                      onClick={() => setSuccess(false)}
-                      className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4"
-                    >
-                      Kirim ulang email?
-                    </button>
+                    <div className="text-center">
+                      <button 
+                        onClick={() => setSuccess(false)}
+                        className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4 transition-colors"
+                      >
+                        Belum menerima email? Kirim ulang
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               ) : (
@@ -239,7 +262,7 @@ export default function ResetPasswordPage() {
                             required
                           />
                           <AnimatePresence>
-                            {email && !emailError && validateEmail(email) && (
+                            {email && !emailError && isValidEmail(email) && (
                               <motion.div 
                                 initial={{ scale: 0 }} 
                                 animate={{ scale: 1 }}

@@ -88,7 +88,7 @@ export default async function VIPDashboardPage() {
     `)
     .eq('status', 'published')
     .order('created_at', { ascending: false }) // Changed to newest first to catch today's jobs
-    .limit(50) // Increased limit to ensure today's jobs are included
+    .limit(100) // Increased limit to ensure today's jobs are included
 
   // Get recently viewed loker details
   console.log('[VIP Dashboard] Recently viewed IDs:', recentlyViewedLokerIds)

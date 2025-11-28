@@ -21,15 +21,17 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex min-h-screen bg-muted/30">
       {/* Sidebar - Fixed on Desktop, Drawer on Mobile */}
       <AdminSidebar />
       
-      {/* Main Content Area - Scrollable */}
-      <main className="flex-1 overflow-y-auto w-full lg:w-auto">
+      {/* Main Content Area */}
+      <main className="flex-1 w-full relative">
         {/* Add top padding on mobile to account for fixed header */}
-        <div className="container mx-auto p-4 sm:p-6 lg:p-6 max-w-[1600px] pt-20 lg:pt-6">
-          {children}
+        <div className="h-full w-full p-4 pt-20 lg:p-8 lg:pt-8 max-w-[1920px] mx-auto">
+          <div className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500">
+             {children}
+          </div>
         </div>
       </main>
     </div>

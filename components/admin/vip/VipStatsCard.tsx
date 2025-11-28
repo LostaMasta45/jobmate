@@ -10,8 +10,23 @@ import {
   Crown, 
   Eye, 
   FileText,
+  Zap,
+  Database,
+  Activity,
+  AlertCircle,
+  Server,
+  CheckCircle,
+  Clock,
+  Users,
+  Shield,
+  Sparkles,
+  Search,
+  Filter,
+  MessageCircle,
+  XCircle,
   LucideIcon 
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // Icon mapping
 const iconMap: Record<string, LucideIcon> = {
@@ -21,6 +36,20 @@ const iconMap: Record<string, LucideIcon> = {
   Crown,
   Eye,
   FileText,
+  Zap,
+  Database,
+  Activity,
+  AlertCircle,
+  Server,
+  CheckCircle,
+  Clock,
+  Users,
+  Shield,
+  Sparkles,
+  Search,
+  Filter,
+  MessageCircle,
+  XCircle
 };
 
 interface VipStatsCardProps {
@@ -43,26 +72,47 @@ export function VipStatsCard({
   href,
 }: VipStatsCardProps) {
   const Icon = iconMap[iconName] || Briefcase; // Fallback to Briefcase
+  
   const cardContent = (
-    <Card className={href ? "cursor-pointer hover:shadow-lg transition-all" : ""}>
-      <CardContent className="p-4 sm:p-6">
-        <div className="flex items-center justify-between gap-2">
+    <Card className={cn(
+      "relative overflow-hidden border-none shadow-sm hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm",
+      href ? "cursor-pointer group" : ""
+    )}>
+      {/* Decorative background blob */}
+      <div className={cn(
+        "absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-10 blur-2xl transition-transform duration-500",
+        color.includes("blue") ? "bg-blue-500" : 
+        color.includes("green") ? "bg-emerald-500" : 
+        color.includes("purple") ? "bg-purple-500" : 
+        color.includes("amber") ? "bg-amber-500" : "bg-primary",
+        href ? "group-hover:scale-150" : ""
+      )} />
+      
+      <CardContent className="p-6 relative z-10">
+        <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">{title}</p>
-            <motion.h2
-              className={`text-2xl sm:text-3xl font-bold mt-1 sm:mt-2 ${color}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+            <p className="text-sm font-medium text-muted-foreground truncate">{title}</p>
+            <motion.div
+              className="flex items-baseline gap-2"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: delay + 0.2 }}
             >
-              {value.toLocaleString()}
-            </motion.h2>
+              <h2 className="text-3xl font-bold mt-2 tracking-tight text-foreground">
+                {value.toLocaleString()}
+              </h2>
+            </motion.div>
             {description && (
-              <p className="text-xs text-muted-foreground mt-1 truncate">{description}</p>
+              <p className="text-xs text-muted-foreground/80 mt-2 truncate font-medium">{description}</p>
             )}
           </div>
-          <div className={`rounded-full p-2 sm:p-3 bg-primary/10 flex-shrink-0`}>
-            <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${color}`} />
+          
+          <div className={cn(
+            "rounded-xl p-3 shadow-sm transition-colors duration-300",
+            color.replace("text-", "bg-").replace("600", "100"),
+            "dark:bg-secondary"
+          )}>
+            <Icon className={cn("h-6 w-6", color)} />
           </div>
         </div>
       </CardContent>
@@ -74,9 +124,10 @@ export function VipStatsCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay }}
+      className="h-full"
     >
       {href ? (
-        <Link href={href}>
+        <Link href={href} className="block h-full">
           {cardContent}
         </Link>
       ) : (

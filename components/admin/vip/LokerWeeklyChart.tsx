@@ -1,7 +1,8 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
+import { BarChart3 } from "lucide-react";
 
 interface LokerWeeklyChartProps {
   data: Array<{ date: string; count: number }>;
@@ -9,37 +10,48 @@ interface LokerWeeklyChartProps {
 
 export function LokerWeeklyChart({ data }: LokerWeeklyChartProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-          📊 Aktivitas Mingguan
+    <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm h-full">
+      <CardHeader className="pb-2 border-b border-border/50 mb-4">
+        <CardTitle className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+          <div className="p-2 rounded-lg bg-primary/10 text-primary">
+            <BarChart3 className="h-5 w-5" />
+          </div>
+          Job Posting Activity
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-2 sm:px-6">
-        <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
-          <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+      <CardContent className="px-4 pb-4">
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
             <XAxis 
               dataKey="date" 
-              className="text-xs"
-              tick={{ fill: 'hsl(var(--muted-foreground))' }}
+              tickLine={false}
+              axisLine={false}
+              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+              dy={10}
             />
             <YAxis 
-              className="text-xs"
-              tick={{ fill: 'hsl(var(--muted-foreground))' }}
+              tickLine={false}
+              axisLine={false}
+              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
             />
             <Tooltip 
+              cursor={{ fill: 'hsl(var(--muted)/0.3)' }}
               contentStyle={{
-                backgroundColor: 'hsl(var(--card))',
+                backgroundColor: 'hsl(var(--popover))',
                 border: '1px solid hsl(var(--border))',
-                borderRadius: '8px',
+                borderRadius: '12px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
               }}
+              itemStyle={{ color: 'hsl(var(--popover-foreground))' }}
             />
             <Bar 
               dataKey="count" 
               fill="hsl(var(--primary))"
-              radius={[8, 8, 0, 0]}
-              name="Loker Ditambahkan"
+              radius={[6, 6, 6, 6]}
+              barSize={32}
+              name="Jobs Posted"
+              fillOpacity={0.9}
             />
           </BarChart>
         </ResponsiveContainer>

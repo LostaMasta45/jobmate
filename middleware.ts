@@ -45,6 +45,7 @@ export async function middleware(request: NextRequest) {
     '/login',
     '/reset',
     '/verify',
+    '/auth/verify', // Password reset verification
     '/ajukan-akun',
     '/cek-status-pengajuan',
     '/toolsjobmate',

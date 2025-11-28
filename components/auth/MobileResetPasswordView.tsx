@@ -33,7 +33,7 @@ const pageVariants = {
   }
 };
 
-export default function MobileResetView() {
+export default function MobileResetPasswordView() {
   const [email, setEmail] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -61,32 +61,26 @@ export default function MobileResetView() {
       // Redirect URL should be the full path to the verify page
       const redirectUrl = `${window.location.origin}/auth/verify?type=recovery`;
       
-      console.log('🔍 [Mobile] Debug Info:');
-      console.log('  Email:', email);
-      console.log('  Redirect URL:', redirectUrl);
-      
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl,
       });
 
-      console.log('📧 [Mobile] Supabase Response:', { data, error });
-
       if (error) {
-        console.error('❌ [Mobile] Reset failed:', error);
         setError(error.message);
         setLoading(false);
         return;
       }
 
-      console.log('✅ [Mobile] Reset request successful!');
       setSuccess(true);
       setLoading(false);
     } catch (err) {
-      console.error("💥 [Mobile] Unexpected error:", err);
+      console.error("Reset error:", err);
       setError("Terjadi kesalahan sistem.");
       setLoading(false);
     }
   };
+
+// ... existing code ...
 
   if (success) {
     return (
@@ -120,7 +114,7 @@ export default function MobileResetView() {
             
             {/* Top Logo */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0">
-                <img src="/Logo/x.png" alt="JobMate" className="w-64 h-64 object-contain drop-shadow-2xl" />
+               <img src="/Logo/x.png" alt="JobMate" className="w-64 h-64 object-contain drop-shadow-2xl" />
             </div>
             
             <div className="w-10" /> 
@@ -247,6 +241,15 @@ export default function MobileResetView() {
 
             {/* Header Section */}
             <div className="relative z-10 pt-6 px-6 shrink-0 flex flex-col items-center w-full">
+              {/* Top Logo */}
+              <div className="absolute top-6 left-6">
+                <Link href="/" className="block">
+                  <div className="relative h-12 w-12">
+                    <img src="/Logo/x.png" alt="JobMate" className="w-12 h-12 object-contain drop-shadow-lg" />
+                  </div>
+                </Link>
+              </div>
+
               {/* Navigation */}
               <div className="w-full flex items-center justify-between mb-2 relative h-10">
                 <Link href="/sign-in">
@@ -258,11 +261,6 @@ export default function MobileResetView() {
                     <ArrowLeft className="w-5 h-5" />
                   </Button>
                 </Link>
-                
-                {/* Top Logo */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0">
-                   <img src="/Logo/x.png" alt="JobMate" className="w-64 h-64 object-contain drop-shadow-2xl" />
-                </div>
                 
                 <div className="w-10" /> 
               </div>

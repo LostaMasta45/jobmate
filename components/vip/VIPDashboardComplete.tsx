@@ -1,5 +1,6 @@
 'use client'
 
+import { OptimizedPosterImage } from '@/components/vip/OptimizedPosterImage'
 import Link from 'next/link'
 import Image from 'next/image'
 import { 
@@ -100,11 +101,17 @@ export function VIPDashboardComplete({
   // Get new loker (posted in last 24 hours)
   const newLoker = lokerList
     .filter(l => {
-      if (!l.published_at) return false
-      const hoursSincePublished = (Date.now() - new Date(l.published_at).getTime()) / (1000 * 60 * 60)
+      if (!l.published_at && !l.created_at) return false
+      const date = new Date(l.published_at || l.created_at || 0)
+      const hoursSincePublished = (Date.now() - date.getTime()) / (1000 * 60 * 60)
       return hoursSincePublished < 24
     })
-    .slice(0, 3)
+    .sort((a, b) => {
+      const dateA = new Date(a.published_at || a.created_at || 0).getTime()
+      const dateB = new Date(b.published_at || b.created_at || 0).getTime()
+      return dateB - dateA // newest first
+    })
+    // REMOVED SLICE LIMIT TO SHOW ALL NEW JOBS FOR COUNT
 
   // Get today's loker (posted today - same day)
   const todayLoker = lokerList
@@ -124,6 +131,7 @@ export function VIPDashboardComplete({
       const dateB = new Date(b.published_at || b.created_at || 0).getTime()
       return dateB - dateA // newest first
     })
+    // REMOVED SLICE LIMIT TO SHOW ALL TODAY'S JOBS
 
   return (
     <div className="min-h-screen space-y-4 lg:space-y-6">
@@ -396,7 +404,7 @@ export function VIPDashboardComplete({
 
             {todayLoker.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {todayLoker.slice(0, 6).map((loker) => (
+                {todayLoker.slice(0, 12).map((loker) => (
                   <div
                     key={loker.id}
                     className="group relative bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 rounded-2xl p-5 hover:shadow-xl transition-all duration-300 border-2 border-orange-200 dark:border-orange-900/30"
@@ -525,16 +533,12 @@ function LokerCardCompact({ loker }: { loker: Loker }) {
       {/* Poster Thumbnail - Optimized */}
       {loker.poster_url && (
         <div className="relative w-full h-32 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
-          <Image
+          <OptimizedPosterImage
             src={loker.poster_url}
             alt={loker.title}
             fill
-            loading="lazy"
-            quality={60}
             className="object-cover transition-transform duration-500 group-hover:scale-110"
             sizes="(max-width: 768px) 100vw, 50vw"
-            placeholder="blur"
-            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y1ZjVmNSIvPjwvc3ZnPg=="
           />
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -680,7 +684,7 @@ function LokerCardHorizontal({ loker }: { loker: Loker }) {
       <div className="flex-shrink-0">
         {loker.poster_url ? (
           <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-600 group-hover:scale-110 transition-transform relative">
-            <Image
+            <OptimizedPosterImage
               src={loker.poster_url}
               alt={loker.title}
               fill
