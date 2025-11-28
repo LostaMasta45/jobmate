@@ -119,6 +119,8 @@ const menuItems: MenuItem[] = [
   },
 ];
 
+import Image from "next/image";
+
 function SidebarContent({ 
   pathname, 
   isLoggingOut, 
@@ -141,15 +143,19 @@ function SidebarContent({
   return (
     <div className="flex flex-col h-full bg-card text-card-foreground">
       {/* Header */}
-      <div className="p-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20 text-primary-foreground">
-            <span className="text-lg font-bold">JM</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-lg tracking-tight leading-none">JobMate</span>
-            <span className="text-xs font-medium text-muted-foreground">Admin Workspace</span>
-          </div>
+      <div className="p-4 flex flex-col items-center border-b border-border/40 bg-muted/5">
+        <div className="relative w-12 h-12 flex items-center justify-center mb-2">
+          <Image 
+            src="/Logo/x.png" 
+            alt="JobMate Logo" 
+            fill
+            className="object-contain"
+            priority
+          />
+        </div>
+        <div className="flex flex-col items-center gap-0.5">
+          <span className="text-sm font-bold text-foreground tracking-tight">JobMate Admin</span>
+          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest opacity-90">Workspace</span>
         </div>
       </div>
 
@@ -259,11 +265,20 @@ export function AdminSidebar() {
     <>
       {/* Mobile Header - Improved */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b px-4 h-16 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-            <span className="text-sm font-bold">JM</span>
+        <div className="flex items-center gap-2.5">
+          <div className="relative w-8 h-8 flex items-center justify-center" suppressHydrationWarning>
+            <Image 
+              src="/Logo/x.png" 
+              alt="JobMate Admin Logo" 
+              fill
+              className="object-contain"
+              priority
+            />
           </div>
-          <span className="font-bold text-lg tracking-tight">JobMate Admin</span>
+          <div className="flex flex-col leading-tight">
+            <span className="text-sm font-bold text-foreground">JobMate Admin</span>
+            <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Workspace</span>
+          </div>
         </div>
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>

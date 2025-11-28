@@ -141,24 +141,23 @@ export function MemberTable({ memberList }: { memberList: Member[] }) {
   const getMembershipBadge = (membership: string) => {
     if (membership === "vip_premium") {
       return (
-        <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-sm">
-          <Star className="w-3 h-3 mr-1 fill-current" />
-          VIP Premium
+        <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-sm px-2 py-0.5 text-xs">
+          <Sparkles className="w-3 h-3 mr-1 fill-white/20" />
+          Premium
         </Badge>
       );
     }
     if (membership === "vip_basic") {
       return (
-        <Badge className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/50 dark:text-blue-300 shadow-sm">
+        <Badge className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 shadow-sm px-2 py-0.5 text-xs hover:bg-blue-200">
           <Crown className="w-3 h-3 mr-1" />
-          VIP Basic
+          Basic
         </Badge>
       );
     }
     return (
-      <Badge variant="outline" className="bg-muted/50 text-muted-foreground">
-        <Users className="w-3 h-3 mr-1" />
-        Free User
+      <Badge variant="outline" className="bg-muted/50 text-muted-foreground px-2 py-0.5 text-xs font-normal">
+        Free
       </Badge>
     );
   };
@@ -166,8 +165,8 @@ export function MemberTable({ memberList }: { memberList: Member[] }) {
   const getExpiryStatus = (expiry: string | null | undefined) => {
     if (!expiry) {
       return (
-        <div className="flex items-center text-xs font-medium text-green-600 dark:text-green-400 bg-green-100/50 dark:bg-green-900/20 px-2 py-1 rounded-md">
-          Lifetime Access ♾️
+        <div className="flex items-center text-[10px] sm:text-xs font-medium text-green-600 dark:text-green-400 bg-green-100/50 dark:bg-green-900/20 px-2 py-1 rounded-full">
+          <span className="mr-1">♾️</span> Lifetime
         </div>
       );
     }
@@ -177,103 +176,190 @@ export function MemberTable({ memberList }: { memberList: Member[] }) {
     const daysLeft = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
     if (daysLeft < 0) {
-      return <Badge variant="destructive">Expired</Badge>;
+      return <Badge variant="destructive" className="text-[10px] px-2 py-0.5">Expired</Badge>;
     }
 
     if (daysLeft <= 7) {
       return (
-        <Badge className="bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400">
-          {daysLeft} days left ⚠️
+        <Badge className="bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 text-[10px] px-2 py-0.5">
+          {daysLeft}d left ⚠️
         </Badge>
       );
     }
 
     return (
-      <Badge variant="secondary" className="text-green-600 bg-green-100/50 dark:text-green-400 dark:bg-green-900/20">
-        {daysLeft} days left
+      <Badge variant="secondary" className="text-green-600 bg-green-100/50 dark:text-green-400 dark:bg-green-900/20 text-[10px] px-2 py-0.5">
+        {daysLeft}d left
       </Badge>
     );
   };
 
   return (
-    <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-      <CardHeader className="pb-4 border-b border-border/50">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <CardTitle className="text-xl font-semibold">User Management</CardTitle>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search users..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 bg-background/50"
-              />
-            </div>
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-full sm:w-40 bg-background/50">
-                <SelectValue placeholder="Membership" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Users</SelectItem>
-                <SelectItem value="free">Free Users</SelectItem>
-                <SelectItem value="vip_basic">VIP Basic</SelectItem>
-                <SelectItem value="vip_premium">VIP Premium</SelectItem>
-              </SelectContent>
-            </Select>
+    <Card className="border shadow-sm bg-card/50 backdrop-blur-sm overflow-hidden">
+      <div className="p-4 border-b bg-muted/30 flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
+        <h2 className="text-lg font-semibold tracking-tight">User Management</h2>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <div className="relative w-full sm:w-64 group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <Input
+              placeholder="Search users..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 bg-background h-9 text-sm"
+            />
           </div>
+          <Select value={filterType} onValueChange={setFilterType}>
+            <SelectTrigger className="w-full sm:w-36 bg-background h-9 text-sm">
+              <div className="flex items-center gap-2">
+                 <Filter className="w-3.5 h-3.5 text-muted-foreground" />
+                 <SelectValue placeholder="Filter" />
+              </div>
+            </SelectTrigger>
+            <SelectContent align="end">
+              <SelectItem value="all">All Users</SelectItem>
+              <SelectItem value="free">Free Users</SelectItem>
+              <SelectItem value="vip_basic">VIP Basic</SelectItem>
+              <SelectItem value="vip_premium">VIP Premium</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent className="p-0">
-        <div className="space-y-1">
+      <div className="divide-y divide-border/50">
+        <div className="hidden sm:grid grid-cols-12 gap-4 p-3 bg-muted/50 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+           <div className="col-span-5 pl-2">User Info</div>
+           <div className="col-span-3">Membership</div>
+           <div className="col-span-3">Status</div>
+           <div className="col-span-1 text-right pr-2">Action</div>
+        </div>
+
+        <div className="max-h-[600px] overflow-y-auto custom-scrollbar">
           {filteredData.length > 0 ? (
             filteredData.map((member) => (
               <div 
                 key={member.id} 
-                className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-accent/40 transition-colors border-b border-border/40 last:border-0"
+                className="group relative flex flex-col sm:grid sm:grid-cols-12 gap-3 sm:gap-4 p-4 sm:p-3 hover:bg-muted/30 transition-colors items-start sm:items-center"
               >
-                <div className="flex items-start gap-4 mb-4 sm:mb-0">
-                  <Avatar className="h-10 w-10 border bg-muted">
-                    <AvatarFallback className="font-semibold text-primary">
-                      {(member.full_name || member.email || "U").charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-sm">
-                        {member.full_name || member.email || "No Name"}
-                      </h3>
-                      {getMembershipBadge(member.membership || "free")}
-                    </div>
-                    
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Mail className="w-3 h-3" />
-                        <span>{member.email}</span>
+                {/* Mobile Layout: Top Row (User Info + Action) */}
+                <div className="flex items-center justify-between w-full sm:hidden mb-2">
+                   <div className="flex items-center gap-3">
+                      <Avatar className="h-9 w-9 border bg-muted">
+                        <AvatarFallback className="text-xs font-medium text-primary">
+                          {(member.full_name || member.email || "U").charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-sm truncate max-w-[150px]">
+                           {member.full_name || member.email?.split('@')[0] || "No Name"}
+                        </span>
+                        <span className="text-xs text-muted-foreground truncate max-w-[150px]">
+                           {member.email}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        <span>Joined {new Date(member.created_at).toLocaleDateString("id-ID")}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 self-start sm:self-center mt-4 sm:mt-0 w-full sm:w-auto justify-between sm:justify-end">
-                  <div className="block">
-                    {getExpiryStatus(member.membership_expiry)}
-                  </div>
-
-                  <DropdownMenu>
+                   </div>
+                   
+                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2">
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      {/* ... (Same Dropdown Content) ... */}
+                       <DropdownMenuLabel>Manage User</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      
+                      {member.membership === "free" || !member.membership ? (
+                        <>
+                          <DropdownMenuItem onClick={() => handleUpgrade(member.id, "vip_basic")}>
+                            <Crown className="w-4 h-4 mr-2 text-blue-500" />
+                            Upgrade to Basic
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleUpgrade(member.id, "vip_premium")}>
+                            <Sparkles className="w-4 h-4 mr-2 text-purple-500" />
+                            Upgrade to Premium
+                          </DropdownMenuItem>
+                        </>
+                      ) : (
+                        <>
+                          <DropdownMenuItem onClick={() => {
+                            setSelectedMember(member);
+                            setIsExtendDialogOpen(true);
+                          }}>
+                            <Clock className="w-4 h-4 mr-2" />
+                            Extend Access
+                          </DropdownMenuItem>
+                          
+                          {member.membership === "vip_basic" ? (
+                            <DropdownMenuItem onClick={() => handleUpgrade(member.id, "vip_premium")}>
+                              <Sparkles className="w-4 h-4 mr-2 text-purple-500" />
+                              Upgrade to Premium
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem onClick={() => handleUpgrade(member.id, "vip_basic")}>
+                              <Crown className="w-4 h-4 mr-2" />
+                              Downgrade to Basic
+                            </DropdownMenuItem>
+                          )}
+
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            onClick={() => handleDeactivate(member.id)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <ShieldAlert className="w-4 h-4 mr-2" />
+                            Deactivate
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                {/* Desktop: User Info col-span-5 */}
+                <div className="hidden sm:flex col-span-5 items-center gap-3 pl-2 min-w-0">
+                  <Avatar className="h-8 w-8 border bg-muted shrink-0">
+                    <AvatarFallback className="text-xs font-medium text-primary">
+                      {(member.full_name || member.email || "U").charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-medium text-sm truncate block text-foreground">
+                        {member.full_name || member.email?.split('@')[0] || "No Name"}
+                    </span>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="truncate max-w-[140px]">{member.email}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Shared: Membership col-span-3 */}
+                <div className="col-span-3 w-full sm:w-auto flex items-center justify-between sm:justify-start gap-2 sm:gap-0 pl-12 sm:pl-0">
+                   <span className="text-xs text-muted-foreground sm:hidden">Plan:</span>
+                   <div className="flex flex-col items-end sm:items-start">
+                      {getMembershipBadge(member.membership || "free")}
+                      <span className="text-[10px] text-muted-foreground mt-1 sm:hidden">
+                         Since {new Date(member.created_at).toLocaleDateString()}
+                      </span>
+                   </div>
+                </div>
+
+                {/* Shared: Status col-span-3 */}
+                <div className="col-span-3 w-full sm:w-auto flex items-center justify-between sm:justify-start gap-2 sm:gap-0 pl-12 sm:pl-0">
+                   <span className="text-xs text-muted-foreground sm:hidden">Status:</span>
+                   {getExpiryStatus(member.membership_expiry)}
+                </div>
+
+                 {/* Desktop: Action col-span-1 */}
+                <div className="hidden sm:flex col-span-1 justify-end pr-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                       <DropdownMenuLabel>Manage User</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       
                       {member.membership === "free" || !member.membership ? (
@@ -329,8 +415,8 @@ export function MemberTable({ memberList }: { memberList: Member[] }) {
               <div className="h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center mb-4">
                 <Users className="h-6 w-6 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-semibold">No members found</h3>
-              <p className="text-muted-foreground text-sm max-w-sm mt-1">
+              <h3 className="text-sm font-semibold">No members found</h3>
+              <p className="text-muted-foreground text-xs max-w-xs mt-1">
                 {search || filterType !== "all"
                   ? "Try adjusting your filters or search terms."
                   : "Users will appear here once they register."}
@@ -338,7 +424,7 @@ export function MemberTable({ memberList }: { memberList: Member[] }) {
             </div>
           )}
         </div>
-      </CardContent>
+      </div>
 
       {/* Extend Membership Dialog */}
       <Dialog open={isExtendDialogOpen} onOpenChange={setIsExtendDialogOpen}>

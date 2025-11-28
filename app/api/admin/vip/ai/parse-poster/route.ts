@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert to base64
+    // Convert to base64 (original quality for better OCR)
     const bytes = await imageFile.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const base64 = buffer.toString('base64');

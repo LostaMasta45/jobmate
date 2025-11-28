@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingScreen } from "@/components/ui/loading-screen";
-import { createClient } from "@/lib/supabase/client";
 import { 
   AlertCircle, Mail, ArrowLeft, CheckCircle2, Lock, KeyRound
 } from "lucide-react";
@@ -57,16 +56,18 @@ export default function MobileResetPasswordView() {
     setError(null);
 
     try {
-      const supabase = createClient();
-      // Redirect URL should be the full path to the verify page
-      const redirectUrl = `${window.location.origin}/auth/verify?type=recovery`;
-      
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl,
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
       });
 
-      if (error) {
-        setError(error.message);
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Gagal mengirim email reset password');
         setLoading(false);
         return;
       }

@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingScreen } from "@/components/ui/loading-screen";
-import { createClient } from "@/lib/supabase/client";
 import { 
   AlertCircle, Mail, CheckCircle2, Shield, ArrowLeft, Lock, KeyRound
 } from "lucide-react";
@@ -87,26 +86,27 @@ export default function ResetPasswordPage() {
     setError(null);
 
     try {
-      const supabase = createClient();
-      // Redirect URL should be the full path to the verify page
-      const redirectUrl = `${window.location.origin}/auth/verify?type=recovery`;
-      
-      console.log('🔍 Debug Info:');
+      console.log('🔍 Sending reset request via Resend...');
       console.log('  Email:', email);
-      console.log('  Redirect URL:', redirectUrl);
       
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl,
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
       });
 
-      if (error) {
-        console.error('❌ Reset failed:', error);
-        setError(error.message);
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('❌ Reset failed:', data.error);
+        setError(data.error || 'Gagal mengirim email reset password');
         setLoading(false);
         return;
       }
 
-      console.log('✅ Reset request successful! Check email (and spam folder)');
+      console.log('✅ Reset request successful! Check email');
       setSuccess(true);
       setLoading(false);
     } catch (err) {

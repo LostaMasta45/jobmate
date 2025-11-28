@@ -57,70 +57,79 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`[Batch Upload] Processing ${imageFiles.length} images...`);
+    const processStartTime = Date.now();
 
-    // Validate and convert images to base64
-    const images = await Promise.all(
-      imageFiles.map(async (file) => {
-        // Validate type
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-        if (!allowedTypes.includes(file.type)) {
-          throw new Error(`Invalid file type: ${file.name}`);
-        }
+    // Validate and convert images to base64 in parallel
+    const imagePromises = imageFiles.map(async (file) => {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error(`Invalid file type: ${file.name}`);
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error(`File too large (${file.name}). Max 5MB`);
+      }
 
-        // Validate size
-        if (file.size > 5 * 1024 * 1024) {
-          throw new Error(`File too large (${file.name}). Max 5MB`);
-        }
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const base64 = buffer.toString('base64');
+      
+      return {
+        base64,
+        mimeType: file.type,
+        filename: file.name,
+        file, // Keep original file for storage
+      };
+    });
 
-        // Convert to base64
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const base64 = buffer.toString('base64');
+    const processedImages = await Promise.all(imagePromises);
 
-        // Upload to storage
-        let posterUrl = null;
-        try {
-          const fileName = `batch-${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-          const { data: uploadData, error: uploadError } = await supabase.storage
+    // Upload to storage in parallel
+    const uploadPromises = processedImages.map(async (img) => {
+      try {
+        const fileName = `batch-${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${img.filename.replace(/\s+/g, '-')}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('vip-posters')
+          .upload(fileName, img.file, {
+            contentType: img.mimeType,
+            cacheControl: '3600',
+            upsert: false,
+          });
+
+        if (!uploadError && uploadData) {
+          const { data: { publicUrl } } = supabase.storage
             .from('vip-posters')
-            .upload(fileName, file, {
-              contentType: file.type,
-              cacheControl: '3600',
-              upsert: false,
-            });
-
-          if (!uploadError && uploadData) {
-            const { data: { publicUrl } } = supabase.storage
-              .from('vip-posters')
-              .getPublicUrl(uploadData.path);
-            posterUrl = publicUrl;
-          }
-        } catch (storageError) {
-          console.warn(`Storage upload failed for ${file.name}:`, storageError);
+            .getPublicUrl(uploadData.path);
+          return publicUrl;
         }
+      } catch (e) {
+        console.warn(`Storage upload failed for ${img.filename}`);
+      }
+      return null;
+    });
 
-        return {
-          base64,
-          mimeType: file.type,
-          filename: file.name,
-          posterUrl,
-        };
-      })
-    );
+    // Prepare images for AI (original quality)
+    const images = processedImages.map((img) => ({
+      base64: img.base64,
+      mimeType: img.mimeType,
+      filename: img.filename,
+    }));
 
-    // Parse with AI
-    const results = await parseBatchPosters(
-      images.map(img => ({
-        base64: img.base64,
-        mimeType: img.mimeType,
-        filename: img.filename,
-      }))
-    );
+    // Parse with AI (using compressed images) AND upload to storage in parallel
+    const [results, posterUrls] = await Promise.all([
+      parseBatchPosters(
+        images.map(img => ({
+          base64: img.base64,
+          mimeType: img.mimeType,
+          filename: img.filename,
+        }))
+      ),
+      Promise.all(uploadPromises)
+    ]);
 
     // Add poster URLs to results
     const enrichedResults = results.map((result, index) => ({
       ...result,
-      poster_url: images[index]?.posterUrl,
+      poster_url: posterUrls[index] || null,
     }));
 
     // Count total positions
@@ -131,8 +140,9 @@ export async function POST(request: NextRequest) {
 
     const successCount = enrichedResults.filter(r => r.positions.length > 0).length;
     const errorCount = enrichedResults.filter(r => r.error).length;
+    const totalTime = ((Date.now() - processStartTime) / 1000).toFixed(1);
 
-    console.log(`[Batch Upload] Complete: ${successCount}/${imageFiles.length} posters parsed, ${totalPositions} positions found`);
+    console.log(`[Batch Upload] Complete in ${totalTime}s: ${successCount}/${imageFiles.length} posters → ${totalPositions} positions`);
 
     return NextResponse.json({
       success: true,

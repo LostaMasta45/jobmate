@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
+// Forced rebuild for cache clearance: 2025-11-28
 const nextConfig: NextConfig = {
   // REMOVED: output: "standalone" 
   // Reason: Vercel tidak perlu ini (punya build system sendiri)

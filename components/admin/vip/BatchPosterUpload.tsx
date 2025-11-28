@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
@@ -29,7 +30,17 @@ import {
   Sparkles,
   ArrowRight,
   FileText,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Maximize2,
+  Briefcase,
+  Building2,
+  MapPin,
+  DollarSign,
+  Phone,
+  Mail,
+  Tags,
+  AlignLeft,
+  ListChecks
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
@@ -44,8 +55,11 @@ interface JobPosition {
   kategori: string[];
   tipe_kerja?: string;
   gaji_text?: string;
+  gaji_min?: number;
+  gaji_max?: number;
   deskripsi?: string;
-  persyaratan?: string;
+  kualifikasi: string[]; // Array of requirements
+  deadline?: string;
   kontak_wa?: string;
   kontak_email?: string;
 }
@@ -54,7 +68,21 @@ interface PosterResult {
   poster_index: number;
   poster_filename: string;
   poster_url?: string;
-  positions: JobPosition[];
+  positions: Array<{
+    title: string;
+    perusahaan_name: string;
+    lokasi: string;
+    kategori?: string[];
+    tipe_kerja?: string;
+    gaji_text?: string;
+    gaji_min?: number;
+    gaji_max?: number;
+    deskripsi?: string;
+    kualifikasi?: string[];
+    deadline?: string;
+    kontak_wa?: string;
+    kontak_email?: string;
+  }>;
   has_multiple_positions: boolean;
   confidence_score: number;
   error?: string;
@@ -78,6 +106,7 @@ export function BatchPosterUpload() {
   const [parseResults, setParseResults] = useState<PosterResult[]>([]);
   const [editedJobs, setEditedJobs] = useState<(JobPosition & { poster_url?: string; poster_filename?: string })[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   // --- Handlers ---
 
@@ -163,7 +192,19 @@ export function BatchPosterUpload() {
       result.results.forEach((posterResult: PosterResult) => {
         posterResult.positions.forEach((position) => {
           allJobs.push({
-            ...position,
+            title: position.title || '',
+            perusahaan_name: position.perusahaan_name || '',
+            lokasi: position.lokasi || '',
+            kategori: Array.isArray(position.kategori) ? position.kategori : [],
+            tipe_kerja: position.tipe_kerja || undefined,
+            gaji_text: position.gaji_text || undefined,
+            gaji_min: position.gaji_min || undefined,
+            gaji_max: position.gaji_max || undefined,
+            deskripsi: position.deskripsi || undefined,
+            kualifikasi: Array.isArray(position.kualifikasi) ? position.kualifikasi : [],
+            deadline: position.deadline || undefined,
+            kontak_wa: position.kontak_wa || undefined,
+            kontak_email: position.kontak_email || undefined,
             poster_url: posterResult.poster_url,
             poster_filename: posterResult.poster_filename,
           });
@@ -377,25 +418,40 @@ export function BatchPosterUpload() {
                   ))}
                 </div>
 
-                <div className="flex justify-end pt-4">
-                  <Button 
-                    size="lg" 
-                    onClick={handleParse} 
-                    disabled={isParsing}
-                    className="w-full md:w-auto bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/25"
-                  >
-                    {isParsing ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Parsing with AI...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="mr-2 h-5 w-5" />
-                        Parse {files.length} Posters
-                      </>
-                    )}
-                  </Button>
+                <div className="flex flex-col gap-3 pt-4">
+                  {isParsing && (
+                    <div className="bg-muted/50 rounded-lg p-4 border">
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                        <div className="relative">
+                          <Sparkles className="h-5 w-5 text-primary animate-pulse" />
+                        </div>
+                        <span>AI sedang menganalisis {files.length} poster secara paralel...</span>
+                      </div>
+                      <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-primary to-purple-600 animate-pulse" style={{ width: '100%' }} />
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex justify-end">
+                    <Button 
+                      size="lg" 
+                      onClick={handleParse} 
+                      disabled={isParsing}
+                      className="w-full md:w-auto bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/25"
+                    >
+                      {isParsing ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Parsing {files.length} Posters...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="mr-2 h-5 w-5" />
+                          Parse {files.length} Posters
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -405,162 +461,392 @@ export function BatchPosterUpload() {
     );
   }
 
+  // Helper functions for kualifikasi management
+  const addKualifikasi = (jobIndex: number) => {
+    setEditedJobs((prev) => {
+      const updated = [...prev];
+      const job = updated[jobIndex];
+      updated[jobIndex] = { 
+        ...job, 
+        kualifikasi: [...(job.kualifikasi || []), ''] 
+      };
+      return updated;
+    });
+  };
+
+  const updateKualifikasi = (jobIndex: number, qualIndex: number, value: string) => {
+    setEditedJobs((prev) => {
+      const updated = [...prev];
+      const job = updated[jobIndex];
+      const newKualifikasi = [...(job.kualifikasi || [])];
+      newKualifikasi[qualIndex] = value;
+      updated[jobIndex] = { ...job, kualifikasi: newKualifikasi };
+      return updated;
+    });
+  };
+
+  const removeKualifikasi = (jobIndex: number, qualIndex: number) => {
+    setEditedJobs((prev) => {
+      const updated = [...prev];
+      const job = updated[jobIndex];
+      const newKualifikasi = (job.kualifikasi || []).filter((_, i) => i !== qualIndex);
+      updated[jobIndex] = { ...job, kualifikasi: newKualifikasi };
+      return updated;
+    });
+  };
+
+  const removeKategori = (jobIndex: number, katIndex: number) => {
+    setEditedJobs((prev) => {
+      const updated = [...prev];
+      const job = updated[jobIndex];
+      const newKategori = (job.kategori || []).filter((_, i) => i !== katIndex);
+      updated[jobIndex] = { ...job, kategori: newKategori };
+      return updated;
+    });
+  };
+
   // --- Review Step Render ---
   if (step === 'review') {
     return (
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 pb-32">
         {renderSteps()}
         
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight">Review Results</h2>
-            <p className="text-muted-foreground">Found {editedJobs.length} positions from your posters.</p>
-          </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setStep('upload')}>
-              <X className="mr-2 h-4 w-4" />
-              Cancel
-            </Button>
-            <Button onClick={handleSaveAll} disabled={isSaving} className="min-w-[140px]">
-              {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Publish All
-                </>
-              )}
-            </Button>
+        {/* Sticky Header for Actions */}
+        <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md py-4 mb-8 border-b -mx-4 md:-mx-6 px-4 md:px-6 shadow-sm transition-all">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl md:text-2xl font-bold tracking-tight">Review & Edit Data</h2>
+              <p className="text-sm text-muted-foreground">
+                <span className="font-semibold text-primary">{editedJobs.length}</span> posisi siap dipublish - silakan koreksi jika ada yang salah
+              </p>
+            </div>
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <Button variant="outline" onClick={() => setStep('upload')} className="flex-1 sm:flex-none h-10">
+                <X className="mr-2 h-4 w-4" />
+                Kembali
+              </Button>
+              <Button onClick={handleSaveAll} disabled={isSaving} className="flex-1 sm:flex-none h-10 shadow-md bg-green-600 hover:bg-green-700">
+                {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Simpan Semua ({editedJobs.length})
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-12 gap-8">
-          {/* Main List */}
-          <div className="lg:col-span-12 space-y-4">
-            {editedJobs.map((job, index) => (
-              <motion.div 
-                key={index}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <Card className="overflow-hidden border-l-4 border-l-primary shadow-sm hover:shadow-md transition-shadow">
-                  <CardContent className="p-0">
-                    <div className="flex flex-col md:flex-row">
-                      {/* Left: Poster Preview Mini */}
-                      <div className="relative w-full md:w-48 bg-muted min-h-[200px] md:min-h-full border-r">
-                        {job.poster_url ? (
-                          <Image 
-                            src={job.poster_url} 
-                            alt="Source" 
-                            fill 
-                            className="object-cover"
-                            unoptimized 
-                          />
-                        ) : (
-                          <div className="flex items-center justify-center h-full text-muted-foreground">
-                            <FileImage className="h-8 w-8" />
-                          </div>
-                        )}
-                        <div className="absolute top-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded">
+        <div className="grid gap-10">
+          {editedJobs.map((job, index) => (
+            <motion.div 
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <Card className="border shadow-sm hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm rounded-xl overflow-hidden">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
+                  {/* Left: Poster Preview */}
+                  <div className="lg:col-span-1 bg-muted/20 border-b lg:border-b-0 lg:border-r">
+                    <div className="p-4 lg:sticky lg:top-28">
+                      <div className="flex items-center justify-between mb-3">
+                        <Badge className="bg-primary text-primary-foreground">
                           #{index + 1}
+                        </Badge>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => duplicateJob(index)} 
+                            className="h-8 text-xs"
+                          >
+                            <Plus className="h-3 w-3 mr-1" /> Copy
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => removeJob(index)} 
+                            className="h-8 text-xs text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-3 w-3 mr-1" /> Hapus
+                          </Button>
                         </div>
                       </div>
+                      
+                      {job.poster_url ? (
+                        <div 
+                          className="relative aspect-[3/4] rounded-lg overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-primary transition-colors"
+                          onClick={() => setPreviewImage(job.poster_url!)}
+                        >
+                          <Image 
+                            src={job.poster_url} 
+                            alt="Poster" 
+                            fill 
+                            className="object-contain bg-white"
+                            unoptimized 
+                          />
+                          <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
+                            <span className="text-white text-sm font-medium bg-black/50 px-3 py-1 rounded-full">
+                              Klik untuk zoom
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="aspect-[3/4] rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                          <div className="text-center text-muted-foreground">
+                            <FileImage className="h-12 w-12 mx-auto opacity-30 mb-2" />
+                            <p className="text-sm">No Image</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-                      {/* Right: Form */}
-                      <div className="flex-1 p-6 space-y-4">
-                        <div className="flex justify-between items-start gap-4">
-                           <div className="flex-1 space-y-4">
-                             <div className="grid md:grid-cols-2 gap-4">
-                               <div className="space-y-2">
-                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">Judul Posisi</Label>
-                                 <Input 
-                                   value={job.title} 
-                                   onChange={(e) => updateJob(index, 'title', e.target.value)}
-                                   className="font-semibold text-lg"
-                                 />
-                               </div>
-                               <div className="space-y-2">
-                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">Perusahaan</Label>
-                                 <Input 
-                                   value={job.perusahaan_name} 
-                                   onChange={(e) => updateJob(index, 'perusahaan_name', e.target.value)}
-                                 />
-                               </div>
-                             </div>
+                  {/* Right: Form Fields */}
+                  <div className="lg:col-span-2 p-6 space-y-6">
+                    
+                    {/* 📋 Informasi Dasar */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>📋</span> Informasi Dasar
+                      </h3>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor={`title-${index}`}>Judul Loker *</Label>
+                          <Input
+                            id={`title-${index}`}
+                            value={job.title}
+                            onChange={(e) => updateJob(index, 'title', e.target.value)}
+                            placeholder="Contoh: Staff Administrasi"
+                            className="mt-1.5"
+                          />
+                        </div>
 
-                             <div className="grid md:grid-cols-3 gap-4">
-                               <div className="space-y-2">
-                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">Lokasi</Label>
-                                 <Input 
-                                   value={job.lokasi} 
-                                   onChange={(e) => updateJob(index, 'lokasi', e.target.value)}
-                                 />
-                               </div>
-                               <div className="space-y-2">
-                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">Gaji (Text)</Label>
-                                 <Input 
-                                   value={job.gaji_text || ''} 
-                                   placeholder="e.g. Rp 5-10 Juta"
-                                   onChange={(e) => updateJob(index, 'gaji_text', e.target.value)}
-                                 />
-                               </div>
-                               <div className="space-y-2">
-                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">Tipe</Label>
-                                 <Select
-                                    value={job.tipe_kerja || ''}
-                                    onValueChange={(value) => updateJob(index, 'tipe_kerja', value)}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Select..." />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="Full-time">Full-time</SelectItem>
-                                      <SelectItem value="Part-time">Part-time</SelectItem>
-                                      <SelectItem value="Contract">Contract</SelectItem>
-                                      <SelectItem value="Freelance">Freelance</SelectItem>
-                                      <SelectItem value="Remote">Remote</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                               </div>
-                             </div>
+                        <div>
+                          <Label htmlFor={`perusahaan-${index}`}>Nama Perusahaan *</Label>
+                          <Input
+                            id={`perusahaan-${index}`}
+                            value={job.perusahaan_name}
+                            onChange={(e) => updateJob(index, 'perusahaan_name', e.target.value)}
+                            placeholder="Contoh: PT Sukses Jaya"
+                            className="mt-1.5"
+                          />
+                        </div>
 
-                             <div className="grid md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                  <Label className="text-xs font-semibold uppercase text-muted-foreground">Kategori</Label>
-                                  <Input 
-                                    value={job.kategori.join(', ')}
-                                    onChange={(e) => updateJob(index, 'kategori', e.target.value.split(',').map(k=>k.trim()))}
-                                    placeholder="IT, Marketing, etc"
-                                  />
-                                </div>
-                                <div className="space-y-2">
-                                  <Label className="text-xs font-semibold uppercase text-muted-foreground">Kontak WA</Label>
-                                  <Input 
-                                    value={job.kontak_wa || ''}
-                                    onChange={(e) => updateJob(index, 'kontak_wa', e.target.value)}
-                                    placeholder="08xxx"
-                                  />
-                                </div>
-                             </div>
-                           </div>
+                        <div>
+                          <Label htmlFor={`lokasi-${index}`}>Lokasi *</Label>
+                          <Input
+                            id={`lokasi-${index}`}
+                            value={job.lokasi}
+                            onChange={(e) => updateJob(index, 'lokasi', e.target.value)}
+                            placeholder="Contoh: Jombang Kota"
+                            className="mt-1.5"
+                          />
+                        </div>
 
-                           {/* Action Buttons */}
-                           <div className="flex flex-col gap-2">
-                              <Button variant="ghost" size="icon" onClick={() => duplicateJob(index)} title="Duplicate">
-                                <Plus className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="icon" onClick={() => removeJob(index)} className="text-destructive hover:text-destructive hover:bg-destructive/10" title="Delete">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                           </div>
+                        <div>
+                          <Label>Kategori</Label>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {(job.kategori || []).map((kat, katIdx) => (
+                              <Badge key={katIdx} variant="outline" className="px-3 py-1">
+                                {kat}
+                                <button
+                                  onClick={() => removeKategori(index, katIdx)}
+                                  className="ml-2 text-gray-500 hover:text-red-600"
+                                >
+                                  ×
+                                </button>
+                              </Badge>
+                            ))}
+                            <Input
+                              placeholder="+ Tambah kategori"
+                              className="w-32 h-7 text-xs"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                                  updateJob(index, 'kategori', [...(job.kategori || []), e.currentTarget.value.trim()]);
+                                  e.currentTarget.value = '';
+                                }
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor={`tipe-${index}`}>Tipe Kerja</Label>
+                          <Select
+                            value={job.tipe_kerja || ''}
+                            onValueChange={(value) => updateJob(index, 'tipe_kerja', value)}
+                          >
+                            <SelectTrigger className="w-full mt-1.5">
+                              <SelectValue placeholder="Pilih tipe kerja" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Full-time">Full-time</SelectItem>
+                              <SelectItem value="Part-time">Part-time</SelectItem>
+                              <SelectItem value="Contract">Contract</SelectItem>
+                              <SelectItem value="Freelance">Freelance</SelectItem>
+                              <SelectItem value="Remote">Remote</SelectItem>
+                              <SelectItem value="Internship">Internship</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+
+                    {/* 💰 Gaji */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>💰</span> Gaji
+                      </h3>
+                      <div>
+                        <Label htmlFor={`gaji-${index}`}>Gaji (Text)</Label>
+                        <Input
+                          id={`gaji-${index}`}
+                          value={job.gaji_text || ''}
+                          onChange={(e) => updateJob(index, 'gaji_text', e.target.value)}
+                          placeholder="Contoh: Rp 3-5 juta + bonus"
+                          className="mt-1.5"
+                        />
+                      </div>
+                    </div>
+
+                    {/* 📝 Deskripsi & Kualifikasi */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>📝</span> Deskripsi & Kualifikasi
+                      </h3>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor={`deskripsi-${index}`}>Deskripsi / Benefit</Label>
+                          <Textarea
+                            id={`deskripsi-${index}`}
+                            value={job.deskripsi || ''}
+                            onChange={(e) => updateJob(index, 'deskripsi', e.target.value)}
+                            placeholder="Deskripsi pekerjaan, benefit, fasilitas, jam kerja..."
+                            rows={4}
+                            className="mt-1.5"
+                          />
+                        </div>
+
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <Label>Kualifikasi / Persyaratan</Label>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => addKualifikasi(index)}
+                            >
+                              <Plus className="w-4 h-4 mr-1" />
+                              Tambah
+                            </Button>
+                          </div>
+                          <div className="space-y-2">
+                            {(job.kualifikasi || []).length === 0 ? (
+                              <p className="text-sm text-muted-foreground italic">
+                                Belum ada kualifikasi. Klik "Tambah" untuk menambahkan.
+                              </p>
+                            ) : (
+                              (job.kualifikasi || []).map((kual, qualIdx) => (
+                                <div key={qualIdx} className="flex gap-2">
+                                  <Input
+                                    value={kual}
+                                    onChange={(e) => updateKualifikasi(index, qualIdx, e.target.value)}
+                                    placeholder={`Kualifikasi ${qualIdx + 1}`}
+                                  />
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => removeKualifikasi(index, qualIdx)}
+                                    className="flex-shrink-0"
+                                  >
+                                    <Trash2 className="w-4 h-4 text-red-500" />
+                                  </Button>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 📞 Kontak */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>📞</span> Kontak
+                      </h3>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor={`wa-${index}`}>WhatsApp</Label>
+                          <Input
+                            id={`wa-${index}`}
+                            value={job.kontak_wa || ''}
+                            onChange={(e) => updateJob(index, 'kontak_wa', e.target.value)}
+                            placeholder="081234567890"
+                            className="mt-1.5"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor={`email-${index}`}>Email</Label>
+                          <Input
+                            id={`email-${index}`}
+                            value={job.kontak_email || ''}
+                            onChange={(e) => updateJob(index, 'kontak_email', e.target.value)}
+                            placeholder="hr@perusahaan.com"
+                            className="mt-1.5"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor={`deadline-${index}`}>Deadline (Optional)</Label>
+                          <Input
+                            id={`deadline-${index}`}
+                            type="date"
+                            value={job.deadline || ''}
+                            onChange={(e) => updateJob(index, 'deadline', e.target.value)}
+                            className="mt-1.5"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          ))}
         </div>
+
+        {/* Image Preview Modal */}
+        <Dialog open={!!previewImage} onOpenChange={(open) => !open && setPreviewImage(null)}>
+          <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden flex flex-col bg-background border-none shadow-2xl rounded-xl">
+            <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/60 to-transparent z-50 flex items-center justify-between px-6">
+               <span className="text-white/90 font-medium text-sm">Preview Poster</span>
+               <Button 
+                 variant="secondary" 
+                 size="icon" 
+                 className="rounded-full h-9 w-9 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/10"
+                 onClick={() => setPreviewImage(null)}
+               >
+                 <X className="h-4 w-4" />
+               </Button>
+            </div>
+            {previewImage && (
+              <div className="w-full h-full relative bg-black/95 flex items-center justify-center p-4 md:p-8">
+                <Image 
+                  src={previewImage} 
+                  alt="Full Preview" 
+                  fill 
+                  className="object-contain"
+                  unoptimized 
+                />
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
       </div>
     );
   }

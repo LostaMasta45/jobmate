@@ -45,14 +45,16 @@ export async function middleware(request: NextRequest) {
     '/login',
     '/reset',
     '/verify',
-    '/auth/verify', // Password reset verification
+    '/auth/verify',          // Password reset verification (Supabase)
+    '/auth/reset-password',  // Custom password reset (Resend)
+    '/expired',              // Membership expired page
     '/ajukan-akun',
     '/cek-status-pengajuan',
     '/toolsjobmate',
     '/revisi',
     '/test-public',
     '/generate-thumbnails',
-    '/admin-login', // Admin login is public
+    '/admin-login',          // Admin login is public
   ];
 
   // Check if current path is public
@@ -235,7 +237,7 @@ export async function middleware(request: NextRequest) {
     if (!isActive) {
       console.log('[MIDDLEWARE] VIP membership expired or inactive');
       // Membership expired → redirect with message
-      return NextResponse.redirect(new URL("/sign-in?message=membership_expired", request.url));
+      return NextResponse.redirect(new URL("/expired", request.url));
     }
 
     // All good - VIP user (Basic or Premium) with active membership
@@ -268,7 +270,7 @@ export async function middleware(request: NextRequest) {
         return supabaseResponse;
       } else {
         console.log('[MIDDLEWARE] VIP Premium status is not active');
-        return NextResponse.redirect(new URL("/sign-in?message=membership_expired", request.url));
+        return NextResponse.redirect(new URL("/expired", request.url));
       }
     }
 

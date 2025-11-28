@@ -28,44 +28,34 @@ export async function parsePosterWithAI(
   imageBase64: string,
   imageMimeType: string
 ): Promise<PosterParseResult> {
-  const prompt = `Kamu adalah AI yang expert dalam membaca poster lowongan kerja di Indonesia.
+  // Comprehensive prompt for complete data extraction
+  const prompt = `Kamu adalah AI expert membaca poster lowongan kerja Indonesia. BACA SEMUA TEKS dengan teliti.
 
-TUGAS: Extract informasi dari poster loker ini dengan SANGAT TELITI.
+TUGAS: Ekstrak SEMUA informasi dari poster lowongan kerja ini.
 
-OUTPUT FORMAT (JSON):
+OUTPUT JSON:
 {
-  "title": "Posisi/Jabatan yang dicari (contoh: Full Stack Developer, Marketing Executive)",
-  "perusahaan_name": "Nama perusahaan (contoh: PT Maju Jaya, CV Sukses Mandiri)",
-  "lokasi": "Lokasi kerja (contoh: Jombang Kota, Mojowarno, Ploso)",
-  "kategori": ["Kategori 1", "Kategori 2"],
-  "tipe_kerja": "Full-time | Part-time | Contract | Freelance | Remote",
-  "gaji_text": "Format gaji seperti di poster (contoh: Rp 5-7 juta, UMR + Tunjangan, Gaji pokok + komisi)",
-  "gaji_min": 5000000,
-  "gaji_max": 7000000,
-  "deskripsi": "Deskripsi pekerjaan atau benefit yang disebutkan",
-  "persyaratan": "Persyaratan umum (jika ada, contoh: Min. 2 tahun pengalaman, Pendidikan S1)",
-  "kualifikasi": [
-    "Kualifikasi 1",
-    "Kualifikasi 2",
-    "Kualifikasi 3"
-  ],
-  "deadline": "YYYY-MM-DD format (jika ada tanggal deadline, convert ke format ini)",
-  "kontak_wa": "Nomor WA (jika ada, format: 081234567890)",
-  "kontak_email": "Email (jika ada)",
-  "confidence_score": 85
+  "title": "Nama posisi/jabatan yang dicari",
+  "perusahaan_name": "Nama perusahaan/CV/PT",
+  "lokasi": "Lokasi kerja (kota/kecamatan)",
+  "kategori": ["Pilih 1-3 dari: IT, Marketing, Sales, Finance, Accounting, Administrasi, Customer Service, F&B, Retail, Design, Manufacturing, Healthcare, Logistik, Education, Security, Driver, Warehouse, Operator, Teknisi, Lainnya"],
+  "tipe_kerja": "Full-time/Part-time/Contract/Freelance/Remote atau null",
+  "gaji_text": "Tulis PERSIS seperti di poster (contoh: 'Rp 3-5 juta', 'UMR + Bonus', 'Gaji Menarik')",
+  "gaji_min": angka atau null,
+  "gaji_max": angka atau null,
+  "deskripsi": "Deskripsi pekerjaan, tanggung jawab, benefit, fasilitas yang disebutkan. Gabungkan semua info relevan.",
+  "kualifikasi": ["SEMUA syarat yang disebutkan: pendidikan, pengalaman, skill, usia, gender, dll. Satu item per syarat."],
+  "deadline": "YYYY-MM-DD atau null",
+  "kontak_wa": "Nomor WA/HP (hanya angka, contoh: 081234567890)",
+  "kontak_email": "Email atau null",
+  "confidence_score": 0-100
 }
 
-RULES:
-1. Jika informasi tidak ada di poster, gunakan null atau []
-2. Kategori harus dari list: IT, Web Development, Marketing, Sales, Finance, Accounting, Administrasi, Customer Service, F&B, Retail, Design, Content Creator, Manufacturing, Healthcare, Logistik, Education, Security
-3. Lokasi harus spesifik: Jombang Kota, Mojowarno, Ploso, Sumobito, Diwek, Kabuh, dll (sesuai poster)
-4. Gaji: Extract angka jika ada, kalau tidak ada angka jelas simpan text mentahnya
-5. Kualifikasi: Buat array terpisah untuk setiap poin (max 10 items)
-6. Nomor WA: Bersihkan format, hanya angka (contoh: 081234567890)
-7. Response HARUS valid JSON, tidak boleh ada markdown atau text lain
-8. Confidence score: 0-100, seberapa yakin AI dengan hasil parsing
-
-EXTRACT DATA:`;
+PENTING:
+- kualifikasi: Ekstrak SEMUA persyaratan (min. pendidikan SMA/SMK/S1, pengalaman kerja, usia, skill, penampilan, dll)
+- deskripsi: Gabungkan semua info tentang pekerjaan, benefit, fasilitas, jam kerja
+- Jika tidak ada info, gunakan null atau []
+- Response harus valid JSON`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -78,6 +68,7 @@ EXTRACT DATA:`;
               type: 'image_url',
               image_url: {
                 url: `data:${imageMimeType};base64,${imageBase64}`,
+                detail: 'high', // High detail for better text recognition
               },
             },
             {
@@ -87,8 +78,9 @@ EXTRACT DATA:`;
           ],
         },
       ],
-      max_tokens: 2000,
-      temperature: 0.3, // Lower temperature for more consistent extraction
+      max_tokens: 2500, // More tokens for complete data
+      temperature: 0.1,
+      response_format: { type: 'json_object' },
     });
 
     const content = response.choices[0]?.message?.content?.trim() || '';

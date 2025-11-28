@@ -1,7 +1,9 @@
 import { Metadata } from 'next';
 import { BatchPosterUpload } from '@/components/admin/vip/BatchPosterUpload';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lightbulb, AlertTriangle, FileImage, BrainCircuit, Layers, CheckSquare } from 'lucide-react';
+import { Lightbulb, AlertTriangle, FileImage, BrainCircuit, Layers, CheckSquare, Sparkles, ArrowLeft, ChevronLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Batch Upload Loker - Admin VIP Career',
@@ -10,97 +12,75 @@ export const metadata: Metadata = {
 
 export default function BatchUploadPage() {
   return (
-    <div className="space-y-8 pb-8 animate-in fade-in duration-500">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Batch Upload Loker</h1>
-        <p className="text-muted-foreground mt-1">
-          Upload multiple job posters at once and let AI extract the details for you.
-        </p>
-      </div>
+    <div className="min-h-[calc(100vh-4rem)] bg-muted/30 -m-6 p-6 md:p-10">
+      <div className="max-w-screen-2xl mx-auto space-y-8 animate-in fade-in duration-500">
+        {/* Header Section with Glassmorphism */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/50">
+          <div className="space-y-4">
+            <Link 
+              href="/admin/vip-loker" 
+              className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors group"
+            >
+              <ChevronLeft className="mr-1 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+              Kembali ke Dashboard VIP
+            </Link>
+            <div className="flex items-center gap-3">
+               <div className="p-2.5 bg-gradient-to-br from-primary to-purple-600 rounded-xl shadow-lg shadow-primary/25">
+                 <Sparkles className="h-6 w-6 text-white" />
+               </div>
+               <div>
+                 <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400">
+                   Batch Upload Loker
+                 </h1>
+               </div>
+            </div>
+            <p className="text-muted-foreground text-lg pl-[3.75rem]">
+              AI-Powered Bulk Upload & Extraction Wizard
+            </p>
+          </div>
+          
+          <div className="flex gap-3 pl-[3.75rem] md:pl-0 self-start md:self-center">
+             <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground bg-background/50 px-4 py-2 rounded-full border shadow-sm">
+                <BrainCircuit className="h-4 w-4 text-purple-500" />
+                <span>Powered by Gemini AI 1.5 Pro</span>
+             </div>
+          </div>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content - Upload Tool */}
-        <div className="lg:col-span-2">
+        {/* Main Wizard Container */}
+        <div className="relative">
            <BatchPosterUpload />
         </div>
 
-        {/* Sidebar - Info & Guidelines */}
-        <div className="space-y-6">
-          <Card className="border-none shadow-sm bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-900/20">
-            <CardHeader className="pb-3">
-               <CardTitle className="flex items-center gap-2 text-base font-semibold text-blue-900 dark:text-blue-100">
-                 <Lightbulb className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                 Key Features
-               </CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-               <div className="flex items-start gap-3">
-                 <div className="bg-blue-100 dark:bg-blue-900/50 p-2 rounded-lg">
-                   <FileImage className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                 </div>
-                 <div>
-                   <p className="font-medium text-sm text-blue-900 dark:text-blue-100">Bulk Upload</p>
-                   <p className="text-xs text-blue-700/80 dark:text-blue-300/80">Process up to 10 posters in a single batch.</p>
-                 </div>
-               </div>
-               
-               <div className="flex items-start gap-3">
-                 <div className="bg-purple-100 dark:bg-purple-900/50 p-2 rounded-lg">
-                   <BrainCircuit className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                 </div>
-                 <div>
-                   <p className="font-medium text-sm text-blue-900 dark:text-blue-100">AI Extraction</p>
-                   <p className="text-xs text-blue-700/80 dark:text-blue-300/80">Automatically parses company, role, and requirements.</p>
-                 </div>
-               </div>
-
-               <div className="flex items-start gap-3">
-                 <div className="bg-emerald-100 dark:bg-emerald-900/50 p-2 rounded-lg">
-                   <Layers className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                 </div>
-                 <div>
-                   <p className="font-medium text-sm text-blue-900 dark:text-blue-100">Multi-Position Detection</p>
-                   <p className="text-xs text-blue-700/80 dark:text-blue-300/80">Detects multiple jobs from a single poster.</p>
-                 </div>
-               </div>
-
-               <div className="flex items-start gap-3">
-                 <div className="bg-amber-100 dark:bg-amber-900/50 p-2 rounded-lg">
-                   <CheckSquare className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                 </div>
-                 <div>
-                   <p className="font-medium text-sm text-blue-900 dark:text-blue-100">Review & Publish</p>
-                   <p className="text-xs text-blue-700/80 dark:text-blue-300/80">Edit details before pushing to live.</p>
-                 </div>
-               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-none shadow-sm bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-900/20">
-            <CardHeader className="pb-3">
-               <CardTitle className="flex items-center gap-2 text-base font-semibold text-amber-900 dark:text-amber-100">
-                 <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                 Examples & Tips
-               </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 text-sm text-amber-900/80 dark:text-amber-200/80">
-              <div className="space-y-1">
-                <p className="font-semibold text-amber-900 dark:text-amber-100">Single Position Poster</p>
-                <p className="text-xs italic bg-background/50 p-2 rounded border border-amber-100 dark:border-amber-900/30">
-                  "Dibutuhkan: Staff Admin - PT Maju Jaya"
-                  <br />→ AI detects 1 position.
-                </p>
+        {/* Footer / Help Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12 text-sm text-muted-foreground border-t border-border/50">
+           <div className="flex gap-4 items-start p-4 rounded-xl hover:bg-background/50 transition-colors border border-transparent hover:border-border/50">
+              <div className="mt-0.5 p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600">
+                <FileImage className="h-5 w-5" />
               </div>
-              <div className="space-y-1">
-                <p className="font-semibold text-amber-900 dark:text-amber-100">Multi-Position Poster</p>
-                <p className="text-xs italic bg-background/50 p-2 rounded border border-amber-100 dark:border-amber-900/30">
-                  "Lowongan: 1. Staff Admin, 2. Sales, 3. Driver"
-                  <br />→ AI detects 3 separate jobs.
-                </p>
+              <div>
+                <p className="font-semibold text-foreground text-base mb-1">1. Upload Posters</p>
+                <p>Drag & Drop hingga 10 poster lowongan sekaligus. Kami mendukung format JPG dan PNG.</p>
               </div>
-            </CardContent>
-          </Card>
+           </div>
+           <div className="flex gap-4 items-start p-4 rounded-xl hover:bg-background/50 transition-colors border border-transparent hover:border-border/50">
+              <div className="mt-0.5 p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-600">
+                <BrainCircuit className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-semibold text-foreground text-base mb-1">2. AI Extraction</p>
+                <p>AI akan otomatis membaca dan mengekstrak detail penting seperti Posisi, Gaji, dan Kontak.</p>
+              </div>
+           </div>
+           <div className="flex gap-4 items-start p-4 rounded-xl hover:bg-background/50 transition-colors border border-transparent hover:border-border/50">
+              <div className="mt-0.5 p-2 bg-green-100 dark:bg-green-900/30 rounded-lg text-green-600">
+                <CheckSquare className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-semibold text-foreground text-base mb-1">3. Review & Publish</p>
+                <p>Review hasil ekstraksi, edit jika perlu, dan publish semua lowongan dalam satu klik.</p>
+              </div>
+           </div>
         </div>
       </div>
     </div>
