@@ -142,25 +142,29 @@ function VerifyContent() {
 
         {/* Header */}
         <div className="relative z-10 pt-6 px-6 flex flex-col items-center h-[40%]">
-          {/* Top Logo - Centered */}
-          <div className="w-full flex justify-center mb-2">
-             <Link href="/" className="block relative">
-                <div className="relative h-24 w-24">
-                   <Image 
-                      src="/Logo/x.png" 
-                      alt="JobMate Logo" 
-                      fill 
-                      className="object-contain" 
-                      priority 
-                   />
+          {/* Top Logo - Absolute like MobileSignInView */}
+          <div className="absolute -top-20 left-0 right-0 z-0 flex justify-center pointer-events-none">
+             <div className="relative">
+                <div className="absolute inset-0 bg-white/20 rounded-full blur-xl animate-pulse" />
+                <div className="relative h-64 w-64">
+                  <Image 
+                    src="/Logo/x.png" 
+                    alt="JobMate Logo" 
+                    fill 
+                    className="object-contain drop-shadow-2xl" 
+                    priority 
+                  />
                 </div>
-             </Link>
+             </div>
           </div>
+          
+          {/* Spacer for the absolute logo */}
+          <div className="h-16 w-full" />
 
           <motion.div 
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="relative w-[120px] h-[120px] flex items-center justify-center mt-4 mb-2"
+            className="relative w-[120px] h-[120px] flex items-center justify-center mt-2 mb-2 z-10"
           >
             <div className="absolute w-24 h-24 bg-white/5 rounded-full blur-[30px]" />
             <motion.div 
