@@ -143,7 +143,7 @@ function VerifyContent() {
         {/* Header */}
         <div className="relative z-10 pt-6 px-6 flex flex-col items-center h-[40%]">
           {/* Top Logo - Absolute like MobileSignInView */}
-          <div className="absolute -top-20 left-0 right-0 z-0 flex justify-center pointer-events-none">
+          <div className="absolute -top-20 left-0 right-0 z-50 flex justify-center pointer-events-none">
              <div className="relative">
                 <div className="absolute inset-0 bg-white/20 rounded-full blur-xl animate-pulse" />
                 <div className="relative h-64 w-64">
