@@ -148,7 +148,7 @@ export function ApplicationsTable({ applications }: { applications: Application[
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="hover:shadow-lg transition-shadow">
           <CardContent className="p-6">
             <div className="text-3xl font-bold">{stats.total}</div>
@@ -175,12 +175,13 @@ export function ApplicationsTable({ applications }: { applications: Application[
         </Card>
       </div>
 
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <Button
             variant={filter === "all" ? "default" : "outline"}
             size="sm"
             onClick={() => setFilter("all")}
+            className="flex-1 sm:flex-none"
           >
             All ({applications.length})
           </Button>
@@ -188,6 +189,7 @@ export function ApplicationsTable({ applications }: { applications: Application[
             variant={filter === "pending" ? "default" : "outline"}
             size="sm"
             onClick={() => setFilter("pending")}
+            className="flex-1 sm:flex-none"
           >
             Pending ({stats.pending})
           </Button>
@@ -195,6 +197,7 @@ export function ApplicationsTable({ applications }: { applications: Application[
             variant={filter === "approved" ? "default" : "outline"}
             size="sm"
             onClick={() => setFilter("approved")}
+            className="flex-1 sm:flex-none"
           >
             Approved ({stats.approved})
           </Button>
@@ -202,12 +205,13 @@ export function ApplicationsTable({ applications }: { applications: Application[
             variant={filter === "rejected" ? "default" : "outline"}
             size="sm"
             onClick={() => setFilter("rejected")}
+            className="flex-1 sm:flex-none"
           >
             Rejected ({stats.rejected})
           </Button>
         </div>
         
-        <div className="flex-1 max-w-md">
+        <div className="w-full sm:w-auto sm:flex-1 sm:max-w-md">
           <Input
             placeholder="Search by name, email, username..."
             value={searchQuery}
