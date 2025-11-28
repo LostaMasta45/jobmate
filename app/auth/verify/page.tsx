@@ -118,7 +118,7 @@ function VerifyContent() {
     }
   };
 
-  if (!isMounted || type !== "recovery") {
+  if (!isMounted) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="animate-pulse text-muted-foreground">Loading...</div>
@@ -609,5 +609,17 @@ function VerifyContent() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      </div>
+    }>
+      <VerifyContent />
+    </Suspense>
   );
 }
