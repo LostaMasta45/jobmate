@@ -95,7 +95,7 @@ export default async function AdminMemberPage() {
 
         <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 min-w-0">
              <MemberTable memberList={memberList || []} />
           </div>
 

@@ -261,8 +261,8 @@ export function MemberTable({ memberList }: { memberList: Member[] }) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 self-end sm:self-center">
-                  <div className="hidden sm:block">
+                <div className="flex items-center gap-4 self-start sm:self-center mt-4 sm:mt-0 w-full sm:w-auto justify-between sm:justify-end">
+                  <div className="block">
                     {getExpiryStatus(member.membership_expiry)}
                   </div>
 
