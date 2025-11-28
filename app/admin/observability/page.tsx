@@ -158,14 +158,14 @@ export default function ObservabilityPage() {
       </div>
 
       <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-        <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 pb-4">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/50 pb-4 gap-4">
           <CardTitle>System Logs</CardTitle>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
               <Trash2 className="w-4 h-4 mr-2" />
               Clear
             </Button>
@@ -184,7 +184,7 @@ export default function ObservabilityPage() {
                     <span className="text-xs text-muted-foreground font-mono">{log.timestamp}</span>
                     <Badge variant="secondary" className="text-[10px] h-5">{log.source}</Badge>
                   </div>
-                  <p className="text-sm font-mono text-foreground/90">{log.message}</p>
+                  <p className="text-sm font-mono text-foreground/90 break-all">{log.message}</p>
                 </div>
               </div>
             ))}
