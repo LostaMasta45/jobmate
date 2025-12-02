@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail, Trash2, Eye, Copy, Briefcase, Clock, RotateCw, Sparkles } from "lucide-react";
+import { Mail, Trash2, Eye, Copy, Briefcase, Clock, RotateCw, Sparkles, Edit } from "lucide-react";
 import { listEmailDrafts } from "@/actions/email/list";
 import { deleteEmailDraft } from "@/actions/email/delete";
 import { formatDistanceToNow } from "date-fns";
@@ -29,9 +29,25 @@ interface EmailDraft {
   job_source?: string;
   created_at: string;
   updated_at: string;
+  hrd_name?: string;
+  hrd_title?: string;
+  your_name?: string;
+  current_role?: string;
+  years_experience?: number;
+  personality?: string;
+  length_type?: string;
+  highlight_skills?: string[];
+  achievements?: string;
+  include_why_company?: boolean;
+  include_why_you?: boolean;
+  has_attachment?: boolean;
 }
 
-export function EmailHistory() {
+interface EmailHistoryProps {
+  onEdit?: (draft: any) => void;
+}
+
+export function EmailHistory({ onEdit }: EmailHistoryProps) {
   const [drafts, setDrafts] = useState<EmailDraft[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -88,6 +104,34 @@ export function EmailHistory() {
 
   function handleView(draft: EmailDraft) {
     setSelectedDraft(draft);
+  }
+
+  function handleEdit(draft: EmailDraft) {
+    if (onEdit) {
+      // Map draft snake_case keys to camelCase expected by EmailWizard
+      const mappedDraft = {
+        emailType: draft.email_type,
+        position: draft.position,
+        companyName: draft.company_name,
+        subjectLine: draft.subject_line,
+        bodyContent: draft.body_content,
+        toneStyle: draft.tone_style,
+        jobSource: draft.job_source,
+        hrdName: draft.hrd_name,
+        hrdTitle: draft.hrd_title,
+        yourName: draft.your_name,
+        currentRole: draft.current_role,
+        yearsExperience: draft.years_experience,
+        personality: draft.personality,
+        lengthType: draft.length_type,
+        highlightSkills: draft.highlight_skills,
+        achievements: draft.achievements,
+        includeWhyCompany: draft.include_why_company,
+        includeWhyYou: draft.include_why_you,
+        hasAttachment: draft.has_attachment,
+      };
+      onEdit(mappedDraft);
+    }
   }
 
   async function handleCopy(content: string) {
@@ -229,10 +273,19 @@ export function EmailHistory() {
                   variant="default"
                   size="sm"
                   className="flex-1 gap-2 h-9"
+                  onClick={() => handleEdit(draft)}
+                >
+                  <Edit className="h-4 w-4" />
+                  <span>Edit</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-9 w-9 p-0"
                   onClick={() => handleView(draft)}
+                  title="Lihat Preview"
                 >
                   <Eye className="h-4 w-4" />
-                  <span>Lihat</span>
                 </Button>
                 <Button
                   variant="outline"

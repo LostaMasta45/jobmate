@@ -292,8 +292,8 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
           </Card>
 
           {/* Preview Card */}
-          <Card className="p-6 bg-white border-2">
-            <div className="flex items-center gap-2 mb-4 pb-4 border-b">
+          <Card className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+            <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
               <Eye className="h-5 w-5 text-primary" />
               <h3 className="font-semibold">Preview Email</h3>
             </div>
@@ -301,12 +301,12 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Subject:</p>
-                <p className="font-semibold">{formData.subjectLine}</p>
+                <p className="font-semibold text-slate-900 dark:text-slate-100">{formData.subjectLine}</p>
               </div>
               
-              <hr />
+              <hr className="border-slate-100 dark:border-slate-800" />
               
-              <div className="whitespace-pre-wrap text-sm leading-relaxed">
+              <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800 dark:text-slate-200">
                 {formData.bodyContent}
               </div>
             </div>

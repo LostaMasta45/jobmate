@@ -6,10 +6,18 @@ import { Card } from "@/components/ui/card";
 import { Sparkles, History, Plus, Mail, TrendingUp } from "lucide-react";
 import { EmailWizard } from "./EmailWizard";
 import { EmailHistory } from "./EmailHistory";
-import { Badge } from "@/components/ui/badge";
+import { EmailFormData } from "./types";
 
 export function EmailGeneratorMain() {
   const [activeTab, setActiveTab] = useState("create");
+  // State to hold draft data for editing
+  const [editDraft, setEditDraft] = useState<EmailFormData | null>(null);
+
+  // Handler when user clicks Edit on history item
+  const handleEditHistory = (draftData: any) => {
+    setEditDraft(draftData);
+    setActiveTab("create");
+  };
 
   return (
     <div className="space-y-4 md:space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
@@ -103,7 +111,7 @@ export function EmailGeneratorMain() {
 
         {/* Create New Email Tab */}
         <TabsContent value="create" className="space-y-8 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <EmailWizard />
+          <EmailWizard initialData={editDraft} />
         </TabsContent>
 
         {/* History Tab */}
@@ -117,7 +125,7 @@ export function EmailGeneratorMain() {
                 </p>
               </div>
             </div>
-            <EmailHistory />
+            <EmailHistory onEdit={handleEditHistory} />
           </Card>
         </TabsContent>
       </Tabs>

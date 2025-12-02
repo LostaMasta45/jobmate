@@ -37,8 +37,8 @@ const INITIAL_DATA: EmailFormData = {
     includeWhyYou: true,
 };
 
-export function EmailWizard() {
-  const [currentStep, setCurrentStep] = useState(1);
+export function EmailWizard({ initialData }: { initialData?: EmailFormData | null }) {
+  const [currentStep, setCurrentStep] = useState(initialData ? 5 : 1);
   const [direction, setDirection] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -46,8 +46,14 @@ export function EmailWizard() {
   const [isLoaded, setIsLoaded] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
 
-  // Load from localStorage on mount
+  // Load from localStorage or initialData on mount
   useEffect(() => {
+    if (initialData) {
+      setFormData(prev => ({ ...prev, ...initialData }));
+      setIsLoaded(true);
+      return;
+    }
+
     const savedData = localStorage.getItem("email_wizard_data");
     if (savedData) {
       try {
@@ -59,7 +65,7 @@ export function EmailWizard() {
       }
     }
     setIsLoaded(true);
-  }, []);
+  }, [initialData]);
 
   // Save to localStorage on change
   useEffect(() => {
