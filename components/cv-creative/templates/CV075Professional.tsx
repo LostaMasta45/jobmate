@@ -238,28 +238,50 @@ export function CV075Professional({ cv }: CV075ProfessionalProps) {
           padding: '15mm 12mm 15mm 20mm',
           backgroundColor: '#ffffff',
         }}>
-          {/* MAGANG Section */}
+          {/* PENGALAMAN Section */}
           {experiences.length > 0 && (
-            <div style={{ marginBottom: '15pt' }}>
-              <SectionHeader title="MAGANG" color={primaryColor} />
+            <div style={{ marginBottom: '20pt' }}>
+              <SectionHeader title="PENGALAMAN KERJA" color={primaryColor} />
               {experiences.map((exp, idx) => (
-                <div key={idx} style={{ marginBottom: '12pt' }}>
+                <div key={idx} style={{ marginBottom: '15pt', position: 'relative' }}>
+                  {/* Timeline vertical line */}
+                  <div style={{
+                    position: 'absolute',
+                    left: '-8pt',
+                    top: '4pt',
+                    bottom: 0,
+                    width: '1px',
+                    backgroundColor: '#e2e8f0',
+                    display: idx === experiences.length - 1 ? 'none' : 'block'
+                  }} />
+                  
                   <div style={{ 
                     display: 'flex',
                     justifyContent: 'space-between',
-                    marginBottom: '3pt',
+                    marginBottom: '4pt',
+                    alignItems: 'baseline'
                   }}>
                     <div>
                       <div style={{ 
-                        fontSize: '9pt', 
+                        fontSize: '10pt', 
                         fontWeight: '700',
                         color: '#1e293b',
                         marginBottom: '1pt',
+                        display: 'flex',
+                        alignItems: 'center',
                       }}>
+                         <div style={{
+                          width: '5pt',
+                          height: '5pt',
+                          borderRadius: '50%',
+                          backgroundColor: accentColor,
+                          marginRight: '6pt',
+                          transform: 'translateX(-10.5pt)'
+                        }} />
                         {exp.title}
                       </div>
                       <div style={{ 
-                        fontSize: '8pt', 
+                        fontSize: '9pt', 
                         color: primaryColor,
                         fontWeight: '600',
                       }}>
@@ -267,24 +289,27 @@ export function CV075Professional({ cv }: CV075ProfessionalProps) {
                       </div>
                     </div>
                     <div style={{ 
-                      fontSize: '7.5pt', 
+                      fontSize: '8pt', 
                       color: '#64748b',
                       textAlign: 'right',
                       whiteSpace: 'nowrap',
+                      backgroundColor: '#f1f5f9',
+                      padding: '2pt 6pt',
+                      borderRadius: '4pt'
                     }}>
                       {exp.startDate} - {exp.isCurrent ? 'Sekarang' : exp.endDate}
                     </div>
                   </div>
                   {exp.bullets && exp.bullets.length > 0 && (
                     <ul style={{ 
-                      margin: '4pt 0 0 0',
+                      margin: '6pt 0 0 0',
                       paddingLeft: '14pt',
-                      fontSize: '7.5pt',
-                      lineHeight: '1.5',
+                      fontSize: '8.5pt',
+                      lineHeight: '1.6',
                       color: '#334155',
                     }}>
                       {exp.bullets.filter(Boolean).map((bullet: string, i: number) => (
-                        <li key={i} style={{ marginBottom: '2pt' }}>
+                        <li key={i} style={{ marginBottom: '3pt' }}>
                           {bullet.replace(/^[•\-]\s*/, '')}
                         </li>
                       ))}
@@ -294,158 +319,23 @@ export function CV075Professional({ cv }: CV075ProfessionalProps) {
               ))}
             </div>
           )}
-
-          {/* ORGANISASI Section - Using remaining experiences if any */}
-          {experiences.length > 2 && (
-            <div style={{ marginBottom: '15pt' }}>
-              <SectionHeader title="ORGANISASI" color={primaryColor} />
-              {experiences.slice(2, 4).map((exp, idx) => (
-                <div key={idx} style={{ marginBottom: '12pt' }}>
-                  <div style={{ 
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginBottom: '3pt',
-                  }}>
-                    <div>
-                      <div style={{ 
-                        fontSize: '9pt', 
-                        fontWeight: '700',
-                        color: '#1e293b',
-                        marginBottom: '1pt',
-                      }}>
-                        {exp.title}
-                      </div>
-                      <div style={{ 
-                        fontSize: '8pt', 
-                        color: primaryColor,
-                        fontWeight: '600',
-                      }}>
-                        {exp.company}
-                      </div>
-                    </div>
-                    <div style={{ 
-                      fontSize: '7.5pt', 
-                      color: '#64748b',
-                      textAlign: 'right',
-                      whiteSpace: 'nowrap',
-                    }}>
-                      {exp.startDate} - {exp.isCurrent ? 'Sekarang' : exp.endDate}
-                    </div>
-                  </div>
-                  {exp.bullets && exp.bullets.length > 0 && (
-                    <ul style={{ 
-                      margin: '4pt 0 0 0',
-                      paddingLeft: '14pt',
-                      fontSize: '7.5pt',
-                      lineHeight: '1.5',
-                      color: '#334155',
-                    }}>
-                      {exp.bullets.filter(Boolean).map((bullet: string, i: number) => (
-                        <li key={i} style={{ marginBottom: '2pt' }}>
-                          {bullet.replace(/^[•\-]\s*/, '')}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* HOBI Section with Icons */}
-          <div style={{ marginTop: '20pt' }}>
-            <SectionHeader title="HOBI" color={primaryColor} />
-            <div style={{ 
-              display: 'flex', 
-              gap: '20pt',
-              alignItems: 'flex-start',
-            }}>
-              <div style={{ 
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '6pt',
-              }}>
-                <div style={{ 
-                  fontSize: '24pt',
-                  color: primaryColor,
-                }}>
-                  📷
-                </div>
-                <div style={{ 
-                  fontSize: '7.5pt',
-                  textAlign: 'center',
-                  color: '#334155',
-                }}>
-                  Fotograpy
-                </div>
-              </div>
-              <div style={{ 
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '6pt',
-              }}>
-                <div style={{ 
-                  fontSize: '24pt',
-                  color: primaryColor,
-                }}>
-                  🎵
-                </div>
-                <div style={{ 
-                  fontSize: '7.5pt',
-                  textAlign: 'center',
-                  color: '#334155',
-                }}>
-                  Bernyanyi
-                </div>
-              </div>
-              <div style={{ 
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '6pt',
-              }}>
-                <div style={{ 
-                  fontSize: '24pt',
-                  color: primaryColor,
-                }}>
-                  ✈️
-                </div>
-                <div style={{ 
-                  fontSize: '7.5pt',
-                  textAlign: 'center',
-                  color: '#334155',
-                }}>
-                  Traveling
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* RIGHT COLUMN - Light Gray Background (35%) */}
         <div style={{ 
           width: '35%',
-          backgroundColor: '#F5F5F0',
+          backgroundColor: '#F8F9FA',
           padding: '15mm 12mm',
+          borderLeft: '1px solid #e2e8f0'
         }}>
           {/* PENDIDIKAN Section */}
           {education.length > 0 && (
-            <div style={{ marginBottom: '15pt' }}>
+            <div style={{ marginBottom: '20pt' }}>
               <SectionHeader title="PENDIDIKAN" color={secondaryColor} />
               {education.map((edu, idx) => (
-                <div key={idx} style={{ marginBottom: '10pt' }}>
+                <div key={idx} style={{ marginBottom: '12pt', paddingBottom: '12pt', borderBottom: idx !== education.length -1 ? '1px dashed #cbd5e1' : 'none' }}>
                   <div style={{ 
-                    fontSize: '7.5pt',
-                    color: '#64748b',
-                    marginBottom: '3pt',
-                    textAlign: 'right',
-                  }}>
-                    {edu.startDate} - {edu.endDate}
-                  </div>
-                  <div style={{ 
-                    fontSize: '8.5pt', 
+                    fontSize: '9pt', 
                     fontWeight: '700',
                     marginBottom: '2pt',
                     color: '#1e293b',
@@ -453,48 +343,60 @@ export function CV075Professional({ cv }: CV075ProfessionalProps) {
                     {edu.degree}
                   </div>
                   <div style={{ 
-                    fontSize: '7.5pt',
-                    color: '#475569',
+                    fontSize: '8.5pt',
+                    color: primaryColor,
                     lineHeight: '1.4',
+                    marginBottom: '2pt'
                   }}>
                     {edu.school}
+                  </div>
+                   <div style={{ 
+                    fontSize: '8pt',
+                    color: '#64748b',
+                    fontStyle: 'italic'
+                  }}>
+                    {edu.startDate} - {edu.endDate}
                   </div>
                 </div>
               ))}
             </div>
           )}
 
-          {/* SOFTWARE Section with Progress Bars */}
+          {/* KEAHLIAN Section - Combined */}
           {skills.length > 0 && (
-            <div style={{ marginBottom: '15pt' }}>
-              <SectionHeader title="SOFTWARE" color={secondaryColor} />
-              {skills.slice(0, 5).map((skill, idx) => (
-                <ProgressBar 
-                  key={idx}
-                  label={skill} 
-                  level={90 - (idx * 3)}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* KEAHLIAN Section */}
-          {skills.length > 5 && (
-            <div>
+            <div style={{ marginBottom: '20pt' }}>
               <SectionHeader title="KEAHLIAN" color={secondaryColor} />
-              <ul style={{ 
-                margin: '0',
-                paddingLeft: '12pt',
-                fontSize: '7.5pt',
-                lineHeight: '1.7',
-                color: '#334155',
-              }}>
-                {skills.slice(5, 12).map((skill, idx) => (
-                  <li key={idx} style={{ marginBottom: '3pt' }}>
-                    {skill}
-                  </li>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8pt' }}>
+                {skills.map((skill, idx) => (
+                   <div key={idx}>
+                    <div style={{ 
+                      fontSize: '8.5pt', 
+                      marginBottom: '2pt',
+                      fontWeight: '600',
+                      color: '#334155',
+                      display: 'flex',
+                      justifyContent: 'space-between'
+                    }}>
+                      <span>{skill}</span>
+                    </div>
+                    <div style={{ 
+                      width: '100%', 
+                      height: '4pt', 
+                      backgroundColor: '#e2e8f0',
+                      borderRadius: '2pt',
+                      overflow: 'hidden',
+                    }}>
+                      <div style={{ 
+                        width: `${Math.max(40, 100 - (idx * 5))}%`, 
+                        height: '100%', 
+                        backgroundColor: idx < 3 ? accentColor : primaryColor, // Top 3 skills get Gold accent
+                        borderRadius: '2pt',
+                        opacity: idx < 3 ? 1 : 0.7
+                      }} />
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
         </div>

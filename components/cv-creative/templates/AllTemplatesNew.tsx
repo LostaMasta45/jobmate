@@ -257,159 +257,186 @@ export function DarkModePro({ cv }: TemplateProps) {
       color: colors.text,
       display: 'flex',
       minHeight: '297mm',
-      fontFamily: "'Inter', 'Segoe UI', sans-serif",
+      fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
     }}>
-      {/* LEFT SIDEBAR - 35% Dark with gradient */}
+      {/* LEFT SIDEBAR - 32% width for better ratio */}
       <div style={{
-        width: '35%',
-        background: `linear-gradient(180deg, ${colors.primary}20 0%, ${colors.background} 100%)`,
-        padding: '18mm 12mm',
-        borderRight: `3pt solid ${colors.primary}`,
+        width: '32%',
+        background: `linear-gradient(180deg, ${colors.background} 0%, ${colors.primary}20 100%)`,
+        borderRight: `1px solid ${colors.primary}30`,
+        padding: '15mm 10mm',
         display: 'flex',
         flexDirection: 'column',
-        gap: '15pt',
+        gap: '12mm',
       }}>
-        {/* Photo */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10pt' }}>
+        {/* Photo Area */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15pt' }}>
           {cv.photoUrl && cv.photoOptions && (
             <div style={{
-              width: '100pt',
-              height: '100pt',
+              width: '110pt',
+              height: '110pt',
               borderRadius: '50%',
-              border: `4pt solid ${colors.primary}`,
-              overflow: 'hidden',
-              boxShadow: `0 0 30px ${colors.primary}50`,
+              padding: '4pt',
+              border: `1pt solid ${colors.accent}50`,
+              background: `linear-gradient(135deg, ${colors.primary}20, transparent)`,
             }}>
-              <img src={cv.photoUrl} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                overflow: 'hidden',
+              }}>
+                <img src={cv.photoUrl} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
             </div>
           )}
         </div>
 
-        {/* Contact Info */}
+        {/* Contact Info - Clean & Minimal */}
         <div>
           <h3 style={{ 
-            color: colors.primary,
-            fontSize: '10pt',
+            color: colors.accent,
+            fontSize: '9pt',
             fontWeight: 700,
-            marginBottom: '8pt',
+            marginBottom: '12pt',
             textTransform: 'uppercase',
-            letterSpacing: '1.5pt',
+            letterSpacing: '2px',
+            borderBottom: `1px solid ${colors.primary}40`,
+            paddingBottom: '4pt',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6pt'
           }}>
-            Contact
+            <span style={{ fontSize: '12pt' }}>Connect</span>
           </h3>
-          <div style={{ fontSize: '8pt', lineHeight: 1.7, opacity: 0.9 }}>
+          <div style={{ fontSize: '8.5pt', display: 'flex', flexDirection: 'column', gap: '10pt', opacity: 0.9 }}>
             {content.basics.email && (
-              <div style={{ marginBottom: '6pt', display: 'flex', gap: '6pt', alignItems: 'flex-start' }}>
-                <span style={{ color: colors.primary }}>▸</span>
-                <span style={{ wordBreak: 'break-word' }}>{content.basics.email}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8pt' }}>
+                <div style={{ color: colors.primary, fontSize: '11pt' }}>✉</div>
+                <span style={{ wordBreak: 'break-all', fontWeight: 300 }}>{content.basics.email}</span>
               </div>
             )}
             {content.basics.phone && (
-              <div style={{ marginBottom: '6pt', display: 'flex', gap: '6pt' }}>
-                <span style={{ color: colors.primary }}>▸</span>
-                <span>{content.basics.phone}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8pt' }}>
+                 <div style={{ color: colors.primary, fontSize: '11pt' }}>☎</div>
+                <span style={{ fontWeight: 300 }}>{content.basics.phone}</span>
               </div>
             )}
             {content.basics.city && (
-              <div style={{ marginBottom: '6pt', display: 'flex', gap: '6pt' }}>
-                <span style={{ color: colors.primary }}>▸</span>
-                <span>{content.basics.city}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8pt' }}>
+                 <div style={{ color: colors.primary, fontSize: '11pt' }}>📍</div>
+                <span style={{ fontWeight: 300 }}>{content.basics.city}</span>
               </div>
             )}
             {content.basics.linkedin && (
-              <div style={{ display: 'flex', gap: '6pt', alignItems: 'flex-start' }}>
-                <span style={{ color: colors.primary }}>▸</span>
-                <span style={{ wordBreak: 'break-word', fontSize: '7pt' }}>{content.basics.linkedin}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8pt' }}>
+                 <div style={{ color: colors.primary, fontSize: '11pt' }}>🔗</div>
+                <span style={{ wordBreak: 'break-all', fontSize: '7.5pt', fontWeight: 300 }}>{content.basics.linkedin}</span>
               </div>
             )}
           </div>
         </div>
 
-        {/* Skills */}
+        {/* Skills - Tag Cloud Style */}
         {content.skills && content.skills.length > 0 && (
           <div>
-            <h3 style={{ 
-              color: colors.primary,
-              fontSize: '10pt',
+             <h3 style={{ 
+              color: colors.accent,
+              fontSize: '9pt',
               fontWeight: 700,
-              marginBottom: '8pt',
+              marginBottom: '12pt',
               textTransform: 'uppercase',
-              letterSpacing: '1.5pt',
+              letterSpacing: '2px',
+              borderBottom: `1px solid ${colors.primary}40`,
+              paddingBottom: '4pt',
             }}>
-              Skills
+              Expertise
             </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6pt' }}>
-              {content.skills.slice(0, 10).map((skill, idx) => (
-                <div key={idx} style={{
-                  backgroundColor: `${colors.primary}15`,
-                  padding: '6pt 8pt',
-                  borderLeft: `3pt solid ${colors.primary}`,
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6pt' }}>
+              {content.skills.map((skill, idx) => (
+                <span key={idx} style={{
+                  backgroundColor: `${colors.primary}10`,
+                  color: colors.text,
+                  padding: '4pt 8pt',
+                  borderRadius: '4pt',
                   fontSize: '8pt',
                   fontWeight: 500,
+                  border: `1px solid ${colors.primary}20`,
                 }}>
                   {skill}
-                </div>
+                </span>
               ))}
             </div>
           </div>
         )}
 
-        {/* Education */}
+        {/* Education - Minimal */}
         {content.education && content.education.length > 0 && (
           <div style={{ marginTop: 'auto' }}>
-            <h3 style={{ 
-              color: colors.primary,
-              fontSize: '10pt',
+             <h3 style={{ 
+              color: colors.accent,
+              fontSize: '9pt',
               fontWeight: 700,
-              marginBottom: '8pt',
+              marginBottom: '12pt',
               textTransform: 'uppercase',
-              letterSpacing: '1.5pt',
+              letterSpacing: '2px',
+              borderBottom: `1px solid ${colors.primary}40`,
+              paddingBottom: '4pt',
             }}>
               Education
             </h3>
-            {content.education.map((edu, idx) => (
-              <div key={idx} style={{ marginBottom: '10pt' }}>
-                <div style={{ fontSize: '9pt', fontWeight: 600, color: colors.accent }}>{edu.school}</div>
-                {edu.degree && <div style={{ fontSize: '8pt', marginTop: '2pt' }}>{edu.degree}</div>}
-                {edu.startDate && (
-                  <div style={{ fontSize: '7pt', color: colors.text, opacity: 0.6, marginTop: '2pt' }}>
-                    {edu.startDate} - {edu.endDate}
-                  </div>
-                )}
-              </div>
-            ))}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12pt' }}>
+              {content.education.map((edu, idx) => (
+                <div key={idx}>
+                  <div style={{ fontSize: '9pt', fontWeight: 700, color: 'white' }}>{edu.school}</div>
+                  {edu.degree && <div style={{ fontSize: '8.5pt', color: colors.accent, marginTop: '2pt' }}>{edu.degree}</div>}
+                  {edu.startDate && (
+                    <div style={{ fontSize: '8pt', color: colors.text, opacity: 0.5, marginTop: '2pt' }}>
+                      {edu.startDate} — {edu.endDate}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
 
-      {/* RIGHT MAIN AREA - 65% */}
+      {/* RIGHT MAIN AREA - 68% */}
       <div style={{ 
-        width: '65%',
-        padding: '18mm 16mm',
-        backgroundColor: '#1e293b',
+        width: '68%',
+        padding: '15mm 15mm 15mm 18mm',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10mm',
       }}>
-        {/* Name & Title */}
-        <div style={{ marginBottom: '20pt' }}>
+        {/* Header */}
+        <div>
           <h1 style={{ 
-            fontSize: '32pt',
+            fontSize: '38pt',
             fontWeight: 800,
             margin: 0,
-            backgroundImage: `linear-gradient(135deg, ${colors.primary}, ${colors.accent})`,
+            backgroundImage: `linear-gradient(135deg, white, ${colors.accent})`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
-            lineHeight: 1.1,
+            lineHeight: 1,
+            letterSpacing: '-1px',
+            marginBottom: '8pt'
           }}>
             {content.basics.firstName}<br/>{content.basics.lastName}
           </h1>
           {content.basics.headline && (
             <div style={{ 
-              fontSize: '13pt',
-              color: colors.accent,
-              marginTop: '8pt',
+              fontSize: '14pt',
+              color: colors.primary,
               fontWeight: 500,
-              letterSpacing: '1pt',
+              letterSpacing: '0.5px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8pt'
             }}>
+              <span style={{ width: '20pt', height: '2pt', background: colors.primary, display: 'inline-block' }} />
               {content.basics.headline}
             </div>
           )}
@@ -417,83 +444,97 @@ export function DarkModePro({ cv }: TemplateProps) {
 
         {/* Summary */}
         {content.summary && (
-          <div style={{ 
-            marginBottom: '18pt',
-            padding: '12pt',
-            backgroundColor: `${colors.primary}10`,
-            borderLeft: `4pt solid ${colors.primary}`,
-            borderRadius: '0 8pt 8pt 0',
-          }}>
+          <div>
             <h2 style={{ 
-              color: colors.primary,
-              fontSize: '10pt',
+              color: 'white',
+              fontSize: '11pt',
               fontWeight: 700,
-              marginBottom: '6pt',
+              marginBottom: '8pt',
               textTransform: 'uppercase',
-              letterSpacing: '1.5pt',
+              letterSpacing: '1px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8pt'
             }}>
-              About Me
+              <span style={{ color: colors.accent }}>//</span> About Me
             </h2>
-            <p style={{ fontSize: '9pt', lineHeight: 1.6, margin: 0 }}>{content.summary}</p>
+            <p style={{ fontSize: '9.5pt', lineHeight: 1.7, opacity: 0.85, fontWeight: 300 }}>{content.summary}</p>
           </div>
         )}
 
-        {/* Experience */}
+        {/* Experience - Modern Timeline */}
         {content.experiences && content.experiences.length > 0 && (
-          <div>
+          <div style={{ flex: 1 }}>
             <h2 style={{ 
-              color: colors.primary,
-              fontSize: '12pt',
+              color: 'white',
+              fontSize: '11pt',
               fontWeight: 700,
               marginBottom: '12pt',
-              paddingBottom: '6pt',
-              borderBottom: `2pt solid ${colors.primary}`,
               textTransform: 'uppercase',
-              letterSpacing: '1.5pt',
+              letterSpacing: '1px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8pt'
             }}>
-              Experience
+              <span style={{ color: colors.accent }}>//</span> Professional Experience
             </h2>
-            {content.experiences.map((exp, idx) => (
-              <div key={idx} style={{ 
-                marginBottom: '12pt',
-                padding: '12pt',
-                backgroundColor: `${colors.primary}08`,
-                borderLeft: `3pt solid ${colors.accent}`,
-                borderRadius: '0 6pt 6pt 0',
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                  <div>
-                    <h3 style={{ fontSize: '11pt', fontWeight: 700, color: colors.accent, margin: 0 }}>
-                      {exp.title}
-                    </h3>
-                    <div style={{ fontSize: '10pt', marginTop: '3pt', fontWeight: 500 }}>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16pt' }}>
+              {content.experiences.map((exp, idx) => (
+                <div key={idx} style={{ position: 'relative', paddingLeft: '16pt' }}>
+                  {/* Timeline Line */}
+                  <div style={{ 
+                    position: 'absolute', 
+                    left: 0, 
+                    top: '6pt', 
+                    bottom: 0, 
+                    width: '1px', 
+                    background: `${colors.primary}30` 
+                  }} />
+                  {/* Timeline Dot */}
+                  <div style={{ 
+                    position: 'absolute', 
+                    left: '-2.5pt', 
+                    top: '6pt', 
+                    width: '6pt', 
+                    height: '6pt', 
+                    borderRadius: '50%', 
+                    background: colors.accent,
+                    boxShadow: `0 0 8px ${colors.accent}60`
+                  }} />
+
+                  <div style={{ marginBottom: '4pt' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <h3 style={{ fontSize: '12pt', fontWeight: 700, color: 'white', margin: 0 }}>{exp.title}</h3>
+                      <span style={{ fontSize: '8pt', color: colors.accent, fontWeight: 500, opacity: 0.9 }}>
+                        {exp.startDate} — {exp.isCurrent ? 'Present' : exp.endDate}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '10pt', color: colors.primary, fontWeight: 500, marginTop: '2pt' }}>
                       {exp.company}
                     </div>
                   </div>
-                  <div style={{ 
-                    fontSize: '8pt',
-                    color: colors.text,
-                    opacity: 0.6,
-                    backgroundColor: `${colors.primary}15`,
-                    padding: '3pt 8pt',
-                    borderRadius: '4pt',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
-                  </div>
+
+                  {exp.bullets && exp.bullets.length > 0 && (
+                    <ul style={{ 
+                      marginTop: '6pt', 
+                      paddingLeft: '0', 
+                      listStyle: 'none', 
+                      fontSize: '9pt',
+                      lineHeight: 1.6,
+                      opacity: 0.8 
+                    }}>
+                      {exp.bullets.filter(Boolean).map((bullet: string, i: number) => (
+                        <li key={i} style={{ marginBottom: '4pt', display: 'flex', gap: '6pt' }}>
+                          <span style={{ color: colors.primary }}>›</span>
+                          <span>{bullet}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-                {exp.bullets && exp.bullets.length > 0 && (
-                  <ul style={{ marginTop: '8pt', paddingLeft: '0', listStyle: 'none', fontSize: '9pt' }}>
-                    {exp.bullets.filter(Boolean).map((bullet: string, i: number) => (
-                      <li key={i} style={{ marginBottom: '4pt', display: 'flex', gap: '6pt' }}>
-                        <span style={{ color: colors.primary, flexShrink: 0 }}>→</span>
-                        <span>{bullet}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
       </div>
