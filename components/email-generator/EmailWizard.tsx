@@ -210,7 +210,7 @@ export function EmailWizard() {
   // But to be safe with hydration, we usually just render. 
 
   return (
-    <div className="flex h-[calc(100dvh-5rem)] lg:h-[calc(100dvh-4rem)] overflow-hidden bg-background flex-col lg:flex-row border-0 md:border rounded-none md:rounded-xl shadow-none md:shadow-sm">
+    <div className="flex h-auto min-h-[80vh] lg:h-[calc(100dvh-4rem)] lg:overflow-hidden bg-background flex-col lg:flex-row border-0 md:border rounded-none md:rounded-xl shadow-none md:shadow-sm">
         
         {/* LEFT PANEL: Wizard Form */}
         <div className="flex-1 flex flex-col min-w-0 lg:border-r relative">
@@ -276,7 +276,7 @@ export function EmailWizard() {
              </div>
 
             {/* SCROLLABLE CONTENT */}
-            <div id="wizard-content" className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-slate-950/50 scroll-smooth pb-32 lg:pb-8">
+            <div id="wizard-content" className="flex-1 lg:overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-slate-950/50 scroll-smooth pb-32 lg:pb-8">
                  <AnimatePresence mode="wait" custom={direction} initial={false}>
                     <motion.div
                         key={currentStep}
@@ -286,7 +286,7 @@ export function EmailWizard() {
                         animate="center"
                         exit="exit"
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className={`${currentStep === 1 ? 'max-w-5xl' : 'max-w-2xl'} mx-auto`}
+                        className={`${currentStep === 1 ? 'w-full max-w-7xl px-4' : 'max-w-2xl'} mx-auto`}
                     >
                          {renderStep()}
                     </motion.div>
