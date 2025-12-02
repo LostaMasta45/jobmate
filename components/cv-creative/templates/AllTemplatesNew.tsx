@@ -394,7 +394,7 @@ export function DarkModePro({ cv }: TemplateProps) {
             fontSize: '32pt',
             fontWeight: 800,
             margin: 0,
-            background: `linear-gradient(135deg, ${colors.primary}, ${colors.accent})`,
+            backgroundImage: `linear-gradient(135deg, ${colors.primary}, ${colors.accent})`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
