@@ -3,10 +3,8 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { X, Save } from "lucide-react";
-import { TemplateGallery } from "./TemplateGallery";
+import { X, Save, Eye, ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { PhotoUploader } from "./PhotoUploader";
-import { ColorPicker } from "./ColorPicker";
 import { CVPreview } from "./CVPreview";
 import { StepBasics } from "@/components/cv-ats/steps/StepBasics";
 import { StepSummary } from "@/components/cv-ats/steps/StepSummary";
@@ -15,9 +13,11 @@ import { StepEducation } from "@/components/cv-ats/steps/StepEducation";
 import { StepSkills } from "@/components/cv-ats/steps/StepSkills";
 import { StepReviewCreative } from "./StepReviewCreative";
 import { MobileTemplateSelector } from "./MobileTemplateSelector";
+import { StepTemplateCreative } from "./StepTemplateCreative";
 import { CreativeCV, TemplateId, defaultColorScheme, defaultPhotoOptions } from "@/lib/schemas/cv-creative";
 import { emptyResume, Resume } from "@/lib/schemas/cv-ats";
 import { CreativeWizardStep } from "@/types/cv-ats";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface CVCreativeWizardProps {
   initialCV?: Partial<CreativeCV> | null;
@@ -26,8 +26,8 @@ interface CVCreativeWizardProps {
 
 export function CVCreativeWizard({ initialCV, onClose }: CVCreativeWizardProps) {
   const [currentStep, setCurrentStep] = React.useState<CreativeWizardStep>(1);
-  const [showPreview, setShowPreview] = React.useState(true); // Toggle for mobile
-  const [zoomLevel, setZoomLevel] = React.useState(70); // Zoom percentage - Default 70% for better fit
+  const [showPreview, setShowPreview] = React.useState(false); // Default false for mobile
+  const [direction, setDirection] = React.useState(0);
   
   // Initialize resume from initialCV or use empty
   const migratedResume = React.useMemo(() => {
@@ -65,17 +65,20 @@ export function CVCreativeWizard({ initialCV, onClose }: CVCreativeWizardProps) 
 
   const handleNext = () => {
     if (currentStep < 8) {
+      setDirection(1);
       setCurrentStep((prev) => (prev + 1) as CreativeWizardStep);
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 1) {
+      setDirection(-1);
       setCurrentStep((prev) => (prev - 1) as CreativeWizardStep);
     }
   };
 
   const handleStepClick = (step: CreativeWizardStep) => {
+    setDirection(step > currentStep ? 1 : -1);
     setCurrentStep(step);
   };
 
@@ -129,30 +132,13 @@ export function CVCreativeWizard({ initialCV, onClose }: CVCreativeWizardProps) 
         );
       case 7:
         return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold">Design & Template</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Pilih template dan sesuaikan warna sesuai gaya Anda
-              </p>
-            </div>
-
-            <div>
-              <h3 className="mb-4 text-lg font-semibold">Choose Template</h3>
-              <TemplateGallery
-                selectedTemplate={templateId}
-                onSelect={setTemplateId}
-              />
-            </div>
-            
-            <div>
-              <h3 className="mb-4 text-lg font-semibold">Customize Colors</h3>
-              <ColorPicker
-                value={colorScheme}
-                onChange={setColorScheme}
-              />
-            </div>
-          </div>
+          <StepTemplateCreative
+            cv={cv}
+            templateId={templateId}
+            setTemplateId={setTemplateId}
+            colorScheme={colorScheme}
+            setColorScheme={setColorScheme}
+          />
         );
       case 8:
         return (
@@ -172,35 +158,63 @@ export function CVCreativeWizard({ initialCV, onClose }: CVCreativeWizardProps) 
     }
   };
 
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 20 : -20,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      x: direction > 0 ? -20 : 20,
+      opacity: 0,
+    }),
+  };
+
   return (
-    <div className="flex h-screen flex-col bg-background lg:flex-row">
-      {/* Mobile Navigation Bar - Always visible on mobile */}
-      <div className="flex-shrink-0 border-b bg-white p-3 shadow-sm lg:hidden">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Button 
-              variant={showPreview ? "outline" : "default"}
-              size="sm" 
-              onClick={() => setShowPreview(!showPreview)}
-              className="font-medium"
-            >
-              {showPreview ? "✏️ Edit" : "👁️ Preview"}
-            </Button>
-            <div className="rounded-md bg-purple-100 px-2.5 py-1">
-              <span className="text-xs font-bold text-purple-700">
-                Step {currentStep}/{steps.length}
-              </span>
-            </div>
+    <div className="flex h-[100dvh] flex-col bg-slate-50 dark:bg-slate-950 lg:flex-row lg:h-screen lg:overflow-hidden">
+      
+      {/* MOBILE HEADER: Segmented Progress & Top Bar */}
+      <div className="flex-shrink-0 bg-white dark:bg-slate-900 pt-[env(safe-area-inset-top)] lg:hidden z-20">
+        {/* Segmented Progress Bar */}
+        <div className="flex gap-1 px-2 pt-2 pb-1">
+          {steps.map((s) => (
+            <div 
+              key={s.num} 
+              className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                s.num <= currentStep 
+                  ? "bg-gradient-to-r from-purple-500 to-pink-500" 
+                  : "bg-slate-200 dark:bg-slate-800"
+              }`}
+            />
+          ))}
+        </div>
+        
+        {/* Navbar Content */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Step {currentStep} of {steps.length}
+            </span>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
+              {steps[currentStep - 1]?.label}
+            </h2>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleClose}>
-            <X className="h-5 w-5" />
-          </Button>
+          
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={handleClose}>
+              <X className="h-5 w-5 text-slate-500" />
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Left Panel - Wizard */}
-      <div className={`flex w-full flex-col overflow-hidden lg:w-1/2 lg:border-r ${showPreview ? 'hidden lg:flex' : 'flex'}`}>
-        {/* Desktop Header */}
+      {/* MAIN CONTENT AREA */}
+      <div className={`flex w-full flex-col overflow-hidden lg:w-1/2 lg:border-r relative ${showPreview ? 'hidden lg:flex' : 'flex'}`}>
+        
+        {/* Desktop Header (Hidden on Mobile) */}
         <div className="hidden border-b p-4 sm:p-6 lg:block">
           <div className="flex items-center justify-between">
             <div>
@@ -214,7 +228,7 @@ export function CVCreativeWizard({ initialCV, onClose }: CVCreativeWizardProps) 
             </Button>
           </div>
 
-          {/* Progress Indicator */}
+          {/* Desktop Progress */}
           <div className="mt-4 flex gap-1">
             {steps.map((s) => (
               <button
@@ -233,20 +247,33 @@ export function CVCreativeWizard({ initialCV, onClose }: CVCreativeWizardProps) 
           </div>
         </div>
 
-        {/* Step Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-          {renderStep()}
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden bg-slate-50 dark:bg-slate-950 lg:bg-white lg:dark:bg-slate-950">
+          <div className="min-h-full p-4 pb-32 sm:p-6 lg:pb-6"> {/* Added massive bottom padding for mobile floating bar */}
+            <AnimatePresence mode="wait" custom={direction} initial={false}>
+              <motion.div
+                key={currentStep}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="w-full max-w-2xl mx-auto lg:max-w-none px-4 py-2 lg:p-0 bg-transparent lg:bg-transparent"
+              >
+                {renderStep()}
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
 
-        {/* Navigation Toolbar */}
-        <div className="flex-shrink-0 border-t bg-background p-3 sm:p-4">
-          <div className="flex items-center justify-between gap-2 sm:gap-3">
+        {/* DESKTOP Navigation Toolbar (Bottom Fixed in Column) */}
+        <div className="hidden lg:block flex-shrink-0 border-t bg-background p-4">
+          <div className="flex items-center justify-between gap-3">
             <Button
               variant="outline"
               onClick={handlePrevious}
               disabled={currentStep === 1}
-              className="flex-1 sm:flex-initial"
-              size="sm"
             >
               ← Prev
             </Button>
@@ -256,7 +283,7 @@ export function CVCreativeWizard({ initialCV, onClose }: CVCreativeWizardProps) 
             </div>
 
             {currentStep < 8 ? (
-              <Button onClick={handleNext} className="flex-1 sm:flex-initial" size="sm">
+              <Button onClick={handleNext}>
                 Next →
               </Button>
             ) : (
@@ -264,109 +291,111 @@ export function CVCreativeWizard({ initialCV, onClose }: CVCreativeWizardProps) 
             )}
           </div>
         </div>
-      </div>
 
-      {/* Mobile Bottom Navigation - Always visible when editing */}
-      {!showPreview && (
-        <div className="flex-shrink-0 border-t bg-white p-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] lg:hidden">
-          <div className="flex items-center justify-between gap-3">
-            <Button
-              variant="outline"
+        {/* MOBILE FLOATING BOTTOM BAR */}
+        <div className="lg:hidden fixed bottom-4 left-4 right-4 z-30">
+          <div className="flex items-center gap-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 dark:border-slate-700/50">
+             <Button
+              variant="ghost"
+              size="icon"
               onClick={handlePrevious}
               disabled={currentStep === 1}
-              className="flex-1 font-medium"
-              size="default"
+              className="h-12 w-12 rounded-xl flex-shrink-0 text-slate-500 disabled:opacity-30"
             >
-              ← Back
+              <ArrowLeft className="h-6 w-6" />
             </Button>
+            
+            {/* Preview Button (Middle) */}
+            <Button
+              variant="secondary"
+              onClick={() => setShowPreview(true)}
+              className="flex-1 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              Preview
+            </Button>
+
+            {/* Next / Finish Button (Right) */}
             {currentStep < 8 ? (
-              <Button onClick={handleNext} className="flex-1 font-medium shadow-md" size="default">
-                Next →
+              <Button 
+                onClick={handleNext} 
+                className="h-12 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg shadow-purple-500/20"
+              >
+                <ArrowRight className="h-6 w-6 text-white" />
               </Button>
             ) : (
-              <Button onClick={() => setShowPreview(true)} className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 font-medium shadow-md" size="default">
-                Preview & Save
+              <Button 
+                onClick={() => setShowPreview(true)} 
+                className="h-12 px-6 rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/20"
+              >
+                <Check className="h-6 w-6" />
               </Button>
             )}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Right Panel - Live Preview */}
-      <div className={`flex w-full flex-col bg-gray-50 dark:from-purple-950 dark:to-pink-950 lg:w-1/2 lg:bg-gradient-to-br lg:from-purple-50 lg:to-pink-50 ${showPreview ? 'flex' : 'hidden lg:flex'}`}>
-        {/* Mobile Template Selector - Only on Mobile Preview */}
-        <div className="flex-shrink-0 bg-white p-3 shadow-sm lg:bg-transparent lg:shadow-none">
-          <div className="lg:hidden">
-            <MobileTemplateSelector
-              selectedTemplate={templateId}
-              onSelect={setTemplateId}
-            />
-          </div>
-        </div>
-
-        {/* Preview Header - Desktop Only */}
-        <div className="hidden flex-shrink-0 border-b border-purple-200 bg-white/50 p-4 backdrop-blur-sm dark:border-purple-800 dark:bg-purple-950/50 lg:flex lg:items-center lg:justify-between">
+      {/* DESKTOP RIGHT PANEL - Live Preview */}
+      <div className="hidden w-1/2 flex-col border-l border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 lg:flex">
+        <div className="flex-shrink-0 border-b border-purple-200 dark:border-purple-800 bg-white/50 dark:bg-slate-800/50 p-4 backdrop-blur-sm flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h3 className="text-base font-semibold">Live Preview</h3>
-            <div className="rounded-full bg-white px-2.5 py-1 text-xs font-medium text-purple-600 shadow-sm">
+            <div className="rounded-full bg-white dark:bg-slate-700 px-2.5 py-1 text-xs font-medium text-purple-600 dark:text-purple-300 shadow-sm">
               {templateId}
             </div>
           </div>
-          {/* Zoom Controls - Desktop - Enhanced Visibility */}
-          <div className="flex items-center gap-2 rounded-lg border-2 border-purple-300 bg-white px-3 py-2 shadow-md">
-            <button
-              onClick={() => setZoomLevel(Math.max(50, zoomLevel - 10))}
-              className="flex h-8 w-8 items-center justify-center rounded-md bg-purple-100 text-lg font-bold text-purple-700 transition-all hover:bg-purple-200 disabled:cursor-not-allowed disabled:opacity-30"
-              disabled={zoomLevel <= 50}
-              title="Zoom Out"
-            >
-              −
-            </button>
-            <span className="min-w-[50px] text-center text-sm font-semibold text-purple-900">
-              {zoomLevel}%
-            </span>
-            <button
-              onClick={() => setZoomLevel(Math.min(150, zoomLevel + 10))}
-              className="flex h-8 w-8 items-center justify-center rounded-md bg-purple-100 text-lg font-bold text-purple-700 transition-all hover:bg-purple-200 disabled:cursor-not-allowed disabled:opacity-30"
-              disabled={zoomLevel >= 150}
-              title="Zoom In"
-            >
-              +
-            </button>
-          </div>
+          <p className="text-xs text-muted-foreground">Hover untuk zoom controls</p>
         </div>
 
-        {/* Preview Container - Scrollable with Mobile-Optimized Scaling */}
-        <div className="flex-1 overflow-auto bg-gray-50">
-          {/* Desktop: Use zoom controls */}
-          <div className="hidden min-h-full items-start justify-center p-6 lg:flex">
-            <div
-              style={{
-                transform: `scale(${zoomLevel / 100})`,
-                transformOrigin: 'top center',
-                transition: 'transform 0.2s ease-in-out',
-              }}
-            >
-              <CVPreview cv={cv} />
-            </div>
-          </div>
-          
-          {/* Mobile/Tablet: Responsive A4 preview */}
-          <div className="block p-4 lg:hidden">
-            <div className="mx-auto" style={{ width: 'fit-content' }}>
-              <div
-                className="origin-top"
-                style={{
-                  transform: 'scale(0.48)',
-                  transformOrigin: 'top center',
-                }}
-              >
-                <CVPreview cv={cv} />
-              </div>
-            </div>
-          </div>
+        <div className="flex-1 overflow-hidden bg-gray-50 dark:bg-slate-900 relative">
+          <CVPreview cv={cv} showControls />
         </div>
       </div>
+
+      {/* MOBILE PREVIEW OVERLAY */}
+      <AnimatePresence>
+        {showPreview && (
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-50 flex flex-col bg-slate-100 dark:bg-slate-900 lg:hidden"
+          >
+            {/* Mobile Preview Header */}
+            <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm z-10">
+              <h3 className="font-bold text-lg">Preview</h3>
+              <Button variant="ghost" size="sm" onClick={() => setShowPreview(false)}>
+                <X className="mr-2 h-4 w-4" />
+                Close
+              </Button>
+            </div>
+
+            {/* Mobile Template Selector */}
+            <div className="flex-shrink-0 bg-white dark:bg-slate-800 p-3 shadow-sm z-10">
+              <MobileTemplateSelector
+                selectedTemplate={templateId}
+                onSelect={setTemplateId}
+              />
+            </div>
+
+            {/* Preview Content */}
+            <div className="flex-1 overflow-hidden relative">
+              <CVPreview cv={cv} showControls />
+              
+              {/* Floating Edit Button */}
+              <div className="absolute bottom-6 right-6 z-50">
+                <Button 
+                  onClick={() => setShowPreview(false)}
+                  className="h-14 w-14 rounded-full shadow-xl bg-purple-600 hover:bg-purple-700 text-white p-0 flex items-center justify-center"
+                >
+                  <span className="text-xs font-bold">Edit</span>
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
