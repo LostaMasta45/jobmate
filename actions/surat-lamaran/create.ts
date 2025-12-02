@@ -94,6 +94,18 @@ export async function createCoverLetter(data: any) {
       return { error: `Database error: ${error.message}` };
     }
 
+    // 🆕 MONITORING: Log tool usage and send Telegram notification
+    try {
+      const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+      await logToolUsageWithNotification(
+        "Surat Lamaran Generator",
+        `${data.position} at ${data.companyName}`,
+        { templateType: data.templateType }
+      );
+    } catch (monitorError) {
+      console.error("[Monitoring] Failed to log surat lamaran usage:", monitorError);
+    }
+
     revalidatePath("/surat-lamaran");
     return { data: coverLetter };
   } catch (error: any) {

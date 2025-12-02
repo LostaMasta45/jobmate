@@ -109,6 +109,18 @@ export async function saveWAMessage(data: SaveWAMessageData) {
       return { error: insertError.message };
     }
 
+    // 🆕 MONITORING: Log tool usage and send Telegram notification
+    try {
+      const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+      await logToolUsageWithNotification(
+        "WhatsApp Generator",
+        `${data.position} at ${data.companyName}`,
+        { messageType: data.messageType, toneStyle: data.toneStyle }
+      );
+    } catch (monitorError) {
+      console.error("[Monitoring] Failed to log WA generator usage:", monitorError);
+    }
+
     revalidatePath("/tools/wa-generator");
     revalidatePath("/tools/wa-generator/history");
     

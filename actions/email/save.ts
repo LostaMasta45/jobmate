@@ -79,6 +79,19 @@ export async function saveEmailDraft(data: SaveEmailData) {
       return { error: insertError.message };
     }
 
+    // 🆕 MONITORING: Log tool usage and send Telegram notification
+    try {
+      const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+      await logToolUsageWithNotification(
+        "Email Generator",
+        `${data.position} at ${data.companyName}`,
+        { emailType: data.emailType, toneStyle: data.toneStyle }
+      );
+    } catch (monitorError) {
+      console.error("[Monitoring] Failed to log email generator usage:", monitorError);
+      // Don't throw - monitoring failure shouldn't break functionality
+    }
+
     revalidatePath("/tools/email-generator");
     return { data: draft };
   } catch (error: any) {

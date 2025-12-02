@@ -84,6 +84,18 @@ export async function saveSuratLamaran(data: SaveSuratLamaranData) {
       return { error: insertError.message };
     }
 
+    // 🆕 MONITORING: Log tool usage and send Telegram notification
+    try {
+      const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+      await logToolUsageWithNotification(
+        "Surat Lamaran Sederhana",
+        `${data.perusahaan.posisiLowongan} at ${data.perusahaan.namaPerusahaan}`,
+        { templateId: data.templateId, templateName: data.templateName }
+      );
+    } catch (monitorError) {
+      console.error("[Monitoring] Failed to log surat lamaran sederhana usage:", monitorError);
+    }
+
     revalidatePath("/surat-lamaran-sederhana");
     revalidatePath("/surat-lamaran-sederhana/history");
     

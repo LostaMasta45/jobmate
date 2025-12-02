@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, X, Eye } from "lucide-react";
 import { StepEmailType } from "./StepEmailType";
@@ -24,7 +24,7 @@ const STEPS = [
 ];
 
 const INITIAL_DATA: EmailFormData = {
-    emailType: 'application',
+    emailType: '',
     position: '',
     companyName: '',
     hasAttachment: true,
@@ -44,6 +44,7 @@ export function EmailWizard() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [formData, setFormData] = useState<EmailFormData>(INITIAL_DATA);
   const [isLoaded, setIsLoaded] = useState(false);
+  const topRef = useRef<HTMLDivElement>(null);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -68,6 +69,24 @@ export function EmailWizard() {
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [formData, isLoaded]);
+
+  // Scroll to top helper
+  const scrollToTop = () => {
+    // Small timeout ensures DOM update happens first
+    setTimeout(() => {
+        if (topRef.current) {
+            topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            // Fallback if ref is not attached yet or something else
+             const contentContainer = document.getElementById('wizard-content');
+             if (contentContainer) {
+                contentContainer.scrollTo({ top: 0, behavior: 'smooth' });
+             } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+             }
+        }
+    }, 100);
+  };
 
   // Handle "Generate" action when moving from Step 4 to Step 5
   const handleGenerate = async () => {
@@ -122,16 +141,7 @@ export function EmailWizard() {
     // Proceed to next step
     setDirection(1);
     setCurrentStep(prev => prev + 1);
-    
-    // Smooth scroll to top
-    if (window.innerWidth < 1024) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-        const contentContainer = document.getElementById('wizard-content');
-        if (contentContainer) {
-        contentContainer.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    }
+    scrollToTop();
   };
 
   const updateFormData = (data: Partial<EmailFormData>) => {
@@ -164,19 +174,7 @@ export function EmailWizard() {
     } else if (currentStep < STEPS.length) {
       setDirection(1);
       setCurrentStep(prev => prev + 1);
-      
-      // Smooth scroll to top
-      if (window.innerWidth < 1024) {
-         // Small timeout ensures DOM update happens first
-         setTimeout(() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-         }, 50);
-      } else {
-          const contentContainer = document.getElementById('wizard-content');
-          if (contentContainer) {
-            contentContainer.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-      }
+      scrollToTop();
     }
   };
 
@@ -184,18 +182,7 @@ export function EmailWizard() {
     if (currentStep > 1) {
       setDirection(-1);
       setCurrentStep(prev => prev - 1);
-      
-      // Smooth scroll to top
-      if (window.innerWidth < 1024) {
-         setTimeout(() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-         }, 50);
-      } else {
-          const contentContainer = document.getElementById('wizard-content');
-          if (contentContainer) {
-            contentContainer.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-      }
+      scrollToTop();
     }
   };
 
@@ -239,7 +226,8 @@ export function EmailWizard() {
         
         {/* LEFT PANEL: Wizard Form */}
         <div className="flex-1 flex flex-col min-w-0 lg:border-r relative">
-            
+            <div ref={topRef} className="absolute top-0 h-1 w-1 opacity-0 pointer-events-none" />
+
             {/* MOBILE HEADER: Segmented Progress */}
             <div className="flex-shrink-0 bg-background pt-4 lg:hidden px-6 pb-2 border-b z-10">
                 <div className="flex gap-1 mb-3">

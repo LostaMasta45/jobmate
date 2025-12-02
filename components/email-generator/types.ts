@@ -1,6 +1,6 @@
 export interface EmailFormData {
   // Basic Info
-  emailType: 'application' | 'follow_up' | 'thank_you' | 'inquiry';
+  emailType: 'application' | 'follow_up' | 'thank_you' | 'inquiry' | '';
   position: string;
   companyName: string;
   hrdName?: string;

@@ -562,6 +562,18 @@ export async function generateInterviewPrep(
       return { success: false, error: "Failed to save interview prep session" };
     }
 
+    // 🆕 MONITORING: Log tool usage and send Telegram notification
+    try {
+      const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+      await logToolUsageWithNotification(
+        "Interview Prep Generator",
+        `${jobData.position} at ${jobData.company}`,
+        { matchScore, questionsCount: questions.length, generationTime }
+      );
+    } catch (monitorError) {
+      console.error("[Monitoring] Failed to log interview prep usage:", monitorError);
+    }
+
     console.log(`[Interview Prep] Success! Generated ${questions.length} questions in ${generationTime}ms`);
 
     return {
