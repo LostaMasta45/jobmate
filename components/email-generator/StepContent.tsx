@@ -83,7 +83,7 @@ export function StepContent({ formData, updateFormData }: StepContentProps) {
 
       {/* Highlight Skills - For application and inquiry only */}
       {(isApplication || isInquiry) && (
-        <Card className="p-5 border-slate-200 dark:border-slate-800">
+        <Card className="p-4 md:p-5 border-slate-200 dark:border-slate-800">
         <div className="space-y-3">
           <Label className="text-lg font-semibold flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-[#5547d0]" />
@@ -94,7 +94,7 @@ export function StepContent({ formData, updateFormData }: StepContentProps) {
         </p>
         
         <div className="space-y-3">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Input
               type="text"
               placeholder="e.g. React, TypeScript, Node.js"
@@ -107,7 +107,7 @@ export function StepContent({ formData, updateFormData }: StepContentProps) {
               type="button"
               onClick={() => addSkill(skillInput)}
               disabled={!skillInput.trim() || formData.highlightSkills.length >= 10}
-              className="h-11 px-6 bg-[#5547d0] hover:bg-[#4538b0]"
+              className="h-11 px-6 bg-[#5547d0] hover:bg-[#4538b0] w-full sm:w-auto"
             >
               Tambah
             </Button>
@@ -273,7 +273,7 @@ export function StepContent({ formData, updateFormData }: StepContentProps) {
       </Card>
 
       {/* Call to Action - Dynamic based on email type */}
-      <Card className="p-5 border-slate-200 dark:border-slate-800">
+      <Card className="p-4 md:p-5 border-slate-200 dark:border-slate-800">
       <div className="space-y-4">
         <Label className="text-lg font-semibold flex items-center gap-2">
           <Target className="h-5 w-5 text-red-500" />

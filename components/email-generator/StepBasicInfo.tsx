@@ -58,13 +58,13 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
       </div>
 
       {/* Email Details Section */}
-      <Card className="p-6 shadow-sm border-slate-200 dark:border-slate-800">
+      <Card className="p-4 md:p-6 shadow-sm border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">
             <Briefcase className="h-5 w-5 text-[#5547d0]" />
             <h3 className="font-semibold text-lg">Detail Lamaran</h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         {/* Position - Conditional */}
         {needsPosition ? (
           <div className="space-y-2">
@@ -128,7 +128,7 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
 
       {/* Conditional Fields for Thank You Email */}
       {needsInterviewerName && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-6">
           <div className="space-y-2">
             <Label htmlFor="hrdName" className="flex items-center gap-2">
               <User className="h-4 w-4 text-primary" />
@@ -180,7 +180,7 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
 
       {/* Standard HRD fields for application and inquiry */}
       {!needsInterviewerName && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-6">
           <div className="space-y-2">
             <Label htmlFor="hrdName" className="flex items-center gap-2">
               {formData.emailType === 'inquiry' ? 'Nama Contact Person (Optional)' : 'Nama HRD (Optional)'}
@@ -253,13 +253,13 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
       </Card>
 
       {/* Personal Info Section */}
-      <Card className="p-6 shadow-sm border-slate-200 dark:border-slate-800">
+      <Card className="p-4 md:p-6 shadow-sm border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">
             <User className="h-5 w-5 text-[#5547d0]" />
             <h3 className="font-semibold text-lg">Informasi Personal</h3>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {/* Your Name */}
           <div className="space-y-2">
             <Label htmlFor="yourName">Nama Lengkap Anda *</Label>

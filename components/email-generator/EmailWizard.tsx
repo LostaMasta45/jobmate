@@ -122,6 +122,16 @@ export function EmailWizard() {
     // Proceed to next step
     setDirection(1);
     setCurrentStep(prev => prev + 1);
+    
+    // Smooth scroll to top
+    if (window.innerWidth < 1024) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        const contentContainer = document.getElementById('wizard-content');
+        if (contentContainer) {
+        contentContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
   };
 
   const updateFormData = (data: Partial<EmailFormData>) => {
@@ -154,10 +164,18 @@ export function EmailWizard() {
     } else if (currentStep < STEPS.length) {
       setDirection(1);
       setCurrentStep(prev => prev + 1);
-      // Smooth scroll to top of form
-      const contentContainer = document.getElementById('wizard-content');
-      if (contentContainer) {
-        contentContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Smooth scroll to top
+      if (window.innerWidth < 1024) {
+         // Small timeout ensures DOM update happens first
+         setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+         }, 50);
+      } else {
+          const contentContainer = document.getElementById('wizard-content');
+          if (contentContainer) {
+            contentContainer.scrollTo({ top: 0, behavior: 'smooth' });
+          }
       }
     }
   };
@@ -166,10 +184,17 @@ export function EmailWizard() {
     if (currentStep > 1) {
       setDirection(-1);
       setCurrentStep(prev => prev - 1);
-      // Smooth scroll to top of form
-      const contentContainer = document.getElementById('wizard-content');
-      if (contentContainer) {
-        contentContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Smooth scroll to top
+      if (window.innerWidth < 1024) {
+         setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+         }, 50);
+      } else {
+          const contentContainer = document.getElementById('wizard-content');
+          if (contentContainer) {
+            contentContainer.scrollTo({ top: 0, behavior: 'smooth' });
+          }
       }
     }
   };
@@ -314,14 +339,14 @@ export function EmailWizard() {
         )}
 
             {/* MOBILE PREVIEW BUTTON (Floating) */}
-            <div className="lg:hidden fixed bottom-24 right-4 z-30">
+            <div className="lg:hidden fixed bottom-24 left-0 right-0 z-30 flex justify-center pointer-events-none">
                 {currentStep < 5 && (
                      <Button 
-                        size="icon" 
-                        className="h-12 w-12 rounded-full shadow-xl bg-[#5547d0] hover:bg-[#4538b0] text-white border-2 border-white dark:border-slate-900"
+                        className="pointer-events-auto h-11 px-6 rounded-full shadow-xl bg-[#5547d0] hover:bg-[#4538b0] text-white border border-white/20 backdrop-blur-sm font-medium transition-transform hover:scale-105 active:scale-95 flex items-center gap-2"
                         onClick={() => setShowPreview(true)}
                     >
-                        <Eye className="h-5 w-5" />
+                        <Eye className="h-4 w-4" />
+                        Lihat Preview
                      </Button>
                 )}
             </div>

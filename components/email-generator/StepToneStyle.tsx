@@ -110,7 +110,7 @@ export function StepToneStyle({ formData, updateFormData }: StepToneStyleProps) 
           <Label className="text-lg font-semibold">Pilih Gaya Email</Label>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {TONE_STYLES.map((style) => (
             <button
               key={style.value}
@@ -155,25 +155,25 @@ export function StepToneStyle({ formData, updateFormData }: StepToneStyleProps) 
         <RadioGroup
           value={formData.personality}
           onValueChange={(value: any) => updateFormData({ personality: value })}
-          className="space-y-3"
+          className="space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:space-y-0"
         >
           {PERSONALITIES.map((personality) => (
             <label
               key={personality.value}
-              className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+              className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all h-full ${
                 formData.personality === personality.value
                   ? 'border-primary bg-primary/5'
                   : 'border-border hover:border-primary/50'
               }`}
             >
-              <RadioGroupItem value={personality.value} className="mt-1" />
-              <div className="flex-1">
+              <RadioGroupItem value={personality.value} className="mt-1 shrink-0" />
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-2xl">{personality.icon}</span>
-                  <p className="font-semibold">{personality.label}</p>
+                  <span className="text-2xl shrink-0">{personality.icon}</span>
+                  <p className="font-semibold truncate">{personality.label}</p>
                 </div>
-                <p className="text-sm text-muted-foreground mb-2">{personality.desc}</p>
-                <p className="text-sm italic text-primary/70">&quot;{personality.example}&quot;</p>
+                <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{personality.desc}</p>
+                <p className="text-sm italic text-primary/70 line-clamp-1">&quot;{personality.example}&quot;</p>
               </div>
             </label>
           ))}

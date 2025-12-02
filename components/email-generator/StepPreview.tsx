@@ -182,7 +182,7 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
 
             {/* Action Buttons - Responsive Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <Button onClick={handleCopy} variant="outline" className="gap-2 h-11">
+              <Button onClick={handleCopy} variant="outline" className="gap-2 h-11 w-full">
                 <Copy className="h-4 w-4" />
                 Copy
               </Button>
@@ -194,7 +194,7 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
                   window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
                 }}
                 variant="outline"
-                className="gap-2 h-11"
+                className="gap-2 h-11 w-full"
               >
                 <Send className="h-4 w-4" />
                 Open Mail
@@ -203,7 +203,7 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
               <Button
                 onClick={handleSave}
                 variant="default"
-                className="gap-2 h-11 bg-[#5547d0] hover:bg-[#4538b0]"
+                className="gap-2 h-11 bg-[#5547d0] hover:bg-[#4538b0] w-full"
                 disabled={saving || saved}
               >
                 {saved ? (
