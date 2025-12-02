@@ -262,7 +262,7 @@ export function MagazineLayout({ cv }: TemplateProps) {
   );
 }
 
-// 6. Colorful Blocks - Vibrant sections with color blocks
+// 6. Colorful Blocks - Vibrant sections with color blocks, now cleaner and more structured
 export function ColorfulBlocks({ cv }: TemplateProps) {
   const colors = cv.colorScheme || { primary: "#f59e0b", secondary: "#fbbf24", accent: "#fcd34d", background: "#ffffff", text: "#1e293b" };
   const content = cv.content;
@@ -271,29 +271,35 @@ export function ColorfulBlocks({ cv }: TemplateProps) {
   const blockColors = [colors.primary, colors.secondary, colors.accent, "#8b5cf6", "#ec4899"];
 
   return (
-    <div className="cv-template" style={{ color: colors.text, padding: "16mm" }}>
+    <div className="cv-template" style={{ 
+      color: colors.text, 
+      padding: "16mm", 
+      fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+      backgroundColor: "#fdfdfd"
+    }}>
       {/* Colorful header */}
       <div style={{ 
         background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary}, ${colors.accent})`,
-        padding: "16pt",
+        padding: "24pt",
         marginLeft: "-16mm",
         marginRight: "-16mm",
         marginTop: "-16mm",
-        marginBottom: "12pt",
+        marginBottom: "20pt",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "16pt", maxWidth: "178mm", margin: "0 auto" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "20pt", maxWidth: "178mm", margin: "0 auto" }}>
           <PhotoComponent photo={cv.photoUrl} photoOpts={cv.photoOptions} borderColor="white" />
           <div style={{ flex: 1, color: "white" }}>
-            <h1 style={{ fontSize: "28pt", fontWeight: 900, margin: 0, textShadow: "2px 2px 4px rgba(0,0,0,0.2)" }}>
+            <h1 style={{ fontSize: "32pt", fontWeight: 800, margin: 0, textShadow: "0 2px 4px rgba(0,0,0,0.1)", lineHeight: 1 }}>
               {content.basics.firstName} {content.basics.lastName}
             </h1>
             {content.basics.headline && (
-              <p style={{ fontSize: "13pt", marginTop: "4pt", opacity: 0.95 }}>{content.basics.headline}</p>
+              <p style={{ fontSize: "14pt", marginTop: "6pt", opacity: 0.95, fontWeight: 500 }}>{content.basics.headline}</p>
             )}
-            <div style={{ marginTop: "8pt", fontSize: "9pt", display: "flex", flexWrap: "wrap", gap: "12pt", opacity: 0.9 }}>
-              {content.basics.email && <span>📧 {content.basics.email}</span>}
-              {content.basics.phone && <span>📱 {content.basics.phone}</span>}
-              {content.basics.city && <span>📍 {content.basics.city}</span>}
+            <div style={{ marginTop: "12pt", fontSize: "9.5pt", display: "flex", flexWrap: "wrap", gap: "16pt", opacity: 0.95, fontWeight: 500 }}>
+              {content.basics.email && <span style={{ display: "flex", alignItems: "center", gap: "4pt" }}>📧 {content.basics.email}</span>}
+              {content.basics.phone && <span style={{ display: "flex", alignItems: "center", gap: "4pt" }}>📱 {content.basics.phone}</span>}
+              {content.basics.city && <span style={{ display: "flex", alignItems: "center", gap: "4pt" }}>📍 {content.basics.city}</span>}
             </div>
           </div>
         </div>
@@ -302,46 +308,70 @@ export function ColorfulBlocks({ cv }: TemplateProps) {
       {/* Summary block */}
       {content.summary && (
         <div style={{ 
-          backgroundColor: `${colors.primary}15`,
-          padding: "12pt",
+          backgroundColor: "white",
+          padding: "16pt",
           borderLeft: `6pt solid ${colors.primary}`,
-          marginBottom: "12pt",
+          marginBottom: "20pt",
           borderRadius: "0 8pt 8pt 0",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.03)"
         }}>
-          <p style={{ fontSize: "9pt", lineHeight: 1.6 }}>{content.summary}</p>
+          <h2 style={{ fontSize: "11pt", fontWeight: 700, color: colors.primary, marginBottom: "8pt", textTransform: "uppercase" }}>Professional Summary</h2>
+          <p style={{ fontSize: "9.5pt", lineHeight: 1.6, color: "#334155", margin: 0 }}>{content.summary}</p>
         </div>
       )}
 
       {/* Experience blocks */}
       {content.experiences && content.experiences.length > 0 && (
-        <div style={{ marginBottom: "12pt" }}>
+        <div style={{ marginBottom: "20pt" }}>
           <h2 style={{ 
             fontSize: "14pt",
-            fontWeight: 700,
-            color: colors.primary,
-            marginBottom: "10pt",
-            paddingBottom: "4pt",
+            fontWeight: 800,
+            color: "#0f172a",
+            marginBottom: "12pt",
+            paddingBottom: "6pt",
             borderBottom: `3pt solid ${colors.primary}`,
-          }}>💼 Work Experience</h2>
+            display: "flex",
+            alignItems: "center",
+            gap: "8pt"
+          }}>
+            <span style={{ fontSize: "16pt" }}>💼</span> Work Experience
+          </h2>
           {content.experiences.map((exp, idx) => (
             <div key={idx} style={{ 
-              marginBottom: "10pt",
-              padding: "12pt",
-              backgroundColor: `${blockColors[idx % blockColors.length]}10`,
+              marginBottom: "12pt",
+              padding: "16pt",
+              backgroundColor: "white",
               borderLeft: `5pt solid ${blockColors[idx % blockColors.length]}`,
-              borderRadius: "0 6pt 6pt 0",
+              borderRadius: "0 8pt 8pt 0",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.03)"
             }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6pt" }}>
                 <div>
-                  <h3 style={{ fontSize: "11pt", fontWeight: 700, color: blockColors[idx % blockColors.length] }}>{exp.title}</h3>
-                  <p style={{ fontSize: "10pt", margin: "2pt 0", fontWeight: 600 }}>{exp.company}</p>
+                  <h3 style={{ fontSize: "12pt", fontWeight: 700, color: "#0f172a", margin: 0 }}>{exp.title}</h3>
+                  <p style={{ fontSize: "10pt", margin: "2pt 0", fontWeight: 600, color: blockColors[idx % blockColors.length] }}>{exp.company}</p>
                 </div>
-                <span style={{ fontSize: "8pt", color: "#64748b", padding: "2pt 8pt", backgroundColor: "white", borderRadius: "10pt", whiteSpace: "nowrap" }}>
-                  {exp.startDate} - {exp.isCurrent ? "Now" : exp.endDate}
+                <span style={{ 
+                  fontSize: "8.5pt", 
+                  color: "#475569", 
+                  padding: "4pt 10pt", 
+                  backgroundColor: "#f8fafc", 
+                  borderRadius: "20pt", 
+                  whiteSpace: "nowrap",
+                  fontWeight: 500,
+                  border: "1px solid #e2e8f0"
+                }}>
+                  {exp.startDate} - {exp.isCurrent ? "Present" : exp.endDate}
                 </span>
               </div>
-              <ul style={{ marginTop: "6pt", paddingLeft: "14pt", fontSize: "9pt" }}>
-                {exp.bullets.map((bullet, i) => bullet.trim() && <li key={i} style={{ marginBottom: "2pt" }}>{bullet}</li>)}
+              <ul style={{ margin: 0, paddingLeft: "0", listStyle: "none" }}>
+                {exp.bullets.map((bullet, i) => (
+                  bullet.trim() && (
+                    <li key={i} style={{ marginBottom: "4pt", fontSize: "9.5pt", color: "#334155", display: "flex", gap: "8pt", lineHeight: 1.5 }}>
+                      <span style={{ color: blockColors[idx % blockColors.length], fontWeight: "bold" }}>•</span>
+                      <span>{bullet}</span>
+                    </li>
+                  )
+                ))}
               </ul>
             </div>
           ))}
@@ -349,28 +379,34 @@ export function ColorfulBlocks({ cv }: TemplateProps) {
       )}
 
       {/* Education & Skills in colored blocks */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12pt" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20pt" }}>
         {content.education && content.education.length > 0 && (
           <div>
             <h2 style={{ 
               fontSize: "14pt",
-              fontWeight: 700,
-              color: colors.secondary,
-              marginBottom: "10pt",
-              paddingBottom: "4pt",
+              fontWeight: 800,
+              color: "#0f172a",
+              marginBottom: "12pt",
+              paddingBottom: "6pt",
               borderBottom: `3pt solid ${colors.secondary}`,
-            }}>🎓 Education</h2>
+              display: "flex",
+              alignItems: "center",
+              gap: "8pt"
+            }}>
+              <span style={{ fontSize: "16pt" }}>🎓</span> Education
+            </h2>
             {content.education.map((edu, idx) => (
               <div key={idx} style={{ 
-                marginBottom: "8pt",
-                padding: "10pt",
-                backgroundColor: `${colors.secondary}15`,
+                marginBottom: "10pt",
+                padding: "14pt",
+                backgroundColor: "white",
                 borderLeft: `4pt solid ${colors.secondary}`,
-                borderRadius: "0 6pt 6pt 0",
+                borderRadius: "0 8pt 8pt 0",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.03)"
               }}>
-                <h3 style={{ fontSize: "10pt", fontWeight: 700 }}>{edu.school}</h3>
-                {edu.degree && <p style={{ fontSize: "9pt", margin: "2pt 0" }}>{edu.degree} {edu.field}</p>}
-                {edu.startDate && <p style={{ fontSize: "8pt", color: "#64748b" }}>{edu.startDate} - {edu.endDate}</p>}
+                <h3 style={{ fontSize: "11pt", fontWeight: 700, color: "#0f172a" }}>{edu.school}</h3>
+                {edu.degree && <p style={{ fontSize: "9.5pt", margin: "2pt 0", color: "#334155" }}>{edu.degree} {edu.field}</p>}
+                {edu.startDate && <p style={{ fontSize: "8.5pt", color: "#64748b", marginTop: "4pt" }}>{edu.startDate} - {edu.endDate}</p>}
               </div>
             ))}
           </div>
@@ -380,22 +416,28 @@ export function ColorfulBlocks({ cv }: TemplateProps) {
           <div>
             <h2 style={{ 
               fontSize: "14pt",
-              fontWeight: 700,
-              color: colors.accent,
-              marginBottom: "10pt",
-              paddingBottom: "4pt",
+              fontWeight: 800,
+              color: "#0f172a",
+              marginBottom: "12pt",
+              paddingBottom: "6pt",
               borderBottom: `3pt solid ${colors.accent}`,
-            }}>⚡ Skills</h2>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "6pt" }}>
+              display: "flex",
+              alignItems: "center",
+              gap: "8pt"
+            }}>
+              <span style={{ fontSize: "16pt" }}>⚡</span> Skills
+            </h2>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "8pt" }}>
               {content.skills.map((skill, idx) => (
                 <span key={idx} style={{
-                  backgroundColor: blockColors[idx % blockColors.length],
-                  color: "white",
-                  padding: "5pt 10pt",
-                  borderRadius: "6pt",
-                  fontSize: "8pt",
+                  backgroundColor: "white",
+                  color: "#0f172a",
+                  padding: "6pt 12pt",
+                  borderRadius: "8pt",
+                  fontSize: "9pt",
                   fontWeight: 600,
-                  boxShadow: "2px 2px 4px rgba(0,0,0,0.1)",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                  borderLeft: `3pt solid ${blockColors[idx % blockColors.length]}`
                 }}>
                   {skill}
                 </span>
@@ -408,44 +450,45 @@ export function ColorfulBlocks({ cv }: TemplateProps) {
   );
 }
 
-// 7. Timeline Hero - Vertical timeline with milestone circles
+// 7. Timeline Hero - Vertical timeline with milestone circles, refined
 export function TimelineHero({ cv }: TemplateProps) {
   const colors = cv.colorScheme || { primary: "#0891b2", secondary: "#06b6d4", accent: "#22d3ee", background: "#ffffff", text: "#0f172a" };
   const content = cv.content;
   if (!content) return null;
 
   return (
-    <div className="cv-template" style={{ color: colors.text, fontFamily: "'Poppins', sans-serif" }}>
+    <div className="cv-template" style={{ color: colors.text, fontFamily: "'Poppins', sans-serif", lineHeight: 1.6 }}>
       {/* Header with photo */}
       <div style={{ 
         display: 'flex',
         alignItems: 'center',
-        gap: '16pt',
-        marginBottom: '16pt',
-        paddingBottom: '12pt',
-        borderBottom: `3pt solid ${colors.primary}`,
+        gap: '24pt',
+        marginBottom: '24pt',
+        paddingBottom: '20pt',
+        borderBottom: `4pt solid ${colors.primary}`,
       }}>
         {cv.photoUrl && cv.photoOptions && (
           <div style={{
-            width: '90pt',
-            height: '90pt',
+            width: '100pt',
+            height: '100pt',
             borderRadius: '50%',
             border: `4pt solid ${colors.primary}`,
             overflow: 'hidden',
+            boxShadow: `0 0 0 4pt ${colors.primary}20`
           }}>
             <img src={cv.photoUrl} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
         <div style={{ flex: 1 }}>
-          <h1 style={{ fontSize: '28pt', fontWeight: 800, margin: 0, color: colors.primary }}>
+          <h1 style={{ fontSize: '32pt', fontWeight: 800, margin: 0, color: colors.primary, lineHeight: 1.1 }}>
             {content.basics.firstName} {content.basics.lastName}
           </h1>
           {content.basics.headline && (
-            <div style={{ fontSize: '12pt', marginTop: '4pt', color: colors.secondary, fontWeight: 500 }}>
+            <div style={{ fontSize: '14pt', marginTop: '6pt', color: colors.secondary, fontWeight: 500 }}>
               {content.basics.headline}
             </div>
           )}
-          <div style={{ marginTop: '6pt', fontSize: '8pt', display: 'flex', gap: '12pt', flexWrap: 'wrap', opacity: 0.8 }}>
+          <div style={{ marginTop: '12pt', fontSize: '9.5pt', display: 'flex', gap: '16pt', flexWrap: 'wrap', color: "#475569", fontWeight: 500 }}>
             {content.basics.email && <span>✉ {content.basics.email}</span>}
             {content.basics.phone && <span>☎ {content.basics.phone}</span>}
             {content.basics.city && <span>📍 {content.basics.city}</span>}
@@ -456,74 +499,94 @@ export function TimelineHero({ cv }: TemplateProps) {
       {/* Summary */}
       {content.summary && (
         <div style={{ 
-          marginBottom: '16pt',
-          padding: '12pt',
+          marginBottom: '24pt',
+          padding: '16pt',
           backgroundColor: `${colors.primary}08`,
           borderLeft: `4pt solid ${colors.primary}`,
-          fontSize: '9pt',
-          lineHeight: 1.6,
+          borderRadius: '0 8pt 8pt 0'
         }}>
-          {content.summary}
+          <h2 style={{ fontSize: "11pt", fontWeight: 700, color: colors.primary, marginBottom: "8pt", textTransform: "uppercase" }}>Profile</h2>
+          <p style={{ fontSize: "9.5pt", margin: 0 }}>{content.summary}</p>
         </div>
       )}
 
       {/* Experience Timeline */}
       {content.experiences && content.experiences.length > 0 && (
-        <div style={{ marginBottom: '14pt' }}>
+        <div style={{ marginBottom: '24pt' }}>
           <h2 style={{ 
             color: colors.primary,
-            fontSize: '14pt',
+            fontSize: '16pt',
             fontWeight: 700,
-            marginBottom: '12pt',
+            marginBottom: '16pt',
+            display: "flex",
+            alignItems: "center",
+            gap: "8pt"
           }}>
             Career Timeline
           </h2>
           {content.experiences.map((exp, idx) => (
             <div key={idx} style={{ 
               position: 'relative',
-              paddingLeft: '30pt',
-              marginBottom: '16pt',
-              paddingBottom: '8pt',
-              borderLeft: idx < content.experiences.length - 1 ? `2pt solid ${colors.accent}` : 'none',
+              paddingLeft: '32pt',
+              marginBottom: '20pt',
+              paddingBottom: idx === content.experiences.length - 1 ? 0 : '8pt',
             }}>
+              {/* Timeline Line */}
+              {idx !== content.experiences.length - 1 && (
+                <div style={{
+                  position: 'absolute',
+                  left: '0',
+                  top: '8pt',
+                  bottom: '-20pt',
+                  width: '2pt',
+                  backgroundColor: `${colors.primary}30`,
+                  marginLeft: '5pt'
+                }} />
+              )}
+
               {/* Timeline circle */}
               <div style={{
                 position: 'absolute',
-                left: '-7pt',
-                top: '2pt',
+                left: '0',
+                top: '4pt',
                 width: '12pt',
                 height: '12pt',
                 borderRadius: '50%',
                 backgroundColor: colors.primary,
                 border: `2pt solid white`,
                 boxShadow: `0 0 0 2pt ${colors.primary}`,
+                zIndex: 1
               }} />
               
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6pt' }}>
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ fontSize: '11pt', fontWeight: 700, color: colors.primary, margin: 0 }}>
+                  <h3 style={{ fontSize: '12pt', fontWeight: 700, color: "#0f172a", margin: 0 }}>
                     {exp.title}
                   </h3>
-                  <div style={{ fontSize: '10pt', marginTop: '2pt', fontWeight: 600 }}>
+                  <div style={{ fontSize: '10.5pt', marginTop: '2pt', fontWeight: 600, color: colors.primary }}>
                     {exp.company}
                   </div>
                 </div>
                 <div style={{ 
-                  fontSize: '8pt',
+                  fontSize: '8.5pt',
                   color: 'white',
                   backgroundColor: colors.secondary,
-                  padding: '4pt 10pt',
-                  borderRadius: '12pt',
+                  padding: '4pt 12pt',
+                  borderRadius: '20pt',
                   whiteSpace: 'nowrap',
-                  marginLeft: '10pt',
+                  marginLeft: '12pt',
+                  fontWeight: 600
                 }}>
                   {exp.startDate} - {exp.isCurrent ? 'Now' : exp.endDate}
                 </div>
               </div>
               {exp.bullets && exp.bullets.length > 0 && (
-                <ul style={{ marginTop: '6pt', paddingLeft: '14pt', fontSize: '9pt', lineHeight: 1.5 }}>
+                <ul style={{ margin: 0, paddingLeft: '0', listStyle: 'none' }}>
                   {exp.bullets.filter(Boolean).map((bullet: string, i: number) => (
-                    <li key={i} style={{ marginBottom: '3pt' }}>{bullet}</li>
+                    <li key={i} style={{ marginBottom: '4pt', fontSize: "9.5pt", color: "#334155", display: "flex", gap: "8pt" }}>
+                      <span style={{ color: colors.primary, fontWeight: "bold" }}>›</span>
+                      <span>{bullet}</span>
+                    </li>
                   ))}
                 </ul>
               )}
@@ -533,33 +596,35 @@ export function TimelineHero({ cv }: TemplateProps) {
       )}
 
       {/* Education & Skills Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14pt' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24pt' }}>
         {content.education && content.education.length > 0 && (
           <div>
             <h2 style={{ 
               color: colors.primary,
-              fontSize: '12pt',
+              fontSize: '14pt',
               fontWeight: 700,
-              marginBottom: '10pt',
+              marginBottom: '12pt',
             }}>
               Education
             </h2>
-            {content.education.map((edu, idx) => (
-              <div key={idx} style={{ 
-                marginBottom: '10pt',
-                padding: '10pt',
-                backgroundColor: `${colors.accent}15`,
-                borderRadius: '8pt',
-              }}>
-                <div style={{ fontSize: '10pt', fontWeight: 700 }}>{edu.school}</div>
-                {edu.degree && <div style={{ fontSize: '9pt', marginTop: '2pt' }}>{edu.degree}</div>}
-                {edu.startDate && (
-                  <div style={{ fontSize: '8pt', color: '#64748b', marginTop: '2pt' }}>
-                    {edu.startDate} - {edu.endDate}
-                  </div>
-                )}
-              </div>
-            ))}
+            <div style={{ display: "flex", flexDirection: "column", gap: "12pt" }}>
+              {content.education.map((edu, idx) => (
+                <div key={idx} style={{ 
+                  padding: '12pt',
+                  backgroundColor: `${colors.accent}10`,
+                  borderRadius: '12pt',
+                  border: `1px solid ${colors.accent}30`
+                }}>
+                  <div style={{ fontSize: '11pt', fontWeight: 700, color: "#0f172a" }}>{edu.school}</div>
+                  {edu.degree && <div style={{ fontSize: '10pt', marginTop: '2pt', color: colors.primary, fontWeight: 500 }}>{edu.degree}</div>}
+                  {edu.startDate && (
+                    <div style={{ fontSize: '9pt', color: '#64748b', marginTop: '4pt' }}>
+                      {edu.startDate} - {edu.endDate}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -567,21 +632,23 @@ export function TimelineHero({ cv }: TemplateProps) {
           <div>
             <h2 style={{ 
               color: colors.primary,
-              fontSize: '12pt',
+              fontSize: '14pt',
               fontWeight: 700,
-              marginBottom: '10pt',
+              marginBottom: '12pt',
             }}>
               Skills & Expertise
             </h2>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6pt' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8pt' }}>
               {content.skills.map((skill, idx) => (
                 <span key={idx} style={{
-                  backgroundColor: colors.primary,
-                  color: 'white',
-                  padding: '5pt 10pt',
-                  borderRadius: '6pt',
-                  fontSize: '8pt',
-                  fontWeight: 500,
+                  backgroundColor: "white",
+                  color: colors.primary,
+                  padding: '6pt 12pt',
+                  borderRadius: '8pt',
+                  fontSize: '9pt',
+                  fontWeight: 600,
+                  border: `1px solid ${colors.primary}30`,
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
                 }}>
                   {skill}
                 </span>
@@ -593,7 +660,6 @@ export function TimelineHero({ cv }: TemplateProps) {
     </div>
   );
 }
-
 // 8. Portfolio Grid - Modern card-based grid layout
 export function PortfolioGrid({ cv }: TemplateProps) {
   const colors = cv.colorScheme || { primary: "#7c3aed", secondary: "#8b5cf6", accent: "#a78bfa", background: "#faf5ff", text: "#1e293b" };
