@@ -42,7 +42,9 @@ export function MobileToolHeader({
     <>
       {/* Mobile Header - Only visible on mobile */}
       <div className={cn(
-        "lg:hidden sticky top-0 z-40 w-full",
+        "lg:hidden sticky top-0 z-40",
+        // Negative margins to counteract AppShell padding
+        "-mx-3 sm:-mx-4 mb-4",
         "bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg",
         "border-b border-gray-200 dark:border-gray-800",
         "shadow-sm",

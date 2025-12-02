@@ -142,8 +142,8 @@ export function StepExperience({ resume, setResume }: StepExperienceProps) {
       )}
 
       {resume.experiences.map((exp, idx) => (
-        <Card key={exp.id} className="p-6">
-          <div className="space-y-4">
+        <Card key={exp.id} className="p-4 sm:p-6">
+          <div className="space-y-6">
             {/* Header */}
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2">
@@ -160,9 +160,9 @@ export function StepExperience({ resume, setResume }: StepExperienceProps) {
             </div>
 
             {/* Basic Info */}
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <Label htmlFor={`title-${exp.id}`}>
+                <Label htmlFor={`title-${exp.id}`} className="text-base sm:text-sm">
                   Posisi <span className="text-destructive">*</span>
                 </Label>
                 <Input
@@ -170,11 +170,11 @@ export function StepExperience({ resume, setResume }: StepExperienceProps) {
                   value={exp.title}
                   onChange={(e) => updateExperience(exp.id!, "title", e.target.value)}
                   placeholder="Frontend Developer"
-                  className="mt-1.5"
+                  className="mt-1.5 h-12"
                 />
               </div>
               <div>
-                <Label htmlFor={`company-${exp.id}`}>
+                <Label htmlFor={`company-${exp.id}`} className="text-base sm:text-sm">
                   Perusahaan <span className="text-destructive">*</span>
                 </Label>
                 <Input
@@ -182,39 +182,39 @@ export function StepExperience({ resume, setResume }: StepExperienceProps) {
                   value={exp.company}
                   onChange={(e) => updateExperience(exp.id!, "company", e.target.value)}
                   placeholder="PT. Teknologi Indonesia"
-                  className="mt-1.5"
+                  className="mt-1.5 h-12"
                 />
               </div>
             </div>
 
             {/* Location */}
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <Label htmlFor={`city-${exp.id}`}>Kota</Label>
+                <Label htmlFor={`city-${exp.id}`} className="text-base sm:text-sm">Kota</Label>
                 <Input
                   id={`city-${exp.id}`}
                   value={exp.city || ""}
                   onChange={(e) => updateExperience(exp.id!, "city", e.target.value)}
                   placeholder="Jakarta"
-                  className="mt-1.5"
+                  className="mt-1.5 h-12"
                 />
               </div>
               <div>
-                <Label htmlFor={`region-${exp.id}`}>Provinsi/Negara</Label>
+                <Label htmlFor={`region-${exp.id}`} className="text-base sm:text-sm">Provinsi/Negara</Label>
                 <Input
                   id={`region-${exp.id}`}
                   value={exp.region || ""}
                   onChange={(e) => updateExperience(exp.id!, "region", e.target.value)}
                   placeholder="DKI Jakarta, Indonesia"
-                  className="mt-1.5"
+                  className="mt-1.5 h-12"
                 />
               </div>
             </div>
 
             {/* Dates */}
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-3">
               <div>
-                <Label htmlFor={`startDate-${exp.id}`}>
+                <Label htmlFor={`startDate-${exp.id}`} className="text-base sm:text-sm">
                   Tanggal Mulai <span className="text-destructive">*</span>
                 </Label>
                 <Input
@@ -224,29 +224,29 @@ export function StepExperience({ resume, setResume }: StepExperienceProps) {
                   onChange={(e) =>
                     updateExperience(exp.id!, "startDate", e.target.value)
                   }
-                  className="mt-1.5"
+                  className="mt-1.5 h-12"
                 />
               </div>
               <div>
-                <Label htmlFor={`endDate-${exp.id}`}>Tanggal Selesai</Label>
+                <Label htmlFor={`endDate-${exp.id}`} className="text-base sm:text-sm">Tanggal Selesai</Label>
                 <Input
                   id={`endDate-${exp.id}`}
                   type="month"
                   value={exp.endDate || ""}
                   onChange={(e) => updateExperience(exp.id!, "endDate", e.target.value)}
                   disabled={exp.isCurrent}
-                  className="mt-1.5"
+                  className="mt-1.5 h-12"
                 />
               </div>
-              <div className="flex items-end">
-                <label className="flex items-center gap-2 text-sm">
+              <div className="flex items-end pb-3 sm:pb-0">
+                <label className="flex items-center gap-2 text-sm sm:text-sm text-base font-medium sm:font-normal">
                   <input
                     type="checkbox"
                     checked={exp.isCurrent}
                     onChange={(e) =>
                       updateExperience(exp.id!, "isCurrent", e.target.checked)
                     }
-                    className="h-4 w-4"
+                    className="h-5 w-5 sm:h-4 sm:w-4"
                   />
                   Posisi saat ini
                 </label>
@@ -254,9 +254,9 @@ export function StepExperience({ resume, setResume }: StepExperienceProps) {
             </div>
 
             {/* Bullets */}
-            <div>
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label>
+                <Label className="text-base sm:text-sm">
                   Tanggung Jawab & Pencapaian{" "}
                   <span className="text-destructive">*</span>
                 </Label>
@@ -264,41 +264,52 @@ export function StepExperience({ resume, setResume }: StepExperienceProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => addBullet(exp.id!)}
-                  className="text-xs"
+                  className="text-xs h-8"
                 >
                   <Plus className="mr-1 h-3 w-3" />
                   Tambah Poin
                 </Button>
               </div>
 
-              <div className="mt-2 space-y-2">
+              <div className="space-y-3">
                 {exp.bullets.map((bullet, bidx) => (
                   <div key={bidx} className="flex gap-2">
                     <Textarea
                       value={bullet}
                       onChange={(e) => updateBullet(exp.id!, bidx, e.target.value)}
                       placeholder="• Membangun fitur X yang meningkatkan conversion rate 25%"
-                      className="min-h-[80px] resize-none"
+                      className="min-h-[80px] resize-none text-base sm:text-sm p-3"
                       rows={3}
                     />
                     {exp.bullets.length > 1 && (
                       <Button
                         variant="ghost"
-                        size="sm"
+                        size="icon"
                         onClick={() => removeBullet(exp.id!, bidx)}
+                        className="h-10 w-10 shrink-0"
                       >
-                        <Trash2 className="h-4 w-4 text-muted-foreground" />
+                        <Trash2 className="h-5 w-5 text-muted-foreground" />
                       </Button>
                     )}
                   </div>
                 ))}
               </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => addBullet(exp.id!)}
+                className="w-full border-dashed h-10"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Tambah Poin
+              </Button>
             </div>
 
             {/* AI Rewrite Button */}
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full h-12"
               onClick={() => handleAIRewrite(exp.id!)}
               disabled={rewritingId === exp.id || !exp.title || !exp.company}
             >

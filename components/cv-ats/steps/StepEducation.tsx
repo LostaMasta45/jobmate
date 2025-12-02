@@ -78,8 +78,8 @@ export function StepEducation({ resume, setResume }: StepEducationProps) {
       )}
 
       {resume.education.map((edu, idx) => (
-        <Card key={edu.id} className="p-6">
-          <div className="space-y-4">
+        <Card key={edu.id} className="p-4 sm:p-6">
+          <div className="space-y-6">
             {/* Header */}
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2">
@@ -97,7 +97,7 @@ export function StepEducation({ resume, setResume }: StepEducationProps) {
 
             {/* School Info */}
             <div>
-              <Label htmlFor={`school-${edu.id}`}>
+              <Label htmlFor={`school-${edu.id}`} className="text-base sm:text-sm">
                 Nama Institusi / Universitas <span className="text-destructive">*</span>
               </Label>
               <Input
@@ -105,61 +105,61 @@ export function StepEducation({ resume, setResume }: StepEducationProps) {
                 value={edu.school}
                 onChange={(e) => updateEducation(edu.id!, "school", e.target.value)}
                 placeholder="Universitas Indonesia"
-                className="mt-1.5"
+                className="mt-1.5 h-12"
               />
             </div>
 
             {/* Degree & Field */}
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <Label htmlFor={`degree-${edu.id}`}>Gelar / Tingkat</Label>
+                <Label htmlFor={`degree-${edu.id}`} className="text-base sm:text-sm">Gelar / Tingkat</Label>
                 <Input
                   id={`degree-${edu.id}`}
                   value={edu.degree || ""}
                   onChange={(e) => updateEducation(edu.id!, "degree", e.target.value)}
                   placeholder="S1 / Bachelor / D3"
-                  className="mt-1.5"
+                  className="mt-1.5 h-12"
                 />
               </div>
               <div>
-                <Label htmlFor={`field-${edu.id}`}>Jurusan / Program Studi</Label>
+                <Label htmlFor={`field-${edu.id}`} className="text-base sm:text-sm">Jurusan / Program Studi</Label>
                 <Input
                   id={`field-${edu.id}`}
                   value={edu.field || ""}
                   onChange={(e) => updateEducation(edu.id!, "field", e.target.value)}
                   placeholder="Teknik Informatika"
-                  className="mt-1.5"
+                  className="mt-1.5 h-12"
                 />
               </div>
             </div>
 
             {/* Dates */}
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <Label htmlFor={`startDate-${edu.id}`}>Tahun Mulai</Label>
+                <Label htmlFor={`startDate-${edu.id}`} className="text-base sm:text-sm">Tahun Mulai</Label>
                 <Input
                   id={`startDate-${edu.id}`}
                   type="month"
                   value={edu.startDate || ""}
                   onChange={(e) => updateEducation(edu.id!, "startDate", e.target.value)}
-                  className="mt-1.5"
+                  className="mt-1.5 h-12"
                 />
               </div>
               <div>
-                <Label htmlFor={`endDate-${edu.id}`}>Tahun Lulus / Selesai</Label>
+                <Label htmlFor={`endDate-${edu.id}`} className="text-base sm:text-sm">Tahun Lulus / Selesai</Label>
                 <Input
                   id={`endDate-${edu.id}`}
                   type="month"
                   value={edu.endDate || ""}
                   onChange={(e) => updateEducation(edu.id!, "endDate", e.target.value)}
-                  className="mt-1.5"
+                  className="mt-1.5 h-12"
                 />
               </div>
             </div>
 
             {/* Description */}
             <div>
-              <Label htmlFor={`description-${edu.id}`}>
+              <Label htmlFor={`description-${edu.id}`} className="text-base sm:text-sm">
                 Deskripsi / Prestasi (Opsional)
               </Label>
               <Textarea
@@ -167,7 +167,7 @@ export function StepEducation({ resume, setResume }: StepEducationProps) {
                 value={edu.description || ""}
                 onChange={(e) => updateEducation(edu.id!, "description", e.target.value)}
                 placeholder="Contoh: IPK 3.85/4.00, Cumlaude, Juara 1 Hackathon Nasional"
-                className="mt-1.5 min-h-[100px]"
+                className="mt-1.5 min-h-[100px] text-base sm:text-sm"
                 rows={3}
               />
               <p className="mt-1 text-xs text-muted-foreground">

@@ -1,166 +1,241 @@
 "use client";
 
+import React, { useState, useEffect, useRef } from "react";
+import { ZoomIn, ZoomOut, Maximize, LayoutTemplate } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Resume } from "@/lib/schemas/cv-ats";
-import { Card } from "@/components/ui/card";
-import { Mail, Phone, Globe, Linkedin, MapPin } from "lucide-react";
+import { ATS_TEMPLATES, ATSTemplateId } from "@/lib/ats-templates";
+import { TemplateClassic } from "./templates/TemplateClassic";
+import { TemplateModern } from "./templates/TemplateModern";
+import { TemplateExecutive } from "./templates/TemplateExecutive";
+import { TemplateMinimalist } from "./templates/TemplateMinimalist";
+import { TemplateCorporate } from "./templates/TemplateCorporate";
+import { TemplateElegant } from "./templates/TemplateElegant";
+import { TemplateFunctional } from "./templates/TemplateFunctional";
+import { TemplateSidebar } from "./templates/TemplateSidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface CVPreviewProps {
   resume: Resume;
+  scale?: number;
+  fitMode?: "width" | "page";
+  templateId?: ATSTemplateId;
+  onTemplateChange?: (id: ATSTemplateId) => void;
 }
 
-export function CVPreview({ resume }: CVPreviewProps) {
-  const { basics, summary, experiences, education, skills, customSections } = resume;
+// A4 dimensions in mm: 210mm x 297mm
+// At 96 DPI: 1mm = 3.7795px
+// So A4 in pixels: 794px x 1123px
+const A4_WIDTH_PX = 794;
+const A4_HEIGHT_PX = 1123;
+
+export function CVPreview({ resume, scale: initialScale = 1, templateId, onTemplateChange }: CVPreviewProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  
+  // Determine effective template ID
+  const effectiveTemplateId = templateId || (resume.templateId as ATSTemplateId) || "classic";
+  
+  const [scale, setScale] = useState(initialScale);
+  const [isAutoFit, setIsAutoFit] = useState(true);
+  const [contentHeight, setContentHeight] = useState(A4_HEIGHT_PX);
+
+  // Measure content height
+  useEffect(() => {
+    if (contentRef.current) {
+      const observer = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          setContentHeight(Math.max(entry.contentRect.height, A4_HEIGHT_PX));
+        }
+      });
+      observer.observe(contentRef.current);
+      return () => observer.disconnect();
+    }
+  }, [effectiveTemplateId]); // Re-measure when template changes
+
+  // Auto-scale logic with ResizeObserver
+  useEffect(() => {
+    if (!containerRef.current || !isAutoFit) return;
+
+    const calculateScale = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.clientWidth;
+        
+        // Add breathing room (margin) around the paper
+        // Mobile: 24px total margin
+        // Desktop: 64px total margin
+        const isMobile = window.innerWidth < 640;
+        const marginX = isMobile ? 24 : 64;
+
+        if (containerWidth > 0) {
+          // Calculate scale to fit the container width minus margin
+          const availableWidth = containerWidth - marginX;
+          const widthScale = availableWidth / A4_WIDTH_PX;
+          
+          // Cap scale at 1.0 (don't stretch larger than actual A4) unless very zoomed in manually
+          // But for auto-fit, we usually want to see the whole width.
+          // If screen is huge (4k), scale 1.0 is fine.
+          // If screen is small, scale down.
+          const newScale = Math.min(widthScale, 1.2); // Allow slight overscale on huge screens if desired, or stick to 1.0
+          
+          setScale(newScale);
+        }
+      }
+    };
+
+    const observer = new ResizeObserver(calculateScale);
+    observer.observe(containerRef.current);
+    window.addEventListener('resize', calculateScale);
+    calculateScale();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', calculateScale);
+    };
+  }, [isAutoFit]);
+
+  const handleZoomIn = () => {
+    setIsAutoFit(false);
+    setScale(prev => Math.min(prev + 0.1, 2.0));
+  };
+
+  const handleZoomOut = () => {
+    setIsAutoFit(false);
+    setScale(prev => Math.max(prev - 0.1, 0.3));
+  };
+
+  const handleFitWidth = () => {
+    setIsAutoFit(true);
+  };
+
+  const renderTemplate = () => {
+    switch (effectiveTemplateId) {
+      case "modern":
+        return <TemplateModern resume={resume} />;
+      case "executive":
+        return <TemplateExecutive resume={resume} />;
+      case "minimalist":
+        return <TemplateMinimalist resume={resume} />;
+      case "corporate":
+        return <TemplateCorporate resume={resume} />;
+      case "elegant":
+        return <TemplateElegant resume={resume} />;
+      case "functional":
+        return <TemplateFunctional resume={resume} />;
+      case "sidebar":
+        return <TemplateSidebar resume={resume} />;
+      case "classic":
+      default:
+        return <TemplateClassic resume={resume} />;
+    }
+  };
 
   return (
-    <Card className="mx-auto max-w-3xl bg-white p-8 shadow-lg">
-      {/* Header */}
-      <div className="border-b-2 border-gray-900 pb-4">
-        <h1 className="text-3xl font-bold text-gray-900">
-          {basics.firstName} {basics.lastName}
-        </h1>
-        {basics.headline && (
-          <p className="mt-1 text-lg text-gray-700">{basics.headline}</p>
+    <div className="flex flex-col h-full w-full relative group bg-slate-100/50">
+      {/* Zoom & Template Controls */}
+      <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5 bg-white shadow-md border border-slate-200 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        {/* Template Switcher - Only shown if onTemplateChange is provided */}
+        {onTemplateChange && (
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full hover:bg-slate-100 text-slate-600"
+                  title="Ganti Template"
+                >
+                  <LayoutTemplate className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Pilih Layout ATS</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {ATS_TEMPLATES.map((template) => (
+                  <DropdownMenuItem
+                    key={template.id}
+                    onClick={() => onTemplateChange(template.id)}
+                    className={cn("cursor-pointer flex items-center gap-2", effectiveTemplateId === template.id && "bg-slate-100 font-medium")}
+                  >
+                    <div 
+                      className="w-3 h-3 rounded-full border border-slate-300" 
+                      style={{ backgroundColor: template.thumbnailColor }}
+                    />
+                    {template.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <div className="w-px h-4 bg-slate-200 mx-1" />
+          </>
         )}
 
-        {/* Contact Info */}
-        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
-          {basics.email && (
-            <div className="flex items-center gap-1">
-              <Mail className="h-3.5 w-3.5" />
-              <span>{basics.email}</span>
-            </div>
-          )}
-          {basics.phone && (
-            <div className="flex items-center gap-1">
-              <Phone className="h-3.5 w-3.5" />
-              <span>{basics.phone}</span>
-            </div>
-          )}
-          {(basics.city || basics.address) && (
-            <div className="flex items-center gap-1">
-              <MapPin className="h-3.5 w-3.5" />
-              <span>{basics.city || basics.address}</span>
-            </div>
-          )}
-          {basics.website && (
-            <div className="flex items-center gap-1">
-              <Globe className="h-3.5 w-3.5" />
-              <span className="break-all">{basics.website}</span>
-            </div>
-          )}
-          {basics.linkedin && (
-            <div className="flex items-center gap-1">
-              <Linkedin className="h-3.5 w-3.5" />
-              <span className="break-all">{basics.linkedin}</span>
-            </div>
-          )}
-        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 rounded-full hover:bg-slate-100 text-slate-600"
+          onClick={handleZoomOut}
+          title="Zoom Out"
+        >
+          <ZoomOut className="h-4 w-4" />
+        </Button>
+        <span className="text-xs font-medium w-12 text-center text-slate-600 tabular-nums">
+          {Math.round(scale * 100)}%
+        </span>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 rounded-full hover:bg-slate-100 text-slate-600"
+          onClick={handleZoomIn}
+          title="Zoom In"
+        >
+          <ZoomIn className="h-4 w-4" />
+        </Button>
+        <div className="w-px h-4 bg-slate-200 mx-1" />
+        <Button
+          variant={isAutoFit ? "secondary" : "ghost"}
+          size="icon"
+          className={cn("h-8 w-8 rounded-full hover:bg-slate-100 text-slate-600", isAutoFit && "bg-slate-100 text-slate-900")}
+          onClick={handleFitWidth}
+          title="Fit Width"
+        >
+          <Maximize className="h-4 w-4" />
+        </Button>
       </div>
 
-      {/* Summary */}
-      {summary && (
-        <div className="mt-6">
-          <h2 className="text-lg font-bold text-gray-900">RINGKASAN</h2>
-          <p className="mt-2 text-sm leading-relaxed text-gray-700">{summary}</p>
+      {/* Scrollable Container - The "Desk" */}
+      <div 
+        ref={containerRef} 
+        className="flex-1 overflow-y-auto overflow-x-hidden bg-slate-200/80 p-4 sm:p-8 flex items-start justify-center custom-scrollbar"
+      >
+        {/* The A4 Paper */}
+        <div
+          ref={contentRef}
+          style={{
+            width: A4_WIDTH_PX,
+            minHeight: A4_HEIGHT_PX,
+            transform: `scale(${scale})`,
+            transformOrigin: "top center",
+            // Center the paper horizontally after scaling
+            marginBottom: -(contentHeight * (1 - scale)) + 40, // Add 40px bottom buffer
+            marginRight: scale < 1 ? -(A4_WIDTH_PX * (1 - scale)) / 2 : 0,
+            marginLeft: scale < 1 ? -(A4_WIDTH_PX * (1 - scale)) / 2 : 0,
+          }}
+          className="relative bg-white shadow-[0_4px_24px_rgba(0,0,0,0.12)] ring-1 ring-slate-900/5 shrink-0 transition-transform duration-200 ease-out"
+        >
+          {/* Dynamic Template Render */}
+          {renderTemplate()}
         </div>
-      )}
-
-      {/* Experience */}
-      {experiences.length > 0 && (
-        <div className="mt-6">
-          <h2 className="text-lg font-bold text-gray-900">PENGALAMAN PROFESIONAL</h2>
-          <div className="mt-3 space-y-4">
-            {experiences.map((exp, idx) => (
-              <div key={idx}>
-                <div className="flex justify-between">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{exp.title}</h3>
-                    <p className="text-sm text-gray-700">{exp.company}</p>
-                  </div>
-                  <div className="text-right text-sm text-gray-600">
-                    {exp.city && <p>{exp.city}</p>}
-                    <p>
-                      {exp.startDate} - {exp.isCurrent ? "Sekarang" : exp.endDate || ""}
-                    </p>
-                  </div>
-                </div>
-                {exp.bullets.length > 0 && (
-                  <ul className="mt-2 ml-4 list-disc text-sm text-gray-700">
-                    {exp.bullets.map((bullet, bidx) => (
-                      <li key={bidx}>{bullet}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Education */}
-      {education.length > 0 && (
-        <div className="mt-6">
-          <h2 className="text-lg font-bold text-gray-900">PENDIDIKAN</h2>
-          <div className="mt-3 space-y-3">
-            {education.map((edu, idx) => (
-              <div key={idx}>
-                <div className="flex justify-between">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{edu.school}</h3>
-                    {(edu.degree || edu.field) && (
-                      <p className="text-sm text-gray-700">
-                        {edu.degree} {edu.field && `in ${edu.field}`}
-                      </p>
-                    )}
-                  </div>
-                  {(edu.startDate || edu.endDate) && (
-                    <p className="text-sm text-gray-600">
-                      {edu.startDate} {edu.endDate && `- ${edu.endDate}`}
-                    </p>
-                  )}
-                </div>
-                {edu.description && (
-                  <p className="mt-1 text-sm text-gray-700">{edu.description}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Skills */}
-      {skills.length > 0 && (
-        <div className="mt-6">
-          <h2 className="text-lg font-bold text-gray-900">KETERAMPILAN</h2>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {skills.map((skill, idx) => (
-              <span
-                key={idx}
-                className="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Custom Sections */}
-      {customSections.map((section, idx) => (
-        <div key={idx} className="mt-6">
-          <h2 className="text-lg font-bold text-gray-900">{section.title.toUpperCase()}</h2>
-          <div className="mt-3 space-y-2">
-            {section.items.map((item, iidx) => (
-              <div key={iidx}>
-                <p className="font-semibold text-gray-900">{item.label}</p>
-                {item.description && (
-                  <p className="text-sm text-gray-700">{item.description}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </Card>
+      </div>
+    </div>
   );
 }
+

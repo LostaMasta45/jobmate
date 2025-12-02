@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
   Select,
   SelectContent,
@@ -461,6 +462,7 @@ export function BatchPosterUpload() {
     );
   }
 
+
   // Helper functions for kualifikasi management
   const addKualifikasi = (jobIndex: number) => {
     setEditedJobs((prev) => {
@@ -504,6 +506,7 @@ export function BatchPosterUpload() {
       return updated;
     });
   };
+
 
   // --- Review Step Render ---
   if (step === 'review') {
@@ -649,28 +652,33 @@ export function BatchPosterUpload() {
                           <Label>Kategori</Label>
                           <div className="flex flex-wrap gap-2 mt-2">
                             {(job.kategori || []).map((kat, katIdx) => (
-                              <Badge key={katIdx} variant="outline" className="px-3 py-1">
+                              <Badge key={katIdx} variant="outline" className="px-3 py-1 flex items-center gap-1">
                                 {kat}
                                 <button
                                   onClick={() => removeKategori(index, katIdx)}
-                                  className="ml-2 text-gray-500 hover:text-red-600"
+                                  className="ml-1 hover:text-destructive"
                                 >
-                                  ×
+                                  <X className="h-3 w-3" />
                                 </button>
                               </Badge>
                             ))}
                             <Input
-                              placeholder="+ Tambah kategori"
-                              className="w-32 h-7 text-xs"
+                              placeholder="+ Tambah kategori (Enter)"
+                              className="w-40 h-8 text-xs"
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                                  updateJob(index, 'kategori', [...(job.kategori || []), e.currentTarget.value.trim()]);
+                                  e.preventDefault();
+                                  const newValue = e.currentTarget.value.trim();
+                                  if (!job.kategori.includes(newValue)) {
+                                    updateJob(index, 'kategori', [...(job.kategori || []), newValue]);
+                                  }
                                   e.currentTarget.value = '';
                                 }
                               }}
                             />
                           </div>
                         </div>
+
 
                         <div>
                           <Label htmlFor={`tipe-${index}`}>Tipe Kerja</Label>
@@ -737,37 +745,41 @@ export function BatchPosterUpload() {
                               size="sm"
                               variant="outline"
                               onClick={() => addKualifikasi(index)}
+                              className="h-7 text-xs"
                             >
-                              <Plus className="w-4 h-4 mr-1" />
+                              <Plus className="w-3 h-3 mr-1" />
                               Tambah
                             </Button>
                           </div>
-                          <div className="space-y-2">
+                          <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
                             {(job.kualifikasi || []).length === 0 ? (
-                              <p className="text-sm text-muted-foreground italic">
+                              <p className="text-sm text-muted-foreground italic border border-dashed p-2 rounded text-center">
                                 Belum ada kualifikasi. Klik "Tambah" untuk menambahkan.
                               </p>
                             ) : (
                               (job.kualifikasi || []).map((kual, qualIdx) => (
-                                <div key={qualIdx} className="flex gap-2">
+                                <div key={qualIdx} className="flex gap-2 items-center">
+                                  <span className="text-xs text-muted-foreground w-4 text-center">{qualIdx + 1}.</span>
                                   <Input
                                     value={kual}
                                     onChange={(e) => updateKualifikasi(index, qualIdx, e.target.value)}
                                     placeholder={`Kualifikasi ${qualIdx + 1}`}
+                                    className="h-8 text-sm"
                                   />
                                   <Button
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => removeKualifikasi(index, qualIdx)}
-                                    className="flex-shrink-0"
+                                    className="flex-shrink-0 h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                                   >
-                                    <Trash2 className="w-4 h-4 text-red-500" />
+                                    <Trash2 className="w-4 h-4" />
                                   </Button>
                                 </div>
                               ))
                             )}
                           </div>
                         </div>
+
                       </div>
                     </div>
 
@@ -822,6 +834,9 @@ export function BatchPosterUpload() {
         {/* Image Preview Modal */}
         <Dialog open={!!previewImage} onOpenChange={(open) => !open && setPreviewImage(null)}>
           <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden flex flex-col bg-background border-none shadow-2xl rounded-xl">
+            <VisuallyHidden>
+              <DialogTitle>Preview Poster</DialogTitle>
+            </VisuallyHidden>
             <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/60 to-transparent z-50 flex items-center justify-between px-6">
                <span className="text-white/90 font-medium text-sm">Preview Poster</span>
                <Button 

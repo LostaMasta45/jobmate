@@ -16,9 +16,10 @@ interface AppShellProps {
     avatar?: string | null;
   };
   isAdmin?: boolean;
+  hideMobileHeader?: boolean;
 }
 
-export function AppShell({ children, user, isAdmin = false }: AppShellProps) {
+export function AppShell({ children, user, isAdmin = false, hideMobileHeader = false }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const pathname = usePathname();
   const hideBottomBar = shouldHideBottomBar(pathname);
@@ -56,9 +57,11 @@ export function AppShell({ children, user, isAdmin = false }: AppShellProps) {
       />
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* VIP Header with theme toggle & notifications - Replaces MobileHeader */}
-        <div className="lg:hidden">
-          <VIPHeader />
-        </div>
+        {!hideMobileHeader && (
+          <div className="lg:hidden">
+            <VIPHeader />
+          </div>
+        )}
         
         {/* Desktop Topbar - hidden on mobile */}
         <div className="hidden lg:block">
@@ -66,7 +69,7 @@ export function AppShell({ children, user, isAdmin = false }: AppShellProps) {
         </div>
         
         {/* Main content with top padding for VIPHeader and conditional bottom padding */}
-        <main className={`flex-1 overflow-y-auto bg-background p-3 sm:p-4 md:p-6 lg:p-8 pt-20 lg:pt-8 ${getMainPaddingClass(hideBottomBar)}`}>
+        <main className={`flex-1 overflow-y-auto bg-background p-3 sm:p-4 md:p-6 lg:p-8 ${hideMobileHeader ? '' : 'pt-12 sm:pt-14'} lg:pt-8 ${getMainPaddingClass(hideBottomBar)}`}>
           <div className="mx-auto max-w-7xl w-full">{children}</div>
         </main>
         

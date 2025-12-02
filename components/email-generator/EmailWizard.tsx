@@ -154,6 +154,11 @@ export function EmailWizard() {
     } else if (currentStep < STEPS.length) {
       setDirection(1);
       setCurrentStep(prev => prev + 1);
+      // Smooth scroll to top of form
+      const contentContainer = document.getElementById('wizard-content');
+      if (contentContainer) {
+        contentContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   };
 
@@ -161,6 +166,11 @@ export function EmailWizard() {
     if (currentStep > 1) {
       setDirection(-1);
       setCurrentStep(prev => prev - 1);
+      // Smooth scroll to top of form
+      const contentContainer = document.getElementById('wizard-content');
+      if (contentContainer) {
+        contentContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   };
 
@@ -182,7 +192,7 @@ export function EmailWizard() {
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <StepEmailType formData={formData} updateFormData={updateFormData} />;
+        return <StepEmailType formData={formData} updateFormData={updateFormData} onNext={nextStep} />;
       case 2:
         return <StepBasicInfo formData={formData} updateFormData={updateFormData} />;
       case 3:
@@ -200,51 +210,65 @@ export function EmailWizard() {
   // But to be safe with hydration, we usually just render. 
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-background flex-col lg:flex-row">
+    <div className="flex h-[calc(100dvh-5rem)] lg:h-[calc(100dvh-4rem)] overflow-hidden bg-background flex-col lg:flex-row border-0 md:border rounded-none md:rounded-xl shadow-none md:shadow-sm">
         
         {/* LEFT PANEL: Wizard Form */}
         <div className="flex-1 flex flex-col min-w-0 lg:border-r relative">
             
             {/* MOBILE HEADER: Segmented Progress */}
-            <div className="flex-shrink-0 bg-background pt-2 lg:hidden px-4 pb-2 border-b z-10">
-                <div className="flex gap-1 mb-2">
+            <div className="flex-shrink-0 bg-background pt-4 lg:hidden px-6 pb-2 border-b z-10">
+                <div className="flex gap-1 mb-3">
                     {STEPS.map((s) => (
                         <div 
                         key={s.id} 
-                        className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                        className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
                             s.id <= currentStep 
-                            ? "bg-blue-600" 
-                            : "bg-slate-200 dark:bg-slate-800"
+                            ? "bg-[#5547d0]" 
+                            : "bg-slate-100 dark:bg-slate-800"
                         }`}
                         />
                     ))}
                 </div>
                 <div className="flex justify-between items-center">
-                     <h2 className="font-bold text-lg flex items-center gap-2">
+                     <h2 className="font-bold text-xl flex items-center gap-2 text-slate-900 dark:text-white">
                         {STEPS[currentStep-1].icon} {STEPS[currentStep-1].title}
                      </h2>
-                     <span className="text-xs text-muted-foreground">{currentStep}/{STEPS.length}</span>
+                     <span className="text-xs font-medium text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full">
+                        {currentStep}/{STEPS.length}
+                     </span>
                 </div>
             </div>
 
              {/* DESKTOP HEADER */}
-             <div className="hidden lg:block p-6 border-b">
-                <h1 className="text-2xl font-bold flex items-center gap-2">
-                    <Sparkles className="h-6 w-6 text-blue-600" />
-                    Email Generator
-                </h1>
-                <p className="text-muted-foreground text-sm mt-1">
-                    Step {currentStep} of {STEPS.length}: <span className="font-medium text-foreground">{STEPS[currentStep-1].title}</span>
-                </p>
+             <div className="hidden lg:block p-6 border-b bg-slate-50/50 dark:bg-slate-900/20">
+                <div className="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100">
+                            <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#5547d0]/10 text-[#5547d0]">
+                                {STEPS[currentStep-1].icon}
+                            </span>
+                            {STEPS[currentStep-1].title}
+                        </h2>
+                        <p className="text-muted-foreground text-sm ml-10">
+                            Step {currentStep} of {STEPS.length}
+                        </p>
+                    </div>
+                    {isGenerating && (
+                         <div className="flex items-center gap-2 text-sm text-[#5547d0] animate-pulse">
+                            <Sparkles className="h-4 w-4" />
+                            <span>AI Writing...</span>
+                         </div>
+                    )}
+                </div>
 
                 {/* Desktop Progress Bar */}
-                <div className="mt-4 flex gap-2">
+                <div className="flex gap-2">
                     {STEPS.map((s) => (
                          <div 
                             key={s.id}
-                            className={`h-1.5 flex-1 rounded-full transition-all ${
-                                s.id === currentStep ? "bg-blue-600" :
-                                s.id < currentStep ? "bg-blue-600/50" : "bg-slate-100 dark:bg-slate-800"
+                            className={`h-2 flex-1 rounded-full transition-all duration-500 ${
+                                s.id === currentStep ? "bg-[#5547d0]" :
+                                s.id < currentStep ? "bg-[#5547d0]/40" : "bg-slate-200 dark:bg-slate-800"
                             }`}
                          />
                     ))}
@@ -252,7 +276,7 @@ export function EmailWizard() {
              </div>
 
             {/* SCROLLABLE CONTENT */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-slate-950/50">
+            <div id="wizard-content" className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-slate-950/50 scroll-smooth pb-32 lg:pb-8">
                  <AnimatePresence mode="wait" custom={direction} initial={false}>
                     <motion.div
                         key={currentStep}
@@ -262,7 +286,7 @@ export function EmailWizard() {
                         animate="center"
                         exit="exit"
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className="max-w-2xl mx-auto"
+                        className={`${currentStep === 1 ? 'max-w-5xl' : 'max-w-2xl'} mx-auto`}
                     >
                          {renderStep()}
                     </motion.div>
@@ -270,57 +294,64 @@ export function EmailWizard() {
             </div>
 
             {/* TOOLBAR (Fixed Bottom) */}
-            <EmailWizardToolbar
-                currentStep={currentStep}
-                totalSteps={STEPS.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                canProceed={canProceedToNext()} // Pass true if you want to allow click and validate inside nextStep, but standard is disabling
-                isGenerating={isGenerating}
-            />
+            <div className="fixed bottom-0 left-0 right-0 z-50 lg:relative lg:bottom-auto lg:left-auto lg:right-auto">
+                <EmailWizardToolbar
+                    currentStep={currentStep}
+                    totalSteps={STEPS.length}
+                    onNext={nextStep}
+                    onPrevious={prevStep}
+                    canProceed={canProceedToNext()} // Pass true if you want to allow click and validate inside nextStep, but standard is disabling
+                    isGenerating={isGenerating}
+                />
+            </div>
         </div>
 
         {/* RIGHT PANEL: Live Preview (Desktop Only) */}
-        <div className="hidden lg:flex w-1/2 xl:w-[45%] p-6 bg-slate-50 dark:bg-slate-950 border-l flex-col justify-center">
-             <LivePreview formData={formData} isGenerating={isGenerating} />
+        {currentStep !== 1 && (
+            <div className="hidden lg:flex w-1/2 xl:w-[45%] p-6 bg-slate-50 dark:bg-slate-950 border-l flex-col justify-center">
+                <LivePreview formData={formData} isGenerating={isGenerating} />
+            </div>
+        )}
+
+            {/* MOBILE PREVIEW BUTTON (Floating) */}
+            <div className="lg:hidden fixed bottom-24 right-4 z-30">
+                {currentStep < 5 && (
+                     <Button 
+                        size="icon" 
+                        className="h-12 w-12 rounded-full shadow-xl bg-[#5547d0] hover:bg-[#4538b0] text-white border-2 border-white dark:border-slate-900"
+                        onClick={() => setShowPreview(true)}
+                    >
+                        <Eye className="h-5 w-5" />
+                     </Button>
+                )}
+            </div>
+
+            {/* MOBILE PREVIEW OVERLAY */}
+            <AnimatePresence>
+                {showPreview && (
+                     <motion.div
+                        initial={{ y: "100%" }}
+                        animate={{ y: 0 }}
+                        exit={{ y: "100%" }}
+                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                        className="fixed inset-0 z-[60] flex flex-col bg-background lg:hidden"
+                     >
+                        <div className="p-4 border-b flex items-center justify-between bg-white dark:bg-slate-950 safe-area-top">
+                            <h3 className="font-bold text-lg flex items-center gap-2">
+                                <Eye className="h-5 w-5 text-[#5547d0]" />
+                                Live Preview
+                            </h3>
+                            <Button variant="ghost" size="sm" onClick={() => setShowPreview(false)} className="rounded-full h-8 w-8 p-0">
+                                <X className="h-5 w-5" />
+                            </Button>
+                        </div>
+                        <div className="flex-1 bg-slate-50 dark:bg-slate-900 overflow-y-auto p-4 pb-24">
+                            <LivePreview formData={formData} isGenerating={isGenerating} />
+                        </div>
+                     </motion.div>
+                )}
+            </AnimatePresence>
+    
         </div>
-
-        {/* MOBILE PREVIEW BUTTON (Floating) */}
-        <div className="lg:hidden fixed bottom-20 right-4 z-20">
-            {currentStep < 5 && (
-                 <Button 
-                    size="icon" 
-                    className="h-12 w-12 rounded-full shadow-xl bg-slate-900 text-white"
-                    onClick={() => setShowPreview(true)}
-                >
-                    <Eye className="h-5 w-5" />
-                 </Button>
-            )}
-        </div>
-
-        {/* MOBILE PREVIEW OVERLAY */}
-        <AnimatePresence>
-            {showPreview && (
-                 <motion.div
-                    initial={{ y: "100%" }}
-                    animate={{ y: 0 }}
-                    exit={{ y: "100%" }}
-                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                    className="fixed inset-0 z-50 flex flex-col bg-background lg:hidden"
-                 >
-                    <div className="p-4 border-b flex items-center justify-between bg-background">
-                        <h3 className="font-bold">Live Preview</h3>
-                        <Button variant="ghost" size="sm" onClick={() => setShowPreview(false)}>
-                            <X className="h-5 w-5" />
-                        </Button>
-                    </div>
-                    <div className="flex-1 p-4 bg-slate-50 dark:bg-slate-900 overflow-y-auto">
-                        <LivePreview formData={formData} isGenerating={isGenerating} />
-                    </div>
-                 </motion.div>
-            )}
-        </AnimatePresence>
-
-    </div>
-  );
-}
+      );
+    }

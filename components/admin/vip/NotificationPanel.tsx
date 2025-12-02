@@ -2,39 +2,49 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, CheckCircle2, Sparkles, ArrowRight } from "lucide-react";
+import { AlertCircle, CheckCircle2, Sparkles, ArrowRight, Bell } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 interface NotificationPanelProps {
   draftCount: number;
 }
 
 export function NotificationPanel({ draftCount }: NotificationPanelProps) {
+  const COLORS = {
+    heliotrope: "#8e68fd",
+    robinsEggBlue: "#00d1dc",
+    alto: "#dfdfdf",
+    pacificBlue: "#00acc7",
+    purpleHeart: "#5547d0",
+    mariner: "#3977d3",
+    robinsEggBlue2: "#00bed1",
+  };
+
   return (
-    <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm h-full flex flex-col">
-      <CardHeader className="pb-3 border-b border-border/50">
-        <CardTitle className="text-lg font-semibold tracking-tight">
+    <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm h-full flex flex-col overflow-hidden">
+      <CardHeader className="pb-3 border-b border-border/50 bg-muted/20">
+        <CardTitle className="text-lg font-bold font-poppins tracking-tight flex items-center gap-2">
+          <Bell className="h-5 w-5" style={{ color: COLORS.pacificBlue }} />
           Action Required
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0 flex-1 flex flex-col">
-        <div className="p-4 space-y-4">
+        <div className="p-6 space-y-5">
           {draftCount > 0 ? (
-            <div className="group relative overflow-hidden rounded-xl border border-amber-200/50 bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/30 dark:to-amber-900/10 p-4 transition-all hover:shadow-md">
+            <div className="group relative overflow-hidden rounded-xl border border-amber-200/50 bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/30 dark:to-amber-900/10 p-5 transition-all hover:shadow-md">
               <div className="flex items-start gap-4">
-                <div className="rounded-full bg-amber-500/10 p-2 text-amber-600 dark:text-amber-400">
-                  <AlertCircle className="h-5 w-5" />
+                <div className="rounded-full bg-amber-500/10 p-3 text-amber-600 dark:text-amber-400">
+                  <AlertCircle className="h-6 w-6" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-amber-900 dark:text-amber-100">
+                  <h3 className="font-semibold text-amber-900 dark:text-amber-100 text-base">
                     {draftCount} Pending Drafts
                   </h3>
-                  <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
+                  <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
                     You have {draftCount} jobs waiting to be published. Review them now to keep the board updated.
                   </p>
                   <Link href="/admin/vip-loker">
-                    <Button size="sm" className="mt-3 w-full bg-amber-600 hover:bg-amber-700 text-white border-none shadow-none">
+                    <Button size="sm" className="mt-4 w-full bg-amber-600 hover:bg-amber-700 text-white border-none shadow-sm rounded-lg">
                       Review Drafts
                     </Button>
                   </Link>
@@ -42,36 +52,42 @@ export function NotificationPanel({ draftCount }: NotificationPanelProps) {
               </div>
             </div>
           ) : (
-            <div className="rounded-xl border border-emerald-200/50 bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-900/10 p-4">
+            <div className="rounded-xl border bg-gradient-to-br from-[#00d1dc]/5 to-transparent p-5 border-dashed border-[#00d1dc]/30">
               <div className="flex items-center gap-4">
-                <div className="rounded-full bg-emerald-500/10 p-2 text-emerald-600 dark:text-emerald-400">
-                  <CheckCircle2 className="h-5 w-5" />
+                <div className="rounded-full p-3" style={{ backgroundColor: `${COLORS.robinsEggBlue}20`, color: COLORS.robinsEggBlue }}>
+                  <CheckCircle2 className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-emerald-900 dark:text-emerald-100">All Caught Up</h3>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-300">No pending actions required.</p>
+                  <h3 className="font-semibold text-foreground">All Caught Up</h3>
+                  <p className="text-sm text-muted-foreground">No pending actions required.</p>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="relative overflow-hidden rounded-xl border border-blue-200/50 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-900/10 p-4">
-            <div className="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-blue-500/10 blur-2xl" />
+          <div className="relative overflow-hidden rounded-xl border p-5 group hover:shadow-md transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#8e68fd]/5 to-transparent opacity-50" />
+            <div className="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full blur-2xl opacity-20" style={{ backgroundColor: COLORS.heliotrope }} />
             
             <div className="relative flex items-start gap-4">
-              <div className="rounded-full bg-blue-500/10 p-2 text-blue-600 dark:text-blue-400">
-                <Sparkles className="h-5 w-5" />
+              <div className="rounded-full p-3" style={{ backgroundColor: `${COLORS.heliotrope}20`, color: COLORS.heliotrope }}>
+                <Sparkles className="h-6 w-6" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-blue-900 dark:text-blue-100">
+                <h3 className="font-semibold text-foreground">
                   AI Assistant
                 </h3>
-                <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Generate engaging captions for your job posts automatically.
                 </p>
                 <Link href="/admin/tools-ai">
-                  <Button size="sm" variant="ghost" className="mt-2 w-full justify-between text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 dark:hover:bg-blue-900/50 p-0 h-auto font-medium">
-                    Try AI Tools <ArrowRight className="h-3 w-3 ml-2" />
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="mt-3 w-full justify-between p-0 h-auto font-medium hover:bg-transparent px-1 group-hover:translate-x-1 transition-transform"
+                    style={{ color: COLORS.heliotrope }}
+                  >
+                    Try AI Tools <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </Link>
               </div>

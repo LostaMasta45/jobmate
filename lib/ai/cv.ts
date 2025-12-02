@@ -6,42 +6,118 @@ export function generateAISummaryPrompt(data: {
   headline: string;
   skills: string[];
   experiences: any[];
+  // Enhanced fields
+  targetPosition?: string;
+  yearsExperience?: string;
+  topAchievements?: string;
+  targetIndustry?: string;
+  careerGoal?: string;
+  summaryTone?: "professional" | "confident" | "friendly";
 }): string {
-  const { firstName, lastName, headline, skills, experiences } = data;
+  const { 
+    firstName, 
+    lastName, 
+    headline, 
+    skills, 
+    experiences,
+    targetPosition,
+    yearsExperience,
+    topAchievements,
+    targetIndustry,
+    careerGoal,
+    summaryTone = "professional"
+  } = data;
 
-  // Get highlights from first experience
-  const firstExpBullets =
-    experiences.length > 0
-      ? experiences[0].bullets
-          .filter((b: string) => b.trim())
-          .slice(0, 3)
-          .join("; ")
-      : "";
+  // Get highlights from experiences
+  const expHighlights = experiences
+    .slice(0, 2)
+    .map((exp: any) => {
+      const bullets = exp.bullets?.filter((b: string) => b.trim()).slice(0, 2).join("; ") || "";
+      return `${exp.title} di ${exp.company}: ${bullets}`;
+    })
+    .filter(Boolean)
+    .join(" | ");
 
   const skillsText = skills.slice(0, 10).join(", ");
 
-  return `Anda adalah asisten karier yang menulis profil CV singkat, Indonesia, profesional, 3–4 kalimat, berorientasi hasil.
+  // Map years experience to readable format
+  const yearsMap: Record<string, string> = {
+    fresh: "Fresh Graduate dengan kurang dari 1 tahun",
+    junior: "1-3 tahun",
+    mid: "3-5 tahun",
+    senior: "5-8 tahun",
+    lead: "8-10 tahun",
+    expert: "lebih dari 10 tahun",
+  };
+  const yearsText = yearsExperience ? yearsMap[yearsExperience] || yearsExperience : "";
 
-**Informasi Kandidat:**
+  // Map tone to writing style
+  const toneGuide: Record<string, string> = {
+    professional: "Gunakan bahasa formal, profesional, dan objektif. Fokus pada fakta dan pencapaian terukur.",
+    confident: "Gunakan bahasa yang percaya diri dan impactful. Tonjolkan achievement secara bold tanpa arogan. Gunakan kata-kata power seperti 'berhasil', 'terbukti', 'sukses'.",
+    friendly: "Gunakan bahasa yang ramah namun tetap profesional. Tunjukkan personality dan enthusiasm, tetap gunakan angka untuk kredibilitas.",
+  };
+
+  return `Anda adalah **Senior HR Consultant & CV Expert** dengan pengalaman 15+ tahun membantu kandidat membuat ringkasan profil yang langsung menarik perhatian HRD dalam 6 detik pertama.
+
+**=== PROFIL KANDIDAT ===**
 - Nama: ${firstName} ${lastName}
-- Headline: ${headline}
-- Skill utama: ${skillsText || "Tidak disebutkan"}
-- Highlight pengalaman: ${firstExpBullets || "Tidak ada pengalaman"}
+- Target Posisi: ${targetPosition || headline}
+- Headline Saat Ini: ${headline}
+- Total Pengalaman: ${yearsText || "Tidak disebutkan"}
+- Skill Utama: ${skillsText || "Tidak disebutkan"}
+- Target Industri: ${targetIndustry || "Tidak spesifik"}
 
-**Instruksi:**
-1. Tulis ringkasan profesional dalam Bahasa Indonesia formal menggunakan kata ganti "saya"
-2. Maksimal 3-4 kalimat (120-180 kata ideal) - ringkas dan powerful
-3. Mulai dengan "Saya adalah [role/title] dengan [X tahun] pengalaman..."
-4. Sertakan teknologi/tools utama dari skill dan achievement terukur
-5. WAJIB gunakan angka dan metrik jika ada di pengalaman (%, Rp, peningkatan, jumlah user, dll)
-6. WAJIB gunakan kata ganti "saya" (bukan nama atau format orang ketiga)
-7. Fokus pada value konkret yang bisa diberikan untuk perusahaan
-8. Hindari kata klise tanpa bukti ("hardworking", "passionate") - ganti dengan pencapaian nyata
-9. Gunakan action words yang kuat: "meningkatkan", "memimpin", "mengembangkan", "mengoptimalkan"
-10. Tutup dengan keahlian unik atau nilai tambah yang membedakan dari kandidat lain
+**=== PENCAPAIAN TERBAIK (INPUT USER) ===**
+${topAchievements || "Tidak disebutkan - generate estimasi realistis berdasarkan role"}
 
-**Output:**
-Tuliskan hanya ringkasan profil, tanpa markup atau penjelasan tambahan. Langsung text saja.`;
+**=== HIGHLIGHT PENGALAMAN ===**
+${expHighlights || "Fresh graduate / belum ada pengalaman formal"}
+
+**=== TUJUAN KARIR ===**
+${careerGoal || "Tidak disebutkan"}
+
+**=== GAYA PENULISAN: ${summaryTone.toUpperCase()} ===**
+${toneGuide[summaryTone]}
+
+**=== FORMULA RINGKASAN YANG DISUKAI HRD ===**
+Gunakan struktur 4 bagian ini dalam 3-4 kalimat (150-200 kata):
+
+1. **IDENTITAS** (Kalimat 1): "Saya adalah [Role/Title] dengan [X tahun] pengalaman di bidang [spesialisasi]..."
+   - WAJIB ada angka tahun pengalaman yang spesifik
+   - Sebutkan bidang keahlian utama
+
+2. **KEAHLIAN TEKNIS** (Kalimat 2): "Expert dalam [3-5 skills/tools utama]..."
+   - Pilih skills paling relevan dengan target posisi
+   - Gunakan istilah yang familiar di industri
+
+3. **PENCAPAIAN TERUKUR** (Kalimat 3): "Berhasil [achievement dengan angka: %, Rp, jumlah, waktu]..."
+   - WAJIB ada minimal 2 angka/metrik konkret
+   - Fokus pada IMPACT bukan task
+   - Gunakan formula: Action + Result + Quantification
+
+4. **VALUE PROPOSITION** (Kalimat 4): "Siap berkontribusi dalam [nilai yang bisa diberikan]..."
+   - Tunjukkan apa yang bisa kandidat berikan ke perusahaan
+   - Bisa mention tujuan karir jika relevan
+
+**=== ATURAN KETAT ===**
+1. WAJIB gunakan kata ganti "Saya" di awal (bukan nama atau orang ketiga)
+2. WAJIB ada minimal 3 angka/metrik dalam ringkasan (%, Rp, tahun, jumlah)
+3. DILARANG gunakan kata klise tanpa bukti: "hardworking", "passionate", "motivated", "fast learner"
+4. DILARANG terlalu panjang - maksimal 4 kalimat, 150-200 kata
+5. Gunakan kata kerja aktif yang kuat: meningkatkan, membangun, memimpin, mengoptimalkan, mengurangi, menghasilkan
+6. Sesuaikan dengan level pengalaman:
+   - Fresh Grad: fokus pada potensi, project, organisasi, magang
+   - Junior: fokus pada skill teknis dan pembelajaran cepat
+   - Mid: fokus pada pencapaian dan kemampuan kolaborasi
+   - Senior/Lead: fokus pada leadership dan strategic impact
+7. JIKA tidak ada data achievements dari user, buat estimasi REALISTIS berdasarkan role dan level
+
+**=== CONTOH OUTPUT EXCELLENT ===**
+"Saya adalah Senior Software Engineer dengan 6 tahun pengalaman membangun sistem backend scalable untuk aplikasi dengan 5+ juta pengguna aktif. Expert dalam Node.js, Python, PostgreSQL, dan microservices architecture dengan Kubernetes. Berhasil meningkatkan throughput API sebesar 300% dan mengurangi biaya infrastruktur Rp 800 juta/tahun melalui optimisasi arsitektur cloud. Siap berkontribusi dalam membangun produk teknologi yang berdampak besar bagi jutaan pengguna Indonesia."
+
+**=== OUTPUT ===**
+Tuliskan HANYA ringkasan profil, tanpa markup, penjelasan, atau komentar. Langsung text saja.`;
 }
 
 export function generateAIRewriteBulletsPrompt(data: {
@@ -95,53 +171,107 @@ Hanya return JSON array, tanpa teks lain.`;
 export function generateATSAnalysisPrompt(resume: any, jobDesc?: string): string {
   const resumeJson = JSON.stringify(resume, null, 2);
 
-  return `Anda adalah analis ATS (Applicant Tracking System). Analisa CV ini dan berikan scoring + saran.
+  return `Anda adalah analis ATS (Applicant Tracking System) expert dengan pengalaman 10+ tahun membantu kandidat lolos screening ATS dan diterima HRD. Analisa CV ini secara mendalam dan berikan feedback yang SANGAT ACTIONABLE.
 
 **Resume:**
 \`\`\`json
 ${resumeJson}
 \`\`\`
 
-${jobDesc ? `**Job Description:**\n${jobDesc}\n` : ""}
+${jobDesc ? `**Job Description Target:**\n${jobDesc}\n` : "**Mode:** Analisa umum tanpa JD spesifik - fokus pada best practices ATS universal.\n"}
 
-**Kriteria Scoring (Total 100 poin):**
+**KRITERIA SCORING (Total 100 poin):**
 
 1. **Header & Contact Info (10 poin)**
-   - Email, phone, location valid
-   - Headline/target role jelas
-   - Format standard
+   - Email profesional (bukan alay), phone valid, location jelas
+   - Headline spesifik dan relevan dengan target role
+   - LinkedIn/portfolio jika ada
 
-2. **Keyword Match (40 poin)**
-   - Hard skills match dengan JD${jobDesc ? "" : " (estimasi untuk role umum)"}
-   - Soft skills relevan
-   - Teknologi/tools match
+2. **Keyword Match (40 poin)** ${jobDesc ? "- Match dengan JD" : "- Berdasarkan role di headline"}
+   - Hard skills (tools, teknologi, bahasa pemrograman)
+   - Soft skills yang relevan
+   - Industry-specific terms
+   - Sertifikasi/metodologi
 
-3. **Pengalaman Relevan (20 poin)**
-   - Bullet points menggunakan action verbs
-   - Ada kuantifikasi (angka, %, metrik)
-   - Relevansi dengan target role
+3. **Pengalaman & Achievement (20 poin)**
+   - SETIAP bullet pakai ACTION VERB kuat di awal
+   - Kuantifikasi dengan angka (%, Rp, jumlah, waktu)
+   - Menunjukkan IMPACT bukan hanya task
+   - Formula CAR: Context-Action-Result
 
 4. **Format ATS-Friendly (10 poin)**
-   - Bullet points < 25 kata
-   - Tidak ada tabel/gambar
-   - Font dan struktur sederhana
+   - Bullet points 15-25 kata (tidak terlalu panjang/pendek)
+   - Struktur jelas dengan section standard
+   - Tidak ada karakter aneh atau formatting kompleks
 
 5. **Kuantifikasi & Impact (10 poin)**
-   - Seberapa banyak bullet punya angka
-   - Jelas menunjukkan impact/hasil
+   - Minimal 70% bullet punya angka/metrik
+   - Angka spesifik (bukan "beberapa" atau "banyak")
+   - Impact terukur dan impressive
 
-6. **Konsistensi & Validitas (10 poin)**
-   - Tanggal valid (start ≤ end)
-   - Tidak ada gap besar yang tidak explained
-   - Info lengkap dan konsisten
+6. **Konsistensi & Completeness (10 poin)**
+   - Tanggal konsisten dan valid
+   - Tidak ada typo atau inkonsistensi
+   - Semua section terisi lengkap
 
-**Output JSON:**
+**OUTPUT JSON (WAJIB IKUTI FORMAT INI PERSIS):**
 {
   "score": <number 0-100>,
-  "missingKeywords": [<array of keywords yang kurang>],
-  "issues": [<masalah yang ditemukan>],
-  "suggestions": [<saran perbaikan konkrit dan actionable>]
+  "scoreBreakdown": {
+    "header": <0-10>,
+    "keywords": <0-40>,
+    "experience": <0-20>,
+    "format": <0-10>,
+    "quantification": <0-10>,
+    "consistency": <0-10>
+  },
+  "missingKeywords": ["keyword1", "keyword2", ...max 10 yang PALING PENTING],
+  "matchedKeywords": ["keyword1", "keyword2", ...yang sudah ada di CV],
+  "keywordMatchPercent": <0-100>,
+  "issues": ["issue singkat 1", "issue singkat 2", ...max 5],
+  "strengths": ["kelebihan CV 1", "kelebihan 2", ...hal positif yang sudah bagus],
+  "quickWins": [
+    "Perbaikan CEPAT yang bisa langsung dilakukan dalam 5 menit",
+    "Quick win 2",
+    ...max 3 yang paling impactful
+  ],
+  "suggestions": [
+    {
+      "priority": "high|medium|low",
+      "section": "header|summary|experience|education|skills|general",
+      "issue": "Masalah spesifik yang ditemukan",
+      "suggestion": "Saran perbaikan yang KONKRIT dan ACTIONABLE",
+      "example": {
+        "before": "Text asli dari CV (jika ada)",
+        "after": "Contoh text yang sudah diperbaiki - WAJIB berikan contoh konkrit!"
+      }
+    }
+  ]
 }
 
-Hanya return JSON, tanpa markdown atau text lain.`;
+**ATURAN PENTING:**
+1. Suggestions WAJIB punya contoh before/after yang KONKRIT dari CV user
+2. Prioritas "high" = yang paling mempengaruhi kelulusan ATS
+3. Quick wins = hal kecil tapi berdampak besar, bisa dilakukan < 5 menit
+4. Strengths = apresiasi hal yang sudah bagus (motivasi user)
+5. Bahasa Indonesia yang mudah dipahami
+6. JANGAN berikan saran generic - harus SPESIFIK ke CV ini
+
+**JANGAN SARANKAN HAL-HAL BERIKUT (sudah di-handle template):**
+- Format tanggal (YYYY-MM sudah di-render jadi "Februari 2020" dll di template)
+- Format nomor telepon
+- Kapitalisasi nama/judul (template sudah handle)
+- Formatting visual (font, spacing, margin)
+- Struktur section (sudah fixed di template)
+- Urutan section
+- Format email/URL
+
+**FOKUS SARAN PADA:**
+- Isi/konten yang bisa diedit user: summary, bullets, skills, headline
+- Kuantifikasi achievement (tambah angka/metrik)
+- Action verbs di bullet points
+- Keyword yang hilang
+- Informasi yang kurang lengkap (bukan format)
+
+Hanya return JSON valid, tanpa markdown code block atau text lain.`;
 }

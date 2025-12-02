@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { EmailFormData } from "./EmailWizard";
+import { EmailFormData } from "./types";
 import { generateEmailWithAI } from "@/actions/email/generate";
 import { saveEmailDraft } from "@/actions/email/save";
-import { Loader2, Copy, Save, RefreshCw, CheckCircle2, Mail, Eye, Sparkles } from "lucide-react";
+import { Loader2, Copy, Save, RefreshCw, CheckCircle2, Mail, Eye, Sparkles, Send } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -182,15 +182,28 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
 
             {/* Action Buttons - Responsive Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <Button onClick={handleCopy} variant="outline" className="gap-2">
+              <Button onClick={handleCopy} variant="outline" className="gap-2 h-11">
                 <Copy className="h-4 w-4" />
-                Copy Email
+                Copy
+              </Button>
+
+              <Button
+                onClick={() => {
+                  const subject = encodeURIComponent(formData.subjectLine || "");
+                  const body = encodeURIComponent(formData.bodyContent || "");
+                  window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+                }}
+                variant="outline"
+                className="gap-2 h-11"
+              >
+                <Send className="h-4 w-4" />
+                Open Mail
               </Button>
 
               <Button
                 onClick={handleSave}
                 variant="default"
-                className="gap-2"
+                className="gap-2 h-11 bg-[#5547d0] hover:bg-[#4538b0]"
                 disabled={saving || saved}
               >
                 {saved ? (
@@ -201,7 +214,7 @@ export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
                 ) : (
                   <>
                     <Save className="h-4 w-4" />
-                    {saving ? "Menyimpan..." : "Simpan Draft"}
+                    {saving ? "..." : "Simpan"}
                   </>
                 )}
               </Button>

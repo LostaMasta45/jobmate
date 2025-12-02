@@ -49,7 +49,7 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
               value={resume.title || ""}
               onChange={(e) => handleTitleChange(e.target.value)}
               placeholder="Contoh: Frontend Developer CV"
-              className="mt-1.5"
+              className="mt-1.5 h-12"
             />
             <p className="mt-1 text-xs text-muted-foreground">
               Nama file CV Anda untuk referensi
@@ -58,12 +58,12 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
         </div>
       </Card>
 
-      <Card className="p-4">
-        <h3 className="mb-4 font-semibold">Informasi Pribadi</h3>
-        <div className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
+      <Card className="p-4 sm:p-6">
+        <h3 className="mb-4 font-semibold text-lg">Informasi Pribadi</h3>
+        <div className="space-y-5">
+          <div className="grid gap-5 sm:grid-cols-2">
             <div>
-              <Label htmlFor="firstName">
+              <Label htmlFor="firstName" className="text-base sm:text-sm">
                 Nama Depan <span className="text-destructive">*</span>
               </Label>
               <Input
@@ -71,11 +71,11 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
                 value={resume.basics.firstName}
                 onChange={(e) => handleChange("firstName", e.target.value)}
                 placeholder="John"
-                className="mt-1.5"
+                className="mt-1.5 h-12"
               />
             </div>
             <div>
-              <Label htmlFor="lastName">
+              <Label htmlFor="lastName" className="text-base sm:text-sm">
                 Nama Belakang <span className="text-destructive">*</span>
               </Label>
               <Input
@@ -83,13 +83,13 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
                 value={resume.basics.lastName}
                 onChange={(e) => handleChange("lastName", e.target.value)}
                 placeholder="Doe"
-                className="mt-1.5"
+                className="mt-1.5 h-12"
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="headline">
+            <Label htmlFor="headline" className="text-base sm:text-sm">
               Headline / Target Role <span className="text-destructive">*</span>
             </Label>
             <Input
@@ -97,7 +97,7 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
               value={resume.basics.headline}
               onChange={(e) => handleChange("headline", e.target.value)}
               placeholder="Frontend Developer | React Specialist"
-              className="mt-1.5"
+              className="mt-1.5 h-12"
             />
             <p className="mt-1 text-xs text-muted-foreground">
               Posisi atau role yang Anda targetkan
@@ -106,11 +106,11 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
         </div>
       </Card>
 
-      <Card className="p-4">
-        <h3 className="mb-4 font-semibold">Informasi Kontak</h3>
-        <div className="space-y-4">
+      <Card className="p-4 sm:p-6">
+        <h3 className="mb-4 font-semibold text-lg">Informasi Kontak</h3>
+        <div className="space-y-5">
           <div>
-            <Label htmlFor="email">
+            <Label htmlFor="email" className="text-base sm:text-sm">
               Email <span className="text-destructive">*</span>
             </Label>
             <Input
@@ -119,70 +119,70 @@ export function StepBasics({ resume, setResume }: StepBasicsProps) {
               value={resume.basics.email}
               onChange={(e) => handleChange("email", e.target.value)}
               placeholder="john.doe@email.com"
-              className="mt-1.5"
+              className="mt-1.5 h-12"
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2">
             <div>
-              <Label htmlFor="phone">Telepon</Label>
+              <Label htmlFor="phone" className="text-base sm:text-sm">Telepon</Label>
               <Input
                 id="phone"
                 value={resume.basics.phone || ""}
                 onChange={(e) => handleChange("phone", e.target.value)}
                 placeholder="+62 812 3456 7890"
-                className="mt-1.5"
+                className="mt-1.5 h-12"
               />
             </div>
             <div>
-              <Label htmlFor="city">Kota</Label>
+              <Label htmlFor="city" className="text-base sm:text-sm">Kota</Label>
               <Input
                 id="city"
                 value={resume.basics.city || ""}
                 onChange={(e) => handleChange("city", e.target.value)}
                 placeholder="Jakarta"
-                className="mt-1.5"
+                className="mt-1.5 h-12"
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="address">Alamat Lengkap</Label>
+            <Label htmlFor="address" className="text-base sm:text-sm">Alamat Lengkap</Label>
             <Input
               id="address"
               value={resume.basics.address || ""}
               onChange={(e) => handleChange("address", e.target.value)}
               placeholder="Jl. Contoh No. 123"
-              className="mt-1.5"
+              className="mt-1.5 h-12"
             />
           </div>
         </div>
       </Card>
 
-      <Card className="p-4">
-        <h3 className="mb-4 font-semibold">Link Profesional</h3>
-        <div className="space-y-4">
+      <Card className="p-4 sm:p-6">
+        <h3 className="mb-4 font-semibold text-lg">Link Profesional</h3>
+        <div className="space-y-5">
           <div>
-            <Label htmlFor="website">Website / Portfolio</Label>
+            <Label htmlFor="website" className="text-base sm:text-sm">Website / Portfolio</Label>
             <Input
               id="website"
               type="url"
               value={resume.basics.website || ""}
               onChange={(e) => handleChange("website", e.target.value)}
               placeholder="https://yourwebsite.com"
-              className="mt-1.5"
+              className="mt-1.5 h-12"
             />
           </div>
 
           <div>
-            <Label htmlFor="linkedin">LinkedIn</Label>
+            <Label htmlFor="linkedin" className="text-base sm:text-sm">LinkedIn</Label>
             <Input
               id="linkedin"
               type="url"
               value={resume.basics.linkedin || ""}
               onChange={(e) => handleChange("linkedin", e.target.value)}
               placeholder="https://linkedin.com/in/username"
-              className="mt-1.5"
+              className="mt-1.5 h-12"
             />
           </div>
         </div>

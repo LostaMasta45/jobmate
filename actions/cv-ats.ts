@@ -14,13 +14,20 @@ export async function generateAISummary(data: {
   headline: string;
   skills: string[];
   experiences: any[];
+  // Enhanced fields for better AI generation
+  targetPosition?: string;
+  yearsExperience?: string;
+  topAchievements?: string;
+  targetIndustry?: string;
+  careerGoal?: string;
+  summaryTone?: "professional" | "confident" | "friendly";
 }) {
   try {
     const prompt = generateAISummaryPrompt(data);
     const summary = await generateText(prompt, {
       model: "gpt-4o-mini",
       temperature: 0.7,
-      maxTokens: 300,
+      maxTokens: 400,
     });
 
     return summary.trim();
@@ -75,6 +82,67 @@ export async function analyzeATSScore(resume: Resume, jobDesc?: string) {
   } catch (error) {
     console.error("ATS analysis error:", error);
     throw new Error("Gagal analisa ATS score");
+  }
+}
+
+// Extract job description from poster image using Vision API
+export async function extractJobDescFromPoster(imageBase64: string): Promise<string> {
+  try {
+    const OpenAI = (await import("openai")).default;
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `Kamu adalah asisten yang ahli mengekstrak informasi lowongan kerja dari gambar poster/flyer lowongan.
+Ekstrak semua informasi penting termasuk:
+- Nama posisi/jabatan
+- Nama perusahaan
+- Kualifikasi/persyaratan
+- Skills yang dibutuhkan
+- Tanggung jawab pekerjaan
+- Benefit (jika ada)
+- Lokasi (jika ada)
+
+Format output sebagai job description yang lengkap dalam bahasa Indonesia.
+Jika tidak bisa membaca gambar atau bukan poster lowongan, kembalikan pesan error.`
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: "Ekstrak informasi lowongan kerja dari poster ini dan buat job description yang lengkap:"
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: imageBase64.startsWith("data:") ? imageBase64 : `data:image/jpeg;base64,${imageBase64}`,
+                detail: "high"
+              }
+            }
+          ]
+        }
+      ],
+      max_tokens: 1500,
+      temperature: 0.3,
+    });
+
+    const extractedText = response.choices[0]?.message?.content;
+    
+    if (!extractedText) {
+      throw new Error("Tidak bisa membaca poster lowongan");
+    }
+
+    return extractedText;
+  } catch (error: any) {
+    console.error("Extract job desc from poster error:", error);
+    if (error.message?.includes("Could not process image")) {
+      throw new Error("Gambar tidak bisa diproses. Pastikan gambar jelas dan format valid (JPG/PNG).");
+    }
+    throw new Error("Gagal mengekstrak informasi dari poster: " + (error.message || "Unknown error"));
   }
 }
 

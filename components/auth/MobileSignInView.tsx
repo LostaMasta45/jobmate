@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingScreen } from "@/components/ui/loading-screen";
+import { RocketLoader } from "@/components/auth/RocketLoader";
 import { createClient } from "@/lib/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
@@ -15,29 +16,31 @@ import {
 } from "lucide-react";
 
 // --- ANIMATION VARIANTS ---
+// Smooth iOS/Android-like page transition
 const pageVariants = {
   initial: (direction: number) => ({
     x: direction > 0 ? '100%' : '-100%',
-    opacity: 0
+    opacity: 0,
+    scale: 0.98,
   }),
   animate: {
     x: 0,
     opacity: 1,
+    scale: 1,
     transition: {
-      type: "spring",
-      stiffness: 300,
-      damping: 30,
-      mass: 0.8
+      type: "tween",
+      duration: 0.4,
+      ease: [0.32, 0.72, 0, 1], // iOS-like easing curve
     }
   },
   exit: (direction: number) => ({
     x: direction < 0 ? '100%' : '-100%',
     opacity: 0,
+    scale: 0.98,
     transition: {
-      type: "spring",
-      stiffness: 300,
-      damping: 30,
-      mass: 0.8
+      type: "tween",
+      duration: 0.35,
+      ease: [0.32, 0.72, 0, 1],
     }
   })
 };
@@ -90,12 +93,21 @@ export default function MobileSignInView() {
   const [password, setPassword] = React.useState("");
   const [rememberMe, setRememberMe] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [loadingStatus, setLoadingStatus] = React.useState<'loading' | 'success' | 'error' | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
-  const [showLoadingScreen, setShowLoadingScreen] = React.useState(false);
   const [capsLock, setCapsLock] = React.useState(false);
   
   const emailInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Load saved email from localStorage on mount
+  React.useEffect(() => {
+    const savedEmail = localStorage.getItem('jobmate_remembered_email');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   // Auto-focus logic
   React.useEffect(() => {
@@ -124,16 +136,11 @@ export default function MobileSignInView() {
     }
 
     setLoading(true);
+    setLoadingStatus('loading');
     setError(null);
 
     try {
       const supabase = createClient();
-      
-      if (rememberMe) {
-        await supabase.auth.updateUser({
-          data: { remember_me: true }
-        });
-      }
 
       const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -143,13 +150,22 @@ export default function MobileSignInView() {
       if (signInError) {
         setError("Email atau kata sandi salah.");
         setLoading(false);
+        setLoadingStatus(null);
         return;
       }
 
       if (!authData.user) {
         setError("Gagal masuk. Silakan coba lagi.");
         setLoading(false);
+        setLoadingStatus(null);
         return;
+      }
+
+      // Handle Remember Me - save or remove email from localStorage
+      if (rememberMe) {
+        localStorage.setItem('jobmate_remembered_email', email);
+      } else {
+        localStorage.removeItem('jobmate_remembered_email');
       }
 
       // Check profile for redirection
@@ -164,13 +180,19 @@ export default function MobileSignInView() {
       else if (["vip_premium", "premium"].includes(profile?.membership)) redirectPath = "/dashboard";
       else if (["vip_basic", "basic"].includes(profile?.membership)) redirectPath = "/vip";
 
-      setShowLoadingScreen(true);
-      setTimeout(() => window.location.replace(redirectPath), 2000);
+      // Success state trigger
+      setLoadingStatus('success');
+      
+      // WAIT for animation to complete (3 seconds) before redirecting
+      setTimeout(() => {
+        window.location.replace(redirectPath);
+      }, 3500); // 3.5s allows the success animation to play fully
       
     } catch (err) {
       console.error("Login error:", err);
       setError("Terjadi kesalahan sistem.");
       setLoading(false);
+      setLoadingStatus(null);
     }
   };
 
@@ -184,10 +206,16 @@ export default function MobileSignInView() {
 
   return (
     <>
-      {showLoadingScreen && <LoadingScreen message="Sedang masuk..." />}
+      <AnimatePresence>
+        {loadingStatus && (
+          <RocketLoader 
+            status={loadingStatus === 'loading' || loadingStatus === 'success' ? loadingStatus : 'error'} 
+          />
+        )}
+      </AnimatePresence>
       
       <div className="fixed inset-0 w-full h-full bg-white overflow-hidden font-sans text-slate-900 selection:bg-[#00acc7] selection:text-white">
-        <AnimatePresence initial={false} custom={direction} mode="wait">
+        <AnimatePresence initial={false} custom={direction} mode="popLayout">
           
           {/* === PAGE 1: WELCOME SCREEN === */}
           {view === 'welcome' && (
@@ -198,161 +226,158 @@ export default function MobileSignInView() {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="absolute inset-0 flex flex-col bg-white"
+              className="absolute inset-0 flex flex-col bg-white will-change-transform transform-gpu"
+              style={{ backfaceVisibility: 'hidden' }}
             >
               {/* Background with Brand Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#8e68fd] via-[#6e52e0] to-[#00acc7] z-0">
-                {/* Mesh Gradient Overlay */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(142,104,253,0.5),transparent_50%)] mix-blend-overlay" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(0,209,220,0.4),transparent_50%)] mix-blend-soft-light" />
-                <div className="absolute inset-0 opacity-30 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#6e52e0] via-[#5547d0] to-[#3d2fa8] z-0">
+                {/* Subtle Pattern Overlay */}
+                <div className="absolute inset-0 opacity-[0.03] bg-[url('/grid.svg')] bg-center" />
                 
-                {/* Animated Background Orbs */}
-                <motion.div 
-                  animate={{ y: [0, -30, 0], opacity: [0.4, 0.7, 0.4] }}
-                  transition={{ duration: 8, repeat: Infinity }}
-                  className="absolute top-[-10%] right-[-10%] w-80 h-80 bg-[#00d1dc] rounded-full blur-[100px] opacity-40 mix-blend-overlay"
-                />
-                <motion.div 
-                  animate={{ y: [0, 30, 0], opacity: [0.3, 0.6, 0.3] }}
-                  transition={{ duration: 10, repeat: Infinity }}
-                  className="absolute bottom-[-10%] left-[-20%] w-96 h-96 bg-[#5547d0] rounded-full blur-[120px] opacity-40 mix-blend-multiply"
-                />
+                {/* Soft Glow Effects */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-[#8e68fd] rounded-full blur-[150px] opacity-30" />
+                <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-[#00acc7] rounded-full blur-[120px] opacity-20" />
               </div>
 
-               {/* Fixed Logo at Top */}
-               <motion.div 
+              {/* Main Content */}
+              <div className="flex-1 relative z-10 flex flex-col px-6 pt-12 pb-8 h-full">
+                
+                {/* Logo Section */}
+                <motion.div 
                   variants={logoVariants}
                   initial="hidden"
                   animate="visible"
-                  className="absolute -top-20 left-0 right-0 z-0 flex justify-center pointer-events-none"
-               >
-                  <div className="relative">
-                    <motion.div
-                      className="absolute inset-0 bg-white/20 rounded-full blur-xl"
-                      animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.3, 0.5] }}
-                      transition={{ duration: 3, repeat: Infinity }}
-                    />
-                    <img src="/Logo/x.png" alt="JobMate" className="w-64 h-64 object-contain relative z-10 drop-shadow-2xl" />
-                  </div>
-               </motion.div>
-
-              {/* Main Content Area */}
-              <div className="flex-1 relative z-10 flex flex-col items-center justify-center px-8 pt-48">
-                
-                {/* JOB SEEKER ILLUSTRATION */}
-                <motion.div 
-                  variants={floatAnimation}
-                  animate="animate"
-                  className="relative w-64 h-64 mb-8"
+                  className="flex justify-center -mt-8 -mb-8"
                 >
-                  {/* Central Circle (The World/Market) */}
-                  <div className="absolute inset-4 bg-gradient-to-tr from-white/10 to-white/5 rounded-full backdrop-blur-sm border border-white/10 shadow-2xl flex items-center justify-center">
-                    
-                    {/* Resume Card */}
-                    <motion.div 
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.2 }}
-                      className="w-32 h-44 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden relative z-20 transform -rotate-6"
-                    >
-                      {/* Card Header */}
-                      <div className="h-16 bg-gradient-to-r from-[#8e68fd] to-[#00acc7] p-3 flex items-end justify-center">
-                        <div className="w-12 h-12 bg-white rounded-full border-4 border-white shadow-sm flex items-center justify-center -mb-6">
-                          <User className="w-6 h-6 text-[#8e68fd]" />
-                        </div>
-                      </div>
-                      {/* Card Lines */}
-                      <div className="flex-1 p-4 pt-8 space-y-2">
-                        <div className="h-2 w-20 bg-slate-100 rounded-full mx-auto" />
-                        <div className="h-1.5 w-24 bg-slate-50 rounded-full mx-auto" />
-                        <div className="flex gap-1 justify-center mt-3 opacity-50">
-                          <div className="w-1 h-1 rounded-full bg-slate-300" />
-                          <div className="w-1 h-1 rounded-full bg-slate-300" />
-                          <div className="w-1 h-1 rounded-full bg-slate-300" />
-                        </div>
-                      </div>
-                      {/* Verified Badge */}
-                      <motion.div 
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.8, type: "spring" }}
-                        className="absolute bottom-2 right-2"
-                      >
-                        <CheckCircle2 className="w-6 h-6 text-[#00acc7] fill-white" />
-                      </motion.div>
-                    </motion.div>
-
-                    {/* Floating Elements */}
-                    <motion.div 
-                      animate={{ x: [0, 10, 0], y: [0, -5, 0] }}
-                      transition={{ duration: 4, repeat: Infinity }}
-                      className="absolute top-0 right-0 bg-white p-3 rounded-2xl shadow-lg z-30"
-                    >
-                      <Search className="w-6 h-6 text-[#00acc7]" />
-                    </motion.div>
-
-                    <motion.div 
-                      animate={{ x: [0, -10, 0], y: [0, 5, 0] }}
-                      transition={{ duration: 5, repeat: Infinity }}
-                      className="absolute bottom-8 left-0 bg-white p-3 rounded-2xl shadow-lg z-30"
-                    >
-                      <Briefcase className="w-6 h-6 text-[#8e68fd]" />
-                    </motion.div>
-                  </div>
+                  <img 
+                    src="/Logo/x.png" 
+                    alt="JobMate" 
+                    className="w-64 h-64 object-contain drop-shadow-2xl" 
+                  />
                 </motion.div>
 
-                {/* Headlines */}
-                <div className="text-center space-y-3">
-                  <motion.h1 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="text-4xl font-extrabold text-white leading-tight drop-shadow-md"
+                {/* Hero Illustration - Simplified & Elegant */}
+                <div className="flex-1 flex flex-col items-center justify-center">
+                  <motion.div 
+                    variants={floatAnimation}
+                    animate="animate"
+                    className="relative w-56 h-56 mb-6"
                   >
-                    Jemput Masa Depan <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00d1dc] to-white">
-                      Cemerlang
-                    </span>
-                  </motion.h1>
-                  <motion.p 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="text-white/80 text-base leading-relaxed max-w-[280px] mx-auto font-medium tracking-wide"
-                  >
-                    Platform karir modern yang menghubungkan potensimu dengan perusahaan impian.
-                  </motion.p>
-                </div>
-              </div>
+                    {/* Outer Ring */}
+                    <div className="absolute inset-0 rounded-full border-2 border-white/10" />
+                    <div className="absolute inset-3 rounded-full border border-white/5" />
+                    
+                    {/* Central Card */}
+                    <div className="absolute inset-6 flex items-center justify-center">
+                      <motion.div 
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                        className="w-28 h-36 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden transform -rotate-3"
+                      >
+                        {/* Card Header */}
+                        <div className="h-12 bg-gradient-to-r from-[#6e52e0] to-[#00acc7] flex items-end justify-center pb-1">
+                          <div className="w-10 h-10 bg-white rounded-full border-2 border-white shadow-md flex items-center justify-center translate-y-4">
+                            <User className="w-5 h-5 text-[#6e52e0]" />
+                          </div>
+                        </div>
+                        {/* Card Body */}
+                        <div className="flex-1 pt-6 px-3 space-y-1.5">
+                          <div className="h-1.5 w-14 bg-slate-200 rounded-full mx-auto" />
+                          <div className="h-1.5 w-18 bg-slate-100 rounded-full mx-auto" />
+                          <div className="h-1.5 w-12 bg-slate-100 rounded-full mx-auto" />
+                        </div>
+                        {/* Verified Badge */}
+                        <motion.div 
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: 0.7, type: "spring" }}
+                          className="absolute bottom-2 right-2"
+                        >
+                          <CheckCircle2 className="w-5 h-5 text-[#00acc7] fill-white" />
+                        </motion.div>
+                      </motion.div>
+                    </div>
 
-              {/* Bottom Actions */}
-              <div className="p-8 pb-12 relative z-20 space-y-6">
-                <Button 
-                  onClick={goToLogin}
-                  className="w-full h-14 rounded-full bg-white text-[#5547d0] font-bold text-lg shadow-[0_8px_25px_rgba(0,0,0,0.2)] hover:bg-slate-50 hover:shadow-[0_12px_35px_rgba(0,0,0,0.25)] active:scale-[0.98] transition-all duration-300 hover:-translate-y-1"
+                    {/* Floating Icons */}
+                    <motion.div 
+                      animate={{ y: [0, -8, 0] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                      className="absolute -top-2 right-4 bg-white p-2.5 rounded-xl shadow-lg"
+                    >
+                      <Search className="w-5 h-5 text-[#00acc7]" />
+                    </motion.div>
+
+                    <motion.div 
+                      animate={{ y: [0, 8, 0] }}
+                      transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+                      className="absolute bottom-4 -left-2 bg-white p-2.5 rounded-xl shadow-lg"
+                    >
+                      <Briefcase className="w-5 h-5 text-[#6e52e0]" />
+                    </motion.div>
+
+                    <motion.div 
+                      animate={{ y: [0, -6, 0] }}
+                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                      className="absolute top-1/2 -right-3 bg-white p-2 rounded-lg shadow-lg"
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    </motion.div>
+                  </motion.div>
+
+                  {/* Headlines - Clean & Impactful */}
+                  <div className="text-center space-y-4 px-4">
+                    <motion.h1 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="text-3xl font-bold text-white leading-tight"
+                    >
+                      Raih Karir Impianmu
+                    </motion.h1>
+                    <motion.p 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="text-white/70 text-sm leading-relaxed max-w-[260px] mx-auto"
+                    >
+                      Buat CV profesional, temukan lowongan terbaik, dan persiapkan interview dengan AI.
+                    </motion.p>
+                  </div>
+                </div>
+
+                {/* Bottom Actions - Clean Layout */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="space-y-4 mt-auto"
                 >
-                  Masuk
-                </Button>
-                
-                <div className="space-y-3 text-center">
-                  <div className="text-sm text-white/80 font-medium">
-                    Belum punya akun?{" "}
-                    <Link href="/ajukan-akun" className="text-white hover:text-[#00d1dc] hover:underline font-bold transition-colors">
-                      Ajukan akun baru
+                  <Button 
+                    onClick={goToLogin}
+                    className="w-full h-14 rounded-2xl bg-white text-[#5547d0] font-semibold text-base shadow-xl active:scale-[0.98] transition-transform"
+                  >
+                    Masuk ke Akun
+                  </Button>
+                  
+                  <div className="flex items-center justify-center gap-1 text-sm">
+                    <span className="text-white/60">Belum punya akun?</span>
+                    <Link 
+                      href="/ajukan-akun" 
+                      className="text-white font-semibold hover:underline"
+                    >
+                      Daftar Sekarang
                     </Link>
                   </div>
                   
                   <Link 
                     href="/cek-status-pengajuan" 
-                    className="text-sm text-white/80 hover:text-white transition-colors inline-flex items-center gap-1.5 group font-medium"
+                    className="flex items-center justify-center gap-1.5 text-sm text-white/50 hover:text-white/80 transition-colors"
                   >
-                    <span>Sudah ajukan akun?</span>
-                    <span className="text-white font-bold group-hover:text-[#00d1dc] transition-colors flex items-center gap-1">
-                      Cek Status Pengajuan <ArrowRight className="w-4 h-4" />
-                    </span>
+                    <span>Cek status pengajuan</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           )}
@@ -366,7 +391,8 @@ export default function MobileSignInView() {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="absolute inset-0 flex flex-col bg-white text-slate-900 overflow-hidden"
+              className="absolute inset-0 flex flex-col bg-white text-slate-900 overflow-hidden will-change-transform transform-gpu"
+              style={{ backfaceVisibility: 'hidden' }}
             >
               {/* Background with Brand Gradient (Same as Page 1) */}
               <div className="absolute inset-0 bg-gradient-to-br from-[#8e68fd] via-[#6e52e0] to-[#00acc7] z-0">
@@ -505,8 +531,13 @@ export default function MobileSignInView() {
               <motion.div 
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.1 }}
-                className="flex-1 bg-white rounded-t-[2.5rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] relative z-20 flex flex-col overflow-hidden"
+                transition={{ 
+                  type: "tween", 
+                  duration: 0.5, 
+                  ease: [0.32, 0.72, 0, 1],
+                  delay: 0.15 
+                }}
+                className="flex-1 bg-white rounded-t-[2.5rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] relative z-20 flex flex-col overflow-hidden will-change-transform"
               >
                 {/* Scrollable Form Area */}
                 <div className="flex-1 overflow-y-auto px-8 pt-8 pb-4 scrollbar-hide">

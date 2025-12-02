@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { EmailFormData } from "./types";
 import { Info, Briefcase, Building2, User, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
 interface StepBasicInfoProps {
   formData: EmailFormData;
@@ -56,12 +57,18 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Email Details Section */}
+      <Card className="p-6 shadow-sm border-slate-200 dark:border-slate-800">
+        <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">
+            <Briefcase className="h-5 w-5 text-[#5547d0]" />
+            <h3 className="font-semibold text-lg">Detail Lamaran</h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Position - Conditional */}
         {needsPosition ? (
           <div className="space-y-2">
             <Label htmlFor="position" className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4 text-primary" />
               {formData.emailType === 'inquiry' ? 'Area/Posisi yang Diminati' : 'Posisi yang Dilamar'} *
             </Label>
             <Input
@@ -70,13 +77,12 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
               value={formData.position}
               onChange={(e: any) => updateFormData({ position: e.target.value })}
               required
-              className={cn("h-11", errorClass(formData.position))}
+              className={cn("h-11 transition-all focus:ring-2 focus:ring-[#5547d0]/20", errorClass(formData.position))}
             />
           </div>
         ) : needsDepartment ? (
           <div className="space-y-2">
             <Label htmlFor="position" className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4 text-primary" />
               Department/Area of Interest *
             </Label>
             <Input
@@ -85,13 +91,12 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
               value={formData.position}
               onChange={(e: any) => updateFormData({ position: e.target.value })}
               required
-              className={cn("h-11", errorClass(formData.position))}
+              className={cn("h-11 transition-all focus:ring-2 focus:ring-[#5547d0]/20", errorClass(formData.position))}
             />
           </div>
         ) : (
           <div className="space-y-2">
             <Label htmlFor="position" className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4 text-primary" />
               Posisi yang Dilamar *
             </Label>
             <Input
@@ -100,7 +105,7 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
               value={formData.position}
               onChange={(e: any) => updateFormData({ position: e.target.value })}
               required
-              className={cn("h-11", errorClass(formData.position))}
+              className={cn("h-11 transition-all focus:ring-2 focus:ring-[#5547d0]/20", errorClass(formData.position))}
             />
           </div>
         )}
@@ -108,7 +113,6 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
         {/* Company Name */}
         <div className="space-y-2">
           <Label htmlFor="companyName" className="flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-primary" />
             Nama Perusahaan *
           </Label>
           <Input
@@ -117,14 +121,14 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
             value={formData.companyName}
             onChange={(e: any) => updateFormData({ companyName: e.target.value })}
             required
-            className={cn("h-11", errorClass(formData.companyName))}
+            className={cn("h-11 transition-all focus:ring-2 focus:ring-[#5547d0]/20", errorClass(formData.companyName))}
           />
         </div>
       </div>
 
       {/* Conditional Fields for Thank You Email */}
       {needsInterviewerName && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <div className="space-y-2">
             <Label htmlFor="hrdName" className="flex items-center gap-2">
               <User className="h-4 w-4 text-primary" />
@@ -157,7 +161,7 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
 
       {/* Conditional Fields for Follow-up Email */}
       {needsApplicationDate && (
-        <div className="space-y-2">
+        <div className="space-y-2 mt-6">
           <Label htmlFor="applicationDate">Tanggal Mengirim Lamaran *</Label>
           <Input
             id="applicationDate"
@@ -176,10 +180,9 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
 
       {/* Standard HRD fields for application and inquiry */}
       {!needsInterviewerName && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <div className="space-y-2">
             <Label htmlFor="hrdName" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
               {formData.emailType === 'inquiry' ? 'Nama Contact Person (Optional)' : 'Nama HRD (Optional)'}
             </Label>
             <Input
@@ -210,7 +213,7 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
 
       {/* Job Source - Only for application and follow_up */}
       {['application', 'follow_up'].includes(formData.emailType) && (
-        <div className="space-y-2">
+        <div className="space-y-2 mt-6">
           <Label htmlFor="jobSource">Sumber Lowongan *</Label>
           <Select
             value={formData.jobSource}
@@ -236,7 +239,7 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
 
       {/* Referral Name (conditional) */}
       {formData.jobSource === 'referral' && (
-        <div className="space-y-2">
+        <div className="space-y-2 mt-4 animate-in fade-in slide-in-from-top-2">
           <Label htmlFor="referralName">Nama yang Mereferensikan</Label>
           <Input
             id="referralName"
@@ -247,12 +250,14 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
           />
         </div>
       )}
-
-      <hr className="my-6" />
+      </Card>
 
       {/* Personal Info Section */}
-      <div className="space-y-4">
-        <h3 className="font-semibold text-lg">Informasi Personal</h3>
+      <Card className="p-6 shadow-sm border-slate-200 dark:border-slate-800">
+        <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">
+            <User className="h-5 w-5 text-[#5547d0]" />
+            <h3 className="font-semibold text-lg">Informasi Personal</h3>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Your Name */}
@@ -282,7 +287,7 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
         </div>
 
         {/* Years Experience */}
-        <div className="space-y-2">
+        <div className="space-y-2 mt-6">
           <Label htmlFor="yearsExperience">Pengalaman (Tahun) (Optional)</Label>
           <Input
             id="yearsExperience"
@@ -295,11 +300,10 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
             className="h-11"
           />
         </div>
-      </div>
 
       {/* Has Attachment - Only for application */}
       {formData.emailType === 'application' && (
-        <div className="flex items-start space-x-3 p-4 rounded-lg border bg-blue-50 dark:bg-blue-950">
+        <div className="flex items-start space-x-3 p-4 rounded-lg border bg-slate-50 dark:bg-slate-900 mt-6">
           <Checkbox
             id="hasAttachment"
             checked={formData.hasAttachment}
@@ -318,6 +322,7 @@ export function StepBasicInfo({ formData, updateFormData, showValidation }: Step
           </div>
         </div>
       )}
+      </Card>
     </div>
   );
 }

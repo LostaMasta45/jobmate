@@ -30,6 +30,7 @@ import {
   Target,
   BookOpen,
   GraduationCap,
+  Palette,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -89,6 +90,12 @@ const navItems: NavItem[] = [
     premiumOnly: true,
   },
   {
+    title: "CV Creative",
+    href: "/tools/cv-creative",
+    icon: Palette,
+    premiumOnly: true,
+  },
+  {
     title: "Interview Prep",
     href: "/tools/interview-prep",
     icon: Target,
@@ -141,24 +148,24 @@ interface SidebarProps {
 
 export function Sidebar({ isAdmin = false, membership: membershipProp = 'free', mobileOpen = false, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = React.useState(false);
-  const [mounted, setMounted] = React.useState(false);
+  const [collapsed, setCollapsed] = React.useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("jobmate_sidebar_collapsed") === "true";
+    }
+    return false;
+  });
   const [membership, setMembership] = React.useState(membershipProp);
   const [toolsExpanded, setToolsExpanded] = React.useState(false);
+  const fetchedRef = React.useRef(false);
 
-  // Load collapsed state from localStorage after component mounts
+  // Fetch user's membership if not provided as prop - only once
   React.useEffect(() => {
-    setMounted(true);
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("jobmate_sidebar_collapsed");
-      // Only set to true if explicitly stored as "true", otherwise default to false (open)
-      setCollapsed(stored === "true");
-    }
-  }, []);
-
-  // Fetch user's membership if not provided as prop
-  React.useEffect(() => {
-    async function fetchMembership() {
+    if (fetchedRef.current) return;
+    if (membershipProp && membershipProp !== 'free') return;
+    
+    fetchedRef.current = true;
+    
+    const fetchMembership = async () => {
       try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -177,12 +184,9 @@ export function Sidebar({ isAdmin = false, membership: membershipProp = 'free', 
       } catch (error) {
         console.error('Error fetching membership:', error);
       }
-    }
+    };
 
-    // Only fetch if membership not provided as prop
-    if (!membershipProp || membershipProp === 'free') {
-      fetchMembership();
-    }
+    fetchMembership();
   }, [membershipProp]);
 
   const toggleCollapse = () => {
@@ -193,22 +197,18 @@ export function Sidebar({ isAdmin = false, membership: membershipProp = 'free', 
     }
   };
 
-  // Filter items based on role and membership
-  const filteredItems = navItems.filter((item) => {
-    // Filter admin items
-    if (item.admin && !isAdmin) return false;
-    
-    // Filter premium-only items for non-premium users
-    if (item.premiumOnly && membership !== 'vip_premium') return false;
-    
-    return true;
-  });
+  // Filter items based on role and membership - memoized for performance
+  const filteredItems = React.useMemo(() => {
+    return navItems.filter((item) => {
+      if (item.admin && !isAdmin) return false;
+      if (item.premiumOnly && membership !== 'vip_premium') return false;
+      return true;
+    });
+  }, [isAdmin, membership]);
 
-  const handleLinkClick = () => {
-    if (onMobileClose) {
-      onMobileClose();
-    }
-  };
+  const handleLinkClick = React.useCallback(() => {
+    onMobileClose?.();
+  }, [onMobileClose]);
 
   // Desktop Sidebar Content
   const DesktopSidebarContent = () => (
@@ -311,6 +311,10 @@ export function Sidebar({ isAdmin = false, membership: membershipProp = 'free', 
                   <div className="flex items-center gap-2 px-2 py-1.5 text-xs text-muted-foreground">
                     <Lock className="h-3 w-3 text-purple-500" />
                     <span className="font-medium">CV ATS Optimizer</span>
+                  </div>
+                  <div className="flex items-center gap-2 px-2 py-1.5 text-xs text-muted-foreground">
+                    <Lock className="h-3 w-3 text-purple-500" />
+                    <span className="font-medium">CV Creative</span>
                   </div>
                   <div className="flex items-center gap-2 px-2 py-1.5 text-xs text-muted-foreground">
                     <Lock className="h-3 w-3 text-purple-500" />
@@ -498,6 +502,10 @@ export function Sidebar({ isAdmin = false, membership: membershipProp = 'free', 
                   <div className="flex items-center gap-2 px-2 py-1.5 text-xs text-muted-foreground">
                     <Lock className="h-3 w-3 text-purple-500" />
                     <span className="font-medium">CV ATS Optimizer</span>
+                  </div>
+                  <div className="flex items-center gap-2 px-2 py-1.5 text-xs text-muted-foreground">
+                    <Lock className="h-3 w-3 text-purple-500" />
+                    <span className="font-medium">CV Creative</span>
                   </div>
                   <div className="flex items-center gap-2 px-2 py-1.5 text-xs text-muted-foreground">
                     <Lock className="h-3 w-3 text-purple-500" />

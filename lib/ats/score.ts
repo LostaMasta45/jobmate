@@ -31,19 +31,46 @@ async function calculateATSScoreWithAI(
   const result = await generateText(prompt, {
     model: "gpt-4o-mini",
     temperature: 0.3,
-    maxTokens: 800,
+    maxTokens: 2000,
   });
 
   try {
-    const analysis = JSON.parse(result);
+    // Clean the response - remove markdown code blocks if present
+    let cleanResult = result.trim();
+    if (cleanResult.startsWith("```json")) {
+      cleanResult = cleanResult.slice(7);
+    }
+    if (cleanResult.startsWith("```")) {
+      cleanResult = cleanResult.slice(3);
+    }
+    if (cleanResult.endsWith("```")) {
+      cleanResult = cleanResult.slice(0, -3);
+    }
+    cleanResult = cleanResult.trim();
+
+    const analysis = JSON.parse(cleanResult);
+    
     return {
       score: analysis.score || 0,
+      scoreBreakdown: analysis.scoreBreakdown || {
+        header: 0,
+        keywords: 0,
+        experience: 0,
+        format: 0,
+        quantification: 0,
+        consistency: 0,
+      },
       missingKeywords: analysis.missingKeywords || [],
+      matchedKeywords: analysis.matchedKeywords || [],
+      keywordMatchPercent: analysis.keywordMatchPercent || 0,
       issues: analysis.issues || [],
       suggestions: analysis.suggestions || [],
+      quickWins: analysis.quickWins || [],
+      strengths: analysis.strengths || [],
     };
   } catch (error) {
     console.error("Failed to parse AI analysis:", error);
+    console.error("Raw result:", result);
     throw error;
   }
 }
@@ -227,11 +254,63 @@ function calculateATSScoreHeuristic(
   // Cap score at 100
   score = Math.min(100, Math.round(score));
 
+  // Build matched keywords list
+  const matchedKeywords: string[] = [];
+  if (jobDesc) {
+    const jdKeywords = extractKeywords(jobDesc);
+    const resumeText = getResumeText(resume).toLowerCase();
+    jdKeywords.forEach((keyword) => {
+      if (resumeText.includes(keyword.toLowerCase())) {
+        matchedKeywords.push(keyword);
+      }
+    });
+  }
+
+  // Calculate keyword match percent
+  const keywordMatchPercent = jobDesc && missingKeywords.length + matchedKeywords.length > 0
+    ? Math.round((matchedKeywords.length / (missingKeywords.length + matchedKeywords.length)) * 100)
+    : 0;
+
+  // Build detailed suggestions
+  const detailedSuggestions = suggestions.map((s, idx) => ({
+    priority: idx === 0 ? "high" as const : idx < 3 ? "medium" as const : "low" as const,
+    section: "general" as const,
+    issue: issues[idx] || "Perlu perbaikan",
+    suggestion: s,
+  }));
+
+  // Quick wins
+  const quickWins: string[] = [];
+  if (!resume.basics.headline) quickWins.push("Tambahkan headline/target role di bagian header");
+  if (resume.skills.length < 5) quickWins.push("Tambahkan 3-5 skills tambahan yang relevan");
+  if (totalBullets > 0 && quantifiedBullets < totalBullets * 0.5) {
+    quickWins.push("Tambahkan angka/metrik di bullet points yang belum ada");
+  }
+
+  // Strengths
+  const strengths: string[] = [];
+  if (resume.basics.email && resume.basics.phone) strengths.push("Kontak info lengkap");
+  if (resume.experiences.length >= 2) strengths.push(`${resume.experiences.length} pengalaman kerja tercatat`);
+  if (resume.skills.length >= 5) strengths.push(`${resume.skills.length} skills terdaftar`);
+  if (quantifiedBullets > 0) strengths.push(`${quantifiedBullets} bullet points sudah ada angka/metrik`);
+
   return {
     score,
-    missingKeywords: missingKeywords.slice(0, 10), // Limit to 10
+    scoreBreakdown: {
+      header: headerScore,
+      keywords: keywordScore,
+      experience: expScore,
+      format: formatScore,
+      quantification: quantScore,
+      consistency: Math.max(0, consistencyScore),
+    },
+    missingKeywords: missingKeywords.slice(0, 10),
+    matchedKeywords: matchedKeywords.slice(0, 10),
+    keywordMatchPercent,
     issues,
-    suggestions,
+    suggestions: detailedSuggestions,
+    quickWins: quickWins.slice(0, 3),
+    strengths,
   };
 }
 

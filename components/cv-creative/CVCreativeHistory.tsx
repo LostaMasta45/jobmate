@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,24 +27,15 @@ import {
   Calendar,
   Award,
   Palette,
+  Plus,
 } from "lucide-react";
 import { CreativeCV } from "@/lib/schemas/cv-creative";
 import { deleteCreativeCV } from "@/actions/cv-creative";
 import { downloadCreativeCVAsPDF, downloadCreativeCVAsPNG } from "@/lib/cv-creative-download";
 import { ModernGradient } from "./templates/ModernGradient";
-import { BoldMinimalist, PastelProfessional, DarkModePro } from "./templates/AllTemplatesNew";
-import { CV075Professional } from "./templates/CV075Professional";
-import { 
-  MagazineLayout,
-  ColorfulBlocks, 
-  TimelineHero, 
-  PortfolioGrid, 
-  InfographicStyle, 
-  SplitScreen, 
-  GeometricModern, 
-  WatercolorArtist 
-} from "./templates/RemainingTemplates";
+import { CreativeThumbnail } from "./CreativeThumbnail";
 import { CVPreview } from "./CVPreview";
+import Link from "next/link";
 
 interface CVCreativeHistoryProps {
   cvs: any[];
@@ -146,24 +135,26 @@ export function CVCreativeHistory({ cvs, onEdit, onRefresh }: CVCreativeHistoryP
     return "text-red-600 dark:text-red-400";
   };
 
-  const getScoreLabel = (score: number | null) => {
-    if (!score) return "Belum dihitung";
-    if (score >= 80) return "Excellent";
-    if (score >= 60) return "Good";
-    return "Needs Work";
-  };
-
   if (cvs.length === 0) {
     return (
-      <Card className="border-dashed">
-        <CardContent className="flex h-48 items-center justify-center">
-          <div className="text-center text-muted-foreground">
-            <Palette className="mx-auto mb-4 h-16 w-16 opacity-50" />
-            <p className="mb-2 text-lg font-semibold">Belum ada Creative CV</p>
-            <p className="text-sm">Mulai buat CV visual yang eye-catching sekarang!</p>
+      <div className="flex flex-col items-center justify-center py-12 px-4">
+        <div className="relative mb-6">
+          <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full" />
+          <div className="relative bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-xl border border-purple-100 dark:border-purple-900/50">
+            <Palette className="h-12 w-12 text-purple-600 dark:text-purple-400" />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Belum ada CV</h3>
+        <p className="text-muted-foreground text-center max-w-xs mb-8">
+          Mulai buat CV professional pertamamu dengan template modern.
+        </p>
+        <Link href="/dashboard/cv-creative/new">
+          <Button size="lg" className="rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg shadow-purple-500/25">
+            <Plus className="mr-2 h-5 w-5" />
+            Buat CV Baru
+          </Button>
+        </Link>
+      </div>
     );
   }
 
@@ -182,313 +173,147 @@ export function CVCreativeHistory({ cvs, onEdit, onRefresh }: CVCreativeHistoryP
       isDefault: cv.is_default,
     };
 
-    // A4 ratio is 210:297 (approximately 1:1.414)
-    // Calculate scale to fit container perfectly
-    // Container width will be 100%, we need to scale 210mm to fit
-    const scaleValue = 0.35; // Adjusted for better fill
-    
     return (
       <div 
-        className="group/thumb relative w-full cursor-pointer overflow-hidden rounded-lg border bg-white shadow-sm transition-all hover:shadow-md"
-        style={{ 
-          paddingBottom: '141.4%', // A4 portrait aspect ratio (297/210 = 1.414)
-        }}
+        className="relative w-full h-full cursor-pointer overflow-hidden bg-white shadow-sm transition-all group-hover:scale-[1.02] duration-500"
         onClick={() => setPreviewCV(cv)}
       >
-        <div 
-          className="absolute inset-0 flex items-start justify-center"
-          style={{
-            overflow: 'hidden',
-            backgroundColor: '#f5f5f5',
-          }}
-        >
-          <div 
-            style={{
-              transform: `scale(${scaleValue})`,
-              transformOrigin: 'top center',
-              width: '210mm',
-              minHeight: '297mm',
-            }}
-            className="pointer-events-none"
-          >
-            <CVPreview cv={cvData} />
-          </div>
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent transition-opacity group-hover/thumb:opacity-80" />
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover/thumb:opacity-100">
-          <div className="rounded-full bg-white/90 p-3 shadow-lg backdrop-blur-sm">
-            <Eye className="h-5 w-5 text-gray-900" />
-          </div>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-          <p className="truncate text-sm font-semibold drop-shadow-md">{cv.template_id}</p>
-        </div>
+        <CreativeThumbnail cv={cvData} />
+        
+        {/* Gradient Overlay for Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 transition-opacity group-hover:opacity-40 pointer-events-none" />
       </div>
     );
   };
 
   return (
     <>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {cvs.map((cv) => {
           const content = cv.content;
-          const expCount = content?.experiences?.length || 0;
-          const skillCount = content?.skills?.length || 0;
-
+          
           return (
-            <Card key={cv.id} className="group relative overflow-hidden">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="line-clamp-1 text-base">
-                      {cv.title}
-                    </CardTitle>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {content?.basics?.firstName} {content?.basics?.lastName}
-                    </p>
-                  </div>
-                  {cv.ats_score !== null && (
-                    <div className="ml-2 flex flex-col items-center">
-                      <Award
-                        className={`h-5 w-5 ${getScoreColor(cv.ats_score)}`}
-                      />
-                      <span
-                        className={`text-xs font-semibold ${getScoreColor(
-                          cv.ats_score
-                        )}`}
-                      >
-                        {cv.ats_score}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-3 pb-4">
-                {/* CV Thumbnail Preview */}
-                {renderThumbnail(cv)}
-
-                {/* Info */}
-                <div className="flex-1 text-sm">
-                  <p className="text-xs text-muted-foreground">
-                    {expCount} pengalaman • {skillCount} skills
-                  </p>
+            <div 
+              key={cv.id} 
+              className="group relative flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-md border border-slate-100 dark:border-slate-800 transition-all hover:shadow-xl hover:border-purple-500/30 dark:hover:border-purple-500/30"
+            >
+              {/* Full Bleed Thumbnail */}
+              <div className="relative overflow-hidden bg-slate-100 aspect-[210/297]">
+                <div className="absolute inset-0">
+                   {renderThumbnail(cv)}
                 </div>
 
-                {/* ATS Score Badge */}
-                {cv.ats_score !== null && (
-                  <div
-                    className={`rounded-md px-2 py-1 text-xs font-medium ${
-                      cv.ats_score >= 80
-                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
-                        : cv.ats_score >= 60
-                        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
-                        : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
-                    }`}
-                  >
-                    ATS Score: {getScoreLabel(cv.ats_score)}
-                  </div>
-                )}
-
-                {/* Date */}
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Calendar className="h-3 w-3" />
-                  <span>Dibuat {formatDate(cv.created_at)}</span>
+                {/* Top Badges */}
+                <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
+                   <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm text-xs font-medium shadow-sm text-gray-800 border-none">
+                      {formatDate(cv.created_at)}
+                   </Badge>
+                   
+                   {cv.ats_score && (
+                     <Badge 
+                        className={`${
+                          cv.ats_score >= 80 ? 'bg-green-500' : cv.ats_score >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                        } text-white border-none shadow-sm`}
+                     >
+                       {cv.ats_score}
+                     </Badge>
+                   )}
                 </div>
 
-                {/* Actions */}
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPreviewCV(cv)}
-                    className="h-8 text-xs"
-                  >
-                    <Eye className="mr-1 h-3 w-3" />
-                    Preview
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onEdit(cv)}
-                    className="h-8 text-xs"
-                  >
-                    <Edit className="mr-1 h-3 w-3" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDownload(cv, "pdf")}
-                    disabled={downloading === cv.id}
-                    className="h-8 text-xs"
-                  >
-                    <FileDown className="mr-1 h-3 w-3" />
-                    PDF
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDownload(cv, "png")}
-                    disabled={downloading === cv.id}
-                    className="h-8 text-xs"
-                  >
-                    <Image className="mr-1 h-3 w-3" />
-                    PNG
-                  </Button>
-                </div>
-
-                {/* Delete Button */}
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(cv.id)}
-                  disabled={deleting === cv.id}
-                  className="w-full h-8 text-xs"
-                >
-                  {deleting === cv.id ? (
-                    "Menghapus..."
-                  ) : (
-                    <>
-                      <Trash2 className="mr-1 h-3 w-3" />
-                      Hapus
-                    </>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Preview Dialog */}
-      <Dialog open={!!previewCV} onOpenChange={() => setPreviewCV(null)}>
-        <DialogContent className="max-h-[80vh] max-w-3xl overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Preview CV Creative</DialogTitle>
-          </DialogHeader>
-
-          {previewCV && previewCV.content && (
-            <div className="space-y-6 text-sm">
-              {/* Header */}
-              <div className="border-b pb-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold">
-                      {previewCV.content.basics?.firstName} {previewCV.content.basics?.lastName}
-                    </h2>
-                    <p className="mt-1 text-lg text-muted-foreground">
-                      {previewCV.content.basics?.headline}
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                      {previewCV.content.basics?.email && (
-                        <span>{previewCV.content.basics.email}</span>
-                      )}
-                      {previewCV.content.basics?.phone && (
-                        <span>{previewCV.content.basics.phone}</span>
-                      )}
-                      {previewCV.content.basics?.city && (
-                        <span>{previewCV.content.basics.city}</span>
-                      )}
-                    </div>
-                  </div>
-                  <Badge
-                    className="shrink-0"
-                    style={{
-                      background: `linear-gradient(135deg, ${previewCV.color_scheme.primary}, ${previewCV.color_scheme.secondary})`,
-                    }}
-                  >
-                    {previewCV.template_id}
-                  </Badge>
+                {/* Actions Overlay (Visible on Hover or Mobile Tap) */}
+                <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-[2px]">
+                   <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 bg-white hover:bg-purple-50 text-purple-600 shadow-lg" onClick={() => onEdit(cv)}>
+                      <Edit className="h-4 w-4" />
+                   </Button>
+                   <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 bg-white hover:bg-blue-50 text-blue-600 shadow-lg" onClick={() => setPreviewCV(cv)}>
+                      <Eye className="h-4 w-4" />
+                   </Button>
+                   <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 bg-white hover:bg-gray-50 text-gray-700 shadow-lg">
+                            <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem onClick={() => handleDownload(cv, "pdf")}>
+                           <FileDown className="mr-2 h-4 w-4" /> PDF
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDownload(cv, "png")}>
+                           <Image className="mr-2 h-4 w-4" /> PNG
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDelete(cv.id)}>
+                           <Trash2 className="mr-2 h-4 w-4" /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                   </DropdownMenu>
                 </div>
               </div>
 
-              {/* Summary */}
-              {previewCV.content.summary && (
-                <div>
-                  <h3 className="mb-2 font-semibold uppercase text-xs tracking-wide">
-                    Ringkasan
-                  </h3>
-                  <p className="text-muted-foreground">{previewCV.content.summary}</p>
+              {/* Card Content */}
+              <div className="p-4 flex flex-col gap-1 bg-white dark:bg-slate-900 relative z-20">
+                <h3 className="font-bold text-gray-900 dark:text-gray-100 truncate pr-6" title={cv.title}>
+                  {cv.title || "Untitled CV"}
+                </h3>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                   <span>{cv.template_id}</span>
+                   <span>{content?.experiences?.length || 0} exp</span>
                 </div>
-              )}
+              </div>
+            </div>
+          );
+        })}
+        
+        {/* Add New Card - Always visible at the end */}
+        <Link href="/dashboard/cv-creative/new" className="group flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 p-6 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all min-h-[280px]">
+           <div className="rounded-full bg-white dark:bg-slate-800 p-4 shadow-sm mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-md">
+              <Plus className="h-8 w-8 text-purple-500" />
+           </div>
+           <h3 className="font-semibold text-gray-900 dark:text-gray-100">Buat CV Baru</h3>
+           <p className="text-xs text-muted-foreground text-center mt-1">
+             Pilih dari {10}+ template professional
+           </p>
+        </Link>
+      </div>
 
-              {/* Experience */}
-              {previewCV.content.experiences && previewCV.content.experiences.length > 0 && (
-                <div>
-                  <h3 className="mb-3 font-semibold uppercase text-xs tracking-wide">
-                    Pengalaman Profesional
-                  </h3>
-                  <div className="space-y-4">
-                    {previewCV.content.experiences.map((exp: any, idx: number) => (
-                      <div key={idx}>
-                        <div className="flex justify-between">
-                          <div>
-                            <p className="font-semibold">{exp.title}</p>
-                            <p className="text-muted-foreground">{exp.company}</p>
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            {exp.startDate} - {exp.isCurrent ? "Sekarang" : exp.endDate}
-                          </p>
-                        </div>
-                        <ul className="mt-2 space-y-1 text-muted-foreground">
-                          {exp.bullets.map((bullet: string, bidx: number) => (
-                            <li key={bidx} className="flex gap-2">
-                              <span>•</span>
-                              <span>{bullet}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+      {/* Preview Dialog - A4 Format */}
+      <Dialog open={!!previewCV} onOpenChange={() => setPreviewCV(null)}>
+        <DialogContent className="max-w-[95vw] w-[900px] h-[90vh] p-0 overflow-hidden">
+          <DialogHeader className="px-4 py-3 border-b shrink-0">
+            <div className="flex items-center justify-between">
+              <DialogTitle>Preview CV Creative - Format A4</DialogTitle>
+              {previewCV?.color_scheme && (
+                <Badge
+                  className="shrink-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${previewCV.color_scheme.primary}, ${previewCV.color_scheme.secondary})`,
+                  }}
+                >
+                  {previewCV.template_id}
+                </Badge>
               )}
+            </div>
+          </DialogHeader>
 
-              {/* Education */}
-              {previewCV.content.education && previewCV.content.education.length > 0 && (
-                <div>
-                  <h3 className="mb-3 font-semibold uppercase text-xs tracking-wide">
-                    Pendidikan
-                  </h3>
-                  <div className="space-y-3">
-                    {previewCV.content.education.map((edu: any, idx: number) => (
-                      <div key={idx}>
-                        <div className="flex justify-between">
-                          <div>
-                            <p className="font-semibold">{edu.school}</p>
-                            <p className="text-muted-foreground">
-                              {edu.degree} {edu.field}
-                            </p>
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            {edu.startDate} - {edu.endDate}
-                          </p>
-                        </div>
-                        {edu.description && (
-                          <p className="mt-1 text-muted-foreground">{edu.description}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Skills */}
-              {previewCV.content.skills && previewCV.content.skills.length > 0 && (
-                <div>
-                  <h3 className="mb-2 font-semibold uppercase text-xs tracking-wide">
-                    Keterampilan
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {previewCV.content.skills.join(", ")}
-                  </p>
-                </div>
-              )}
+          {previewCV && (
+            <div className="flex-1 overflow-hidden h-[calc(90vh-120px)]">
+              <CVPreview 
+                cv={{
+                  id: previewCV.id,
+                  userId: previewCV.user_id,
+                  title: previewCV.title,
+                  templateId: previewCV.template_id,
+                  colorScheme: previewCV.color_scheme,
+                  photoUrl: previewCV.photo_url,
+                  photoOptions: previewCV.photo_options,
+                  content: previewCV.content,
+                  atsScore: previewCV.ats_score,
+                  isDefault: previewCV.is_default,
+                }}
+              />
             </div>
           )}
 
-          <DialogFooter>
+          <DialogFooter className="px-4 py-3 border-t shrink-0">
             <Button variant="outline" onClick={() => setPreviewCV(null)}>
               Tutup
             </Button>

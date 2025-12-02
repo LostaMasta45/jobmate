@@ -2,9 +2,9 @@
 import React from 'react';
 
 // Use Imgur CDN for reliable email logo display
-// OPTIMIZED logos: 98.8% smaller for instant loading! ⚡
-const LOGO_PANJANG_URL = 'https://i.imgur.com/frAxpop.png'; // 8.83 KB (was 505 KB!)
-const LOGO_KECIL_URL = 'https://i.imgur.com/frAxpop.png'; // Can use different logo for footer if needed
+// Logo dari production URL - pastikan file ada di public/Logo/x.png
+const LOGO_PANJANG_URL = 'https://jobmate.web.id/Logo/x.png';
+const LOGO_KECIL_URL = 'https://jobmate.web.id/Logo/x.png';
 
 interface InvoiceEmailProps {
   userName: string;

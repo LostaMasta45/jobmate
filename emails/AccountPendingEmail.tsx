@@ -7,8 +7,8 @@ interface AccountPendingEmailProps {
   submittedAt: string;
 }
 
-// Optimized logo dari Imgur (8.83 KB - instant loading!)
-const LOGO_URL = 'https://i.imgur.com/frAxpop.png';
+// Logo dari production URL - pastikan file ada di public/Logo/x.png
+const LOGO_URL = 'https://jobmate.web.id/Logo/x.png';
 
 export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
   userName,

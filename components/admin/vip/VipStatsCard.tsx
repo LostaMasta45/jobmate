@@ -73,20 +73,27 @@ export function VipStatsCard({
 }: VipStatsCardProps) {
   const Icon = iconMap[iconName] || Briefcase; // Fallback to Briefcase
   
+  const isHex = color.startsWith("#");
+  
   const cardContent = (
     <Card className={cn(
       "relative overflow-hidden border-none shadow-sm hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm",
       href ? "cursor-pointer group" : ""
     )}>
       {/* Decorative background blob */}
-      <div className={cn(
-        "absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-10 blur-2xl transition-transform duration-500",
-        color.includes("blue") ? "bg-blue-500" : 
-        color.includes("green") ? "bg-emerald-500" : 
-        color.includes("purple") ? "bg-purple-500" : 
-        color.includes("amber") ? "bg-amber-500" : "bg-primary",
-        href ? "group-hover:scale-150" : ""
-      )} />
+      <div 
+        className={cn(
+          "absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-10 blur-2xl transition-transform duration-500",
+          !isHex && (
+            color.includes("blue") ? "bg-blue-500" : 
+            color.includes("green") ? "bg-emerald-500" : 
+            color.includes("purple") ? "bg-purple-500" : 
+            color.includes("amber") ? "bg-amber-500" : "bg-primary"
+          ),
+          href ? "group-hover:scale-150" : ""
+        )}
+        style={isHex ? { backgroundColor: color } : undefined}
+      />
       
       <CardContent className="p-6 relative z-10">
         <div className="flex items-start justify-between gap-4">
@@ -107,12 +114,15 @@ export function VipStatsCard({
             )}
           </div>
           
-          <div className={cn(
-            "rounded-xl p-3 shadow-sm transition-colors duration-300",
-            color.replace("text-", "bg-").replace("600", "100"),
-            "dark:bg-secondary"
-          )}>
-            <Icon className={cn("h-6 w-6", color)} />
+          <div 
+            className={cn(
+              "rounded-xl p-3 shadow-sm transition-colors duration-300",
+              !isHex && color.replace("text-", "bg-").replace("600", "100"),
+              !isHex && "dark:bg-secondary"
+            )}
+            style={isHex ? { backgroundColor: `${color}15`, color: color } : undefined}
+          >
+            <Icon className={cn("h-6 w-6", !isHex && color)} />
           </div>
         </div>
       </CardContent>

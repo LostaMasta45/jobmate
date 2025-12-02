@@ -49,6 +49,15 @@ export default function SignInPage() {
     setIsMounted(true);
   }, []);
 
+  // Load saved email from localStorage on mount
+  React.useEffect(() => {
+    const savedEmail = localStorage.getItem('jobmate_remembered_email');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
   // Auto-focus
   React.useEffect(() => {
     if (!isMobile && isMounted) {
@@ -115,10 +124,6 @@ export default function SignInPage() {
 
     try {
       const supabase = createClient();
-      
-      if (rememberMe) {
-        await supabase.auth.updateUser({ data: { remember_me: true } });
-      }
 
       const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -146,6 +151,13 @@ export default function SignInPage() {
         setError("Login gagal. Silakan coba lagi.");
         setLoading(false);
         return;
+      }
+
+      // Handle Remember Me - save or remove email from localStorage
+      if (rememberMe) {
+        localStorage.setItem('jobmate_remembered_email', email);
+      } else {
+        localStorage.removeItem('jobmate_remembered_email');
       }
 
       setLoginAttempts(0);

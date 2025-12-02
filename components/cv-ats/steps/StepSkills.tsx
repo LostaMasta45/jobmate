@@ -133,10 +133,10 @@ export function StepSkills({ resume, setResume }: StepSkillsProps) {
           </p>
         </div>
 
-        <Card className="p-6">
+        <Card className="p-4 sm:p-6">
           <div className="space-y-4">
             <div>
-              <Label htmlFor="skill-input">
+              <Label htmlFor="skill-input" className="text-base sm:text-sm">
                 Tambah Skill <span className="text-destructive">*</span>
               </Label>
               <div className="mt-1.5 flex gap-2">
@@ -146,9 +146,10 @@ export function StepSkills({ resume, setResume }: StepSkillsProps) {
                   onChange={(e) => setSkillInput(e.target.value)}
                   onKeyDown={handleSkillKeyDown}
                   placeholder="Ketik skill dan tekan Enter (contoh: JavaScript, React, Leadership)"
+                  className="h-12"
                 />
-                <Button onClick={addSkill} size="sm">
-                  <Plus className="h-4 w-4" />
+                <Button onClick={addSkill} size="icon" className="h-12 w-12 shrink-0">
+                  <Plus className="h-6 w-6" />
                 </Button>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
@@ -158,18 +159,18 @@ export function StepSkills({ resume, setResume }: StepSkillsProps) {
 
             {resume.skills.length > 0 && (
               <div>
-                <Label>Skills Anda ({resume.skills.length})</Label>
+                <Label className="text-base sm:text-sm">Skills Anda ({resume.skills.length})</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {resume.skills.map((skill, idx) => (
                     <Badge
                       key={idx}
                       variant="secondary"
-                      className="cursor-pointer pr-1 text-sm"
+                      className="cursor-pointer pr-1 text-sm py-1.5 px-3"
                     >
                       {skill}
                       <button
                         onClick={() => removeSkill(skill)}
-                        className="ml-1 rounded-full p-0.5 hover:bg-destructive/20"
+                        className="ml-2 rounded-full p-0.5 hover:bg-destructive/20"
                       >
                         <X className="h-3 w-3" />
                       </button>

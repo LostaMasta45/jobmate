@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   FileText,
   Eye,
@@ -13,6 +14,7 @@ import {
   Plus,
   Calendar,
   Award,
+  MoreVertical,
 } from "lucide-react";
 import {
   Dialog,
@@ -21,10 +23,19 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Resume } from "@/lib/schemas/cv-ats";
 import { deleteResume } from "@/actions/cv-ats";
 import { downloadResumeAsPDF, downloadResumeAsText, downloadResumeAsWord } from "@/lib/cv-download";
-import { CVATSPreview } from "./CVATSPreview";
+import { CVPreview } from "./CVPreview";
+import { TemplateThumbnail } from "./TemplateThumbnail";
+import { ATSTemplateId } from "@/lib/ats-templates";
+import Link from "next/link";
 
 interface ResumeRecord {
   id: string;
@@ -107,454 +118,152 @@ export function CVHistoryList({ resumes, onEdit, onRefresh }: CVHistoryListProps
 
   if (resumes.length === 0) {
     return (
-      <Card className="border-dashed">
-        <CardContent className="flex flex-col items-center justify-center py-16">
-          <FileText className="mb-4 h-16 w-16 text-muted-foreground/50" />
-          <h3 className="mb-2 text-lg font-semibold">Belum Ada CV</h3>
-          <p className="mb-6 text-center text-sm text-muted-foreground">
-            Mulai buat CV ATS-optimized pertama Anda sekarang!
-          </p>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col items-center justify-center py-12 px-4">
+        <div className="relative mb-6">
+          <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full" />
+          <div className="relative bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-xl border border-blue-100 dark:border-blue-900/50">
+            <FileText className="h-12 w-12 text-blue-600 dark:text-blue-400" />
+          </div>
+        </div>
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Belum ada CV</h3>
+        <p className="text-muted-foreground text-center max-w-xs mb-8">
+          Mulai buat CV ATS-optimized pertamamu agar lolos screening mesin.
+        </p>
+        <Link href="/dashboard/cv-ats/new">
+          <Button size="lg" className="rounded-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-lg shadow-blue-500/25">
+            <Plus className="mr-2 h-5 w-5" />
+            Buat CV ATS Baru
+          </Button>
+        </Link>
+      </div>
     );
   }
 
   // Render thumbnail preview with proper sizing
   const renderThumbnail = (resume: Resume) => {
-    const fullName = `${resume.basics?.firstName || ''} ${resume.basics?.lastName || ''}`.trim();
-    const expCount = resume.experiences?.length || 0;
-    const skillCount = resume.skills?.length || 0;
+    const templateId = (resume.templateId as ATSTemplateId) || "classic";
     
     return (
       <div 
-        className="group/thumb relative w-full cursor-pointer overflow-hidden rounded-lg border bg-white shadow-sm transition-all hover:shadow-md"
-        style={{ 
-          paddingBottom: '141.4%', // A4 portrait aspect ratio (297/210)
-        }}
+        className="relative w-full h-full cursor-pointer overflow-hidden bg-white shadow-sm transition-all group-hover:scale-[1.02] duration-500"
         onClick={() => setPreviewResume(resume)}
       >
-        <div 
-          className="absolute inset-0"
-          style={{
-            backgroundColor: '#ffffff',
-            fontSize: '5px',
-            lineHeight: '1.4',
-          }}
-        >
-          {/* Compact CV Preview */}
-          <div 
-            style={{
-              width: '100%',
-              height: '100%',
-              padding: '6%',
-              fontFamily: 'Arial, sans-serif',
-              color: '#1e293b',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '3px',
-            }}
-          >
-            {/* Header */}
-            <div style={{ marginBottom: '4px', borderBottom: '1px solid #e2e8f0', paddingBottom: '3px' }}>
-              <div style={{ fontSize: '7px', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '1px' }}>
-                {fullName || 'CV ATS'}
-              </div>
-              {resume.basics?.headline && (
-                <div style={{ fontSize: '5px', fontWeight: '600', color: '#475569', marginBottom: '1px' }}>
-                  {resume.basics.headline}
-                </div>
-              )}
-              <div style={{ fontSize: '4px', color: '#64748b', lineHeight: 1.3 }}>
-                {resume.basics?.email && <div>{resume.basics.email}</div>}
-                {resume.basics?.phone && <div>{resume.basics.phone}</div>}
-                {resume.basics?.city && <div>{resume.basics.city}</div>}
-              </div>
-            </div>
+        <TemplateThumbnail resume={resume} templateId={templateId} />
 
-            {/* Summary */}
-            {resume.summary && (
-              <div style={{ marginBottom: '3px' }}>
-                <div style={{ 
-                  fontSize: '5px', 
-                  fontWeight: 'bold', 
-                  textTransform: 'uppercase',
-                  marginBottom: '1px',
-                  color: '#0f172a'
-                }}>
-                  PROFESSIONAL SUMMARY
-                </div>
-                <div style={{ fontSize: '4px', color: '#475569', lineHeight: 1.3 }}>
-                  {resume.summary.slice(0, 120)}...
-                </div>
-              </div>
-            )}
-
-            {/* Experience Preview */}
-            {resume.experiences && resume.experiences.length > 0 && (
-              <div style={{ marginBottom: '3px' }}>
-                <div style={{ 
-                  fontSize: '5px', 
-                  fontWeight: 'bold', 
-                  textTransform: 'uppercase',
-                  marginBottom: '1px',
-                  color: '#0f172a'
-                }}>
-                  WORK EXPERIENCE
-                </div>
-                {resume.experiences.slice(0, 2).map((exp, idx) => (
-                  <div key={idx} style={{ marginBottom: '2px' }}>
-                    <div style={{ fontSize: '4.5px', fontWeight: 'bold', color: '#1e293b' }}>
-                      {exp.title}
-                    </div>
-                    <div style={{ fontSize: '4px', color: '#64748b' }}>
-                      {exp.company} • {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
-                    </div>
-                    {exp.bullets && exp.bullets.length > 0 && (
-                      <ul style={{ margin: '1px 0', paddingLeft: '6px', fontSize: '3.5px', color: '#475569' }}>
-                        {exp.bullets.slice(0, 2).map((bullet, bidx) => (
-                          <li key={bidx} style={{ marginBottom: '0.5px' }}>
-                            {bullet.slice(0, 60)}...
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Education Preview */}
-            {resume.education && resume.education.length > 0 && (
-              <div style={{ marginBottom: '3px' }}>
-                <div style={{ 
-                  fontSize: '5px', 
-                  fontWeight: 'bold', 
-                  textTransform: 'uppercase',
-                  marginBottom: '1px',
-                  color: '#0f172a'
-                }}>
-                  EDUCATION
-                </div>
-                {resume.education.slice(0, 1).map((edu, idx) => (
-                  <div key={idx}>
-                    <div style={{ fontSize: '4.5px', fontWeight: 'bold', color: '#1e293b' }}>
-                      {edu.school}
-                    </div>
-                    <div style={{ fontSize: '4px', color: '#64748b' }}>
-                      {edu.degree} {edu.field}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Skills Preview */}
-            {resume.skills && resume.skills.length > 0 && (
-              <div>
-                <div style={{ 
-                  fontSize: '5px', 
-                  fontWeight: 'bold', 
-                  textTransform: 'uppercase',
-                  marginBottom: '1px',
-                  color: '#0f172a'
-                }}>
-                  SKILLS
-                </div>
-                <div style={{ fontSize: '4px', color: '#475569', lineHeight: 1.3 }}>
-                  {resume.skills.slice(0, 8).join(' • ')}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover/thumb:opacity-100" />
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover/thumb:opacity-100">
-          <div className="rounded-full bg-white/95 p-3 shadow-lg backdrop-blur-sm">
-            <Eye className="h-5 w-5 text-gray-900" />
-          </div>
-        </div>
-
-        {/* Bottom Label */}
-        <div className="absolute bottom-0 left-0 right-0 p-2 text-white opacity-0 transition-opacity group-hover/thumb:opacity-100">
-          <p className="truncate text-xs font-semibold drop-shadow-md">ATS Format</p>
-        </div>
+        {/* Gradient Overlay for Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 transition-opacity group-hover:opacity-40 pointer-events-none" />
       </div>
     );
   };
 
   return (
     <>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {resumes.map((record) => {
           const resume = record.content;
           const expCount = resume.experiences?.length || 0;
           const skillCount = resume.skills?.length || 0;
 
           return (
-            <Card key={record.id} className="group relative overflow-hidden">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="line-clamp-1 text-base">
-                      {record.title}
-                    </CardTitle>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {resume.basics?.firstName} {resume.basics?.lastName}
-                    </p>
-                  </div>
-                  {record.ats_score !== null && (
-                    <div className="ml-2 flex flex-col items-center">
-                      <Award
-                        className={`h-5 w-5 ${getScoreColor(record.ats_score)}`}
-                      />
-                      <span
-                        className={`text-xs font-semibold ${getScoreColor(
-                          record.ats_score
-                        )}`}
-                      >
-                        {record.ats_score}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-3 pb-4">
-                {/* CV Thumbnail Preview */}
-                {renderThumbnail(resume)}
-
-                {/* Resume Info */}
-                <div className="space-y-1 text-sm">
-                  <div className="flex gap-4 text-xs text-muted-foreground">
-                    <span>{expCount} pengalaman</span>
-                    <span>•</span>
-                    <span>{skillCount} skills</span>
-                  </div>
+            <div 
+              key={record.id} 
+              className="group relative flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-md border border-slate-100 dark:border-slate-800 transition-all hover:shadow-xl hover:border-blue-500/30 dark:hover:border-blue-500/30"
+            >
+              {/* Full Bleed Thumbnail */}
+              <div className="relative overflow-hidden bg-slate-100 aspect-[210/297]">
+                <div className="absolute inset-0">
+                   {renderThumbnail(resume)}
                 </div>
 
-                {/* ATS Score Badge */}
-                {record.ats_score !== null && (
-                  <div
-                    className={`rounded-md px-2 py-1 text-xs font-medium ${
-                      record.ats_score >= 80
-                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
-                        : record.ats_score >= 60
-                        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
-                        : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
-                    }`}
-                  >
-                    ATS Score: {getScoreLabel(record.ats_score)}
-                  </div>
-                )}
-
-                {/* Date */}
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Calendar className="h-3 w-3" />
-                  <span>Dibuat {formatDate(record.created_at)}</span>
+                {/* Top Badges */}
+                <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
+                   <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm text-xs font-medium shadow-sm text-gray-800 border-none">
+                      {formatDate(record.created_at)}
+                   </Badge>
+                   
+                   {record.ats_score !== null && (
+                     <Badge 
+                        className={`${
+                          record.ats_score >= 80 ? 'bg-green-500' : record.ats_score >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                        } text-white border-none shadow-sm`}
+                     >
+                       {record.ats_score}
+                     </Badge>
+                   )}
                 </div>
 
-                {/* Actions */}
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPreviewResume(resume)}
-                    className="h-8 text-xs"
-                  >
-                    <Eye className="mr-1 h-3 w-3" />
-                    Preview
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onEdit(resume)}
-                    className="h-8 text-xs"
-                  >
-                    <Edit className="mr-1 h-3 w-3" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDownloadPDF(resume)}
-                    className="h-8 text-xs"
-                  >
-                    <FileDown className="mr-1 h-3 w-3" />
-                    PDF
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDownloadWord(resume)}
-                    className="h-8 text-xs"
-                  >
-                    <FileText className="mr-1 h-3 w-3" />
-                    Word
-                  </Button>
-                </div>
-
-                {/* Delete Button */}
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(record.id)}
-                  disabled={deleting === record.id}
-                  className="w-full h-8 text-xs"
-                >
-                  {deleting === record.id ? (
-                    "Menghapus..."
-                  ) : (
-                    <>
-                      <Trash2 className="mr-1 h-3 w-3" />
-                      Hapus
-                    </>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Preview Dialog */}
-      <Dialog open={!!previewResume} onOpenChange={() => setPreviewResume(null)}>
-        <DialogContent className="max-h-[80vh] max-w-3xl overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Preview CV</DialogTitle>
-          </DialogHeader>
-
-          {previewResume && (
-            <div className="space-y-6 text-sm">
-              {/* Header */}
-              <div className="border-b pb-4">
-                <h2 className="text-2xl font-bold">
-                  {previewResume.basics?.firstName} {previewResume.basics?.lastName}
-                </h2>
-                <p className="mt-1 text-lg text-muted-foreground">
-                  {previewResume.basics?.headline}
-                </p>
-                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                  {previewResume.basics?.email && (
-                    <span>{previewResume.basics.email}</span>
-                  )}
-                  {previewResume.basics?.phone && (
-                    <span>{previewResume.basics.phone}</span>
-                  )}
-                  {previewResume.basics?.city && (
-                    <span>{previewResume.basics.city}</span>
-                  )}
+                {/* Actions Overlay (Visible on Hover or Mobile Tap) */}
+                <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-[2px]">
+                   <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 bg-white hover:bg-blue-50 text-blue-600 shadow-lg" onClick={() => onEdit({ ...resume, id: record.id })}>
+                      <Edit className="h-4 w-4" />
+                   </Button>
+                   <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 bg-white hover:bg-cyan-50 text-cyan-600 shadow-lg" onClick={() => setPreviewResume(resume)}>
+                      <Eye className="h-4 w-4" />
+                   </Button>
+                   <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 bg-white hover:bg-gray-50 text-gray-700 shadow-lg">
+                            <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem onClick={() => handleDownloadPDF(resume)}>
+                           <FileDown className="mr-2 h-4 w-4" /> PDF
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDownloadWord(resume)}>
+                           <FileText className="mr-2 h-4 w-4" /> Word
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDownloadText(resume)}>
+                           <FileText className="mr-2 h-4 w-4" /> Text
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDelete(record.id)}>
+                           <Trash2 className="mr-2 h-4 w-4" /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                   </DropdownMenu>
                 </div>
               </div>
 
-              {/* Summary */}
-              {previewResume.summary && (
-                <div>
-                  <h3 className="mb-2 font-semibold uppercase text-xs tracking-wide">
-                    Ringkasan
-                  </h3>
-                  <p className="text-muted-foreground">{previewResume.summary}</p>
+              {/* Card Content */}
+              <div className="p-4 flex flex-col gap-1 bg-white dark:bg-slate-900 relative z-20">
+                <h3 className="font-bold text-gray-900 dark:text-gray-100 truncate pr-6" title={record.title}>
+                  {record.title || "Untitled CV"}
+                </h3>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                   <span className="capitalize">{resume.templateId || "Classic"}</span>
+                   <span>{expCount} exp • {skillCount} skills</span>
                 </div>
-              )}
+              </div>
+            </div>
+          );
+        })}
 
-              {/* Experience */}
-              {previewResume.experiences && previewResume.experiences.length > 0 && (
-                <div>
-                  <h3 className="mb-3 font-semibold uppercase text-xs tracking-wide">
-                    Pengalaman Profesional
-                  </h3>
-                  <div className="space-y-4">
-                    {previewResume.experiences.map((exp, idx) => (
-                      <div key={idx}>
-                        <div className="flex justify-between">
-                          <div>
-                            <p className="font-semibold">{exp.title}</p>
-                            <p className="text-muted-foreground">{exp.company}</p>
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            {exp.startDate} - {exp.isCurrent ? "Sekarang" : exp.endDate}
-                          </p>
-                        </div>
-                        <ul className="mt-2 space-y-1 text-muted-foreground">
-                          {exp.bullets.map((bullet, bidx) => (
-                            <li key={bidx} className="flex gap-2">
-                              <span>•</span>
-                              <span>{bullet}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+        {/* Add New Card - Always visible at the end */}
+        <Link href="/dashboard/cv-ats/new" className="group flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 p-6 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all min-h-[280px]">
+           <div className="rounded-full bg-white dark:bg-slate-800 p-4 shadow-sm mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-md">
+              <Plus className="h-8 w-8 text-blue-500" />
+           </div>
+           <h3 className="font-semibold text-gray-900 dark:text-gray-100">Buat CV Baru</h3>
+           <p className="text-xs text-muted-foreground text-center mt-1">
+             Optimasi otomatis untuk mesin pencari kerja (ATS)
+           </p>
+        </Link>
+      </div>
 
-              {/* Education */}
-              {previewResume.education && previewResume.education.length > 0 && (
-                <div>
-                  <h3 className="mb-3 font-semibold uppercase text-xs tracking-wide">
-                    Pendidikan
-                  </h3>
-                  <div className="space-y-3">
-                    {previewResume.education.map((edu, idx) => (
-                      <div key={idx}>
-                        <div className="flex justify-between">
-                          <div>
-                            <p className="font-semibold">{edu.school}</p>
-                            <p className="text-muted-foreground">
-                              {edu.degree} {edu.field}
-                            </p>
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            {edu.startDate} - {edu.endDate}
-                          </p>
-                        </div>
-                        {edu.description && (
-                          <p className="mt-1 text-muted-foreground">{edu.description}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+      {/* Preview Dialog - A4 Format */}
+      <Dialog open={!!previewResume} onOpenChange={() => setPreviewResume(null)}>
+        <DialogContent className="max-w-[95vw] w-[900px] h-[90vh] p-0 overflow-hidden">
+          <DialogHeader className="px-4 py-3 border-b shrink-0">
+            <DialogTitle>Preview CV ATS - Format A4</DialogTitle>
+          </DialogHeader>
 
-              {/* Skills */}
-              {previewResume.skills && previewResume.skills.length > 0 && (
-                <div>
-                  <h3 className="mb-2 font-semibold uppercase text-xs tracking-wide">
-                    Keterampilan
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {previewResume.skills.join(", ")}
-                  </p>
-                </div>
-              )}
-
-              {/* Custom Sections */}
-              {previewResume.customSections &&
-                previewResume.customSections.length > 0 &&
-                previewResume.customSections.map((section, idx) => (
-                  <div key={idx}>
-                    <h3 className="mb-2 font-semibold uppercase text-xs tracking-wide">
-                      {section.title}
-                    </h3>
-                    <div className="space-y-2">
-                      {section.items.map((item, iidx) => (
-                        <div key={iidx}>
-                          <p className="font-medium">{item.label}</p>
-                          {item.description && (
-                            <p className="text-muted-foreground">{item.description}</p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+          {previewResume && (
+            <div className="flex-1 overflow-hidden h-[calc(90vh-120px)]">
+              <CVPreview resume={previewResume} />
             </div>
           )}
 
-          <DialogFooter>
+          <DialogFooter className="px-4 py-3 border-t shrink-0">
             <Button variant="outline" onClick={() => setPreviewResume(null)}>
               Tutup
             </Button>

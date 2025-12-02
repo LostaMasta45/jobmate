@@ -82,6 +82,7 @@ export const resumeSchema = z.object({
   education: z.array(educationSchema).default([]),
   skills: z.array(z.string()).default([]),
   customSections: z.array(customSectionSchema).default([]),
+  templateId: z.string().default("classic"),
   ats_score: z.number().optional(),
   updated_at: z.string().optional(),
 });
@@ -135,4 +136,5 @@ export const emptyResume: Resume = {
   education: [],
   skills: [],
   customSections: [],
+  templateId: "classic",
 };

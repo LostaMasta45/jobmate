@@ -12,122 +12,90 @@ export function EmailGeneratorMain() {
   const [activeTab, setActiveTab] = useState("create");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-lg" />
-        <Card className="relative p-6 md:p-8 border-2">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 p-4 shadow-lg">
-                <Mail className="h-8 w-8 text-white" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#5547d0] via-[#8e68fd] to-[#00d1dc] p-[1px] shadow-xl">
+        <div className="relative rounded-[15px] bg-white dark:bg-slate-950 p-4 md:p-10 overflow-hidden">
+          {/* Background Decoration */}
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-[#00d1dc]/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-[#8e68fd]/10 rounded-full blur-3xl" />
+          
+          <div className="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#5547d0] to-[#00d1dc] rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200" />
+                <div className="relative rounded-xl bg-white dark:bg-slate-900 p-4 ring-1 ring-slate-900/5 dark:ring-white/10">
+                  <Mail className="h-10 w-10 text-[#5547d0]" />
+                </div>
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#5547d0] to-[#00acc7]">
                   Email Generator
-                  <Badge variant="secondary" className="text-xs">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    AI-Powered
-                  </Badge>
                 </h1>
-                <p className="text-muted-foreground mt-1">
-                  Buat email lamaran profesional dengan AI dalam Bahasa Indonesia & English
+                <p className="text-slate-600 dark:text-slate-400 mt-2 text-sm sm:text-lg">
+                  Buat email profesional dalam hitungan detik dengan AI
                 </p>
               </div>
             </div>
             
-            {/* Quick Stats */}
-            <div className="flex gap-4">
-              <div className="text-center px-4 py-2 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">🇮🇩</div>
-                <div className="text-xs text-muted-foreground">Bahasa ID</div>
+            {/* Modern Stats/Badges */}
+            <div className="flex flex-wrap gap-3 w-full lg:w-auto">
+              <div className="flex items-center justify-center flex-1 lg:flex-none gap-2 px-4 py-2 rounded-full bg-[#5547d0]/10 text-[#5547d0] text-sm font-medium border border-[#5547d0]/20 whitespace-nowrap">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>GPT-4 Powered</span>
               </div>
-              <div className="text-center px-4 py-2 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900">
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">🇬🇧</div>
-                <div className="text-xs text-muted-foreground">English</div>
+              <div className="flex items-center justify-center flex-1 lg:flex-none gap-2 px-4 py-2 rounded-full bg-[#00d1dc]/10 text-[#00acc7] text-sm font-medium border border-[#00d1dc]/20 whitespace-nowrap">
+                <TrendingUp className="h-3.5 w-3.5" />
+                <span>High Impact</span>
               </div>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Main Content with Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <div className="flex items-center justify-center">
-          <TabsList className="grid w-full max-w-md grid-cols-2 h-12">
-            <TabsTrigger value="create" className="gap-2">
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Buat Email Baru</span>
-              <span className="sm:hidden">Buat Baru</span>
-            </TabsTrigger>
-            <TabsTrigger value="history" className="gap-2">
-              <History className="h-4 w-4" />
-              <span className="hidden sm:inline">History Email</span>
-              <span className="sm:hidden">History</span>
-            </TabsTrigger>
-          </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+        <div className="flex justify-center">
+          <div className="bg-slate-100 dark:bg-slate-800/50 p-1 rounded-full shadow-inner">
+            <TabsList className="grid w-full max-w-md grid-cols-2 h-12 bg-transparent">
+              <TabsTrigger 
+                value="create" 
+                className="rounded-full data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 data-[state=active]:text-[#5547d0] data-[state=active]:shadow-sm transition-all duration-300"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Buat Baru
+              </TabsTrigger>
+              <TabsTrigger 
+                value="history" 
+                className="rounded-full data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 data-[state=active]:text-[#5547d0] data-[state=active]:shadow-sm transition-all duration-300"
+              >
+                <History className="h-4 w-4 mr-2" />
+                Riwayat
+              </TabsTrigger>
+            </TabsList>
+          </div>
         </div>
 
         {/* Create New Email Tab */}
-        <TabsContent value="create" className="space-y-6 mt-6">
-          {/* Quick Tips Banner */}
-          <Card className="p-4 bg-gradient-to-r from-amber-50 via-orange-50 to-red-50 dark:from-amber-950 dark:to-red-950 border-amber-200 dark:border-amber-800">
-            <div className="flex items-start gap-3">
-              <TrendingUp className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-amber-900 dark:text-amber-100 mb-2">
-                  💡 Tips Email Lamaran yang Efektif
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-amber-800 dark:text-amber-200">
-                  <div className="flex items-center gap-2">
-                    <span className="text-green-600 dark:text-green-400">✓</span>
-                    <span>Personalisasi untuk setiap perusahaan</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-green-600 dark:text-green-400">✓</span>
-                    <span>Highlight skill yang relevan</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-green-600 dark:text-green-400">✓</span>
-                    <span>Maksimal 200-300 kata</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-green-600 dark:text-green-400">✓</span>
-                    <span>Proofread sebelum kirim</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Email Wizard */}
+        <TabsContent value="create" className="space-y-8 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <EmailWizard />
         </TabsContent>
 
         {/* History Tab */}
-        <TabsContent value="history" className="space-y-6 mt-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-2xl font-bold">Email History</h2>
-              <p className="text-muted-foreground">
-                Kelola semua email lamaran yang pernah kamu buat
-              </p>
+        <TabsContent value="history" className="space-y-6 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <Card className="border-none shadow-lg bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Riwayat Email</h2>
+                <p className="text-muted-foreground">
+                  Arsip email yang pernah Anda buat sebelumnya
+                </p>
+              </div>
             </div>
-          </div>
-          
-          <EmailHistory />
+            <EmailHistory />
+          </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Bottom Info Card */}
-      <Card className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-blue-200 dark:border-blue-800">
-        <div className="flex items-center justify-center gap-2 text-sm text-center">
-          <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          <span className="text-blue-900 dark:text-blue-100">
-            <strong>AI Email Generator</strong> - Menggunakan GPT-4o-mini untuk hasil terbaik
-          </span>
-        </div>
-      </Card>
     </div>
   );
 }

@@ -3,6 +3,17 @@ import { createClient } from '@/lib/supabase/server';
 
 export const maxDuration = 300; // 5 minutes for batch operations
 
+// Helper to sanitize values - convert empty strings, "null", "undefined" to actual null
+function sanitize<T>(value: T): T | null {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed === '' || trimmed === 'null' || trimmed === 'undefined') return null;
+    return trimmed as T;
+  }
+  return value;
+}
+
 interface BatchJobData {
   title: string;
   perusahaan_name: string;
@@ -114,25 +125,25 @@ export async function POST(request: NextRequest) {
           results.perusahaan_created.push(job.perusahaan_name);
         }
 
-        // Prepare loker data
+        // Prepare loker data with sanitized values
         const lokerData = {
-          title: job.title,
+          title: job.title.trim(),
           perusahaan_id: perusahaanId,
-          perusahaan_name: job.perusahaan_name,
-          lokasi: job.lokasi,
-          kategori: job.kategori || [],
-          tipe_kerja: job.tipe_kerja || null,
-          gaji_text: job.gaji_text || null,
-          gaji_min: job.gaji_min || null,
-          gaji_max: job.gaji_max || null,
-          deskripsi: job.deskripsi || null,
-          persyaratan: job.persyaratan || null,
-          kualifikasi: job.kualifikasi || [],
-          deadline: job.deadline || null,
-          kontak_wa: job.kontak_wa || null,
-          kontak_email: job.kontak_email || null,
+          perusahaan_name: job.perusahaan_name.trim(),
+          lokasi: job.lokasi.trim(),
+          kategori: Array.isArray(job.kategori) ? job.kategori.filter(k => k && k.trim()) : [],
+          tipe_kerja: sanitize(job.tipe_kerja),
+          gaji_text: sanitize(job.gaji_text),
+          gaji_min: typeof job.gaji_min === 'number' ? job.gaji_min : null,
+          gaji_max: typeof job.gaji_max === 'number' ? job.gaji_max : null,
+          deskripsi: sanitize(job.deskripsi),
+          persyaratan: sanitize(job.persyaratan),
+          kualifikasi: Array.isArray(job.kualifikasi) ? job.kualifikasi.filter(k => k && k.trim()) : [],
+          deadline: sanitize(job.deadline),
+          kontak_wa: sanitize(job.kontak_wa),
+          kontak_email: sanitize(job.kontak_email),
           sumber: 'Poster',
-          poster_url: job.poster_url || null,
+          poster_url: sanitize(job.poster_url),
           status: 'published',
           created_by: user.id,
         };
@@ -176,10 +187,10 @@ export async function POST(request: NextRequest) {
 
     console.log('[Batch Save] Complete:', summary);
 
-    // Send Telegram batch summary notification (async, don't wait)
+    // Send Telegram notifications (async, don't wait)
     if (results.success.length > 0) {
       try {
-        const { notifyBatchJobsPosted } = await import('@/lib/telegram');
+        const { notifyBatchJobsPosted, notifyNewJobPosting } = await import('@/lib/telegram');
         const { data: adminProfile } = await supabase
           .from('profiles')
           .select('full_name, email')
@@ -188,6 +199,7 @@ export async function POST(request: NextRequest) {
 
         const adminName = adminProfile?.full_name || adminProfile?.email || 'Admin';
         const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/vip`;
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jobmate.web.id';
 
         // Prepare top jobs list
         const topJobs = results.success.map(job => ({
@@ -196,7 +208,7 @@ export async function POST(request: NextRequest) {
           location: jobs.find(j => j.title === job.title)?.lokasi || 'N/A',
         }));
 
-        // Fire and forget - don't block response
+        // 1. Send batch summary first
         notifyBatchJobsPosted({
           totalJobs: summary.total,
           successCount: summary.success,
@@ -207,7 +219,48 @@ export async function POST(request: NextRequest) {
           dashboardUrl,
         }).catch(err => console.error('[Telegram] Failed to send batch summary:', err));
 
-        console.log('[Batch Save] Telegram notification triggered');
+        console.log('[Batch Save] Telegram batch summary triggered');
+
+        // 2. Send individual poster notifications with delay to avoid rate limiting
+        const sendPosterNotifications = async () => {
+          for (let i = 0; i < results.success.length; i++) {
+            const successJob = results.success[i];
+            const originalJob = jobs[successJob.index] as BatchJobData;
+            
+            // Only send if job has a poster
+            if (originalJob.poster_url) {
+              try {
+                await notifyNewJobPosting({
+                  jobTitle: originalJob.title,
+                  companyName: originalJob.perusahaan_name,
+                  location: originalJob.lokasi,
+                  jobType: originalJob.tipe_kerja,
+                  categories: originalJob.kategori,
+                  salary: originalJob.gaji_text,
+                  deadline: originalJob.deadline,
+                  posterUrl: originalJob.poster_url,
+                  viewUrl: `${baseUrl}/vip/loker/${successJob.id}`,
+                  addedBy: adminName,
+                });
+                console.log(`[Telegram] Poster sent for: ${originalJob.title}`);
+                
+                // Add delay between notifications to avoid rate limiting (1 second)
+                if (i < results.success.length - 1) {
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+              } catch (err) {
+                console.error(`[Telegram] Failed to send poster for ${originalJob.title}:`, err);
+              }
+            }
+          }
+        };
+
+        // Fire and forget - don't block response
+        sendPosterNotifications().catch(err => 
+          console.error('[Telegram] Error in poster notifications:', err)
+        );
+
+        console.log('[Batch Save] Telegram poster notifications triggered');
       } catch (error) {
         console.error('[Batch Save] Error triggering Telegram notification:', error);
         // Continue anyway, jobs are already created

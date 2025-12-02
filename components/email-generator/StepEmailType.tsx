@@ -2,12 +2,14 @@
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Mail, Send, ThumbsUp, Search, ArrowRight } from "lucide-react";
-import { EmailFormData } from "./EmailWizard";
+import { Mail, Send, ThumbsUp, Search, ArrowRight, CheckCircle2 } from "lucide-react";
+import { EmailFormData } from "./types";
+import { motion } from "framer-motion";
 
 interface StepEmailTypeProps {
   formData: EmailFormData;
   updateFormData: (data: Partial<EmailFormData>) => void;
+  onNext?: () => void;
 }
 
 const EMAIL_TYPES = [
@@ -65,204 +67,149 @@ const EMAIL_TYPES = [
   },
 ];
 
-export function StepEmailType({ formData, updateFormData }: StepEmailTypeProps) {
+export function StepEmailType({ formData, updateFormData, onNext }: StepEmailTypeProps) {
+  
+  const handleSelect = (value: string) => {
+    updateFormData({ emailType: value as any });
+    // Auto-advance on mobile/small screens after a short delay for visual feedback
+    if (window.innerWidth < 768 && onNext) {
+        setTimeout(() => {
+            onNext();
+        }, 400);
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24 md:pb-0"> {/* Extra padding bottom for mobile fab/toolbar */}
       {/* Header */}
-      <div className="text-center space-y-2 mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold">Pilih Jenis Email</h2>
-        <p className="text-muted-foreground text-sm md:text-base">
-          Setiap jenis email memiliki struktur dan tone yang berbeda untuk hasil maksimal
+      <div className="text-center space-y-2 mb-6 md:mb-8">
+        <h2 className="text-xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Pilih Jenis Email</h2>
+        <p className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto">
+          Setiap jenis email memiliki struktur dan tone yang berbeda. Pilih yang paling sesuai.
         </p>
       </div>
 
-      {/* Email Type Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+      {/* Email Type Cards - Mobile Optimized Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {EMAIL_TYPES.map((type) => {
           const Icon = type.icon;
           const isSelected = formData.emailType === type.value;
           
           return (
-            <button
+            <motion.button
               key={type.value}
-              onClick={() => updateFormData({ emailType: type.value as any })}
-              className={`group relative text-left transition-all duration-300 transform ${
-                isSelected
-                  ? 'scale-[1.03] z-10'
-                  : 'hover:scale-[1.02] opacity-80 hover:opacity-100'
-              }`}
+              onClick={() => handleSelect(type.value)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`group relative text-left transition-all duration-300 w-full outline-none rounded-xl`}
             >
-              <Card className={`relative overflow-hidden p-5 md:p-6 transition-all duration-300 ${
+              <Card className={`relative overflow-hidden h-full p-5 md:p-6 transition-all duration-300 ${
                 isSelected
-                  ? `border-4 border-transparent shadow-2xl ring-4 ring-primary ring-offset-2`
-                  : 'border-2 border-border hover:border-primary/50 hover:shadow-md'
+                  ? `border-2 border-[#5547d0] dark:border-[#5547d0] bg-white dark:bg-slate-900 shadow-xl ring-4 ring-[#5547d0]/10`
+                  : 'border border-slate-200 dark:border-slate-800 hover:border-[#5547d0]/50 bg-white dark:bg-slate-900 hover:shadow-md'
               }`}>
-                {/* Selected Background Glow */}
+                {/* Selected Background Gradient */}
                 {isSelected && (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${type.gradient} opacity-5`} />
+                  <div className={`absolute inset-0 bg-gradient-to-br ${type.bgGradient} opacity-50 dark:opacity-10 transition-opacity`} />
                 )}
                 
-                {/* Gradient Background */}
-                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${type.gradient} opacity-5 rounded-bl-[100px]`} />
-                
-                {/* Popular Badge - Always show, adjust position when selected */}
+                {/* Popular Badge */}
                 {type.popular && (
-                  <div className={`absolute ${isSelected ? 'top-3 left-3' : 'top-3 right-3'} z-20`}>
-                    <Badge variant="secondary" className="text-xs shadow-sm">
-                      ⭐ Popular
-                    </Badge>
+                  <div className="absolute top-0 right-0 z-10">
+                    <div className="bg-gradient-to-r from-[#5547d0] to-[#00acc7] text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm">
+                      POPULAR
+                    </div>
                   </div>
                 )}
 
-                {/* Selected Indicator - Bottom Left Position */}
+                {/* Selected Checkmark Overlay */}
                 {isSelected && (
-                  <div className="absolute -bottom-2 -left-2 z-10">
-                    <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${type.gradient} text-white flex items-center justify-center shadow-2xl animate-in zoom-in duration-300`}>
-                      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
+                  <div className="absolute top-3 right-3 z-20 animate-in fade-in zoom-in duration-300">
+                    <div className="bg-[#5547d0] text-white rounded-full p-1 shadow-lg">
+                      <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
                   </div>
                 )}
 
-                <div className="relative space-y-4">
-                  {/* Icon & Title */}
-                  <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-xl transition-all ${
+                <div className="relative flex flex-col h-full z-10">
+                  {/* Icon & Header */}
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className={`p-3 md:p-3.5 rounded-2xl transition-all shrink-0 shadow-sm ${
                       isSelected
-                        ? `bg-gradient-to-br ${type.gradient} shadow-lg`
-                        : `bg-gradient-to-br ${type.bgGradient}`
-                    } flex-shrink-0`}>
-                      <Icon className={`h-6 w-6 transition-colors ${
-                        isSelected
-                          ? 'text-white'
-                          : `bg-gradient-to-br ${type.gradient} bg-clip-text text-transparent`
-                      }`} />
+                        ? `bg-gradient-to-br ${type.gradient} text-white shadow-[#5547d0]/25`
+                        : `bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:text-[#5547d0] group-hover:bg-[#5547d0]/10`
+                    }`}>
+                      <Icon className={`h-6 w-6 md:h-7 md:w-7 transition-transform duration-300 ${isSelected ? 'scale-110' : ''}`} />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start gap-2 mb-1 flex-wrap">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className={`text-2xl transition-transform ${isSelected ? 'scale-110' : ''}`}>
-                            {type.emoji}
-                          </span>
-                          <h3 className={`font-bold text-lg ${isSelected ? 'text-primary' : ''}`}>
-                            {type.label}
-                          </h3>
-                        </div>
-                        {isSelected && (
-                          <Badge className={`bg-gradient-to-br ${type.gradient} border-0 text-white text-xs px-2.5 py-0.5 shadow-md`}>
-                            ✓ Dipilih
-                          </Badge>
-                        )}
-                      </div>
-                      <p className={`text-sm ${isSelected ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
-                        {type.description}
-                      </p>
+                    <div className="min-w-0 flex-1 pt-1">
+                       <h3 className={`font-bold text-lg md:text-xl leading-tight ${isSelected ? 'text-[#5547d0]' : 'text-slate-900 dark:text-slate-100'}`}>
+                         {type.label}
+                       </h3>
+                       <p className="text-xs md:text-sm text-muted-foreground line-clamp-1 mt-1">
+                         {type.description}
+                       </p>
                     </div>
                   </div>
 
-                  {/* Long Description */}
-                  <p className={`text-sm leading-relaxed ${
-                    isSelected ? 'text-foreground font-medium' : 'text-muted-foreground'
+                  {/* Description */}
+                  <p className={`text-xs md:text-sm leading-relaxed mb-5 flex-1 ${
+                    isSelected ? 'text-slate-700 dark:text-slate-300 font-medium' : 'text-muted-foreground'
                   }`}>
                     {type.longDesc}
                   </p>
+                  
+                  {/* Mobile "Tap to select" hint */}
+                  <div className="md:hidden flex items-center gap-1 text-xs text-[#5547d0] font-medium mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span>Tap to select</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </div>
 
-                  {/* Features */}
-                  <div className="space-y-2">
-                    {type.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm">
-                        <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-br ${type.gradient} flex-shrink-0`} />
-                        <span className={isSelected ? 'text-foreground font-medium' : 'text-muted-foreground'}>
+                  {/* Features List (Hidden on mobile to save space/clean look) */}
+                  <div className="space-y-2 mb-4 hidden sm:block bg-slate-50/50 dark:bg-slate-950/30 p-3 rounded-lg border border-slate-100 dark:border-slate-800/50">
+                    {type.features.slice(0, 2).map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-xs">
+                        <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-br ${type.gradient}`} />
+                        <span className="text-slate-600 dark:text-slate-400 truncate">
                           {feature}
                         </span>
                       </div>
                     ))}
                   </div>
-
-                  {/* Recommended Length */}
-                  <div className={`p-3 rounded-lg transition-all ${
-                    isSelected 
-                      ? `bg-gradient-to-br ${type.gradient} text-white shadow-md`
-                      : `bg-gradient-to-br ${type.bgGradient} border border-current/10`
-                  }`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className={`text-xs font-medium ${isSelected ? 'opacity-90' : 'opacity-70'}`}>
-                          Rekomendasi:
+                  
+                  {/* Selection Indicator */}
+                   <div className={`w-full mt-auto pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between transition-opacity duration-300 ${isSelected ? 'opacity-100' : 'opacity-60'}`}>
+                        <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-1">
+                           <span className="w-1 h-1 rounded-full bg-slate-400"></span>
+                           Length
                         </span>
-                        <span className="text-xs font-semibold">{type.recommendedLength}</span>
-                      </div>
-                      <ArrowRight className={`h-4 w-4 transition-transform ${
-                        isSelected ? 'translate-x-1' : 'group-hover:translate-x-1'
-                      }`} />
-                    </div>
-                  </div>
+                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                           {type.recommendedLength.split(' ')[0]}
+                        </span>
+                   </div>
                 </div>
               </Card>
-            </button>
+            </motion.button>
           );
         })}
       </div>
 
-      {/* Info Banner */}
-      <Card className="p-4 md:p-5 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:to-pink-950 border-blue-200 dark:border-blue-800">
-        <div className="flex items-start gap-3">
-          <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900">
-            <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-sm md:text-base text-blue-900 dark:text-blue-100 mb-2">
-              💡 Kenapa Jenis Email Penting?
-            </h4>
-            <p className="text-xs md:text-sm text-blue-800 dark:text-blue-200 leading-relaxed">
-              Setiap jenis email memiliki <strong>tujuan, struktur, dan tone yang berbeda</strong>. 
-              AI akan menyesuaikan konten, panjang email, dan gaya bahasa sesuai dengan jenis yang kamu pilih 
-              untuk hasil yang lebih profesional dan efektif.
+      {/* Helper Info */}
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-100 dark:border-blue-800/50 rounded-xl p-5 flex gap-4 items-start shadow-sm"
+      >
+         <div className="shrink-0 mt-1 p-2 bg-blue-100 dark:bg-blue-900/50 rounded-full">
+            <Search className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+         </div>
+         <div className="text-sm text-blue-900 dark:text-blue-100">
+            <p className="font-bold mb-1 text-blue-700 dark:text-blue-300">Bingung pilih yang mana?</p>
+            <p className="opacity-90 leading-relaxed">
+              Pilih <span className="font-bold text-blue-700 dark:text-blue-300">Email Lamaran</span> jika kamu baru melamar kerja. 
             </p>
-          </div>
-        </div>
-      </Card>
-
-      {/* Quick Comparison Table (Desktop Only) */}
-      <div className="hidden lg:block">
-        <Card className="p-5">
-          <h4 className="font-semibold mb-4 text-center">Perbandingan Cepat</h4>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2 font-medium">Jenis</th>
-                  <th className="text-left py-2 font-medium">Kapan Digunakan</th>
-                  <th className="text-left py-2 font-medium">Panjang Ideal</th>
-                  <th className="text-left py-2 font-medium">Tone</th>
-                </tr>
-              </thead>
-              <tbody>
-                {EMAIL_TYPES.map((type) => (
-                  <tr key={type.value} className="border-b last:border-0">
-                    <td className="py-3">
-                      <div className="flex items-center gap-2">
-                        <span>{type.emoji}</span>
-                        <span className="font-medium">{type.label}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 text-muted-foreground">{type.description}</td>
-                    <td className="py-3 text-muted-foreground">{type.recommendedLength}</td>
-                    <td className="py-3">
-                      <Badge variant="outline" className="text-xs">
-                        {type.value === 'application' ? 'Professional' :
-                         type.value === 'follow_up' ? 'Polite' :
-                         type.value === 'thank_you' ? 'Grateful' : 'Curious'}
-                      </Badge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      </div>
+         </div>
+      </motion.div>
     </div>
   );
 }

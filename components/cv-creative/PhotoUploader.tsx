@@ -165,13 +165,13 @@ export function PhotoUploader({ value, options, onChange, onSkip }: PhotoUploade
 
               <div className="space-y-3">
                 <div>
-                  <label className="mb-2 block text-sm font-medium">Shape</label>
+                  <label className="mb-2 block text-base sm:text-sm font-medium">Shape</label>
                   <div className="flex gap-2">
                     {(["circle", "square", "rounded-square"] as const).map((shape) => (
                       <Button
                         key={shape}
                         variant={options.shape === shape ? "default" : "outline"}
-                        size="sm"
+                        className="flex-1 h-10"
                         onClick={() => onChange(preview, { ...options, shape })}
                       >
                         {shape === "circle" ? "●" : shape === "square" ? "■" : "▢"}
@@ -181,13 +181,13 @@ export function PhotoUploader({ value, options, onChange, onSkip }: PhotoUploade
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium">Size</label>
+                  <label className="mb-2 block text-base sm:text-sm font-medium">Size</label>
                   <div className="flex gap-2">
                     {(["small", "medium", "large"] as const).map((size) => (
                       <Button
                         key={size}
                         variant={options.size === size ? "default" : "outline"}
-                        size="sm"
+                        className="flex-1 h-10"
                         onClick={() => onChange(preview, { ...options, size })}
                       >
                         {size.charAt(0).toUpperCase() + size.slice(1)}
@@ -196,13 +196,13 @@ export function PhotoUploader({ value, options, onChange, onSkip }: PhotoUploade
                   </div>
                 </div>
 
-                <div className="flex gap-2">
-                  <Button variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()}>
+                <div className="flex gap-2 pt-2">
+                  <Button variant="outline" className="flex-1 h-12" onClick={() => fileInputRef.current?.click()}>
                     <Upload className="mr-2 h-4 w-4" />
                     Ganti Foto
                   </Button>
-                  <Button variant="destructive" onClick={handleRemove}>
-                    <X className="h-4 w-4" />
+                  <Button variant="destructive" className="h-12 w-12 shrink-0" onClick={handleRemove}>
+                    <X className="h-5 w-5" />
                   </Button>
                 </div>
               </div>

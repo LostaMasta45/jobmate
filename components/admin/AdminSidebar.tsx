@@ -19,7 +19,7 @@ import {
   ChevronRight,
   MoreVertical,
 } from "lucide-react";
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { AdminThemeToggle } from "@/components/admin/AdminThemeToggle";
 import { signOut } from "@/actions/auth";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
@@ -230,7 +230,7 @@ function SidebarContent({
         </div>
         <div className="px-1">
           <p className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider mb-2">Preferences</p>
-          <ThemeToggle />
+          <AdminThemeToggle />
         </div>
       </div>
     </div>

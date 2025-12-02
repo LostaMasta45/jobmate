@@ -2,7 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { EmailFormData } from "./EmailWizard";
+import { EmailFormData } from "./types";
 import { Sparkles } from "lucide-react";
 
 interface StepToneStyleProps {
@@ -110,7 +110,7 @@ export function StepToneStyle({ formData, updateFormData }: StepToneStyleProps) 
           <Label className="text-lg font-semibold">Pilih Gaya Email</Label>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {TONE_STYLES.map((style) => (
             <button
               key={style.value}
@@ -185,7 +185,7 @@ export function StepToneStyle({ formData, updateFormData }: StepToneStyleProps) 
       {/* Length */}
       <div className="space-y-4">
         <Label className="text-lg font-semibold">Panjang Email</Label>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {LENGTHS.map((length) => (
             <button
               key={length.value}

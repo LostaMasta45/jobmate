@@ -53,6 +53,7 @@ export async function middleware(request: NextRequest) {
     '/toolsjobmate',
     '/revisi',
     '/test-public',
+    '/test-loader',
     '/generate-thumbnails',
     '/admin-login',          // Admin login is public
   ];

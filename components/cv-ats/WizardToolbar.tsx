@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Save } from "lucide-react";
+import { ChevronLeft, ChevronRight, Save, Eye, Loader2 } from "lucide-react";
 import { WizardStep } from "@/types/cv-ats";
 
 interface WizardToolbarProps {
@@ -9,6 +9,9 @@ interface WizardToolbarProps {
   onNext: () => void;
   onPrevious: () => void;
   onSave: () => void;
+  onPreview?: () => void;
+  saving?: boolean;
+  isEditing?: boolean;
 }
 
 export function WizardToolbar({
@@ -16,6 +19,9 @@ export function WizardToolbar({
   onNext,
   onPrevious,
   onSave,
+  onPreview,
+  saving = false,
+  isEditing = false,
 }: WizardToolbarProps) {
   const stepNames: Record<WizardStep, string> = {
     1: "Informasi Dasar",
@@ -23,7 +29,8 @@ export function WizardToolbar({
     3: "Pengalaman",
     4: "Pendidikan",
     5: "Keterampilan",
-    6: "Tinjau & Ekspor",
+    6: "Pilih Template",
+    7: "Tinjau & Ekspor",
   };
 
   return (
@@ -37,7 +44,7 @@ export function WizardToolbar({
             disabled={currentStep === 1}
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
-            Sebelumnya
+            <span className="hidden xs:inline">Sebelumnya</span>
           </Button>
           <span className="text-sm text-muted-foreground hidden sm:inline">
             {currentStep}. {stepNames[currentStep]}
@@ -45,18 +52,45 @@ export function WizardToolbar({
         </div>
 
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={onSave}>
-            <Save className="h-4 w-4 mr-1" />
-            Simpan
+          {/* Mobile Preview Button */}
+          {onPreview && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onPreview}
+              className="lg:hidden"
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+          )}
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onSave}
+            disabled={saving}
+          >
+            {saving ? (
+              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+            ) : (
+              <Save className="h-4 w-4 mr-1" />
+            )}
+            <span className="hidden sm:inline">
+              {isEditing ? "Update" : "Simpan"}
+            </span>
           </Button>
-          {currentStep < 6 ? (
+          
+          {currentStep < 7 ? (
             <Button size="sm" onClick={onNext}>
-              Selanjutnya
+              <span className="hidden xs:inline">Selanjutnya</span>
               <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           ) : (
-            <Button size="sm" onClick={onSave}>
-              Selesai
+            <Button size="sm" onClick={onSave} disabled={saving}>
+              {saving ? (
+                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+              ) : null}
+              {isEditing ? "Update CV" : "Selesai"}
             </Button>
           )}
         </div>

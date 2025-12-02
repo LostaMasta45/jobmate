@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -26,6 +27,8 @@ import {
   XCircle,
   ExternalLink,
   Sparkles,
+  X,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -37,8 +40,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { deleteLoker, updateLokerStatus } from "@/actions/admin/vip-loker"; // You might need to create/verify this action
+import { deleteLoker, updateLokerStatus, bulkDeleteLoker, bulkUpdateLokerStatus } from "@/actions/admin/vip-loker";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Loker {
   id: string;
@@ -58,6 +62,8 @@ export function VipLokerTable({ lokerList }: { lokerList: Loker[] }) {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("all");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkLoading, setIsBulkLoading] = useState(false);
 
   // Filter logic
   const filteredData = lokerList.filter((item) => {
@@ -102,6 +108,74 @@ export function VipLokerTable({ lokerList }: { lokerList: Loker[] }) {
         }
     } catch (e) {
         toast.error("Error updating status");
+    }
+  };
+
+  // Selection helpers
+  const isAllSelected = filteredData.length > 0 && filteredData.every(item => selectedIds.has(item.id));
+  const isPartialSelected = filteredData.some(item => selectedIds.has(item.id)) && !isAllSelected;
+
+  const toggleSelectAll = () => {
+    if (isAllSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredData.map(item => item.id)));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  // Bulk actions
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`Yakin ingin menghapus ${selectedIds.size} lowongan kerja yang dipilih?`)) return;
+
+    setIsBulkLoading(true);
+    try {
+      const result = await bulkDeleteLoker(Array.from(selectedIds));
+      if (result?.success) {
+        toast.success(`${result.deleted} lowongan berhasil dihapus`);
+        setSelectedIds(new Set());
+        window.location.reload();
+      } else {
+        toast.error("Gagal menghapus lowongan");
+      }
+    } catch (e) {
+      toast.error("Error menghapus lowongan");
+    } finally {
+      setIsBulkLoading(false);
+    }
+  };
+
+  const handleBulkStatusChange = async (newStatus: string) => {
+    if (selectedIds.size === 0) return;
+
+    setIsBulkLoading(true);
+    try {
+      const result = await bulkUpdateLokerStatus(Array.from(selectedIds), newStatus);
+      if (result?.success) {
+        toast.success(`${result.updated} lowongan diubah ke ${newStatus}`);
+        setSelectedIds(new Set());
+        window.location.reload();
+      } else {
+        toast.error("Gagal mengubah status");
+      }
+    } catch (e) {
+      toast.error("Error mengubah status");
+    } finally {
+      setIsBulkLoading(false);
     }
   };
 
@@ -161,19 +235,120 @@ export function VipLokerTable({ lokerList }: { lokerList: Loker[] }) {
       </CardHeader>
 
       <CardContent className="p-0">
+        {/* Bulk Action Bar */}
+        <AnimatePresence>
+          {selectedIds.size > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="sticky top-0 z-20 bg-primary text-primary-foreground p-3 flex flex-wrap items-center justify-between gap-3 border-b"
+            >
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  checked={isAllSelected}
+                  onCheckedChange={toggleSelectAll}
+                  className="border-primary-foreground data-[state=checked]:bg-primary-foreground data-[state=checked]:text-primary"
+                />
+                <span className="font-medium text-sm">
+                  {selectedIds.size} lowongan dipilih
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearSelection}
+                  className="h-7 text-primary-foreground hover:text-primary-foreground hover:bg-primary-foreground/20"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Batal
+                </Button>
+              </div>
+              <div className="flex items-center gap-2">
+                <Select onValueChange={handleBulkStatusChange} disabled={isBulkLoading}>
+                  <SelectTrigger className="w-36 h-8 bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground text-sm">
+                    <SelectValue placeholder="Ubah Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="published">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-600" />
+                        <span>Publish</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="draft">
+                      <div className="flex items-center gap-2">
+                        <Edit className="w-4 h-4 text-gray-600" />
+                        <span>Draft</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="closed">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-4 h-4 text-amber-600" />
+                        <span>Closed</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                  disabled={isBulkLoading}
+                  className="h-8"
+                >
+                  {isBulkLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                  ) : (
+                    <Trash2 className="w-4 h-4 mr-1" />
+                  )}
+                  Hapus ({selectedIds.size})
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Table Header with Select All */}
+        {filteredData.length > 0 && selectedIds.size === 0 && (
+          <div className="flex items-center gap-3 px-4 py-2 bg-muted/30 border-b border-border/40">
+            <Checkbox
+              checked={isAllSelected}
+              ref={(el) => {
+                if (el) {
+                  (el as HTMLButtonElement).dataset.state = isPartialSelected ? 'indeterminate' : isAllSelected ? 'checked' : 'unchecked';
+                }
+              }}
+              onCheckedChange={toggleSelectAll}
+              className="data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground"
+            />
+            <span className="text-sm text-muted-foreground">
+              Pilih semua ({filteredData.length} lowongan)
+            </span>
+          </div>
+        )}
+
         <div className="space-y-1">
           {filteredData.length > 0 ? (
             filteredData.map((item) => (
               <div
                 key={item.id}
-                className="group flex flex-col sm:flex-row sm:items-start justify-between p-4 hover:bg-accent/40 transition-colors border-b border-border/40 last:border-0"
+                className={`group flex flex-col sm:flex-row sm:items-start justify-between p-4 hover:bg-accent/40 transition-colors border-b border-border/40 last:border-0 ${
+                  selectedIds.has(item.id) ? 'bg-primary/5' : ''
+                }`}
               >
                 <div className="flex items-start gap-4 mb-4 sm:mb-0 flex-1">
-                  <Avatar className="h-12 w-12 border bg-muted rounded-xl">
-                    <AvatarFallback className="rounded-xl font-bold text-primary text-lg">
-                      {(item.perusahaan?.name || item.perusahaan_name || "?").charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="flex items-center gap-3">
+                    <Checkbox
+                      checked={selectedIds.has(item.id)}
+                      onCheckedChange={() => toggleSelect(item.id)}
+                      className="mt-1"
+                    />
+                    <Avatar className="h-12 w-12 border bg-muted rounded-xl">
+                      <AvatarFallback className="rounded-xl font-bold text-primary text-lg">
+                        {(item.perusahaan?.name || item.perusahaan_name || "?").charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
 
                   <div className="space-y-1 flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -207,7 +382,7 @@ export function VipLokerTable({ lokerList }: { lokerList: Loker[] }) {
                     
                     <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                         <Calendar className="w-3 h-3" />
-                        <span>Posted {new Date(item.created_at).toLocaleDateString("id-ID")}</span>
+                        <span suppressHydrationWarning>Posted {new Date(item.created_at).toLocaleDateString("id-ID")}</span>
                     </div>
                   </div>
                 </div>

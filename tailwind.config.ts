@@ -116,9 +116,13 @@ const config: Config = {
   		},
   		fontFamily: {
   			sans: [
-  				'Inter',
-                    ...fontFamily.sans
-                ]
+  				'var(--font-inter)',
+  				...fontFamily.sans
+  			],
+            poppins: [
+                'var(--font-poppins)',
+                ...fontFamily.sans
+            ]
   		},
   		borderRadius: {
   			xl: '1rem',

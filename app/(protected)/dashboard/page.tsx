@@ -12,8 +12,10 @@ import { RecentEmails } from "@/components/dashboard/RecentEmails";
 import { RecentPDFOperations } from "@/components/dashboard/RecentPDFOperations";
 import { RecentWhatsAppMessages } from "@/components/dashboard/RecentWhatsAppMessages";
 import { RecentFollowUps } from "@/components/dashboard/RecentFollowUps";
+import { RecentCreativeCVs } from "@/components/dashboard/RecentCreativeCVs";
+import { RecentInterviewPrep } from "@/components/dashboard/RecentInterviewPrep";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Mail, Sparkles, MessageCircle, TrendingUp, Activity, Bell } from "lucide-react";
+import { FileText, Mail, Sparkles, MessageCircle, TrendingUp, Activity, Bell, Palette, Target } from "lucide-react";
 
 // Revalidate dashboard data every 30 seconds
 export const revalidate = 30;
@@ -90,7 +92,7 @@ export default async function DashboardPage() {
             <RecentFollowUps />
           </div>
           
-          <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full">
+          <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full">
             {/* Cover Letters History */}
             <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-l-4 border-l-[#8e68fd] bg-gradient-to-br from-[#8e68fd]/10 via-[#8e68fd]/5 to-transparent dark:from-[#8e68fd]/20 dark:via-[#8e68fd]/10 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-[#8e68fd]/0 to-[#8e68fd]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -104,6 +106,38 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent className="relative">
                 <RecentCoverLetters />
+              </CardContent>
+            </Card>
+
+            {/* CV Creative History */}
+            <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-l-4 border-l-purple-500 bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent dark:from-purple-500/20 dark:via-purple-500/10 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <CardHeader className="pb-3 relative">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2.5 rounded-xl bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors duration-300 group-hover:scale-110 transform">
+                    <Palette className="h-4 w-4 text-purple-500 dark:text-purple-400" />
+                  </div>
+                  <CardTitle className="text-sm font-semibold">CV Creative</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="relative">
+                <RecentCreativeCVs />
+              </CardContent>
+            </Card>
+
+            {/* Interview Prep History */}
+            <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-l-4 border-l-blue-500 bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent dark:from-blue-500/20 dark:via-blue-500/10 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <CardHeader className="pb-3 relative">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2.5 rounded-xl bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors duration-300 group-hover:scale-110 transform">
+                    <Target className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                  </div>
+                  <CardTitle className="text-sm font-semibold">Interview Prep</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="relative">
+                <RecentInterviewPrep />
               </CardContent>
             </Card>
 
