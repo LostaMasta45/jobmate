@@ -11,15 +11,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { EmailFormData } from "./EmailWizard";
+import { EmailFormData } from "./types";
 import { Info, Briefcase, Building2, User, Mail } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface StepBasicInfoProps {
   formData: EmailFormData;
   updateFormData: (data: Partial<EmailFormData>) => void;
+  showValidation?: boolean;
 }
 
-export function StepBasicInfo({ formData, updateFormData }: StepBasicInfoProps) {
+export function StepBasicInfo({ formData, updateFormData, showValidation }: StepBasicInfoProps) {
+  // Helper for validation styling
+  const errorClass = (value: any) => 
+    showValidation && !value ? "border-red-500 focus-visible:ring-red-500 bg-red-50 dark:bg-red-950/10" : "";
+
   // Conditional fields based on email type
   const needsPosition = ['application', 'follow_up', 'thank_you'].includes(formData.emailType);
   const needsInterviewDate = formData.emailType === 'thank_you';
@@ -64,7 +70,7 @@ export function StepBasicInfo({ formData, updateFormData }: StepBasicInfoProps) 
               value={formData.position}
               onChange={(e: any) => updateFormData({ position: e.target.value })}
               required
-              className="h-11"
+              className={cn("h-11", errorClass(formData.position))}
             />
           </div>
         ) : needsDepartment ? (
@@ -79,7 +85,7 @@ export function StepBasicInfo({ formData, updateFormData }: StepBasicInfoProps) 
               value={formData.position}
               onChange={(e: any) => updateFormData({ position: e.target.value })}
               required
-              className="h-11"
+              className={cn("h-11", errorClass(formData.position))}
             />
           </div>
         ) : (
@@ -94,7 +100,7 @@ export function StepBasicInfo({ formData, updateFormData }: StepBasicInfoProps) 
               value={formData.position}
               onChange={(e: any) => updateFormData({ position: e.target.value })}
               required
-              className="h-11"
+              className={cn("h-11", errorClass(formData.position))}
             />
           </div>
         )}
@@ -111,7 +117,7 @@ export function StepBasicInfo({ formData, updateFormData }: StepBasicInfoProps) 
             value={formData.companyName}
             onChange={(e: any) => updateFormData({ companyName: e.target.value })}
             required
-            className="h-11"
+            className={cn("h-11", errorClass(formData.companyName))}
           />
         </div>
       </div>
@@ -130,7 +136,7 @@ export function StepBasicInfo({ formData, updateFormData }: StepBasicInfoProps) 
               value={formData.hrdName || ''}
               onChange={(e: any) => updateFormData({ hrdName: e.target.value })}
               required
-              className="h-11"
+              className={cn("h-11", errorClass(formData.hrdName))}
             />
           </div>
           {needsInterviewDate && (
@@ -258,7 +264,7 @@ export function StepBasicInfo({ formData, updateFormData }: StepBasicInfoProps) 
               value={formData.yourName}
               onChange={(e: any) => updateFormData({ yourName: e.target.value })}
               required
-              className="h-11"
+              className={cn("h-11", errorClass(formData.yourName))}
             />
           </div>
 

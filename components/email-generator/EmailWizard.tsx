@@ -1,50 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { Sparkles, X, Eye } from "lucide-react";
 import { StepEmailType } from "./StepEmailType";
 import { StepBasicInfo } from "./StepBasicInfo";
 import { StepToneStyle } from "./StepToneStyle";
 import { StepContent } from "./StepContent";
 import { StepPreview } from "./StepPreview";
-
-export interface EmailFormData {
-  // Basic Info
-  emailType: 'application' | 'follow_up' | 'thank_you' | 'inquiry';
-  position: string;
-  companyName: string;
-  hrdName?: string;
-  hrdTitle?: string;
-  jobSource?: string;
-  referralName?: string;
-  hasAttachment: boolean;
-  yourName: string;
-  currentRole?: string;
-  yearsExperience?: number;
-  
-  // Conditional fields
-  interviewDate?: string; // For thank_you
-  applicationDate?: string; // For follow_up
-  specificTopics?: string; // For thank_you
-  
-  // Tone & Style
-  toneStyle: 'formal' | 'semi-formal' | 'casual' | 'creative';
-  personality: 'confident' | 'humble' | 'enthusiastic' | 'balanced';
-  lengthType: 'concise' | 'medium' | 'detailed';
-  
-  // Content
-  highlightSkills: string[];
-  achievements?: string;
-  includeWhyCompany: boolean;
-  includeWhyYou: boolean;
-  callToAction?: 'interview' | 'meeting' | 'discussion' | 'portfolio_review';
-  
-  // Generated
-  subjectLine?: string;
-  bodyContent?: string;
-}
+import { EmailWizardToolbar } from "./EmailWizardToolbar";
+import { LivePreview } from "./LivePreview";
+import { motion, AnimatePresence } from "framer-motion";
+import { generateEmailWithAI } from "@/actions/email/generate";
+import { toast } from "sonner";
+import { EmailFormData } from "./types";
 
 const STEPS = [
   { id: 1, title: "Jenis Email", icon: "📧" },
@@ -54,9 +23,7 @@ const STEPS = [
   { id: 5, title: "Preview", icon: "👁️" },
 ];
 
-export function EmailWizard() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<EmailFormData>({
+const INITIAL_DATA: EmailFormData = {
     emailType: 'application',
     position: '',
     companyName: '',
@@ -68,144 +35,292 @@ export function EmailWizard() {
     highlightSkills: [],
     includeWhyCompany: true,
     includeWhyYou: true,
-  });
+};
+
+export function EmailWizard() {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [direction, setDirection] = useState(0);
+  const [showPreview, setShowPreview] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [formData, setFormData] = useState<EmailFormData>(INITIAL_DATA);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const savedData = localStorage.getItem("email_wizard_data");
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        // Merge with initial data to ensure all fields exist
+        setFormData(prev => ({ ...INITIAL_DATA, ...parsed }));
+      } catch (e) {
+        console.error("Failed to parse saved email data", e);
+      }
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Save to localStorage on change
+  useEffect(() => {
+    if (!isLoaded) return; // Don't save before loading
+    const timeoutId = setTimeout(() => {
+        localStorage.setItem("email_wizard_data", JSON.stringify(formData));
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [formData, isLoaded]);
+
+  // Handle "Generate" action when moving from Step 4 to Step 5
+  const handleGenerate = async () => {
+    if (currentStep === 4) {
+      setIsGenerating(true);
+      try {
+        const result = await generateEmailWithAI({
+            language: 'id', // Default to ID
+            emailType: formData.emailType,
+            position: formData.position,
+            companyName: formData.companyName,
+            hrdName: formData.hrdName,
+            hrdTitle: formData.hrdTitle,
+            jobSource: formData.jobSource,
+            referralName: formData.referralName,
+            hasAttachment: formData.hasAttachment,
+            yourName: formData.yourName,
+            currentRole: formData.currentRole,
+            yearsExperience: formData.yearsExperience,
+            toneStyle: formData.toneStyle,
+            personality: formData.personality,
+            lengthType: formData.lengthType,
+            highlightSkills: formData.highlightSkills,
+            achievements: formData.achievements,
+            includeWhyCompany: formData.includeWhyCompany,
+            includeWhyYou: formData.includeWhyYou,
+            callToAction: formData.callToAction,
+        });
+
+        if (result.error) {
+          toast.error("Gagal generate email: " + result.error);
+          setIsGenerating(false);
+          return; // Don't proceed
+        }
+
+        setFormData(prev => ({
+          ...prev,
+          subjectLine: result.subject,
+          bodyContent: result.body,
+        }));
+        toast.success("Email berhasil dibuat!");
+      } catch (error) {
+        console.error(error);
+        toast.error("Terjadi kesalahan saat generate email");
+        setIsGenerating(false);
+        return;
+      } finally {
+        setIsGenerating(false);
+      }
+    }
+    
+    // Proceed to next step
+    setDirection(1);
+    setCurrentStep(prev => prev + 1);
+  };
 
   const updateFormData = (data: Partial<EmailFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
   };
 
+  const canProceedToNext = () => {
+    switch (currentStep) {
+      case 1:
+        return !!formData.emailType;
+      case 2:
+        return !!(formData.position && formData.companyName && formData.yourName);
+      case 3:
+        return true;
+      case 4:
+        return true;
+      default:
+        return false;
+    }
+  };
+
   const nextStep = () => {
-    if (currentStep < STEPS.length) {
+    if (!canProceedToNext()) {
+        toast.error("Mohon lengkapi data yang diperlukan.");
+        return;
+    }
+
+    if (currentStep === 4) {
+        handleGenerate();
+    } else if (currentStep < STEPS.length) {
+      setDirection(1);
       setCurrentStep(prev => prev + 1);
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
+      setDirection(-1);
       setCurrentStep(prev => prev - 1);
     }
   };
 
-  const canProceedToNext = () => {
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 20 : -20,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      x: direction > 0 ? -20 : 20,
+      opacity: 0,
+    }),
+  };
+
+  const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return formData.emailType; // Step 1: Email type must be selected
+        return <StepEmailType formData={formData} updateFormData={updateFormData} />;
       case 2:
-        return formData.position && formData.companyName && formData.yourName;
+        return <StepBasicInfo formData={formData} updateFormData={updateFormData} />;
       case 3:
-        return true; // Always can proceed from step 3
+        return <StepToneStyle formData={formData} updateFormData={updateFormData} />;
       case 4:
-        return true; // Always can proceed from step 4
+        return <StepContent formData={formData} updateFormData={updateFormData} />;
+      case 5:
+        return <StepPreview formData={formData} updateFormData={updateFormData} />;
       default:
-        return false;
+        return null;
     }
   };
 
+  // If not loaded yet, maybe show a spinner or just render (useEffect handles hydration mismatch essentially by being client side only logic for storage)
+  // But to be safe with hydration, we usually just render. 
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 p-3 shadow-lg">
-          <Sparkles className="h-7 w-7 text-white" />
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold">Email Generator</h1>
-          <p className="text-muted-foreground">
-            Buat email lamaran profesional dengan bantuan AI
-          </p>
-        </div>
-      </div>
-
-      {/* Progress Steps */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-8">
-          {STEPS.map((step, index) => (
-            <div key={step.id} className="flex items-center flex-1">
-              {/* Step Item */}
-              <div className="flex flex-col items-center flex-1">
-                <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl mb-2 transition-all ${
-                    currentStep === step.id
-                      ? "bg-primary text-primary-foreground scale-110 shadow-lg"
-                      : currentStep > step.id
-                      ? "bg-green-100 text-green-700"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {step.icon}
+    <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-background flex-col lg:flex-row">
+        
+        {/* LEFT PANEL: Wizard Form */}
+        <div className="flex-1 flex flex-col min-w-0 lg:border-r relative">
+            
+            {/* MOBILE HEADER: Segmented Progress */}
+            <div className="flex-shrink-0 bg-background pt-2 lg:hidden px-4 pb-2 border-b z-10">
+                <div className="flex gap-1 mb-2">
+                    {STEPS.map((s) => (
+                        <div 
+                        key={s.id} 
+                        className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                            s.id <= currentStep 
+                            ? "bg-blue-600" 
+                            : "bg-slate-200 dark:bg-slate-800"
+                        }`}
+                        />
+                    ))}
                 </div>
-                <div className="text-center">
-                  <p
-                    className={`text-sm font-medium ${
-                      currentStep === step.id
-                        ? "text-primary"
-                        : currentStep > step.id
-                        ? "text-green-700"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    {step.title}
-                  </p>
+                <div className="flex justify-between items-center">
+                     <h2 className="font-bold text-lg flex items-center gap-2">
+                        {STEPS[currentStep-1].icon} {STEPS[currentStep-1].title}
+                     </h2>
+                     <span className="text-xs text-muted-foreground">{currentStep}/{STEPS.length}</span>
                 </div>
-              </div>
-
-              {/* Connector Line */}
-              {index < STEPS.length - 1 && (
-                <div className="flex-1 h-1 mx-2 -mt-8">
-                  <div
-                    className={`h-full rounded transition-all ${
-                      currentStep > step.id ? "bg-green-500" : "bg-muted"
-                    }`}
-                  />
-                </div>
-              )}
             </div>
-          ))}
+
+             {/* DESKTOP HEADER */}
+             <div className="hidden lg:block p-6 border-b">
+                <h1 className="text-2xl font-bold flex items-center gap-2">
+                    <Sparkles className="h-6 w-6 text-blue-600" />
+                    Email Generator
+                </h1>
+                <p className="text-muted-foreground text-sm mt-1">
+                    Step {currentStep} of {STEPS.length}: <span className="font-medium text-foreground">{STEPS[currentStep-1].title}</span>
+                </p>
+
+                {/* Desktop Progress Bar */}
+                <div className="mt-4 flex gap-2">
+                    {STEPS.map((s) => (
+                         <div 
+                            key={s.id}
+                            className={`h-1.5 flex-1 rounded-full transition-all ${
+                                s.id === currentStep ? "bg-blue-600" :
+                                s.id < currentStep ? "bg-blue-600/50" : "bg-slate-100 dark:bg-slate-800"
+                            }`}
+                         />
+                    ))}
+                </div>
+             </div>
+
+            {/* SCROLLABLE CONTENT */}
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-slate-950/50">
+                 <AnimatePresence mode="wait" custom={direction} initial={false}>
+                    <motion.div
+                        key={currentStep}
+                        custom={direction}
+                        variants={variants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className="max-w-2xl mx-auto"
+                    >
+                         {renderStep()}
+                    </motion.div>
+                 </AnimatePresence>
+            </div>
+
+            {/* TOOLBAR (Fixed Bottom) */}
+            <EmailWizardToolbar
+                currentStep={currentStep}
+                totalSteps={STEPS.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                canProceed={canProceedToNext()} // Pass true if you want to allow click and validate inside nextStep, but standard is disabling
+                isGenerating={isGenerating}
+            />
         </div>
 
-        {/* Step Content */}
-        <div className="min-h-[400px]">
-          {currentStep === 1 && (
-            <StepEmailType formData={formData} updateFormData={updateFormData} />
-          )}
-          {currentStep === 2 && (
-            <StepBasicInfo formData={formData} updateFormData={updateFormData} />
-          )}
-          {currentStep === 3 && (
-            <StepToneStyle formData={formData} updateFormData={updateFormData} />
-          )}
-          {currentStep === 4 && (
-            <StepContent formData={formData} updateFormData={updateFormData} />
-          )}
-          {currentStep === 5 && (
-            <StepPreview formData={formData} updateFormData={updateFormData} />
-          )}
+        {/* RIGHT PANEL: Live Preview (Desktop Only) */}
+        <div className="hidden lg:flex w-1/2 xl:w-[45%] p-6 bg-slate-50 dark:bg-slate-950 border-l flex-col justify-center">
+             <LivePreview formData={formData} isGenerating={isGenerating} />
         </div>
 
-        {/* Navigation Buttons */}
-        {currentStep < 5 && (
-          <div className="flex justify-between mt-8 pt-6 border-t">
-            <Button
-              variant="outline"
-              onClick={prevStep}
-              disabled={currentStep === 1}
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Kembali
-            </Button>
+        {/* MOBILE PREVIEW BUTTON (Floating) */}
+        <div className="lg:hidden fixed bottom-20 right-4 z-20">
+            {currentStep < 5 && (
+                 <Button 
+                    size="icon" 
+                    className="h-12 w-12 rounded-full shadow-xl bg-slate-900 text-white"
+                    onClick={() => setShowPreview(true)}
+                >
+                    <Eye className="h-5 w-5" />
+                 </Button>
+            )}
+        </div>
 
-            <Button
-              onClick={nextStep}
-              disabled={!canProceedToNext()}
-              className="gap-2"
-            >
-              {currentStep === 4 ? "Generate Email" : "Lanjut"}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-      </Card>
+        {/* MOBILE PREVIEW OVERLAY */}
+        <AnimatePresence>
+            {showPreview && (
+                 <motion.div
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    exit={{ y: "100%" }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    className="fixed inset-0 z-50 flex flex-col bg-background lg:hidden"
+                 >
+                    <div className="p-4 border-b flex items-center justify-between bg-background">
+                        <h3 className="font-bold">Live Preview</h3>
+                        <Button variant="ghost" size="sm" onClick={() => setShowPreview(false)}>
+                            <X className="h-5 w-5" />
+                        </Button>
+                    </div>
+                    <div className="flex-1 p-4 bg-slate-50 dark:bg-slate-900 overflow-y-auto">
+                        <LivePreview formData={formData} isGenerating={isGenerating} />
+                    </div>
+                 </motion.div>
+            )}
+        </AnimatePresence>
+
     </div>
   );
 }
