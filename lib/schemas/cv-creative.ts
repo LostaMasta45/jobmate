@@ -76,11 +76,11 @@ export const TEMPLATES = [
   },
   {
     id: "dark-mode-pro",
-    name: "Dark Mode Pro",
-    description: "Sophisticated dark theme untuk tech professionals",
+    name: "Midnight Executive",
+    description: "Sleek, high-contrast dark theme with modern tech aesthetics",
     category: "modern",
-    bestFor: ["Software Engineer", "DevOps", "Data Scientist"],
-    defaultColors: { primary: "#3b82f6", secondary: "#60a5fa", accent: "#93c5fd", background: "#0f172a", text: "#f1f5f9" },
+    bestFor: ["Software Engineer", "DevOps", "Tech Lead", "Solutions Architect"],
+    defaultColors: { primary: "#3b82f6", secondary: "#60a5fa", accent: "#818cf8", background: "#0f172a", text: "#f8fafc" },
     isPremium: false,
   },
   {
