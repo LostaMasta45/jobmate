@@ -303,7 +303,7 @@ export function EmailWizard({ initialData }: { initialData?: EmailFormData | nul
              </div>
 
             {/* SCROLLABLE CONTENT */}
-            <div id="wizard-content" className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-slate-950/50 scroll-smooth pb-32">
+            <div id="wizard-content" className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-slate-950/50 scroll-smooth pb-32 md:pb-40">
                  <AnimatePresence mode="wait" custom={direction} initial={false}>
                     <motion.div
                         key={currentStep}

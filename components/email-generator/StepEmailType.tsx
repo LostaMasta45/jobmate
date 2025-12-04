@@ -115,7 +115,7 @@ export function StepEmailType({ formData, updateFormData, onNext }: StepEmailTyp
       </div>
 
       {/* Cards Grid - Improved Responsiveness */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 px-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-1">
         {EMAIL_TYPES.map((type, index) => {
           const Icon = type.icon;
           const isSelected = formData.emailType === type.value;
