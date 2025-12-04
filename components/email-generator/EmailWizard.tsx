@@ -236,10 +236,10 @@ export function EmailWizard({ initialData }: { initialData?: EmailFormData | nul
   // But to be safe with hydration, we usually just render. 
 
   return (
-    <div className="flex flex-col h-[calc(100vh-100px)] md:h-[calc(100vh-140px)] bg-background border-0 md:border rounded-none md:rounded-xl shadow-none md:shadow-sm max-w-6xl mx-auto my-0 lg:my-4 relative overflow-hidden">
+    <div className="flex flex-col min-h-[500px] bg-background border-0 md:border rounded-none md:rounded-xl shadow-none md:shadow-sm max-w-6xl mx-auto my-0 lg:my-4 relative">
         
         {/* MAIN PANEL: Wizard Form */}
-        <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-slate-950 h-full overflow-hidden">
+        <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-slate-950">
             <div ref={topRef} className="absolute top-0 h-1 w-1 opacity-0 pointer-events-none" />
 
             {/* MOBILE HEADER: Segmented Progress */}
@@ -303,7 +303,7 @@ export function EmailWizard({ initialData }: { initialData?: EmailFormData | nul
              </div>
 
             {/* SCROLLABLE CONTENT */}
-            <div id="wizard-content" className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-slate-950/50 scroll-smooth pb-32 md:pb-40">
+            <div id="wizard-content" className="p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-slate-950/50 pb-32 md:pb-40">
                  <AnimatePresence mode="wait" custom={direction} initial={false}>
                     <motion.div
                         key={currentStep}
@@ -320,8 +320,8 @@ export function EmailWizard({ initialData }: { initialData?: EmailFormData | nul
                  </AnimatePresence>
             </div>
 
-            {/* TOOLBAR (Fixed Bottom relative to container) */}
-            <div className="border-t bg-white/95 dark:bg-slate-950/95 backdrop-blur flex-shrink-0 w-full shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-50">
+            {/* TOOLBAR (Sticky Bottom) */}
+            <div className="sticky bottom-0 border-t bg-white/95 dark:bg-slate-950/95 backdrop-blur flex-shrink-0 w-full shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-50">
                 <EmailWizardToolbar
                     currentStep={currentStep}
                     totalSteps={STEPS.length}
@@ -334,6 +334,6 @@ export function EmailWizard({ initialData }: { initialData?: EmailFormData | nul
             </div>
         </div>
     
-        </div>
-      );
+    </div>
+  );
     }
