@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Sparkles, X, Eye } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { StepEmailType } from "./StepEmailType";
 import { StepBasicInfo } from "./StepBasicInfo";
 import { StepToneStyle } from "./StepToneStyle";
 import { StepContent } from "./StepContent";
 import { StepPreview } from "./StepPreview";
 import { EmailWizardToolbar } from "./EmailWizardToolbar";
-import { LivePreview } from "./LivePreview";
 import { motion, AnimatePresence } from "framer-motion";
 import { generateEmailWithAI } from "@/actions/email/generate";
 import { toast } from "sonner";
@@ -35,12 +34,16 @@ const INITIAL_DATA: EmailFormData = {
     highlightSkills: [],
     includeWhyCompany: true,
     includeWhyYou: true,
+    // Phase 1 additions
+    personalStory: '',
+    openingStyle: undefined,
+    // Phase 3 additions
+    toneSettings: { formality: 5, confidence: 5, enthusiasm: 5 },
 };
 
 export function EmailWizard({ initialData }: { initialData?: EmailFormData | null }) {
   const [currentStep, setCurrentStep] = useState(initialData ? 5 : 1);
   const [direction, setDirection] = useState(0);
-  const [showPreview, setShowPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [formData, setFormData] = useState<EmailFormData>(INITIAL_DATA);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -101,7 +104,7 @@ export function EmailWizard({ initialData }: { initialData?: EmailFormData | nul
       try {
         const result = await generateEmailWithAI({
             language: 'id', // Default to ID
-            emailType: formData.emailType,
+            emailType: formData.emailType as "application" | "follow_up" | "thank_you" | "inquiry",
             position: formData.position,
             companyName: formData.companyName,
             hrdName: formData.hrdName,
@@ -120,6 +123,11 @@ export function EmailWizard({ initialData }: { initialData?: EmailFormData | nul
             includeWhyCompany: formData.includeWhyCompany,
             includeWhyYou: formData.includeWhyYou,
             callToAction: formData.callToAction,
+            // Phase 1 additions
+            personalStory: formData.personalStory,
+            openingStyle: formData.openingStyle,
+            // Phase 3 additions
+            toneSettings: formData.toneSettings,
         });
 
         if (result.error) {
@@ -228,10 +236,10 @@ export function EmailWizard({ initialData }: { initialData?: EmailFormData | nul
   // But to be safe with hydration, we usually just render. 
 
   return (
-    <div className="flex h-auto min-h-[80vh] lg:h-[calc(100dvh-4rem)] lg:overflow-hidden bg-background flex-col lg:flex-row border-0 md:border rounded-none md:rounded-xl shadow-none md:shadow-sm">
+    <div className="flex flex-col h-[calc(100vh-100px)] md:h-[calc(100vh-140px)] bg-background border-0 md:border rounded-none md:rounded-xl shadow-none md:shadow-sm max-w-6xl mx-auto my-0 lg:my-4 relative overflow-hidden">
         
-        {/* LEFT PANEL: Wizard Form */}
-        <div className="flex-1 flex flex-col min-w-0 lg:border-r relative">
+        {/* MAIN PANEL: Wizard Form */}
+        <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-slate-950 h-full overflow-hidden">
             <div ref={topRef} className="absolute top-0 h-1 w-1 opacity-0 pointer-events-none" />
 
             {/* MOBILE HEADER: Segmented Progress */}
@@ -295,7 +303,7 @@ export function EmailWizard({ initialData }: { initialData?: EmailFormData | nul
              </div>
 
             {/* SCROLLABLE CONTENT */}
-            <div id="wizard-content" className="flex-1 lg:overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-slate-950/50 scroll-smooth pb-32 lg:pb-8">
+            <div id="wizard-content" className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-slate-950/50 scroll-smooth pb-32">
                  <AnimatePresence mode="wait" custom={direction} initial={false}>
                     <motion.div
                         key={currentStep}
@@ -305,71 +313,26 @@ export function EmailWizard({ initialData }: { initialData?: EmailFormData | nul
                         animate="center"
                         exit="exit"
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className={`${currentStep === 1 ? 'w-full max-w-7xl px-4' : 'max-w-2xl'} mx-auto`}
+                        className="w-full max-w-5xl mx-auto"
                     >
                          {renderStep()}
                     </motion.div>
                  </AnimatePresence>
             </div>
 
-            {/* TOOLBAR (Fixed Bottom) */}
-            <div className="fixed bottom-0 left-0 right-0 z-50 lg:relative lg:bottom-auto lg:left-auto lg:right-auto">
+            {/* TOOLBAR (Fixed Bottom relative to container) */}
+            <div className="border-t bg-white/95 dark:bg-slate-950/95 backdrop-blur flex-shrink-0 w-full shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-50">
                 <EmailWizardToolbar
                     currentStep={currentStep}
                     totalSteps={STEPS.length}
                     onNext={nextStep}
                     onPrevious={prevStep}
-                    canProceed={canProceedToNext()} // Pass true if you want to allow click and validate inside nextStep, but standard is disabling
+                    canProceed={canProceedToNext()} 
                     isGenerating={isGenerating}
+                    nextStepLabel={currentStep < STEPS.length ? STEPS[currentStep].title : undefined}
                 />
             </div>
         </div>
-
-        {/* RIGHT PANEL: Live Preview (Desktop Only) */}
-        {currentStep !== 1 && (
-            <div className="hidden lg:flex w-1/2 xl:w-[45%] p-6 bg-slate-50 dark:bg-slate-950 border-l flex-col justify-center">
-                <LivePreview formData={formData} isGenerating={isGenerating} />
-            </div>
-        )}
-
-            {/* MOBILE PREVIEW BUTTON (Floating) */}
-            <div className="lg:hidden fixed bottom-24 left-0 right-0 z-30 flex justify-center pointer-events-none">
-                {currentStep < 5 && (
-                     <Button 
-                        className="pointer-events-auto h-11 px-6 rounded-full shadow-xl bg-[#5547d0] hover:bg-[#4538b0] text-white border border-white/20 backdrop-blur-sm font-medium transition-transform hover:scale-105 active:scale-95 flex items-center gap-2"
-                        onClick={() => setShowPreview(true)}
-                    >
-                        <Eye className="h-4 w-4" />
-                        Lihat Preview
-                     </Button>
-                )}
-            </div>
-
-            {/* MOBILE PREVIEW OVERLAY */}
-            <AnimatePresence>
-                {showPreview && (
-                     <motion.div
-                        initial={{ y: "100%" }}
-                        animate={{ y: 0 }}
-                        exit={{ y: "100%" }}
-                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed inset-0 z-[60] flex flex-col bg-background lg:hidden"
-                     >
-                        <div className="p-4 border-b flex items-center justify-between bg-white dark:bg-slate-950 safe-area-top">
-                            <h3 className="font-bold text-lg flex items-center gap-2">
-                                <Eye className="h-5 w-5 text-[#5547d0]" />
-                                Live Preview
-                            </h3>
-                            <Button variant="ghost" size="sm" onClick={() => setShowPreview(false)} className="rounded-full h-8 w-8 p-0">
-                                <X className="h-5 w-5" />
-                            </Button>
-                        </div>
-                        <div className="flex-1 bg-slate-50 dark:bg-slate-900 overflow-y-auto p-4 pb-24">
-                            <LivePreview formData={formData} isGenerating={isGenerating} />
-                        </div>
-                     </motion.div>
-                )}
-            </AnimatePresence>
     
         </div>
       );

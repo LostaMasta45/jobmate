@@ -1,10 +1,10 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Mail, Send, ThumbsUp, Search, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Mail, Send, ThumbsUp, Search, CheckCircle2, Sparkles, ArrowRight } from "lucide-react";
 import { EmailFormData } from "./types";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface StepEmailTypeProps {
   formData: EmailFormData;
@@ -16,54 +16,66 @@ const EMAIL_TYPES = [
   {
     value: 'application',
     icon: Mail,
-    emoji: '📧',
-    label: 'Email Lamaran',
-    description: 'Apply untuk posisi baru',
-    longDesc: 'Email formal untuk melamar pekerjaan dengan melampirkan CV dan portfolio',
-    features: ['Detail skills & experience', 'Attachments CV/Portfolio', 'Professional tone'],
-    recommendedLength: 'Medium (250-300 kata)',
-    gradient: 'from-blue-500 to-blue-600',
-    bgGradient: 'from-blue-50 to-blue-100',
+    label: 'Lamaran Kerja',
+    shortDesc: 'Apply Job',
+    description: 'Kirim lamaran dengan CV & Portfolio untuk posisi impianmu.',
+    features: ['Formal & Profesional', 'Struktur Standar HR', 'Support Attachments'],
+    color: 'blue',
+    gradient: 'from-blue-500 to-indigo-600',
+    bgGradient: 'from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40',
+    borderColor: 'border-blue-200 dark:border-blue-800',
+    selectedBorder: 'border-blue-600 dark:border-blue-500',
+    shadow: 'shadow-blue-500/20',
     popular: true,
+    textColor: 'text-blue-700 dark:text-blue-400'
   },
   {
     value: 'follow_up',
     icon: Send,
-    emoji: '📬',
-    label: 'Follow-up Email',
-    description: 'Tindak lanjut lamaran sebelumnya',
-    longDesc: 'Email untuk menanyakan status lamaran yang sudah dikirim sebelumnya',
-    features: ['Reference email sebelumnya', 'Polite & not pushy', 'Request update'],
-    recommendedLength: 'Short (150-200 kata)',
-    gradient: 'from-purple-500 to-purple-600',
-    bgGradient: 'from-purple-50 to-purple-100',
+    label: 'Follow Up',
+    shortDesc: 'Cek Status',
+    description: 'Tanyakan kabar lamaranmu yang belum ada respon dari HR.',
+    features: ['Sopan & Tidak Pushy', 'Ingatkan HR', 'Tunjukkan Antusiasme'],
+    color: 'purple',
+    gradient: 'from-purple-500 to-pink-600',
+    bgGradient: 'from-purple-50 to-pink-50 dark:from-purple-950/40 dark:to-pink-950/40',
+    borderColor: 'border-purple-200 dark:border-purple-800',
+    selectedBorder: 'border-purple-600 dark:border-purple-500',
+    shadow: 'shadow-purple-500/20',
     popular: false,
+    textColor: 'text-purple-700 dark:text-purple-400'
   },
   {
     value: 'thank_you',
     icon: ThumbsUp,
-    emoji: '🙏',
-    label: 'Thank You Email',
-    description: 'Ucapan terima kasih setelah interview',
-    longDesc: 'Email berterima kasih dan reinforce interest setelah wawancara',
-    features: ['Mention specific topics', 'Show gratitude', 'Reinforce interest'],
-    recommendedLength: 'Short (150-200 kata)',
-    gradient: 'from-green-500 to-green-600',
-    bgGradient: 'from-green-50 to-green-100',
-    popular: true,
+    label: 'Thank You',
+    shortDesc: 'Habis Interview',
+    description: 'Ucapkan terima kasih setelah selesai sesi interview dengan HR/User.',
+    features: ['Bangun Hubungan', 'Kesan Profesional', 'Rekap Poin Penting'],
+    color: 'emerald',
+    gradient: 'from-emerald-500 to-teal-600',
+    bgGradient: 'from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/40',
+    borderColor: 'border-emerald-200 dark:border-emerald-800',
+    selectedBorder: 'border-emerald-600 dark:border-emerald-500',
+    shadow: 'shadow-emerald-500/20',
+    popular: false,
+    textColor: 'text-emerald-700 dark:text-emerald-400'
   },
   {
     value: 'inquiry',
     icon: Search,
-    emoji: '❓',
     label: 'Job Inquiry',
-    description: 'Tanya peluang kerja tersedia',
-    longDesc: 'Email untuk menanyakan peluang kerja tanpa apply ke posisi spesifik',
-    features: ['No specific position', 'Networking focus', 'Request information'],
-    recommendedLength: 'Short (150-200 kata)',
-    gradient: 'from-amber-500 to-amber-600',
-    bgGradient: 'from-amber-50 to-amber-100',
+    shortDesc: 'Tanya Lowongan',
+    description: 'Kirim pesan ke HR/Koneksi untuk menanyakan peluang kerja.',
+    features: ['Fokus Networking', 'Inisiatif Tinggi', 'Cari Hidden Gems'],
+    color: 'amber',
+    gradient: 'from-amber-500 to-orange-600',
+    bgGradient: 'from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40',
+    borderColor: 'border-amber-200 dark:border-amber-800',
+    selectedBorder: 'border-amber-600 dark:border-amber-500',
+    shadow: 'shadow-amber-500/20',
     popular: false,
+    textColor: 'text-amber-700 dark:text-amber-400'
   },
 ];
 
@@ -71,7 +83,7 @@ export function StepEmailType({ formData, updateFormData, onNext }: StepEmailTyp
   
   const handleSelect = (value: string) => {
     updateFormData({ emailType: value as any });
-    // Auto-advance on mobile/small screens after a short delay for visual feedback
+    // Auto-advance on mobile/small screens after a short delay
     if (window.innerWidth < 768 && onNext) {
         setTimeout(() => {
             onNext();
@@ -80,136 +92,149 @@ export function StepEmailType({ formData, updateFormData, onNext }: StepEmailTyp
   };
 
   return (
-    <div className="space-y-6 pb-24 md:pb-0"> {/* Extra padding bottom for mobile fab/toolbar */}
-      {/* Header */}
-      <div className="text-center space-y-2 mb-6 md:mb-8">
-        <h2 className="text-xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Pilih Jenis Email</h2>
-        <p className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto">
-          Setiap jenis email memiliki struktur dan tone yang berbeda. Pilih yang paling sesuai.
-        </p>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
+      
+      {/* Header Section */}
+      <div className="text-center space-y-4 pt-2">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium"
+        >
+            <Sparkles className="w-3 h-3" />
+            <span>Langkah 1: Pilih Tujuan</span>
+        </motion.div>
+        <div className="space-y-2">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+            Apa tujuan emailmu hari ini?
+          </h2>
+          <p className="text-muted-foreground text-sm md:text-base max-w-2xl mx-auto leading-relaxed px-4">
+            Pilih jenis email yang ingin kamu buat. AI kami akan menyesuaikan struktur dan nada bicara yang tepat untukmu.
+          </p>
+        </div>
       </div>
 
-      {/* Email Type Cards - Mobile Optimized Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
-        {EMAIL_TYPES.map((type) => {
+      {/* Cards Grid - Improved Responsiveness */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 px-1">
+        {EMAIL_TYPES.map((type, index) => {
           const Icon = type.icon;
           const isSelected = formData.emailType === type.value;
           
           return (
-            <motion.button
+            <motion.div
               key={type.value}
-              onClick={() => handleSelect(type.value)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={`group relative text-left transition-all duration-300 w-full outline-none rounded-xl`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="relative h-full"
             >
-              <Card className={`relative overflow-hidden h-full p-5 md:p-6 transition-all duration-300 ${
-                isSelected
-                  ? `border-2 border-[#5547d0] dark:border-[#5547d0] bg-white dark:bg-slate-900 shadow-xl ring-4 ring-[#5547d0]/10`
-                  : 'border border-slate-200 dark:border-slate-800 hover:border-[#5547d0]/50 bg-white dark:bg-slate-900 hover:shadow-md'
-              }`}>
-                {/* Selected Background Gradient */}
-                {isSelected && (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${type.bgGradient} opacity-50 dark:opacity-10 transition-opacity`} />
+              <div
+                onClick={() => handleSelect(type.value)}
+                className={cn(
+                    "group relative w-full h-full cursor-pointer rounded-2xl outline-none transition-all duration-300",
+                    isSelected ? "scale-[1.02]" : "hover:scale-[1.02]"
                 )}
-                
-                {/* Popular Badge */}
-                {type.popular && (
-                  <div className="absolute top-0 right-0 z-10">
-                    <div className="bg-gradient-to-r from-[#5547d0] to-[#00acc7] text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm">
-                      POPULAR
-                    </div>
-                  </div>
-                )}
-
-                {/* Selected Checkmark Overlay */}
-                {isSelected && (
-                  <div className="absolute top-3 right-3 z-20 animate-in fade-in zoom-in duration-300">
-                    <div className="bg-[#5547d0] text-white rounded-full p-1 shadow-lg">
-                      <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5" />
-                    </div>
-                  </div>
-                )}
-
-                <div className="relative flex flex-col h-full z-10">
-                  {/* Icon & Header */}
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className={`p-3 md:p-3.5 rounded-2xl transition-all shrink-0 shadow-sm ${
-                      isSelected
-                        ? `bg-gradient-to-br ${type.gradient} text-white shadow-[#5547d0]/25`
-                        : `bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:text-[#5547d0] group-hover:bg-[#5547d0]/10`
-                    }`}>
-                      <Icon className={`h-6 w-6 md:h-7 md:w-7 transition-transform duration-300 ${isSelected ? 'scale-110' : ''}`} />
-                    </div>
-                    <div className="min-w-0 flex-1 pt-1">
-                       <h3 className={`font-bold text-lg md:text-xl leading-tight ${isSelected ? 'text-[#5547d0]' : 'text-slate-900 dark:text-slate-100'}`}>
-                         {type.label}
-                       </h3>
-                       <p className="text-xs md:text-sm text-muted-foreground line-clamp-1 mt-1">
-                         {type.description}
-                       </p>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <p className={`text-xs md:text-sm leading-relaxed mb-5 flex-1 ${
-                    isSelected ? 'text-slate-700 dark:text-slate-300 font-medium' : 'text-muted-foreground'
-                  }`}>
-                    {type.longDesc}
-                  </p>
+              >
+                <Card className={cn(
+                    "h-full w-full overflow-hidden border-2 transition-all duration-300 relative flex flex-col",
+                    isSelected 
+                        ? cn(type.selectedBorder, type.bgGradient, "shadow-xl ring-1 ring-offset-2 ring-primary/60 dark:ring-offset-slate-900") 
+                        : "border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg"
+                )}>
                   
-                  {/* Mobile "Tap to select" hint */}
-                  <div className="md:hidden flex items-center gap-1 text-xs text-[#5547d0] font-medium mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span>Tap to select</span>
-                    <ArrowRight className="w-3 h-3" />
+                  {/* Popular Badge */}
+                  {type.popular && (
+                    <div className="absolute top-0 right-0 z-20">
+                        <div className="bg-gradient-to-r from-[#ff4e50] to-[#f9d423] text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 fill-current" />
+                            POPULAR
+                        </div>
+                    </div>
+                  )}
+
+                  {/* Content Container */}
+                  <div className="p-5 flex flex-col h-full relative z-10">
+                    
+                    {/* Icon Header */}
+                    <div className="flex justify-between items-start mb-4">
+                        <div className={cn(
+                            "p-3 rounded-xl shadow-sm transition-all duration-300 group-hover:scale-110",
+                            isSelected 
+                                ? cn("bg-gradient-to-br text-white shadow-md ring-1 ring-white/20", type.gradient) 
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700"
+                        )}>
+                            <Icon className="w-6 h-6" />
+                        </div>
+                        
+                        <div className={cn(
+                            "rounded-full p-1 transition-all duration-300",
+                            isSelected 
+                                ? cn("bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm opacity-100 scale-100", type.textColor) 
+                                : "opacity-0 scale-75 group-hover:opacity-100 text-slate-300 dark:text-slate-600"
+                        )}>
+                            <CheckCircle2 className="w-6 h-6" />
+                        </div>
+                    </div>
+
+                    {/* Text Content */}
+                    <div className="space-y-2 mb-4 flex-grow">
+                        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider opacity-70 bg-slate-100 dark:bg-slate-800 inline-block px-2 py-0.5 rounded-md">
+                            {type.shortDesc}
+                        </div>
+                        <h3 className={cn(
+                            "font-bold text-lg transition-colors line-clamp-1",
+                            isSelected ? type.textColor : "text-slate-900 dark:text-slate-100"
+                        )}>
+                            {type.label}
+                        </h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">
+                            {type.description}
+                        </p>
+                    </div>
+
+                    {/* Features (Bullet points) */}
+                    <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800/50 space-y-2">
+                        {type.features.map((feature, i) => (
+                            <div key={i} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                                <div className={cn("w-1.5 h-1.5 rounded-full bg-gradient-to-br shrink-0", type.gradient)} />
+                                <span className="truncate">{feature}</span>
+                            </div>
+                        ))}
+                    </div>
                   </div>
 
-                  {/* Features List (Hidden on mobile to save space/clean look) */}
-                  <div className="space-y-2 mb-4 hidden sm:block bg-slate-50/50 dark:bg-slate-950/30 p-3 rounded-lg border border-slate-100 dark:border-slate-800/50">
-                    {type.features.slice(0, 2).map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-xs">
-                        <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-br ${type.gradient}`} />
-                        <span className="text-slate-600 dark:text-slate-400 truncate">
-                          {feature}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {/* Selection Indicator */}
-                   <div className={`w-full mt-auto pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between transition-opacity duration-300 ${isSelected ? 'opacity-100' : 'opacity-60'}`}>
-                        <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-1">
-                           <span className="w-1 h-1 rounded-full bg-slate-400"></span>
-                           Length
-                        </span>
-                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
-                           {type.recommendedLength.split(' ')[0]}
-                        </span>
-                   </div>
-                </div>
-              </Card>
-            </motion.button>
+                  {/* Hover Effect Gradient Overlay */}
+                  <div className={cn(
+                      "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-[0.08] transition-opacity duration-500 pointer-events-none",
+                      type.gradient
+                  )} />
+                </Card>
+              </div>
+            </motion.div>
           );
         })}
       </div>
 
-      {/* Helper Info */}
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-100 dark:border-blue-800/50 rounded-xl p-5 flex gap-4 items-start shadow-sm"
-      >
-         <div className="shrink-0 mt-1 p-2 bg-blue-100 dark:bg-blue-900/50 rounded-full">
-            <Search className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-         </div>
-         <div className="text-sm text-blue-900 dark:text-blue-100">
-            <p className="font-bold mb-1 text-blue-700 dark:text-blue-300">Bingung pilih yang mana?</p>
-            <p className="opacity-90 leading-relaxed">
-              Pilih <span className="font-bold text-blue-700 dark:text-blue-300">Email Lamaran</span> jika kamu baru melamar kerja. 
-            </p>
-         </div>
-      </motion.div>
+      {/* Help Banner */}
+      <div className="px-1">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 max-w-3xl mx-auto hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+        >
+            <div className="p-2.5 bg-white dark:bg-slate-800 rounded-xl shadow-sm text-blue-500 shrink-0 border border-slate-100 dark:border-slate-700">
+                <Search className="w-5 h-5" />
+            </div>
+            <div className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                <span className="font-bold text-slate-900 dark:text-slate-200 block sm:inline mb-1 sm:mb-0 mr-1">
+                    Bingung pilih yang mana? 
+                </span>
+                Pilih <span className="font-semibold text-blue-600 dark:text-blue-400">"Lamaran Kerja"</span> untuk melamar pekerjaan resmi. Gunakan <span className="font-semibold text-amber-600 dark:text-amber-400">"Job Inquiry"</span> untuk networking.
+            </div>
+        </motion.div>
+      </div>
+
     </div>
   );
 }

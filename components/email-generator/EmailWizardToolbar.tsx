@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Wand2, Loader2, Check } from "lucide-react";
-import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight, Wand2, Loader2, Check, HelpCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface EmailWizardToolbarProps {
   currentStep: number;
@@ -11,6 +11,7 @@ interface EmailWizardToolbarProps {
   onPrevious: () => void;
   canProceed: boolean;
   isGenerating?: boolean;
+  nextStepLabel?: string;
 }
 
 export function EmailWizardToolbar({
@@ -20,65 +21,90 @@ export function EmailWizardToolbar({
   onPrevious,
   canProceed,
   isGenerating = false,
+  nextStepLabel,
 }: EmailWizardToolbarProps) {
-  return (
-    <div className="border-t bg-white/90 dark:bg-slate-950/90 backdrop-blur-md p-4 md:p-6 lg:px-10 shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.1)] relative z-50 safe-area-bottom shrink-0 border-slate-200 dark:border-slate-800">
-      <div className="flex items-center justify-between w-full gap-3 md:gap-4 max-w-2xl mx-auto lg:max-w-none">
-        <Button
-          variant="ghost"
-          onClick={onPrevious}
-          disabled={currentStep === 1 || isGenerating}
-          className="gap-1 md:gap-2 pl-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors text-sm h-10 md:h-11 rounded-full md:rounded-md px-4"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          <span className="font-medium">Kembali</span>
-        </Button>
+  
+  const progress = (currentStep / totalSteps) * 100;
 
-        {/* Progress Dots Mobile - Hidden on very small screens if needed, or adjusted */}
-        <div className="flex gap-1.5 sm:hidden">
-          {Array.from({ length: totalSteps }).map((_, i) => (
-            <div 
-              key={i} 
-              className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                i + 1 === currentStep ? "bg-[#5547d0]" : "bg-slate-200 dark:bg-slate-800"
-              }`} 
-            />
-          ))}
+  return (
+    <div className="w-full px-4 py-4 md:px-8 md:py-5 relative group">
+      {/* Progress Bar Line at Top */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-slate-100 dark:bg-slate-900">
+        <motion.div 
+            className="h-full bg-[#5547d0]"
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+        />
+      </div>
+
+      <div className="flex items-center justify-between w-full max-w-5xl mx-auto">
+        
+        {/* Left Side: Back Button & Progress Text */}
+        <div className="flex items-center gap-4">
+            <Button
+                variant="ghost"
+                onClick={onPrevious}
+                disabled={currentStep === 1 || isGenerating}
+                className="gap-2 pl-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-all text-sm h-10 px-4 rounded-full"
+            >
+                <ChevronLeft className="h-4 w-4" />
+                <span className="hidden sm:inline font-medium">Kembali</span>
+            </Button>
+            
+            <div className="hidden md:flex flex-col">
+                <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Langkah {currentStep} dari {totalSteps}</span>
+            </div>
         </div>
 
-        <Button
-          onClick={onNext}
-          disabled={!canProceed || isGenerating}
-          className={`gap-2 min-w-[120px] md:min-w-[130px] shadow-lg transition-all duration-300 h-11 text-sm md:text-base rounded-full md:rounded-md ${
-            isGenerating 
-             ? "bg-slate-100 text-slate-500"
-             : currentStep === totalSteps
-               ? "bg-[#28c840] hover:bg-[#22aa36] text-white shadow-[#28c840]/20"
-               : "bg-gradient-to-r from-[#5547d0] to-[#00acc7] hover:shadow-[#5547d0]/25 text-white"
-          }`}
-        >
-          {isGenerating ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Menulis...</span>
-            </>
-          ) : currentStep === totalSteps - 1 ? ( // Step before preview is "Generate"
-            <>
-              <Wand2 className="h-4 w-4" />
-              <span>Generate AI</span>
-            </>
-          ) : currentStep === totalSteps ? (
-            <>
-              <Check className="h-4 w-4" />
-              <span>Selesai</span>
-            </>
-          ) : (
-            <>
-              <span>Lanjut</span>
-              <ChevronRight className="h-4 w-4" />
-            </>
-          )}
-        </Button>
+        {/* Right Side: Action Button */}
+        <div className="flex items-center gap-4">
+            {/* Next Step Hint (Desktop) */}
+            {nextStepLabel && currentStep < totalSteps && !isGenerating && (
+                <div className="hidden md:flex flex-col items-end mr-2 animate-in fade-in slide-in-from-right-4 duration-500">
+                    <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Selanjutnya</span>
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{nextStepLabel}</span>
+                </div>
+            )}
+
+            {currentStep !== totalSteps && (
+                <Button
+                    onClick={onNext}
+                    disabled={!canProceed || isGenerating}
+                    size="lg"
+                    className={`
+                        relative overflow-hidden group/btn gap-2 shadow-lg transition-all duration-300 h-11 md:h-12 rounded-full px-6 md:px-8
+                        ${isGenerating 
+                            ? "bg-slate-100 text-slate-500 shadow-none cursor-wait"
+                            : !canProceed
+                                ? "bg-slate-200 text-slate-400 dark:bg-slate-800 dark:text-slate-600 cursor-not-allowed shadow-none" 
+                                : currentStep === totalSteps - 1
+                                    ? "bg-gradient-to-r from-[#5547d0] to-[#7c6bf2] hover:shadow-[#5547d0]/25 hover:shadow-xl hover:scale-[1.02] text-white border-0"
+                                    : "bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 hover:shadow-lg hover:scale-[1.02] text-white"
+                        }
+                    `}
+                >
+                    <div className="relative z-10 flex items-center gap-2">
+                        {isGenerating ? (
+                            <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <span>Menulis Email...</span>
+                            </>
+                        ) : currentStep === totalSteps - 1 ? (
+                            <>
+                                <Wand2 className="h-4 w-4" />
+                                <span className="font-semibold">Generate with AI</span>
+                            </>
+                        ) : (
+                            <>
+                                <span className="font-semibold">Lanjut</span>
+                                <ChevronRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                            </>
+                        )}
+                    </div>
+                </Button>
+            )}
+        </div>
       </div>
     </div>
   );
