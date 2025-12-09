@@ -142,10 +142,9 @@ export function StepSummary({ resume, setResume }: StepSummaryProps) {
                 <Label className="flex items-center gap-2 text-sm">
                   <Target className="h-4 w-4 text-purple-500" />
                   Posisi yang Dituju
-                  <HelpCircle 
-                    className="h-3.5 w-3.5 text-muted-foreground cursor-help" 
-                    title="Posisi spesifik yang Anda lamar, misal: Senior Frontend Developer, Product Manager"
-                  />
+                  <span title="Posisi spesifik yang Anda lamar, misal: Senior Frontend Developer, Product Manager" className="cursor-help">
+                    <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                  </span>
                 </Label>
                 <Input
                   placeholder="misal: Senior Software Engineer"
@@ -180,10 +179,9 @@ export function StepSummary({ resume, setResume }: StepSummaryProps) {
               <Label className="flex items-center gap-2 text-sm">
                 <Trophy className="h-4 w-4 text-yellow-500" />
                 Pencapaian Terbaik (3 Teratas)
-                <HelpCircle 
-                  className="h-3.5 w-3.5 text-muted-foreground cursor-help" 
-                  title="Gunakan angka dan metrik! Contoh: Meningkatkan revenue 30%, Memimpin tim 10 orang, Mengelola budget Rp 500jt"
-                />
+                <span title="Gunakan angka dan metrik! Contoh: Meningkatkan revenue 30%, Memimpin tim 10 orang, Mengelola budget Rp 500jt" className="cursor-help">
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                </span>
               </Label>
               <Textarea
                 placeholder="1. Meningkatkan efisiensi sistem 40%&#10;2. Memimpin tim 8 engineer untuk deliver project on-time&#10;3. Mengurangi bug rate hingga 60%"

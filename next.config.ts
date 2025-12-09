@@ -2,9 +2,8 @@ import type { NextConfig } from "next";
 
 // Forced rebuild for cache clearance: 2025-11-28
 const nextConfig: NextConfig = {
-  // REMOVED: output: "standalone" 
-  // Reason: Vercel tidak perlu ini (punya build system sendiri)
-  // Docker tetap bisa jalan tanpa ini (image sedikit lebih besar tapi OK)
+  // Required for Docker standalone deployment
+  output: "standalone",
   
   // Compression for better performance
   compress: true,

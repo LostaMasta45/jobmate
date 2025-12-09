@@ -12,12 +12,12 @@ export interface SaveEmailData {
   hrdTitle?: string;
   jobSource?: string;
   referralName?: string;
-  
+
   // Tone & Style
   toneStyle: string;
   personality: string;
   lengthType: string;
-  
+
   // Content
   subjectLine: string;
   bodyContent: string;
@@ -26,7 +26,7 @@ export interface SaveEmailData {
   includeWhyCompany: boolean;
   includeWhyYou: boolean;
   hasAttachment: boolean;
-  
+
   // Metadata
   status?: string;
   notes?: string;
@@ -36,10 +36,10 @@ export interface SaveEmailData {
 export async function saveEmailDraft(data: SaveEmailData) {
   try {
     const supabase = await createClient();
-    
+
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+
     if (authError || !user) {
       return { error: "Unauthorized: Please login first" };
     }
@@ -93,6 +93,8 @@ export async function saveEmailDraft(data: SaveEmailData) {
     }
 
     revalidatePath("/tools/email-generator");
+    revalidatePath("/tools/email-generator2");
+    revalidatePath("/tools/email-generator2/history");
     return { data: draft };
   } catch (error: any) {
     console.error("Error in saveEmailDraft:", error);
