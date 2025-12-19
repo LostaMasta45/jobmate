@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { getProfile } from "@/lib/supabase/server";
-import { EmailHistory } from "@/components/email-generator/EmailHistory";
+import { EmailHistory } from "@/components/email-generator-legacy/EmailHistory";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Mail, Sparkles } from "lucide-react";
 import Link from "next/link";

@@ -1,7 +1,7 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
 import { getProfile } from "@/lib/supabase/server";
-import { EmailGeneratorMain } from "@/components/email-generator/EmailGeneratorMain";
+import { EmailGeneratorMain } from "@/components/email-generator-legacy/EmailGeneratorMain";
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +16,7 @@ export default async function EmailGeneratorPage() {
         title="Email Generator"
         description="Buat email profesional"
       />
-      
+
       <EmailGeneratorMain />
     </AppShell>
   );
