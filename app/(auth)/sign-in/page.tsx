@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingScreen } from "@/components/ui/loading-screen";
 import { createClient } from "@/lib/supabase/client";
-import { 
-  Eye, EyeOff, AlertCircle, Mail, KeyRound, 
+import {
+  Eye, EyeOff, AlertCircle, Mail, KeyRound,
   Shield, CheckCircle2, Star, Briefcase, Users, TrendingUp, ArrowRight, Rocket
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -21,7 +21,7 @@ import MobileSignInView from "@/components/auth/MobileSignInView";
 export default function SignInPage() {
   const isMobile = useIsMobile();
   const router = useRouter();
-  
+
   // State
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -30,12 +30,12 @@ export default function SignInPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
   const [rememberMe, setRememberMe] = React.useState(false);
-  
+
   // Validation State
   const [emailError, setEmailError] = React.useState<string | null>(null);
   const [passwordError, setPasswordError] = React.useState<string | null>(null);
   const [isFocused, setIsFocused] = React.useState<string | null>(null);
-  
+
   // Rate Limiting
   const [loginAttempts, setLoginAttempts] = React.useState(0);
   const [isRateLimited, setIsRateLimited] = React.useState(false);
@@ -113,7 +113,7 @@ export default function SignInPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (isRateLimited) {
       setError(`Terlalu banyak percobaan. Tunggu ${rateLimitTimer} detik.`);
       return;
@@ -176,7 +176,7 @@ export default function SignInPage() {
       setShowLoadingScreen(true);
       await new Promise(resolve => setTimeout(resolve, 2000));
       window.location.replace(redirectPath);
-      
+
     } catch (err) {
       console.error("Login error:", err);
       setError("Terjadi kesalahan sistem.");
@@ -185,9 +185,30 @@ export default function SignInPage() {
     }
   };
 
-  // Prevent Hydration Mismatch
-  if (!isMounted) {
-    return null;
+  // Show loading skeleton during hydration to prevent blank page flash
+  if (!isMounted || isMobile === undefined) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          {/* Logo */}
+          <div className="relative h-24 w-24 animate-pulse">
+            <Image
+              src="/Logo/x.png"
+              alt="JobMate Logo"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+          {/* Loading dots */}
+          <div className="flex gap-1.5">
+            <div className="h-2 w-2 rounded-full bg-brand animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="h-2 w-2 rounded-full bg-brand animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="h-2 w-2 rounded-full bg-brand animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Mobile View
@@ -199,38 +220,38 @@ export default function SignInPage() {
   return (
     <>
       {showLoadingScreen && <LoadingScreen message="Memuat dashboard..." />}
-      
+
       <div className="flex min-h-screen w-full overflow-hidden bg-background">
-        
+
         {/* === LEFT SIDE: FORM === */}
-        <div className="relative flex w-full flex-col justify-center px-8 sm:px-12 lg:w-[45%] xl:w-[40%] h-screen border-r border-border/40 shadow-xl z-20 bg-background/80 backdrop-blur-md">
-          
+        <div className="relative flex w-full flex-col justify-center px-8 sm:px-12 lg:w-[50%] xl:w-[40%] h-screen border-r border-border/40 shadow-xl z-20 bg-background/80 backdrop-blur-md overflow-y-auto scrollbar-hide">
+
           {/* Brand Logo */}
           <div className="absolute top-8 left-8 sm:left-12 z-50">
-             <Link href="/" className="block group">
-               <div className="relative h-32 w-32 transition-transform group-hover:scale-105">
-                  <Image 
-                    src="/Logo/x.png" 
-                    alt="JobMate Logo" 
-                    fill 
-                    className="object-contain object-left" 
-                    priority 
-                  />
-               </div>
-             </Link>
+            <Link href="/" className="block group">
+              <div className="relative h-24 w-24 sm:h-32 sm:w-32 transition-transform group-hover:scale-105">
+                <Image
+                  src="/Logo/x.png"
+                  alt="JobMate Logo"
+                  fill
+                  className="object-contain object-left"
+                  priority
+                />
+              </div>
+            </Link>
           </div>
 
-          <div className="mx-auto w-full max-w-sm space-y-8">
+          <div className="mx-auto w-full max-w-sm space-y-8 py-12">
             {/* Header */}
             <div className="space-y-2">
-              <motion.h1 
+              <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="text-3xl font-bold tracking-tight sm:text-4xl"
               >
                 Welcome Back
               </motion.h1>
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
@@ -281,8 +302,8 @@ export default function SignInPage() {
                     />
                     <AnimatePresence>
                       {email && !emailError && (
-                        <motion.div 
-                          initial={{ scale: 0 }} 
+                        <motion.div
+                          initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500"
                         >
@@ -298,8 +319,8 @@ export default function SignInPage() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
-                    <Link 
-                      href="/reset" 
+                    <Link
+                      href="/reset"
                       className="text-xs font-medium text-brand hover:text-brand/80 hover:underline"
                     >
                       Lupa password?
@@ -349,8 +370,8 @@ export default function SignInPage() {
               </div>
 
               <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="remember" 
+                <Checkbox
+                  id="remember"
                   checked={rememberMe}
                   onCheckedChange={(c) => setRememberMe(!!c)}
                 />
@@ -362,16 +383,16 @@ export default function SignInPage() {
                 </label>
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={loading || isRateLimited}
                 className="w-full h-11 bg-brand hover:bg-brand/90 text-base shadow-lg shadow-brand/20 transition-all hover:-translate-y-0.5 active:translate-y-0"
               >
                 {loading ? (
-                   <div className="flex items-center gap-2">
-                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                     <span>Masuk...</span>
-                   </div>
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <span>Masuk...</span>
+                  </div>
                 ) : (
                   "Masuk Sekarang"
                 )}
@@ -390,14 +411,14 @@ export default function SignInPage() {
                   </span>
                 </div>
               </div>
-              
+
               <div className="flex flex-col gap-2">
                 <Link href="/ajukan-akun">
-                   <Button variant="outline" className="w-full h-11 border-dashed hover:border-brand hover:text-brand hover:bg-brand/5 transition-colors">
-                     Ajukan Pembuatan Akun
-                   </Button>
+                  <Button variant="outline" className="w-full h-11 border-dashed hover:border-brand hover:text-brand hover:bg-brand/5 transition-colors">
+                    Ajukan Pembuatan Akun
+                  </Button>
                 </Link>
-                <Link 
+                <Link
                   href="/cek-status-pengajuan"
                   className="inline-flex items-center justify-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
                 >
@@ -419,147 +440,147 @@ export default function SignInPage() {
 
         {/* === RIGHT SIDE: VISUAL === */}
         <div className="relative hidden w-0 flex-1 lg:flex h-screen overflow-hidden bg-[#0a0a0a]">
-          
+
           {/* Animated Background Elements */}
           <div className="absolute inset-0 overflow-hidden">
             {/* Mesh Gradients */}
             <div className="absolute -top-[20%] -right-[10%] h-[800px] w-[800px] rounded-full bg-indigo-600/20 blur-[120px] animate-pulse duration-[8000ms]" />
             <div className="absolute top-[40%] -left-[20%] h-[600px] w-[600px] rounded-full bg-blue-600/10 blur-[100px] animate-pulse duration-[10000ms]" />
             <div className="absolute bottom-[-10%] right-[10%] h-[500px] w-[500px] rounded-full bg-purple-600/20 blur-[120px] animate-pulse duration-[6000ms]" />
-            
+
             {/* Digital Grid Pattern */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
           </div>
 
           {/* Content Overlay */}
-          <div className="relative z-10 flex h-full w-full flex-col justify-between p-16 text-white">
-            
+          <div className="relative z-10 flex h-full w-full flex-col justify-between p-12 xl:p-16 text-white max-w-[1920px] mx-auto">
+
             {/* Top Badge */}
             <div className="flex justify-end">
-               <motion.div 
-                 initial={{ opacity: 0, y: -20 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ delay: 0.5 }}
-                 className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1.5 backdrop-blur-xl border border-white/10 shadow-2xl"
-               >
-                  <div className="flex gap-1">
-                     <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                     <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse delay-75" />
-                     <div className="h-2 w-2 rounded-full bg-purple-500 animate-pulse delay-150" />
-                  </div>
-                  <span className="text-xs font-medium text-white/80">AI-Powered Career Growth</span>
-               </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1.5 backdrop-blur-xl border border-white/10 shadow-2xl"
+              >
+                <div className="flex gap-1">
+                  <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                  <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse delay-75" />
+                  <div className="h-2 w-2 rounded-full bg-purple-500 animate-pulse delay-150" />
+                </div>
+                <span className="text-xs font-medium text-white/80">AI-Powered Career Growth</span>
+              </motion.div>
             </div>
 
             {/* Main Visual: Holographic Career Hub */}
-            <div className="flex flex-1 items-center justify-center relative perspective-1000">
-               
-               {/* Central Glowing Core */}
-               <div className="relative">
-                  <motion.div 
-                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                    className="absolute inset-0 bg-gradient-to-r from-brand to-blue-500 rounded-full blur-3xl opacity-50"
-                  />
-                  <div className="relative h-32 w-32 bg-black/40 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center shadow-[0_0_50px_-12px_rgba(255,255,255,0.3)] z-10">
-                     <Rocket className="h-12 w-12 text-white" />
-                  </div>
+            <div className="flex flex-1 items-center justify-center relative perspective-1000 min-h-[500px]">
 
-                  {/* Orbiting Rings */}
-                  <div className="absolute inset-[-50px] border border-white/5 rounded-full animate-spin-slow" style={{ animationDuration: '20s' }} />
-                  <div className="absolute inset-[-100px] border border-dashed border-white/10 rounded-full animate-spin-reverse-slow" style={{ animationDuration: '30s' }} />
-               </div>
+              {/* Central Glowing Core */}
+              <div className="relative z-20">
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                  className="absolute inset-0 bg-gradient-to-r from-brand to-blue-500 rounded-full blur-3xl opacity-50"
+                />
+                <div className="relative h-24 w-24 xl:h-32 xl:w-32 bg-black/40 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center shadow-[0_0_50px_-12px_rgba(255,255,255,0.3)] z-10">
+                  <Rocket className="h-10 w-10 xl:h-12 xl:w-12 text-white" />
+                </div>
 
-               {/* Floating Success Cards */}
-               {/* Card 1: Job Offer */}
-               <motion.div 
-                 initial={{ x: 50, opacity: 0 }}
-                 animate={{ x: 0, opacity: 1, y: [0, -10, 0] }}
-                 transition={{ duration: 5, repeat: Infinity, repeatType: "reverse", delay: 0.2 }}
-                 className="absolute right-0 top-1/4 w-64 bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl p-4 rounded-2xl border border-white/10 shadow-2xl"
-               >
-                  <div className="flex items-start gap-4">
-                     <div className="h-10 w-10 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
-                        <CheckCircle2 className="h-5 w-5 text-green-400" />
-                     </div>
-                     <div>
-                        <h4 className="text-sm font-semibold text-white">Job Offer Received</h4>
-                        <p className="text-xs text-white/60 mt-1">Senior UX Designer</p>
-                        <div className="mt-2 inline-block px-2 py-0.5 rounded bg-green-500/20 text-[10px] text-green-400 font-medium">
-                           +35% Salary Increase
-                        </div>
-                     </div>
-                  </div>
-               </motion.div>
+                {/* Orbiting Rings */}
+                <div className="absolute inset-[-40px] xl:inset-[-50px] border border-white/5 rounded-full animate-spin-slow" style={{ animationDuration: '20s' }} />
+                <div className="absolute inset-[-80px] xl:inset-[-100px] border border-dashed border-white/10 rounded-full animate-spin-reverse-slow" style={{ animationDuration: '30s' }} />
+              </div>
 
-               {/* Card 2: Interview Schedule */}
-               <motion.div 
-                 initial={{ x: -50, opacity: 0 }}
-                 animate={{ x: 0, opacity: 1, y: [0, 15, 0] }}
-                 transition={{ duration: 6, repeat: Infinity, repeatType: "reverse", delay: 0.5 }}
-                 className="absolute left-[-20px] bottom-1/3 w-56 bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl p-4 rounded-2xl border border-white/10 shadow-2xl"
-               >
-                  <div className="flex items-center gap-3 mb-3">
-                     <div className="h-2 w-2 rounded-full bg-orange-500" />
-                     <span className="text-xs font-medium text-white/80">Upcoming Interview</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                     <div className="h-8 w-8 rounded-lg bg-white/10" />
-                     <div>
-                        <div className="h-2 w-24 bg-white/20 rounded-full mb-1.5" />
-                        <div className="h-2 w-16 bg-white/10 rounded-full" />
-                     </div>
-                  </div>
-               </motion.div>
-
-               {/* Card 3: Profile Views */}
-               <motion.div 
-                 initial={{ y: 50, opacity: 0 }}
-                 animate={{ y: 0, opacity: 1, x: [0, 10, 0] }}
-                 transition={{ duration: 7, repeat: Infinity, repeatType: "reverse", delay: 0.8 }}
-                 className="absolute bottom-0 right-1/3 bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl p-4 rounded-2xl border border-white/10 shadow-2xl flex items-center gap-4"
-               >
-                  <div className="flex -space-x-3">
-                     {[1,2,3].map((i) => (
-                        <div key={i} className="h-8 w-8 rounded-full border-2 border-black bg-gradient-to-br from-indigo-400 to-purple-400" />
-                     ))}
+              {/* Floating Success Cards - positioned relatively to container for better responsiveness */}
+              {/* Card 1: Job Offer - Top Right */}
+              <motion.div
+                initial={{ x: 50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1, y: [0, -10, 0] }}
+                transition={{ duration: 5, repeat: Infinity, repeatType: "reverse", delay: 0.2 }}
+                className="absolute right-[-20px] lg:right-[-40px] xl:right-0 top-[15%] w-56 lg:w-60 xl:w-64 bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl p-4 rounded-2xl border border-white/10 shadow-2xl z-30 scale-90 xl:scale-100"
+              >
+                <div className="flex items-start gap-3 xl:gap-4">
+                  <div className="h-8 w-8 xl:h-10 xl:w-10 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="h-4 w-4 xl:h-5 xl:w-5 text-green-400" />
                   </div>
                   <div>
-                     <p className="text-xs text-white/60">Recruiters viewed you</p>
-                     <p className="text-lg font-bold">+127 <span className="text-xs font-normal text-green-400">this week</span></p>
+                    <h4 className="text-sm font-semibold text-white">Job Offer Received</h4>
+                    <p className="text-xs text-white/60 mt-0.5">Senior UX Designer</p>
+                    <div className="mt-2 inline-block px-2 py-0.5 rounded bg-green-500/20 text-[10px] text-green-400 font-medium">
+                      +35% Salary Increase
+                    </div>
                   </div>
-               </motion.div>
+                </div>
+              </motion.div>
+
+              {/* Card 2: Interview Schedule - Left Center/Bottom */}
+              <motion.div
+                initial={{ x: -50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1, y: [0, 15, 0] }}
+                transition={{ duration: 6, repeat: Infinity, repeatType: "reverse", delay: 0.5 }}
+                className="absolute left-[-40px] lg:left-[-60px] xl:left-[-20px] bottom-[25%] xl:bottom-[30%] w-52 xl:w-56 bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl p-4 rounded-2xl border border-white/10 shadow-2xl z-20 scale-90 xl:scale-100"
+              >
+                <div className="flex items-center gap-2 xl:gap-3 mb-3">
+                  <div className="h-2 w-2 rounded-full bg-orange-500" />
+                  <span className="text-xs font-medium text-white/80">Upcoming Interview</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-lg bg-white/10" />
+                  <div>
+                    <div className="h-2 w-20 xl:w-24 bg-white/20 rounded-full mb-1.5" />
+                    <div className="h-2 w-12 xl:w-16 bg-white/10 rounded-full" />
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Card 3: Profile Views - Bottom Right */}
+              <motion.div
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1, x: [0, 10, 0] }}
+                transition={{ duration: 7, repeat: Infinity, repeatType: "reverse", delay: 0.8 }}
+                className="absolute bottom-5 right-[10%] xl:right-1/4 bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl p-4 rounded-2xl border border-white/10 shadow-2xl flex items-center gap-4 z-20 scale-90 xl:scale-100"
+              >
+                <div className="flex -space-x-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-6 w-6 xl:h-8 xl:w-8 rounded-full border-2 border-black bg-gradient-to-br from-indigo-400 to-purple-400" />
+                  ))}
+                </div>
+                <div>
+                  <p className="text-[10px] xl:text-xs text-white/60">Recruiters viewed</p>
+                  <p className="text-base xl:text-lg font-bold">+127 <span className="text-xs font-normal text-green-400">this week</span></p>
+                </div>
+              </motion.div>
 
             </div>
 
             {/* Bottom Quote - Encouraging Copywriting */}
             <div className="max-w-md">
-               <motion.div 
-                 initial={{ opacity: 0, y: 20 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ delay: 0.8 }}
-                 className="relative"
-               >
-                 <div className="mb-4">
-                    <h3 className="text-2xl font-bold text-white mb-2">
-                      Wujudkan Karir Impianmu
-                    </h3>
-                    <div className="h-1 w-16 bg-gradient-to-r from-brand to-blue-500 rounded-full"></div>
-                 </div>
-                 
-                 <blockquote className="text-lg font-light leading-relaxed text-white/90 relative z-10">
-                   "Jangan menunggu peluang datang, tapi ciptakanlah. Setiap lamaran adalah langkah menuju masa depan yang lebih cerah. Tetap semangat dan percayalah pada prosesnya."
-                 </blockquote>
-                 
-                 <div className="mt-6 flex items-center gap-2">
-                    <div className="px-3 py-1 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-white/80">
-                      #PejuangKarir
-                    </div>
-                    <div className="px-3 py-1 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-white/80">
-                      #SuksesBersamaJobMate
-                    </div>
-                 </div>
-               </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+                className="relative"
+              >
+                <div className="mb-4">
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    Wujudkan Karir Impianmu
+                  </h3>
+                  <div className="h-1 w-16 bg-gradient-to-r from-brand to-blue-500 rounded-full"></div>
+                </div>
+
+                <blockquote className="text-lg font-light leading-relaxed text-white/90 relative z-10">
+                  "Jangan menunggu peluang datang, tapi ciptakanlah. Setiap lamaran adalah langkah menuju masa depan yang lebih cerah."
+                </blockquote>
+
+                <div className="mt-6 flex flex-wrap items-center gap-2">
+                  <div className="px-3 py-1 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-white/80">
+                    #PejuangKarir
+                  </div>
+                  <div className="px-3 py-1 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-white/80">
+                    #SuksesBersamaJobMate
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </div>
         </div>

@@ -17,9 +17,10 @@ interface AppShellProps {
   };
   isAdmin?: boolean;
   hideMobileHeader?: boolean;
+  isFullScreen?: boolean;
 }
 
-export function AppShell({ children, user, isAdmin = false, hideMobileHeader = false }: AppShellProps) {
+export function AppShell({ children, user, isAdmin = false, hideMobileHeader = false, isFullScreen = false }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const pathname = usePathname();
   const hideBottomBar = shouldHideBottomBar(pathname);
@@ -50,8 +51,8 @@ export function AppShell({ children, user, isAdmin = false, hideMobileHeader = f
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <Sidebar 
-        isAdmin={isAdmin} 
+      <Sidebar
+        isAdmin={isAdmin}
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
       />
@@ -62,19 +63,26 @@ export function AppShell({ children, user, isAdmin = false, hideMobileHeader = f
             <VIPHeader />
           </div>
         )}
-        
+
         {/* Desktop Topbar - hidden on mobile */}
         <div className="hidden lg:block">
           <Topbar user={user} />
         </div>
-        
-        {/* Main content with top padding for VIPHeader and conditional bottom padding */}
-        <main className={`flex-1 overflow-y-auto bg-background p-3 sm:p-4 md:p-6 lg:p-8 ${hideMobileHeader ? '' : 'pt-12 sm:pt-14'} lg:pt-8 ${getMainPaddingClass(hideBottomBar)}`}>
-          <div className="mx-auto max-w-7xl w-full">{children}</div>
+
+        {/* Main content */}
+        <main className={`flex-1 bg-background ${isFullScreen
+          ? 'overflow-hidden flex flex-col'
+          : `overflow-y-auto p-3 sm:p-4 md:p-6 lg:p-8 ${hideMobileHeader ? '' : 'pt-12 sm:pt-14'} lg:pt-8 ${getMainPaddingClass(hideBottomBar)}`
+          }`}>
+          {isFullScreen ? (
+            children
+          ) : (
+            <div className="mx-auto max-w-7xl w-full">{children}</div>
+          )}
         </main>
-        
+
         {/* Mobile Bottom Navigation Bar - Always visible on mobile */}
-        <BottomBar />
+        {!isFullScreen && <BottomBar />}
       </div>
     </div>
   );

@@ -1,400 +1,390 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { EmailFormData } from "./types";
-import { generateEmailWithAI } from "@/actions/email/generate";
-import { saveEmailDraft } from "@/actions/email/save";
-import { 
-  Loader2, Copy, Save, RefreshCw, CheckCircle2, 
-  Send, Paperclip, MoreVertical, 
-  Bold, Italic, Underline, AlignLeft, X, User,
-  Undo2, Sparkles, Globe2, Zap
+import { Label } from "@/components/ui/label";
+import {
+    Copy, Check, Mail, Save, RefreshCw, Loader2,
+    Edit3, X, Sparkles, ExternalLink, CheckCircle2,
+    Lightbulb, AlertCircle, Quote
 } from "lucide-react";
 import { toast } from "sonner";
-import { EmailSuggestions } from "./EmailSuggestions";
-import { QuickRefinements } from "./QuickRefinements";
-import { Separator } from "@/components/ui/separator";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import type { EmailFormDataV2 } from "./EmailWizardV2";
+import { EmailVariationsV2 } from "./EmailVariationsV2";
 
 interface StepPreviewProps {
-  formData: EmailFormData;
-  updateFormData: (data: Partial<EmailFormData>) => void;
+    formData: Partial<EmailFormDataV2> & { generatedEmail: string; subjectLine: string; position: string; companyName: string; fullName: string };
+    updateFormData: (data: Partial<EmailFormDataV2>) => void;
+    onRegenerate: () => Promise<void>;
+    onReset?: () => void;
+    isGenerating: boolean;
+    emailType?: 'application' | 'follow_up' | 'thank_you' | 'inquiry';
 }
 
-export function StepPreview({ formData, updateFormData }: StepPreviewProps) {
-  const [generating, setGenerating] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState<'id' | 'en'>('id');
-  const [showAnalysis, setShowAnalysis] = useState(false);
-  
-  // History Management for Undo
-  const [history, setHistory] = useState<string[]>([]);
-  const [canUndo, setCanUndo] = useState(false);
+export function StepPreview({
+    formData,
+    updateFormData,
+    onRegenerate,
+    onReset,
+    isGenerating,
+    emailType = 'application'
+}: StepPreviewProps) {
+    const [copied, setCopied] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
+    const [editedBody, setEditedBody] = useState(formData.generatedEmail);
+    const [editedSubject, setEditedSubject] = useState(formData.subjectLine);
 
-  // Initialize history
-  useEffect(() => {
-    if (formData.bodyContent && history.length === 0) {
-      setHistory([formData.bodyContent]);
-    }
-  }, [formData.bodyContent]);
+    const handleCopy = async () => {
+        const fullEmail = `Subject: ${formData.subjectLine}\n\n${formData.generatedEmail}`;
+        try {
+            await navigator.clipboard.writeText(fullEmail);
+            setCopied(true);
+            toast.success("Email dicopy ke clipboard!");
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            toast.error("Gagal copy email");
+        }
+    };
 
-  const pushToHistory = (newContent: string) => {
-    setHistory(prev => [...prev, newContent]);
-    setCanUndo(true);
-  };
+    const handleOpenEmail = () => {
+        const subject = encodeURIComponent(formData.subjectLine);
+        const body = encodeURIComponent(formData.generatedEmail);
+        window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+    };
 
-  const handleUndo = () => {
-    if (history.length > 1) {
-      const previousContent = history[history.length - 2];
-      const newHistory = history.slice(0, -1);
-      setHistory(newHistory);
-      updateFormData({ bodyContent: previousContent });
-      
-      if (newHistory.length <= 1) {
-        setCanUndo(false);
-      }
-      toast.info("Perubahan dibatalkan");
-    }
-  };
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            const { saveEmailDraft } = await import("@/actions/email/save");
 
-  const handleRefineUpdate = (refinedEmail: string) => {
-    pushToHistory(refinedEmail);
-    updateFormData({ bodyContent: refinedEmail });
-  };
+            const result = await saveEmailDraft({
+                emailType: emailType,
+                position: formData.position || '',
+                companyName: formData.companyName || '',
+                hrdName: formData.hrdName || '',
+                toneStyle: 'semi-formal', // Ideally these should come from formData if available
+                personality: 'balanced',
+                lengthType: 'medium',
+                subjectLine: formData.subjectLine,
+                bodyContent: formData.generatedEmail,
+                highlightSkills: formData.skills ? formData.skills.split(',').map(s => s.trim()) : [],
+                achievements: '',
+                includeWhyCompany: false,
+                includeWhyYou: true,
+                hasAttachment: true,
+                status: 'draft',
+            });
 
-  // Auto-generate on mount if not already generated
-  useEffect(() => {
-    if (!formData.bodyContent && !generating) {
-      handleGenerate('id');
-    }
-  }, []);
+            if (result.error) {
+                toast.error("Gagal menyimpan: " + result.error);
+                return;
+            }
 
-  const handleGenerate = async (language: 'id' | 'en' = 'id') => {
-    setGenerating(true);
-    setCurrentLanguage(language);
-    try {
-      const result = await generateEmailWithAI({
-        language,
-        emailType: formData.emailType as "application" | "follow_up" | "thank_you" | "inquiry",
-        position: formData.position,
-        companyName: formData.companyName,
-        hrdName: formData.hrdName,
-        hrdTitle: formData.hrdTitle,
-        jobSource: formData.jobSource,
-        referralName: formData.referralName,
-        hasAttachment: formData.hasAttachment,
-        yourName: formData.yourName,
-        currentRole: formData.currentRole,
-        yearsExperience: formData.yearsExperience,
-        toneStyle: (formData.toneStyle === 'professional' ? 'semi-formal' : formData.toneStyle) as any,
-        personality: formData.personality || 'balanced',
-        lengthType: formData.lengthType || 'medium',
-        highlightSkills: formData.highlightSkills,
-        achievements: formData.achievements,
-        includeWhyCompany: formData.includeWhyCompany,
-        includeWhyYou: formData.includeWhyYou,
-        callToAction: formData.callToAction,
-        personalStory: formData.personalStory,
-        openingStyle: formData.openingStyle,
-        toneSettings: formData.toneSettings,
-      });
+            setIsSaved(true);
+            toast.success("Email tersimpan ke riwayat!");
+        } catch (error) {
+            toast.error("Terjadi kesalahan saat menyimpan");
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
-      if (result.error) {
-        toast.error("Gagal generate email: " + result.error);
-        return;
-      }
+    const handleRegenerate = async () => {
+        setIsSaved(false);
+        await onRegenerate();
+    };
 
-      // Reset history on new generation
-      setHistory([result.body || '']);
-      setCanUndo(false);
+    const handleStartEdit = () => {
+        setEditedBody(formData.generatedEmail);
+        setEditedSubject(formData.subjectLine);
+        setIsEditing(true);
+    };
 
-      updateFormData({
-        subjectLine: result.subject,
-        bodyContent: result.body,
-      });
+    const handleSaveEdit = () => {
+        updateFormData({
+            generatedEmail: editedBody,
+            subjectLine: editedSubject
+        });
+        setIsEditing(false);
+        setIsSaved(false);
+        toast.success("Perubahan disimpan!");
+    };
 
-      toast.success("Email berhasil di-generate!");
-    } catch (error: any) {
-      console.error("Error generating email:", error);
-      toast.error("Terjadi kesalahan saat generate email");
-    } finally {
-      setGenerating(false);
-    }
-  };
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setEditedBody(formData.generatedEmail);
+        setEditedSubject(formData.subjectLine);
+    };
 
-  const handleCopy = async () => {
-    const fullEmail = `Subject: ${formData.subjectLine}\n\n${formData.bodyContent}`;
-    try {
-      await navigator.clipboard.writeText(fullEmail);
-      toast.success("Email berhasil dicopy ke clipboard!");
-    } catch (error) {
-      toast.error("Gagal copy email");
-    }
-  };
+    const wordCount = formData.generatedEmail.split(/\s+/).filter(Boolean).length;
 
-  const handleSave = async () => {
-    if (!formData.subjectLine || !formData.bodyContent) {
-      toast.error("Harap generate email terlebih dahulu");
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const result = await saveEmailDraft({
-        emailType: formData.emailType as "application" | "follow_up" | "thank_you" | "inquiry",
-        position: formData.position,
-        companyName: formData.companyName,
-        hrdName: formData.hrdName,
-        hrdTitle: formData.hrdTitle,
-        jobSource: formData.jobSource,
-        referralName: formData.referralName,
-        toneStyle: (formData.toneStyle === 'professional' ? 'semi-formal' : formData.toneStyle) as any,
-        personality: formData.personality || 'balanced',
-        lengthType: formData.lengthType || 'medium',
-        subjectLine: formData.subjectLine,
-        bodyContent: formData.bodyContent,
-        highlightSkills: formData.highlightSkills,
-        achievements: formData.achievements,
-        includeWhyCompany: formData.includeWhyCompany,
-        includeWhyYou: formData.includeWhyYou,
-        hasAttachment: formData.hasAttachment,
-        status: 'draft',
-      });
-
-      if (result.error) {
-        toast.error("Gagal menyimpan: " + result.error);
-        return;
-      }
-
-      setSaved(true);
-      toast.success("Email berhasil disimpan!");
-    } catch (error: any) {
-      console.error("Error saving email:", error);
-      toast.error("Terjadi kesalahan saat menyimpan");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const wordCount = formData.bodyContent ? formData.bodyContent.split(/\s+/).length : 0;
-  
-  // Mock data for the email UI
-  const hrdNameDisplay = formData.hrdName || "Hiring Manager";
-  
-  if (generating) {
     return (
-        <div className="min-h-[500px] flex flex-col items-center justify-center text-center p-8 animate-in fade-in duration-500">
-          <div className="relative mb-6">
-            <div className="absolute inset-0 bg-[#5547d0]/20 rounded-full blur-2xl animate-pulse"></div>
-            <div className="relative bg-white dark:bg-slate-900 p-6 rounded-full shadow-lg border border-[#5547d0]/10">
-                <Loader2 className="h-12 w-12 text-[#5547d0] animate-spin" />
-            </div>
-          </div>
-          <h3 className="font-bold text-2xl mb-2 text-slate-800 dark:text-slate-100">Sedang Menulis Email...</h3>
-          <p className="text-slate-500 dark:text-slate-400 max-w-md leading-relaxed">
-            AI sedang merangkai kata-kata terbaik untuk lamaran kerjamu. 
-            Mengoptimalkan tone, struktur, dan personalisasi.
-          </p>
-        </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-5xl mx-auto">
-        
-        {/* Top Actions Bar */}
-        <div className="sticky top-0 z-20 flex flex-col md:flex-row justify-between items-center gap-4 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 shadow-sm">
-            
-            {/* Language Toggle */}
-            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-lg">
-                <button
-                    onClick={() => handleGenerate('id')}
-                    className={cn(
-                        "px-4 py-1.5 text-sm font-medium rounded-md transition-all flex items-center gap-2",
-                        currentLanguage === 'id' 
-                            ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm" 
-                            : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-300"
-                    )}
-                >
-                    <span>🇮🇩</span> Bahasa
-                </button>
-                <button
-                    onClick={() => handleGenerate('en')}
-                    className={cn(
-                        "px-4 py-1.5 text-sm font-medium rounded-md transition-all flex items-center gap-2",
-                        currentLanguage === 'en' 
-                            ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm" 
-                            : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-300"
-                    )}
-                >
-                    <span>🇬🇧</span> English
-                </button>
-            </div>
-
-            <div className="flex items-center gap-3 w-full md:w-auto">
-                <Button 
-                    onClick={() => setShowAnalysis(!showAnalysis)} 
-                    variant="outline" 
-                    size="sm" 
-                    className={cn(
-                        "gap-2 border-slate-200 dark:border-slate-800",
-                        showAnalysis ? "bg-[#5547d0]/10 text-[#5547d0] border-[#5547d0]/20" : ""
-                    )}
-                >
-                    <Sparkles className={cn("h-4 w-4", showAnalysis ? "text-[#5547d0]" : "text-amber-500")} />
-                    {showAnalysis ? "Hide AI Analysis" : "Analyze Email"}
-                </Button>
-                
-                <Separator orientation="vertical" className="h-6 hidden md:block" />
-                
-                <Button onClick={handleSave} disabled={saved || saving} variant="outline" size="sm" className="gap-2">
-                    {saved ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <Save className="h-4 w-4" />}
-                    {saved ? "Saved" : "Save Draft"}
-                </Button>
-            </div>
-        </div>
-
-        {/* Analysis Panel (Collapsible) */}
-        {showAnalysis && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in slide-in-from-top-4 fade-in duration-300">
-                <EmailSuggestions email={formData.bodyContent || ''} formData={formData} />
-                <Card className="p-5 bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 border-slate-200 dark:border-slate-800 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-semibold flex items-center gap-2">
-                            <Zap className="h-4 w-4 text-[#5547d0]" />
-                            Quick Refinements
-                        </h3>
-                        {canUndo && (
-                            <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                onClick={handleUndo}
-                                className="h-8 text-xs gap-1 text-muted-foreground hover:text-foreground"
-                            >
-                                <Undo2 className="h-3 w-3" />
-                                Undo
-                            </Button>
-                        )}
-                    </div>
-                    <QuickRefinements
-                        currentEmail={formData.bodyContent || ''}
-                        onRefine={handleRefineUpdate}
-                        disabled={generating}
-                    />
-                </Card>
-            </div>
-        )}
-
-        {/* EMAIL CLIENT UI */}
-        <div className="relative mx-auto shadow-2xl rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 ring-1 ring-slate-900/5">
-            
-            {/* Window Header (Mac style) */}
-            <div className="h-12 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-800 flex items-center px-5 justify-between">
-                <div className="flex gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#ff5f57] border border-[#e0443e]" />
-                    <div className="w-3 h-3 rounded-full bg-[#febc2e] border border-[#d89e24]" />
-                    <div className="w-3 h-3 rounded-full bg-[#28c840] border border-[#1aab29]" />
-                </div>
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">New Message</div>
-                <div className="w-10" />
-            </div>
-
-            {/* Email Header Fields */}
-            <div className="px-6 pt-4 pb-2 bg-white dark:bg-slate-950 space-y-1">
-                <div className="flex items-center py-1">
-                    <span className="text-sm text-slate-400 w-16 shrink-0 font-medium">To:</span>
-                    <div className="flex-1 flex items-center gap-2">
-                        <div className="bg-slate-100 dark:bg-slate-800 text-xs px-3 py-1 rounded-full flex items-center gap-1.5 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                             <User className="h-3 w-3 text-slate-400" />
-                             <span className="font-medium">{hrdNameDisplay}</span>
-                             <X className="h-3 w-3 cursor-pointer hover:text-red-500 transition-colors" />
+        <div className="space-y-6">
+            {/* Email Preview Card */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+            >
+                <Card className="overflow-hidden shadow-xl border-0 bg-white/60 dark:bg-black/40 backdrop-blur-xl rounded-2xl">
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-gmail-red-500/10 via-gmail-red-500/5 to-transparent p-4 border-b border-gmail-red-500/10 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">
+                                <Mail className="h-5 w-5" />
+                            </div>
+                            <span className="font-semibold text-foreground">Preview Email</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <span className="text-xs font-medium px-2 py-1 rounded-full bg-muted text-muted-foreground">{wordCount} kata</span>
+                            {!isEditing && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleStartEdit}
+                                    className="h-8 hover:bg-gmail-red-50 dark:hover:bg-gmail-red-900/20 hover:text-gmail-red-600 transition-colors"
+                                >
+                                    <Edit3 className="h-4 w-4 mr-1.5" />
+                                    Edit
+                                </Button>
+                            )}
                         </div>
                     </div>
-                </div>
-                <Separator className="bg-slate-100 dark:bg-slate-800" />
-                
-                <div className="flex items-center py-2">
-                     <span className="text-sm text-slate-400 w-16 shrink-0 font-medium">Subject:</span>
-                     <Input 
-                        value={formData.subjectLine || ''}
-                        onChange={(e) => updateFormData({ subjectLine: e.target.value })}
-                        className="border-none shadow-none focus-visible:ring-0 px-0 font-semibold text-slate-800 dark:text-slate-100 h-auto py-1 text-base placeholder:text-slate-300 bg-transparent"
-                        placeholder="Subject line goes here..."
-                     />
-                </div>
-                <Separator className="bg-slate-100 dark:bg-slate-800" />
-            </div>
 
-            {/* Email Body Area */}
-            <div className="px-6 py-4 min-h-[400px] bg-white dark:bg-slate-950 relative group">
-                <Textarea
-                    value={formData.bodyContent || ''}
-                    onChange={(e) => updateFormData({ bodyContent: e.target.value })}
-                    className="w-full min-h-[400px] border-none shadow-none focus-visible:ring-0 p-0 resize-y text-base leading-relaxed text-slate-700 dark:text-slate-300 font-sans bg-transparent selection:bg-[#5547d0]/20"
-                    placeholder="Write your email content here..."
-                />
-                
-                {/* Hover hint */}
-                <div className="absolute top-2 right-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                    <span className="text-[10px] text-slate-300 bg-slate-50 px-2 py-1 rounded">Click to edit</span>
-                </div>
-            </div>
-
-            {/* Email Toolbar / Footer */}
-            <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <Button 
-                        onClick={() => {
-                             const subject = encodeURIComponent(formData.subjectLine || "");
-                             const body = encodeURIComponent(formData.bodyContent || "");
-                             window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
-                        }}
-                        className="bg-[#0b57d0] hover:bg-[#0b57d0]/90 text-white rounded-full px-6 h-10 shadow-md hover:shadow-lg transition-all flex items-center gap-2 font-medium"
-                    >
-                        Send <Send className="h-4 w-4 ml-1" />
-                    </Button>
-                    
-                    <div className="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1" />
-                    
-                    <div className="flex items-center gap-1">
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 dark:hover:bg-slate-800 rounded-full">
-                                        <Paperclip className="h-4 w-4" />
+                    {/* Content */}
+                    <div className="p-5 sm:p-8 space-y-6">
+                        {isEditing ? (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="space-y-4"
+                            >
+                                <div className="space-y-3">
+                                    <Label className="text-base font-semibold text-gmail-red-600 dark:text-gmail-red-400">Subject</Label>
+                                    <Input
+                                        value={editedSubject}
+                                        onChange={(e) => setEditedSubject(e.target.value)}
+                                        className="font-medium text-lg h-12 bg-background/50 border-gmail-red-200 focus:border-gmail-red-500 transition-all rounded-xl"
+                                    />
+                                </div>
+                                <div className="space-y-3">
+                                    <Label className="text-base font-semibold text-gmail-red-600 dark:text-gmail-red-400">Body Email</Label>
+                                    <Textarea
+                                        value={editedBody}
+                                        onChange={(e) => setEditedBody(e.target.value)}
+                                        className="min-h-[350px] font-mono text-sm leading-relaxed bg-background/50 border-gmail-red-200 focus:border-gmail-red-500 transition-all rounded-xl p-4 resize-y"
+                                    />
+                                </div>
+                                <div className="flex gap-3 justify-end pt-2">
+                                    <Button variant="outline" onClick={handleCancelEdit} className="rounded-xl border-muted-foreground/20 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30">
+                                        <X className="h-4 w-4 mr-2" />
+                                        Batal
                                     </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>Attach files</TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                        
-                        <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 dark:hover:bg-slate-800 rounded-full"><Bold className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 dark:hover:bg-slate-800 rounded-full"><Italic className="h-4 w-4" /></Button>
-                    </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                     <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 rounded-full" onClick={handleCopy}>
-                        <Copy className="h-4 w-4" />
-                     </Button>
-                     <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 rounded-full">
-                        <MoreVertical className="h-4 w-4" />
-                     </Button>
-                </div>
-            </div>
-        </div>
+                                    <Button onClick={handleSaveEdit} className="rounded-xl bg-gmail-red-600 hover:bg-gmail-red-700 text-white shadow-lg shadow-gmail-red-500/20">
+                                        <Check className="h-4 w-4 mr-2" />
+                                        Simpan Perubahan
+                                    </Button>
+                                </div>
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="space-y-6"
+                            >
+                                {/* Subject View */}
+                                <div className="space-y-1.5">
+                                    <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Subject</div>
+                                    <div className="font-semibold text-lg text-foreground border-b border-border/50 pb-2">
+                                        {formData.subjectLine}
+                                    </div>
+                                </div>
 
-        <div className="flex justify-center pt-2 pb-6">
-             <span className="text-xs font-medium text-slate-400 bg-slate-100 dark:bg-slate-900 px-3 py-1 rounded-full">
-                {wordCount} words • Ready to send
-             </span>
+                                {/* Body View */}
+                                <div className="space-y-1.5">
+                                    <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Body</div>
+                                    <div className="whitespace-pre-wrap text-foreground leading-loose text-[15px] font-normal text-slate-700 dark:text-slate-200 font-sans p-4 rounded-xl bg-background/30 border border-white/10">
+                                        {formData.generatedEmail}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </div>
+                </Card>
+            </motion.div>
+
+            {/* Action Buttons */}
+            {!isEditing && (
+                <Card className="p-4 sm:p-5 shadow-xl border-white/20 bg-white/40 dark:bg-black/40 backdrop-blur rounded-2xl">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                        <Button
+                            onClick={handleCopy}
+                            variant="outline"
+                            className="h-12 sm:h-14 gap-2.5 rounded-xl border-muted-foreground/20 hover:bg-gmail-red-50 hover:text-gmail-red-600 hover:border-gmail-red-200 dark:hover:bg-gmail-red-900/20 transition-all active:scale-95"
+                        >
+                            {copied ? (
+                                <>
+                                    <Check className="h-5 w-5 text-green-500" />
+                                    <span className="font-medium">Copied!</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Copy className="h-5 w-5" />
+                                    <span className="font-medium">Copy</span>
+                                </>
+                            )}
+                        </Button>
+
+                        <Button
+                            onClick={handleSave}
+                            disabled={isSaving || isSaved}
+                            variant="outline"
+                            className="h-12 sm:h-14 gap-2.5 rounded-xl border-muted-foreground/20 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 dark:hover:bg-blue-900/20 transition-all active:scale-95"
+                        >
+                            {isSaving ? (
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                            ) : isSaved ? (
+                                <>
+                                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                    <span className="font-medium">Saved</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Save className="h-5 w-5" />
+                                    <span className="font-medium">Simpan</span>
+                                </>
+                            )}
+                        </Button>
+
+                        <Button
+                            onClick={handleRegenerate}
+                            disabled={isGenerating}
+                            variant="outline"
+                            className="h-12 sm:h-14 gap-2.5 rounded-xl border-muted-foreground/20 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 dark:hover:bg-orange-900/20 transition-all active:scale-95"
+                        >
+                            {isGenerating ? (
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                            ) : (
+                                <>
+                                    <RefreshCw className="h-5 w-5" />
+                                    <span className="font-medium">Generate Ulang</span>
+                                </>
+                            )}
+                        </Button>
+
+                        <Button
+                            onClick={handleOpenEmail}
+                            className="h-12 sm:h-14 gap-2.5 rounded-xl bg-gradient-to-br from-gmail-red-600 to-gmail-red-500 hover:from-gmail-red-700 hover:to-gmail-red-600 text-white shadow-lg shadow-gmail-red-500/20 transition-all active:scale-95 hover:translate-y-[-2px]"
+                        >
+                            <ExternalLink className="h-5 w-5" />
+                            <span className="font-semibold">Kirim Email</span>
+                        </Button>
+                    </div>
+
+                    {/* New Email Button */}
+                    <div className="mt-4 pt-3 border-t border-border/50 flex justify-center">
+                        <Button
+                            onClick={onReset}
+                            variant="ghost"
+                            className="gap-2 text-muted-foreground hover:text-gmail-red-500 hover:bg-gmail-red-50/50 rounded-full px-6 transition-all"
+                        >
+                            <Sparkles className="h-4 w-4" />
+                            Buat Email Baru
+                        </Button>
+                    </div>
+                </Card>
+            )}
+
+            {/* 3 Email Variations - Available for all email types */}
+            {!isEditing && (
+                <EmailVariationsV2
+                    formData={formData}
+                    emailType={emailType}
+                    onSelectVariation={(subject, body) => {
+                        updateFormData({
+                            generatedEmail: body,
+                            subjectLine: subject
+                        });
+                        setIsSaved(false);
+                    }}
+                />
+            )}
+
+            {/* Tips & Tutorial Section */}
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+                {/* Before Sending Checklist - Expanded for better visibility */}
+                <Card className="p-5 bg-gradient-to-br from-emerald-50 to-green-50/50 dark:from-emerald-950/30 dark:to-green-900/20 border-emerald-100 dark:border-emerald-800/50 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
+                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <CheckCircle2 className="w-24 h-24 text-emerald-600" />
+                    </div>
+                    <div className="relative z-10 flex gap-4">
+                        <div className="p-3 bg-emerald-100 rounded-xl h-fit text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400">
+                            <CheckCircle2 className="w-6 h-6" />
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-bold text-emerald-900 dark:text-emerald-100">Checklist Sebelum Kirim</h4>
+                            <ul className="text-sm text-emerald-800 dark:text-emerald-200/80 space-y-2 list-none">
+                                <li className="flex items-start gap-2">
+                                    <span className="mt-1 block w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                    <span>Cek <strong>nama perusahaan & posisi</strong> sudah benar</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="mt-1 block w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                    <span>Pastikan tidak ada <strong>typo</strong> yang fatal</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="mt-1 block w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                    <span>Lampirkan <strong>CV (PDF)</strong> maks 2MB</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="mt-1 block w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                    <span>Subject email <strong>jelas & to the point</strong></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </Card>
+
+                {/* Pro Tips */}
+                <Card className="p-5 bg-gradient-to-br from-amber-50 to-yellow-50/50 dark:from-amber-950/30 dark:to-yellow-900/20 border-amber-100 dark:border-amber-800/50 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
+                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Lightbulb className="w-24 h-24 text-amber-600" />
+                    </div>
+                    <div className="relative z-10 flex gap-4">
+                        <div className="p-3 bg-amber-100 rounded-xl h-fit text-amber-600 dark:bg-amber-900/40 dark:text-amber-400">
+                            <Lightbulb className="w-6 h-6" />
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-bold text-amber-900 dark:text-amber-100">Pro Tips HRD</h4>
+                            <ul className="text-sm text-amber-800 dark:text-amber-200/80 space-y-2 list-none">
+                                <li className="flex items-start gap-2">
+                                    <span className="mt-1 block w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                                    <span>Kirim di jam kerja <strong>(09.00 - 15.00)</strong></span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="mt-1 block w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                                    <span>Simpan email ini untuk <strong>tracking lamaran</strong></span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="mt-1 block w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                                    <span>Kirim <strong>follow-up</strong> setelah 2 minggu no respon</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </Card>
+            </motion.div>
         </div>
-    </div>
-  );
+    );
 }

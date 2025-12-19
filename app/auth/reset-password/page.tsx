@@ -9,12 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Suspense } from "react";
-import { 
-  AlertCircle, 
-  Lock, 
-  Eye, 
-  EyeOff, 
-  CheckCircle2, 
+import {
+  AlertCircle,
+  Lock,
+  Eye,
+  EyeOff,
+  CheckCircle2,
   Shield,
   KeyRound,
   ArrowRight,
@@ -27,7 +27,7 @@ function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const isMobile = useIsMobile();
-  
+
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -36,11 +36,11 @@ function ResetPasswordContent() {
   const [success, setSuccess] = React.useState(false);
   const [tokenValid, setTokenValid] = React.useState(false);
   const [userEmail, setUserEmail] = React.useState("");
-  
+
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirm, setShowConfirm] = React.useState(false);
   const [isMounted, setIsMounted] = React.useState(false);
-  
+
   const passwordInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
@@ -87,7 +87,7 @@ function ResetPasswordContent() {
 
   const calculatePasswordStrength = (pass: string) => {
     if (!pass) return { strength: 0, label: "", color: "" };
-    
+
     let strength = 0;
     if (pass.length >= 8) strength += 25;
     if (pass.length >= 12) strength += 10;
@@ -95,7 +95,7 @@ function ResetPasswordContent() {
     if (/[A-Z]/.test(pass)) strength += 15;
     if (/[0-9]/.test(pass)) strength += 15;
     if (/[^a-zA-Z0-9]/.test(pass)) strength += 20;
-    
+
     if (strength < 40) return { strength, label: "Lemah", color: "bg-red-500" };
     if (strength < 70) return { strength, label: "Sedang", color: "bg-yellow-500" };
     return { strength, label: "Kuat", color: "bg-green-500" };
@@ -139,7 +139,7 @@ function ResetPasswordContent() {
       }
 
       setSuccess(true);
-      
+
       setTimeout(() => {
         router.push("/sign-in");
       }, 3000);
@@ -149,10 +149,25 @@ function ResetPasswordContent() {
     }
   };
 
-  if (!isMounted) {
+  if (!isMounted || isMobile === undefined) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative h-24 w-24 animate-pulse">
+            <Image
+              src="/Logo/x.png"
+              alt="JobMate Logo"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+          <div className="flex gap-1.5">
+            <div className="h-2 w-2 rounded-full bg-brand animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="h-2 w-2 rounded-full bg-brand animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="h-2 w-2 rounded-full bg-brand animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
       </div>
     );
   }
@@ -197,7 +212,7 @@ function ResetPasswordContent() {
       <div className="fixed inset-0 w-full h-full bg-white overflow-hidden font-sans text-slate-900">
         <div className="absolute inset-0 bg-gradient-to-br from-[#8e68fd] via-[#6e52e0] to-[#00acc7] z-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(142,104,253,0.5),transparent_50%)] mix-blend-overlay" />
-          <motion.div 
+          <motion.div
             animate={{ y: [0, -30, 0], opacity: [0.4, 0.7, 0.4] }}
             transition={{ duration: 8, repeat: Infinity }}
             className="absolute top-[-10%] right-[-10%] w-80 h-80 bg-[#00d1dc] rounded-full blur-[100px] opacity-40"
@@ -206,29 +221,29 @@ function ResetPasswordContent() {
 
         <div className="relative z-10 pt-6 px-6 flex flex-col items-center h-[40%]">
           <div className="absolute -top-20 left-0 right-0 z-50 flex justify-center pointer-events-none">
-             <div className="relative">
-                <div className="absolute inset-0 bg-white/20 rounded-full blur-xl animate-pulse" />
-                <div className="relative h-64 w-64">
-                  <Image 
-                    src="/Logo/x.png" 
-                    alt="JobMate Logo" 
-                    fill 
-                    className="object-contain drop-shadow-2xl" 
-                    priority 
-                  />
-                </div>
-             </div>
+            <div className="relative">
+              <div className="absolute inset-0 bg-white/20 rounded-full blur-xl animate-pulse" />
+              <div className="relative h-64 w-64">
+                <Image
+                  src="/Logo/x.png"
+                  alt="JobMate Logo"
+                  fill
+                  className="object-contain drop-shadow-2xl"
+                  priority
+                />
+              </div>
+            </div>
           </div>
-          
+
           <div className="h-16 w-full" />
 
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="relative w-[120px] h-[120px] flex items-center justify-center mt-2 mb-2 z-10"
           >
             <div className="absolute w-24 h-24 bg-white/5 rounded-full blur-[30px]" />
-            <motion.div 
+            <motion.div
               animate={{ rotate: [0, 360] }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
               className="relative z-20 w-20 h-20 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-full shadow-2xl flex items-center justify-center"
@@ -239,14 +254,14 @@ function ResetPasswordContent() {
             </motion.div>
           </motion.div>
 
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-2xl font-bold text-white text-center"
           >
             Buat Password Baru
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -256,7 +271,7 @@ function ResetPasswordContent() {
           </motion.p>
         </div>
 
-        <motion.div 
+        <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
@@ -315,15 +330,14 @@ function ResetPasswordContent() {
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
-                  
+
                   {password && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-1.5">
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-slate-600">Kekuatan Password:</span>
-                        <span className={`font-bold ${
-                          passwordStrength.strength < 40 ? 'text-red-600' :
-                          passwordStrength.strength < 70 ? 'text-yellow-600' : 'text-green-600'
-                        }`}>
+                        <span className={`font-bold ${passwordStrength.strength < 40 ? 'text-red-600' :
+                            passwordStrength.strength < 70 ? 'text-yellow-600' : 'text-green-600'
+                          }`}>
                           {passwordStrength.label}
                         </span>
                       </div>
@@ -360,7 +374,7 @@ function ResetPasswordContent() {
                       {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
-                  
+
                   {confirmPassword && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 text-xs">
                       {passwordsMatch ? (
@@ -407,16 +421,16 @@ function ResetPasswordContent() {
   return (
     <div className="flex min-h-screen w-full overflow-hidden bg-background">
       <div className="relative flex w-full flex-col justify-center px-8 sm:px-12 lg:w-[45%] xl:w-[40%] h-screen border-r border-border/40 shadow-xl z-20 bg-background/80 backdrop-blur-md">
-        
+
         <div className="absolute top-8 left-8 sm:left-12 z-50">
           <Link href="/" className="block group">
             <div className="relative h-24 w-24 transition-transform group-hover:scale-105">
-              <Image 
-                src="/Logo/x.png" 
-                alt="JobMate Logo" 
-                fill 
-                className="object-contain" 
-                priority 
+              <Image
+                src="/Logo/x.png"
+                alt="JobMate Logo"
+                fill
+                className="object-contain"
+                priority
               />
             </div>
           </Link>
@@ -499,10 +513,9 @@ function ResetPasswordContent() {
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-muted-foreground">Kekuatan password:</span>
-                          <span className={`font-semibold ${
-                            passwordStrength.strength < 40 ? 'text-red-600' :
-                            passwordStrength.strength < 70 ? 'text-yellow-600' : 'text-green-600'
-                          }`}>
+                          <span className={`font-semibold ${passwordStrength.strength < 40 ? 'text-red-600' :
+                              passwordStrength.strength < 70 ? 'text-yellow-600' : 'text-green-600'
+                            }`}>
                             {passwordStrength.label}
                           </span>
                         </div>
@@ -547,8 +560,8 @@ function ResetPasswordContent() {
 
                     <AnimatePresence>
                       {confirmPassword && (
-                        <motion.div 
-                          initial={{ opacity: 0 }} 
+                        <motion.div
+                          initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           className="flex items-center gap-2 text-xs"
                         >
@@ -603,7 +616,7 @@ function ResetPasswordContent() {
 
         <div className="relative z-10 flex h-full w-full flex-col justify-between p-16 text-white">
           <div className="flex justify-end">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
@@ -619,7 +632,7 @@ function ResetPasswordContent() {
 
           <div className="flex flex-1 items-center justify-center">
             <div className="relative">
-              <motion.div 
+              <motion.div
                 animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
                 transition={{ duration: 4, repeat: Infinity }}
                 className="absolute inset-0 bg-gradient-to-r from-green-500 to-blue-600 rounded-full blur-3xl opacity-50"
@@ -633,7 +646,7 @@ function ResetPasswordContent() {
           </div>
 
           <div className="max-w-md">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}

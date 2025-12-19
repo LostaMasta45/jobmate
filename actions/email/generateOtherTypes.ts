@@ -2,9 +2,9 @@
 
 import OpenAI from "openai";
 import { logToolUsageWithNotification } from "@/lib/telegram-monitoring";
-import type { FollowUpFormData } from "@/components/email-generator2/FollowUpForm";
-import type { ThankYouFormData } from "@/components/email-generator2/ThankYouForm";
-import type { InquiryFormData } from "@/components/email-generator2/InquiryForm";
+import type { FollowUpFormData } from "@/components/email-generator/FollowUpForm";
+import type { ThankYouFormData } from "@/components/email-generator/ThankYouForm";
+import type { InquiryFormData } from "@/components/email-generator/InquiryForm";
 
 // OpenAI client using Sumapod
 const openai = new OpenAI({

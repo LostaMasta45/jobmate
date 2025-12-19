@@ -93,8 +93,8 @@ export async function saveEmailDraft(data: SaveEmailData) {
     }
 
     revalidatePath("/tools/email-generator");
-    revalidatePath("/tools/email-generator2");
-    revalidatePath("/tools/email-generator2/history");
+    revalidatePath("/tools/email-generator");
+    revalidatePath("/tools/email-generator/history");
     return { data: draft };
   } catch (error: any) {
     console.error("Error in saveEmailDraft:", error);

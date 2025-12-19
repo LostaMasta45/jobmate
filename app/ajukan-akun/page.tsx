@@ -26,8 +26,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PasswordStrengthMeter } from "@/components/ui/password-strength-meter";
 import { FileUploadPreview } from "@/components/ui/file-upload-preview";
-import { 
-  Info, 
+import {
+  Info,
   AlertCircle,
   Eye,
   EyeOff,
@@ -45,6 +45,7 @@ export default function AjukanAkunPage() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
   const [formData, setFormData] = React.useState({
     fullName: "",
     username: "",
@@ -54,7 +55,29 @@ export default function AjukanAkunPage() {
   });
   const [proofFile, setProofFile] = React.useState<File | null>(null);
 
-  // If mobile, render the mobile view immediately
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Show loading skeleton during hydration to prevent blank page flash
+  if (!isMounted || isMobile === undefined) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-brand/5 via-background to-brand/5">
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-brand to-brand/80 text-white shadow-lg animate-pulse">
+            <span className="text-2xl font-bold">JM</span>
+          </div>
+          <div className="flex gap-1.5">
+            <div className="h-2 w-2 rounded-full bg-brand animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="h-2 w-2 rounded-full bg-brand animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="h-2 w-2 rounded-full bg-brand animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If mobile, render the mobile view
   if (isMobile) {
     return <MobileAjukanAkunView />;
   }
@@ -75,7 +98,7 @@ export default function AjukanAkunPage() {
     return phoneRegex.test(phone);
   };
 
-  const isFormValid = 
+  const isFormValid =
     formData.fullName.length > 0 &&
     isValidUsername(formData.username) &&
     isValidEmail(formData.email) &&
@@ -345,7 +368,7 @@ export default function AjukanAkunPage() {
               <AccordionItem value="item-1">
                 <AccordionTrigger>❓ Apakah harus bayar dulu sebelum ajukan akun?</AccordionTrigger>
                 <AccordionContent>
-                  Ya, Anda harus melakukan pembayaran terlebih dahulu di halaman /payment. 
+                  Ya, Anda harus melakukan pembayaran terlebih dahulu di halaman /payment.
                   Setelah pembayaran berhasil, gunakan form ini untuk melengkapi data akun Anda.
                 </AccordionContent>
               </AccordionItem>
@@ -353,7 +376,7 @@ export default function AjukanAkunPage() {
               <AccordionItem value="item-2">
                 <AccordionTrigger>📸 Bukti pembayaran apa yang harus di-upload?</AccordionTrigger>
                 <AccordionContent>
-                  Screenshot invoice dari Xendit, bukti pembayaran dari e-wallet (OVO, GoPay, DANA), 
+                  Screenshot invoice dari Xendit, bukti pembayaran dari e-wallet (OVO, GoPay, DANA),
                   atau bukti transfer dari bank. Pastikan nominal dan tanggal pembayaran terlihat jelas.
                 </AccordionContent>
               </AccordionItem>
@@ -361,7 +384,7 @@ export default function AjukanAkunPage() {
               <AccordionItem value="item-3">
                 <AccordionTrigger>🕐 Berapa lama proses aktivasi?</AccordionTrigger>
                 <AccordionContent>
-                  Maksimal 1x24 jam pada hari kerja (Senin-Jumat). Pada hari libur, 
+                  Maksimal 1x24 jam pada hari kerja (Senin-Jumat). Pada hari libur,
                   pengajuan akan diproses pada hari kerja berikutnya.
                 </AccordionContent>
               </AccordionItem>
@@ -369,7 +392,7 @@ export default function AjukanAkunPage() {
               <AccordionItem value="item-4">
                 <AccordionTrigger>📧 Apa yang dikirim ke email saya?</AccordionTrigger>
                 <AccordionContent>
-                  Anda akan menerima: (1) Konfirmasi pengajuan diterima, (2) Notifikasi 
+                  Anda akan menerima: (1) Konfirmasi pengajuan diterima, (2) Notifikasi
                   saat pengajuan disetujui/ditolak, (3) Petunjuk login jika disetujui.
                 </AccordionContent>
               </AccordionItem>
@@ -377,7 +400,7 @@ export default function AjukanAkunPage() {
               <AccordionItem value="item-5">
                 <AccordionTrigger>🔍 Bagaimana cara cek status pengajuan?</AccordionTrigger>
                 <AccordionContent>
-                  Setelah submit, Anda akan mendapat kode referensi. Simpan kode ini dan 
+                  Setelah submit, Anda akan mendapat kode referensi. Simpan kode ini dan
                   gunakan di halaman &quot;Cek Status Pengajuan&quot; untuk tracking.
                 </AccordionContent>
               </AccordionItem>
@@ -386,9 +409,9 @@ export default function AjukanAkunPage() {
             {/* Submit Button with Confirmation Dialog */}
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button 
-                  type="button" 
-                  className="w-full" 
+                <Button
+                  type="button"
+                  className="w-full"
                   size="lg"
                   disabled={!isFormValid || loading}
                 >

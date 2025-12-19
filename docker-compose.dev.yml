@@ -1,172 +1,72 @@
 # ==============================================================================
-# DOCKER COMPOSE - DEVELOPMENT MODE (HOT RELOAD)
+# DOCKER COMPOSE DEV - DEVELOPMENT WITH HOT RELOAD
 # ==============================================================================
-# File ini untuk DEVELOPMENT dengan hot reload
-# Source code di-mount sebagai volume (tidak di-copy)
-# Setiap perubahan file langsung detect & auto reload!
+# Jalankan dengan: docker compose -f docker-compose.dev.yml up --build
 # ==============================================================================
 
+version: '3.8'
+
 services:
-  # ----------------------------------------------------------------------------
-  # SERVICE: jobmate-dev
-  # ----------------------------------------------------------------------------
   jobmate-dev:
-    # Nama container
     container_name: jobmate-dev
-    
-    # Build dari Dockerfile.dev (development)
     build:
       context: .
       dockerfile: Dockerfile.dev
     
-    # Port mapping
-    # Akses via: http://localhost:3005
-    # Next.js dev server di dalam container running di port 3001
+    # Port mapping (Next.js dev runs on port 3001)
     ports:
       - "3005:3001"
     
-    # ⚡ VOLUME MOUNT - Ini yang bikin HOT RELOAD work!
-    # Mount source code dari lokal ke container
-    volumes:
-      # Mount seluruh folder project (LIVE SYNC!)
-      - .:/app
-      
-      # EXCEPT node_modules (pakai yang di container)
-      # Ini penting! Node_modules di container beda platform dengan Windows
-      - /app/node_modules
-      
-      # EXCEPT .next (build cache di container)
-      - /app/.next
-    
-    # Environment variables dari .env.local
-    # Semua env vars yang dibutuhkan aplikasi
+    # Environment variables
     environment:
-      # Next.js Configuration
       - NODE_ENV=development
-      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3005}
-      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3005}
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3005
+      - NEXT_PUBLIC_APP_URL=http://localhost:3005
       
-      # Supabase - Database & Auth
+      # Supabase
       - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
       
-      # OpenAI API - AI Features
+      # OpenAI
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
       
-      # Resend - Email Service
+      # Resend
       - RESEND_API_KEY=${RESEND_API_KEY}
       - RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL:-noreply@yourdomain.com}
       
-      # Telegram Bot - Admin Notifications
+      # Telegram
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_ADMIN_CHAT_ID=${TELEGRAM_ADMIN_CHAT_ID}
       
-      # Xendit - Payment Gateway
+      # Xendit
       - XENDIT_SECRET_KEY=${XENDIT_SECRET_KEY}
       - XENDIT_WEBHOOK_VERIFICATION_TOKEN=${XENDIT_WEBHOOK_VERIFICATION_TOKEN}
       
-      # ILovePDF - PDF Tools
+      # ILovePDF
       - ILOVEPDF_PUBLIC_KEY=${ILOVEPDF_PUBLIC_KEY}
       - ILOVEPDF_SECRET_KEY=${ILOVEPDF_SECRET_KEY}
       
-      # Development specific
-      - WATCHPACK_POLLING=true  # Enable hot reload di Windows
-      - CHOKIDAR_USEPOLLING=true  # Backup option untuk file watching
+      # Hot reload polling (untuk Windows/Docker)
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    
+    # VOLUME MOUNTING untuk Hot Reload
+    volumes:
+      # Mount source code (hot reload akan detect perubahan)
+      - .:/app
+      # Exclude node_modules (gunakan yang ada di container)
+      - /app/node_modules
+      # Exclude .next (biar container yang handle)
+      - /app/.next
     
     # Restart policy
-    # unless-stopped = restart otomatis kecuali di-stop manual
     restart: unless-stopped
     
-    # Logging
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    
-    # Command override (optional, sudah di Dockerfile.dev)
-    # Uncomment jika mau custom command
-    # command: npm run dev
+    networks:
+      - jobmate-dev-network
 
-# ==============================================================================
-# CARA MENGGUNAKAN DEVELOPMENT MODE
-# ==============================================================================
-#
-# 1. START DEVELOPMENT SERVER:
-#    docker-compose -f docker-compose.dev.yml up
-#    
-#    Atau background mode:
-#    docker-compose -f docker-compose.dev.yml up -d
-#
-# 2. EDIT CODE:
-#    Edit file di VSCode (atau editor apapun)
-#    Save file (Ctrl+S)
-#    ⚡ Tunggu 2-3 detik
-#    ✅ Browser auto refresh!
-#
-# 3. LIHAT LOGS (Real-time):
-#    docker-compose -f docker-compose.dev.yml logs -f
-#
-# 4. STOP SERVER:
-#    Ctrl+C (jika foreground)
-#    atau
-#    docker-compose -f docker-compose.dev.yml down
-#
-# 5. RESTART (jika perlu):
-#    docker-compose -f docker-compose.dev.yml restart
-#
-# ==============================================================================
-# HOT RELOAD - CARA KERJANYA
-# ==============================================================================
-#
-# LOCAL MACHINE                  DOCKER CONTAINER
-# ─────────────                  ────────────────
-#
-# C:\JOBMATE\                    /app/
-#   ├── app/                       ├── app/  ◄───┐
-#   ├── components/                ├── components/ │
-#   └── ...                        └── ...         │
-#                                                  │
-#   [Edit file]                                   │
-#        ↓                                         │
-#   [Save: Ctrl+S]                                │
-#        ↓                                         │
-#   [Volume sync] ─────────────────────────────────┘
-#                                                  │
-#                     [Next.js detect change] ◄────┘
-#                              ↓
-#                     [Recompile changed file]
-#                              ↓
-#                     [Send update to browser]
-#                              ↓
-#                     [Browser auto refresh]
-#                              ↓
-#                          ✅ DONE! (2-3 sec)
-#
-# ==============================================================================
-# TIPS & TRICKS
-# ==============================================================================
-#
-# 1. File Changes Not Detected?
-#    - Cek volume mount working: docker-compose -f docker-compose.dev.yml exec jobmate-dev ls -la /app
-#    - Restart container: docker-compose -f docker-compose.dev.yml restart
-#
-# 2. Slow Hot Reload?
-#    - Normal di Windows (volume performance)
-#    - Bisa 3-5 detik (masih OK)
-#    - Lebih cepat dari rebuild (5-10 menit!)
-#
-# 3. Port Already in Use?
-#    - Change port: "3001:3000"
-#    - Access: http://localhost:3001
-#
-# 4. Container Keeps Restarting?
-#    - Check logs: docker-compose -f docker-compose.dev.yml logs
-#    - Common: Missing env vars or npm install error
-#
-# 5. Want to Rebuild (new dependencies)?
-#    docker-compose -f docker-compose.dev.yml up --build
-#
-# ==============================================================================
+networks:
+  jobmate-dev-network:
+    driver: bridge

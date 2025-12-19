@@ -1,6 +1,11 @@
 import * as React from "react"
 
-export function useIsMobile() {
+/**
+ * Hook to detect if the current viewport is mobile.
+ * Returns `undefined` during SSR/initial render (before hydration).
+ * This allows consumers to show a loading state instead of flashing incorrect content.
+ */
+export function useIsMobile(): boolean | undefined {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
 
   React.useEffect(() => {
@@ -13,5 +18,5 @@ export function useIsMobile() {
     return () => mql.removeEventListener("change", onChange)
   }, [])
 
-  return !!isMobile
+  return isMobile
 }

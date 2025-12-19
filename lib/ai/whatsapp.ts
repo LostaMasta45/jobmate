@@ -4,12 +4,22 @@
 
 import { openai } from "@/lib/openai";
 
+// Experience level types
+export type WAExperienceLevel =
+  | 'fresh_graduate'
+  | 'student'
+  | 'career_changer'
+  | 'first_job'
+  | '1_2_years'
+  | '3_5_years'
+  | '5_plus_years';
+
 export interface WAGenerationData {
   messageType: 'application' | 'follow_up' | 'interview_confirmation' | 'thank_you' | 'status_inquiry' | 're_application' | 'referral';
   yourName: string;
   position: string;
   companyName: string;
-  
+
   // Optional Context
   hrdName?: string;
   hrdTitle?: string;
@@ -17,16 +27,22 @@ export interface WAGenerationData {
   jobSource?: string;
   referralName?: string;
   previousInteraction?: string;
-  
+
+  // Experience Level (NEW - for adaptive prompting)
+  experienceLevel?: WAExperienceLevel;
+  strengthHighlights?: string[]; // For fresh grads
+  relevantProject?: string; // For fresh grads
+  relevantOrganization?: string; // For fresh grads
+
   // Your Info
   currentRole?: string;
   yearsExperience?: number;
   topSkills?: string[];
-  
+
   // Tone & Style
   toneStyle: 'formal' | 'semi-formal' | 'friendly' | 'enthusiastic';
   personality: 'confident' | 'humble' | 'balanced';
-  
+
   // Preferences
   includeGreeting: boolean;
   includeIntro: boolean;
@@ -35,7 +51,7 @@ export interface WAGenerationData {
   specificReason?: string;
   recentAchievement?: string;
   availability?: string;
-  
+
   // Message Control
   useEmoji: boolean;
   messageLength: 'short' | 'medium' | 'long';
@@ -51,9 +67,9 @@ export interface WAGenerationResult {
 export async function generateWAMessage(data: WAGenerationData): Promise<WAGenerationResult> {
   try {
     const prompt = buildWAPrompt(data);
-    
+
     console.log('Generating WhatsApp message with AI...');
-    
+
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
@@ -71,7 +87,7 @@ export async function generateWAMessage(data: WAGenerationData): Promise<WAGener
     });
 
     const content = response.choices[0]?.message?.content?.trim() || '';
-    
+
     if (!content) {
       throw new Error('No content generated from AI');
     }
@@ -106,7 +122,85 @@ Your goal: Create WhatsApp messages that are:
 6. Mobile-friendly (short paragraphs, easy to read on phones)
 7. Unique and creative in wording (different every time)
 
+=== ANTI-CLICHE SYSTEM V2 ===
+NEVER use these cliché phrases:
+❌ "Perkenalkan nama saya..."
+❌ "Dengan hormat..."
+❌ "Saya adalah lulusan..." / "Saya lulusan..."
+❌ "Saya sangat tertarik dengan..."
+❌ "Saya berharap dapat bergabung..."
+❌ "Mohon maaf mengganggu waktunya..."
+❌ "Dengan ini saya bermaksud..."
+❌ "Bersama ini saya lampirkan..."
+❌ "Saya ingin mengajukan lamaran..."
+
+INSTEAD, use creative openings based on context:
+✅ For fresh grad: "Sebagai fresh grad yang passionate di bidang [X]..."
+✅ For career changer: "Meski baru memulai journey di [field], saya bawa [skill]..."
+✅ For experienced: "Dengan [X] tahun handle [Y] dengan hasil [Z]..."
+✅ Context-first: "Melihat lowongan [Posisi] di [Source]..."
+✅ Referral-first: "Berdasarkan rekomendasi dari [Nama]..."
+
 IMPORTANT: Generate a clean, ready-to-send message. NO placeholders, NO spintax, NO brackets.`;
+}
+
+// Get adaptive guidance based on experience level
+function getAdaptiveGuidance(experienceLevel?: WAExperienceLevel): string {
+  switch (experienceLevel) {
+    case 'fresh_graduate':
+    case 'student':
+      return `
+=== GUIDANCE FOR FRESH GRADUATE ===
+- Lead dengan PASSION dan ANTUSIASME, bukan pengalaman kerja
+- Mention pendidikan dengan cara menarik (JANGAN "saya lulusan...")
+- Highlight: project kuliah, organisasi, magang, sertifikasi
+- Tunjukkan eagerness to learn dan growth mindset
+- Contoh opening: "Sebagai fresh grad Teknik UI yang passionate di data science..."
+- Fokus pada POTENTIAL dan WILLINGNESS, bukan track record
+`;
+
+    case 'career_changer':
+    case 'first_job':
+      return `
+=== GUIDANCE FOR CAREER CHANGER / FIRST JOB ===
+- Lead dengan TRANSFERABLE SKILLS atau soft skills
+- Tunjukkan research yang sudah dilakukan tentang company/role
+- Highlight willingness to learn dan adaptability
+- Mention pengalaman non-kerja yang relevan (volunteer, freelance, hobby)
+- Contoh opening: "Meski baru memulai journey di bidang marketing, saya bawa pengalaman 3 tahun handle customer service..."
+- Fokus pada VALUE yang bisa dibawa, bukan gap experience
+`;
+
+    case '1_2_years':
+      return `
+=== GUIDANCE FOR 1-2 YEARS EXPERIENCE ===
+- Lead dengan recent LEARNING dan GROWTH
+- Mention 1-2 skills yang sudah terbukti
+- Tunjukkan trajectory dan potential
+- Contoh opening: "Setelah 1 tahun handle social media marketing dengan hasil +50% engagement..."
+- Balance antara confidence dan humility
+`;
+
+    case '3_5_years':
+    case '5_plus_years':
+      return `
+=== GUIDANCE FOR EXPERIENCED (3+ YEARS) ===
+- Lead dengan ACHIEVEMENT dan IMPACT
+- Gunakan angka/metrics spesifik
+- Tunjukkan track record yang proven
+- Contoh opening: "Dengan 5 tahun build fintech products yang dipakai 2 juta user..."
+- Tunjukkan expertise dan leadership capability
+`;
+
+    default:
+      return `
+=== GENERAL GUIDANCE ===
+- Sesuaikan opening dengan background applicant
+- Jika tidak ada pengalaman kerja, fokus pada passion dan potential
+- Jika ada pengalaman, highlight achievement relevan
+- Selalu personal dan genuine
+`;
+  }
 }
 
 function buildWAPrompt(data: WAGenerationData): string {
@@ -178,10 +272,12 @@ MESSAGE STRUCTURE:
 
   prompt += `\n7. Close with polite gratitude
 
+${getAdaptiveGuidance(data.experienceLevel)}
+
 IMPORTANT RULES:
 1. Write in BAHASA INDONESIA (natural, bukan terjemahan kaku)
 2. Keep it mobile-friendly (short paragraphs, max 3-4 lines per paragraph)
-3. NO CLICHE phrases like "Perkenalkan nama saya..." - be creative and varied!
+3. STRICTLY FOLLOW Anti-Cliche rules - be creative and varied!
 4. Make it sound PERSONAL and UNIQUE, not like a template
 5. Respectful of recipient's time (concise but complete)
 6. Include line breaks between paragraphs (use \\n\\n for double line break)
@@ -189,6 +285,8 @@ IMPORTANT RULES:
 8. Avoid overly formal language that sounds outdated
 9. Match the tone to the company culture
 10. Be creative with wording - each generation should feel different
+11. For fresh graduates: highlight PASSION and POTENTIAL, not experience
+12. For experienced: highlight ACHIEVEMENTS and METRICS
 
 OUTPUT FORMAT:
 Return ONLY the final WhatsApp message text. Clean and ready to send. No placeholders, no explanations, no subject line.`;
@@ -212,10 +310,10 @@ function analyzeMessage(content: string): {
 } {
   // Count words (Indonesian/English)
   const words = content.trim().split(/\s+/).length;
-  
+
   // Count characters (excluding whitespace)
   const chars = content.replace(/\s/g, '').length;
-  
+
   return {
     wordCount: words,
     charCount: chars
@@ -230,15 +328,15 @@ export async function generateWAVariations(
   count: number = 3
 ): Promise<Array<WAGenerationResult & { variation: string }>> {
   const variations: Array<WAGenerationResult & { variation: string }> = [];
-  
+
   const tones: Array<WAGenerationData['toneStyle']> = ['formal', 'semi-formal', 'friendly'];
-  
+
   for (let i = 0; i < Math.min(count, 3); i++) {
     const variantData = {
       ...data,
       toneStyle: tones[i]
     };
-    
+
     const result = await generateWAMessage(variantData);
     if (!result.error && result.content) {
       variations.push({
@@ -247,7 +345,7 @@ export async function generateWAVariations(
       });
     }
   }
-  
+
   return variations;
 }
 
@@ -269,10 +367,10 @@ export function analyzeMessageQuality(
   data: WAGenerationData
 ): MessageQuality {
   const { wordCount, charCount } = analyzeMessage(content);
-  
+
   // Tone Score (check if matches desired tone)
   const toneScore = 80; // Placeholder - could use sentiment analysis
-  
+
   // Length Score (optimal ranges)
   let lengthScore = 100;
   if (data.messageLength === 'short' && (wordCount < 40 || wordCount > 90)) {
@@ -282,25 +380,25 @@ export function analyzeMessageQuality(
   } else if (data.messageLength === 'long' && (wordCount < 110 || wordCount > 160)) {
     lengthScore = 70;
   }
-  
+
   // Personalization Score (check for context provided)
   let personalizationScore = 100;
   if (!data.hrdName) personalizationScore -= 10;
   if (!data.specificReason && data.messageType === 'application') personalizationScore -= 15;
   if (!data.topSkills || data.topSkills.length === 0) personalizationScore -= 10;
-  
+
   // Mobile Readability (check paragraph length)
   const paragraphs = content.split('\n\n');
   let mobileReadabilityScore = 100;
   paragraphs.forEach(para => {
     if (para.length > 250) mobileReadabilityScore -= 10; // Too long for mobile
   });
-  
+
   // Overall Score
   const overallScore = Math.round(
     (toneScore + lengthScore + personalizationScore + mobileReadabilityScore) / 4
   );
-  
+
   return {
     score: overallScore,
     feedback: {
