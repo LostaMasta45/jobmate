@@ -10,7 +10,8 @@ import { ResultCard } from "../ResultCard";
 import { ImageResultCard } from "../ImageResultCard";
 import { wordToPDF, imagesToPDF, pdfToWord, pdfToImage } from "@/actions/pdf/convert";
 import { toast } from "sonner";
-import { FileImage, FileEdit, AlertCircle } from "lucide-react";
+import { FileImage, FileEdit, AlertCircle, ArrowRight, Zap, Image as ImageIcon, FileType } from "lucide-react";
+import { PDFToolLayout } from "../PDFToolLayout";
 
 interface UploadedFile {
   fileId: string;
@@ -20,7 +21,11 @@ interface UploadedFile {
   path: string;
 }
 
-export function ConvertTool() {
+interface ConvertToolProps {
+  onBack: () => void;
+}
+
+export function ConvertTool({ onBack }: ConvertToolProps) {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -140,49 +145,54 @@ export function ConvertTool() {
   };
 
   return (
-    <div className="space-y-6">
-      <Card className="p-6">
-        <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-green-100 dark:bg-green-900 p-2">
-              <FileImage className="h-5 w-5 text-green-600 dark:text-green-400" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-xl font-semibold">Convert File</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Convert Word, Image, atau PDF ke format yang dibutuhkan
-              </p>
-            </div>
-          </div>
-        </div>
-      </Card>
+    <PDFToolLayout
+      title="Convert File"
+      description="Ubah format dokumen Anda dengan mudah, dari Word ke PDF, Gambar ke PDF, atau sebaliknya."
+      icon={FileImage}
+      color="text-blue-500"
+      onBack={onBack}
+      theme="green"
+    >
+      <div className="space-y-8 max-w-4xl mx-auto">
 
-      <Tabs value={activeTab} onValueChange={(v) => {
-        setActiveTab(v);
-        setUploadedFiles([]);
-        setResult(null);
-      }}>
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-          <TabsTrigger value="word-to-pdf">Word → PDF</TabsTrigger>
-          <TabsTrigger value="image-to-pdf">Image → PDF</TabsTrigger>
-          <TabsTrigger value="pdf-to-word">PDF → Word</TabsTrigger>
-          <TabsTrigger value="pdf-to-image">PDF → Image</TabsTrigger>
-        </TabsList>
+        <Tabs value={activeTab} onValueChange={(v) => {
+          setActiveTab(v);
+          setUploadedFiles([]);
+          setResult(null);
+        }} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 p-1 h-auto bg-slate-100 dark:bg-white/5 rounded-2xl mb-8">
+            <TabsTrigger value="word-to-pdf" className="flex flex-col md:flex-row gap-2 py-3 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:shadow-lg">
+              <FileEdit className="h-4 w-4" />
+              <span className="text-xs md:text-sm">Word → PDF</span>
+            </TabsTrigger>
+            <TabsTrigger value="image-to-pdf" className="flex flex-col md:flex-row gap-2 py-3 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:shadow-lg">
+              <ImageIcon className="h-4 w-4" />
+              <span className="text-xs md:text-sm">Image → PDF</span>
+            </TabsTrigger>
+            <TabsTrigger value="pdf-to-word" className="flex flex-col md:flex-row gap-2 py-3 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:shadow-lg">
+              <FileType className="h-4 w-4" />
+              <span className="text-xs md:text-sm">PDF → Word</span>
+            </TabsTrigger>
+            <TabsTrigger value="pdf-to-image" className="flex flex-col md:flex-row gap-2 py-3 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:shadow-lg">
+              <FileImage className="h-4 w-4" />
+              <span className="text-xs md:text-sm">PDF → Image</span>
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="word-to-pdf" className="space-y-6">
-          <Card className="p-6">
-            <Alert className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-sm">
-                <strong>Kapan digunakan:</strong> Convert CV atau Cover Letter dari Word ke PDF untuk aplikasi kerja. 
-                Semua formatting, font, dan gambar akan dipertahankan.
-              </AlertDescription>
-            </Alert>
+          <div className="bg-slate-50 dark:bg-zinc-900/50 border border-slate-200 dark:border-white/5 rounded-3xl p-6 md:p-8">
+            <TabsContent value="word-to-pdf" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                  <FileEdit className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Word ke PDF</h3>
+                  <p className="text-sm text-slate-500 dark:text-zinc-400">Pertahankan format asli dokumen Anda.</p>
+                </div>
+              </div>
 
-            <div className="space-y-4">
-              <h3 className="font-semibold">Upload File Word</h3>
               <UploadZone
-                accept={{ 
+                accept={{
                   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
                   'application/msword': ['.doc']
                 }}
@@ -192,43 +202,29 @@ export function ConvertTool() {
               />
 
               {uploadedFiles.length > 0 && (
-                <Button 
+                <Button
                   onClick={handleWordToPDF}
                   disabled={processing}
-                  className="w-full"
-                  size="lg"
+                  className="w-full h-14 text-lg font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/20 rounded-xl transition-all hover:scale-[1.01] mt-6"
                 >
-                  {processing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                      Converting...
-                    </>
-                  ) : (
-                    <>
-                      <FileEdit className="h-4 w-4 mr-2" />
-                      Convert ke PDF
-                    </>
-                  )}
+                  {processing ? "Converting..." : "Convert ke PDF Sekarang"}
                 </Button>
               )}
-            </div>
-          </Card>
-        </TabsContent>
+            </TabsContent>
 
-        <TabsContent value="image-to-pdf" className="space-y-6">
-          <Card className="p-6">
-            <Alert className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-sm">
-                <strong>Kapan digunakan:</strong> Convert scan ijazah, sertifikat, atau KTP dari foto ke PDF profesional. 
-                Bisa upload multiple images sekaligus.
-              </AlertDescription>
-            </Alert>
+            <TabsContent value="image-to-pdf" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+                  <ImageIcon className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Image ke PDF</h3>
+                  <p className="text-sm text-slate-500 dark:text-zinc-400">Gabungkan foto scan, ijazah, atau KTP.</p>
+                </div>
+              </div>
 
-            <div className="space-y-4">
-              <h3 className="font-semibold">Upload Gambar (JPG, PNG)</h3>
               <UploadZone
-                accept={{ 
+                accept={{
                   'image/jpeg': ['.jpg', '.jpeg'],
                   'image/png': ['.png'],
                   'image/heic': ['.heic'],
@@ -240,50 +236,32 @@ export function ConvertTool() {
               />
 
               {uploadedFiles.length > 0 && (
-                <>
-                  <div className="rounded-lg bg-muted p-4">
-                    <p className="text-sm font-medium">Preview:</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {uploadedFiles.length} gambar akan dijadikan {uploadedFiles.length} halaman PDF
-                    </p>
-                  </div>
-
-                  <Button 
+                <div className="space-y-4 mt-6">
+                  <p className="text-sm text-center text-slate-500 dark:text-zinc-400">
+                    {uploadedFiles.length} gambar terpilih
+                  </p>
+                  <Button
                     onClick={handleImagesToPDF}
                     disabled={processing}
-                    className="w-full"
-                    size="lg"
+                    className="w-full h-14 text-lg font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-xl shadow-purple-500/20 rounded-xl transition-all hover:scale-[1.01]"
                   >
-                    {processing ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                        Converting...
-                      </>
-                    ) : (
-                      <>
-                        <FileImage className="h-4 w-4 mr-2" />
-                        Convert {uploadedFiles.length} Gambar ke PDF
-                      </>
-                    )}
+                    {processing ? "Converting..." : "Convert Gambar ke PDF"}
                   </Button>
-                </>
+                </div>
               )}
-            </div>
-          </Card>
-        </TabsContent>
+            </TabsContent>
 
-        <TabsContent value="pdf-to-word" className="space-y-6">
-          <Card className="p-6">
-            <Alert className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-sm">
-                <strong>Kapan digunakan:</strong> Edit CV atau dokumen yang sudah dalam format PDF. 
-                Hasil convert bisa diedit di Microsoft Word.
-              </AlertDescription>
-            </Alert>
+            <TabsContent value="pdf-to-word" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                  <FileType className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">PDF ke Word</h3>
+                  <p className="text-sm text-slate-500 dark:text-zinc-400">Edit isi dokumen PDF di Microsoft Word.</p>
+                </div>
+              </div>
 
-            <div className="space-y-4">
-              <h3 className="font-semibold">Upload File PDF</h3>
               <UploadZone
                 accept={{ 'application/pdf': ['.pdf'] }}
                 maxFiles={1}
@@ -292,42 +270,27 @@ export function ConvertTool() {
               />
 
               {uploadedFiles.length > 0 && (
-                <Button 
+                <Button
                   onClick={handlePDFToWord}
                   disabled={processing}
-                  className="w-full"
-                  size="lg"
+                  className="w-full h-14 text-lg font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-500/20 rounded-xl transition-all hover:scale-[1.01] mt-6"
                 >
-                  {processing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                      Converting...
-                    </>
-                  ) : (
-                    <>
-                      <FileEdit className="h-4 w-4 mr-2" />
-                      Convert ke Word (.docx)
-                    </>
-                  )}
+                  {processing ? "Converting..." : "Convert ke Word"}
                 </Button>
               )}
-            </div>
-          </Card>
-        </TabsContent>
+            </TabsContent>
 
-        <TabsContent value="pdf-to-image" className="space-y-6">
-          <Card className="p-6">
-            <Alert className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-sm">
-                <strong>Kapan digunakan:</strong> Extract semua halaman PDF menjadi gambar JPG. 
-                Berguna untuk membagikan dokumen dalam format gambar atau posting ke media sosial. 
-                Hasil berupa file ZIP berisi semua halaman sebagai JPG.
-              </AlertDescription>
-            </Alert>
+            <TabsContent value="pdf-to-image" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400">
+                  <FileImage className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">PDF ke Image</h3>
+                  <p className="text-sm text-slate-500 dark:text-zinc-400">Extract halaman PDF menjadi file JPG.</p>
+                </div>
+              </div>
 
-            <div className="space-y-4">
-              <h3 className="font-semibold">Upload File PDF</h3>
               <UploadZone
                 accept={{ 'application/pdf': ['.pdf'] }}
                 maxFiles={1}
@@ -336,48 +299,31 @@ export function ConvertTool() {
               />
 
               {uploadedFiles.length > 0 && (
-                <>
-                  <div className="rounded-lg bg-muted p-4">
-                    <p className="text-sm font-medium">Info:</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Setiap halaman PDF akan diconvert menjadi 1 file JPG. 
-                      Hasil akan di-download sebagai file ZIP.
-                    </p>
-                  </div>
-
-                  <Button 
-                    onClick={handlePDFToImage}
-                    disabled={processing}
-                    className="w-full"
-                    size="lg"
-                  >
-                    {processing ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                        Converting...
-                      </>
-                    ) : (
-                      <>
-                        <FileImage className="h-4 w-4 mr-2" />
-                        Convert ke Gambar (JPG)
-                      </>
-                    )}
-                  </Button>
-                </>
+                <Button
+                  onClick={handlePDFToImage}
+                  disabled={processing}
+                  className="w-full h-14 text-lg font-bold bg-pink-600 hover:bg-pink-700 text-white shadow-xl shadow-pink-500/20 rounded-xl transition-all hover:scale-[1.01] mt-6"
+                >
+                  {processing ? "Converting..." : "Convert ke Image (JPG)"}
+                </Button>
               )}
-            </div>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </TabsContent>
+          </div>
 
-      {/* Result */}
-      {result && (
-        result.images ? (
-          <ImageResultCard result={result} />
-        ) : (
-          <ResultCard result={result} operation="convert" />
-        )
-      )}
-    </div>
+        </Tabs>
+
+        {/* Result */}
+        {result && (
+          <div className="pt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {result.images ? (
+              <ImageResultCard result={result} />
+            ) : (
+              <ResultCard result={result} operation="convert" />
+            )}
+          </div>
+        )}
+
+      </div>
+    </PDFToolLayout>
   );
 }

@@ -10,7 +10,8 @@ import { UploadZone } from "../UploadZone";
 import { ResultCard } from "../ResultCard";
 import { compressPDF } from "@/actions/pdf/compress";
 import { toast } from "sonner";
-import { Minimize2, AlertCircle, TrendingDown } from "lucide-react";
+import { Minimize2, AlertCircle, TrendingDown, ArrowRight, Zap, CheckCircle2 } from "lucide-react";
+import { PDFToolLayout } from "../PDFToolLayout";
 
 interface UploadedFile {
   fileId: string;
@@ -20,7 +21,11 @@ interface UploadedFile {
   path: string;
 }
 
-export function CompressTool() {
+interface CompressToolProps {
+  onBack: () => void;
+}
+
+export function CompressTool({ onBack }: CompressToolProps) {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -75,35 +80,22 @@ export function CompressTool() {
   const currentFile = uploadedFiles[0];
 
   return (
-    <div className="space-y-6">
-      <Card className="p-6">
+    <PDFToolLayout
+      title="Kompres PDF"
+      description="Kecilkan ukuran file PDF Anda agar mudah di-upload ke portal kerja, tanpa mengorbankan kualitas."
+      icon={Minimize2}
+      color="text-orange-500"
+      onBack={onBack}
+      theme="blue"
+    >
+      <div className="space-y-8 max-w-3xl mx-auto">
+
+        {/* Step 1: Upload */}
         <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-purple-100 dark:bg-purple-900 p-2">
-              <Minimize2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-xl font-semibold">Kompres PDF</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Kurangi ukuran file PDF untuk memenuhi limit job portal
-              </p>
-            </div>
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400 font-bold text-sm">1</div>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Upload Dokumen</h3>
           </div>
-
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription className="text-sm">
-              <strong>Kapan digunakan:</strong> Saat file portfolio terlalu besar (&gt;2MB) dan job portal membatasi ukuran upload. 
-              Kompres tanpa kehilangan kualitas signifikan.
-            </AlertDescription>
-          </Alert>
-        </div>
-      </Card>
-
-      {/* Upload Zone */}
-      <Card className="p-6">
-        <div className="space-y-4">
-          <h3 className="font-semibold">Upload File PDF</h3>
           <UploadZone
             accept={{ 'application/pdf': ['.pdf'] }}
             maxFiles={1}
@@ -111,145 +103,120 @@ export function CompressTool() {
             uploadedFiles={uploadedFiles}
           />
         </div>
-      </Card>
 
-      {/* Compression Options */}
-      {currentFile && (
-        <Card className="p-6">
-          <div className="space-y-6">
-            <div>
-              <h3 className="font-semibold mb-2">File Info</h3>
-              <div className="rounded-lg bg-muted p-4">
-                <p className="text-sm font-medium">{currentFile.filename}</p>
-                <p className="text-2xl font-bold mt-2 text-primary">
-                  {formatFileSize(currentFile.size)}
-                </p>
-                {currentFile.size > 2 * 1024 * 1024 && (
-                  <p className="text-xs text-destructive mt-1">
-                    ⚠️ File terlalu besar untuk kebanyakan job portal (max 2MB)
-                  </p>
-                )}
+        {/* Step 2: Options */}
+        {currentFile && (
+          <div className="space-y-6 pt-6 border-t border-slate-200 dark:border-white/10 animate-in fade-in slide-in-from-top-4 duration-500">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400 font-bold text-sm">2</div>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Pilih Kualitas</h3>
+            </div>
+
+            {/* File Info Check */}
+            <div className="p-4 rounded-xl bg-orange-50/50 dark:bg-orange-900/10 border border-orange-100 dark:border-orange-900/20 flex flex-col md:flex-row justify-between items-center gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">
+                  <Minimize2 className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-white truncate max-w-[200px]">{currentFile.filename}</p>
+                  <p className="text-sm text-slate-500 dark:text-zinc-400">Ukuran saat ini</p>
+                </div>
+              </div>
+              <div className="text-2xl font-black text-slate-900 dark:text-white">
+                {formatFileSize(currentFile.size)}
               </div>
             </div>
 
-            <div className="space-y-4">
-              <Label>Level Kompresi</Label>
-              
-              <RadioGroup 
-                value={compressionLevel} 
-                onValueChange={(v) => setCompressionLevel(v as any)}
-                className="space-y-3"
-              >
-                <div className="flex items-center space-between border rounded-lg p-4 has-[[data-state=checked]]:border-primary">
-                  <div className="flex items-center space-x-3 flex-1">
-                    <RadioGroupItem value="low" id="low" />
-                    <div className="flex-1">
-                      <Label htmlFor="low" className="font-medium">
-                        Low Compression (Ringan)
-                      </Label>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Pengurangan ~40% • Kualitas sangat tinggi • Terbaik untuk gambar/foto
-                      </p>
+            {/* Compression Options */}
+            <RadioGroup
+              value={compressionLevel}
+              onValueChange={(v) => setCompressionLevel(v as any)}
+              className="grid grid-cols-1 md:grid-cols-3 gap-4"
+            >
+              {[
+                {
+                  id: 'low',
+                  label: 'Ringan',
+                  sub: 'Kualitas Tinggi',
+                  reduction: '40%',
+                  color: 'border-blue-200 dark:border-blue-900',
+                  bg: 'hover:bg-blue-50 dark:hover:bg-blue-900/10'
+                },
+                {
+                  id: 'recommended',
+                  label: 'Standard',
+                  sub: 'Recommended',
+                  reduction: '60%',
+                  color: 'border-green-200 dark:border-green-900 ring-2 ring-green-500 dark:ring-green-500',
+                  bg: 'bg-green-50/50 dark:bg-green-900/10'
+                },
+                {
+                  id: 'extreme',
+                  label: 'Ekstrim',
+                  sub: 'Size Terkecil',
+                  reduction: '80%',
+                  color: 'border-orange-200 dark:border-orange-900',
+                  bg: 'hover:bg-orange-50 dark:hover:bg-orange-900/10'
+                },
+              ].map((option) => (
+                <label
+                  key={option.id}
+                  htmlFor={option.id}
+                  className={`relative cursor-pointer rounded-2xl border p-4 transition-all ${option.bg} ${compressionLevel === option.id ? option.color : 'border-slate-200 dark:border-zinc-800'}`}
+                >
+                  <RadioGroupItem value={option.id} id={option.id} className="sr-only" />
+                  <div className="flex flex-col items-center text-center gap-2">
+                    <div className="text-sm font-medium text-slate-900 dark:text-white">{option.label}</div>
+                    <div className="text-3xl font-black text-slate-900 dark:text-white">-{option.reduction}</div>
+                    <div className="text-xs text-slate-500 dark:text-zinc-500 uppercase tracking-wider">{option.sub}</div>
+                  </div>
+                  {compressionLevel === option.id && (
+                    <div className="absolute top-2 right-2 text-green-500">
+                      <CheckCircle2 className="h-4 w-4" />
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium">
-                      ~{formatFileSize(getEstimatedSize(currentFile.size))}
-                    </p>
-                    <p className="text-xs text-muted-foreground">hasil</p>
-                  </div>
-                </div>
+                  )}
+                </label>
+              ))}
+            </RadioGroup>
 
-                <div className="flex items-center space-between border rounded-lg p-4 has-[[data-state=checked]]:border-primary">
-                  <div className="flex items-center space-x-3 flex-1">
-                    <RadioGroupItem value="recommended" id="recommended" />
-                    <div className="flex-1">
-                      <Label htmlFor="recommended" className="font-medium">
-                        Recommended (Direkomendasikan) ✓
-                      </Label>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Pengurangan ~60% • Kualitas bagus • Balance terbaik
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-green-600">
-                      ~{formatFileSize(getEstimatedSize(currentFile.size))}
-                    </p>
-                    <p className="text-xs text-muted-foreground">hasil</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-between border rounded-lg p-4 has-[[data-state=checked]]:border-primary">
-                  <div className="flex items-center space-x-3 flex-1">
-                    <RadioGroupItem value="extreme" id="extreme" />
-                    <div className="flex-1">
-                      <Label htmlFor="extreme" className="font-medium">
-                        Extreme Compression (Maksimal)
-                      </Label>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Pengurangan ~80% • Kualitas cukup • Untuk text-only PDF
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-orange-600">
-                      ~{formatFileSize(getEstimatedSize(currentFile.size))}
-                    </p>
-                    <p className="text-xs text-muted-foreground">hasil</p>
-                  </div>
-                </div>
-              </RadioGroup>
-            </div>
-
-            {/* Expected Result */}
-            <div className="rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950 p-4 border">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingDown className="h-4 w-4 text-purple-600" />
-                <p className="text-sm font-semibold">Estimasi Hasil Kompresi:</p>
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-xs text-muted-foreground">Ukuran Awal</p>
-                  <p className="text-lg font-bold">{formatFileSize(currentFile.size)}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">→</p>
-                  <p className="text-2xl">🗜️</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Ukuran Akhir</p>
-                  <p className="text-lg font-bold text-green-600">
-                    {formatFileSize(getEstimatedSize(currentFile.size))}
-                  </p>
-                </div>
+            {/* Estimated Result Section */}
+            <div className="p-6 rounded-2xl bg-slate-100 dark:bg-black/20 text-center">
+              <p className="text-sm text-slate-500 dark:text-zinc-500 mb-2">Estimasi Ukuran Akhir</p>
+              <div className="flex items-center justify-center gap-4 text-3xl font-black text-slate-900 dark:text-white">
+                <span className="line-through opacity-30 text-xl">{formatFileSize(currentFile.size)}</span>
+                <ArrowRight className="h-6 w-6 text-orange-500" />
+                <span className="text-green-500">{formatFileSize(getEstimatedSize(currentFile.size))}</span>
               </div>
             </div>
 
-            <Button 
+            <Button
               onClick={handleCompress}
               disabled={processing}
-              className="w-full"
-              size="lg"
+              className="w-full h-14 text-lg font-bold bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white shadow-xl shadow-orange-500/20 rounded-xl transition-all hover:scale-[1.01]"
             >
               {processing ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  Mengompres PDF...
-                </>
+                <span className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                  Memproses...
+                </span>
               ) : (
-                <>
-                  <Minimize2 className="h-4 w-4 mr-2" />
-                  Kompres PDF
-                </>
+                <span className="flex items-center gap-2">
+                  Kompres PDF Sekarang <ArrowRight className="h-5 w-5" />
+                </span>
               )}
             </Button>
           </div>
-        </Card>
-      )}
+        )}
 
-      {/* Result */}
-      {result && <ResultCard result={result} operation="compress" />}
-    </div>
+        {/* Result */}
+        {result && (
+          <div className="pt-8 border-t border-slate-200 dark:border-white/10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <ResultCard result={result} operation="compress" />
+          </div>
+        )}
+
+      </div>
+    </PDFToolLayout>
   );
 }

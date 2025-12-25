@@ -16,7 +16,7 @@ import { StepPreview } from "./StepPreview";
 // Lazy load form components
 import dynamic from "next/dynamic";
 
-const EmailTypeHome = dynamic(() => import("./EmailTypeHome").then(mod => ({ default: mod.EmailTypeHome })), { ssr: true });
+const EmailGeneratorHome = dynamic(() => import("./EmailGeneratorHome").then(mod => ({ default: mod.EmailGeneratorHome })), { ssr: true });
 const FollowUpForm = dynamic(() => import("./FollowUpForm").then(mod => ({ default: mod.FollowUpForm })), { ssr: false });
 const ThankYouForm = dynamic(() => import("./ThankYouForm").then(mod => ({ default: mod.ThankYouForm })), { ssr: false });
 const InquiryForm = dynamic(() => import("./InquiryForm").then(mod => ({ default: mod.InquiryForm })), { ssr: false });
@@ -230,8 +230,8 @@ export function EmailGeneratorV2Main({ userName }: EmailGeneratorV2MainProps) {
 
     // Show home page with email type selection
     return (
-        <div className="min-h-screen bg-background">
-            <EmailTypeHome userName={userName} onSelectType={handleSelectType} />
+        <div className="h-full w-full">
+            <EmailGeneratorHome onSelectType={handleSelectType} />
         </div>
     );
 }

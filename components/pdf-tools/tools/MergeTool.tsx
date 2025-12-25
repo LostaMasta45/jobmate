@@ -11,7 +11,8 @@ import { UploadZone } from "../UploadZone";
 import { ResultCard } from "../ResultCard";
 import { mergePDFs } from "@/actions/pdf/merge";
 import { toast } from "sonner";
-import { FileText, Download, AlertCircle } from "lucide-react";
+import { FileText, Download, AlertCircle, ArrowRight, CheckCircle2 } from "lucide-react";
+import { PDFToolLayout } from "../PDFToolLayout";
 
 interface UploadedFile {
   fileId: string;
@@ -21,7 +22,11 @@ interface UploadedFile {
   path: string;
 }
 
-export function MergeTool() {
+interface MergeToolProps {
+  onBack: () => void;
+}
+
+export function MergeTool({ onBack }: MergeToolProps) {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -43,7 +48,7 @@ export function MergeTool() {
 
     try {
       const fileIds = uploadedFiles.map(f => f.fileId);
-      
+
       const result = await mergePDFs(fileIds, {
         addPageNumbers,
         pageNumberPosition,
@@ -75,173 +80,155 @@ export function MergeTool() {
   };
 
   return (
-    <div className="space-y-6">
-      <Card className="p-6">
+    <PDFToolLayout
+      title="Gabung PDF"
+      description="Satukan berbagai file lamaran, CV, dan portofolio menjadi satu dokumen profesional yang rapi."
+      icon={FileText}
+      color="text-red-500"
+      onBack={onBack}
+    >
+      <div className="space-y-8 max-w-4xl mx-auto">
+
+        {/* Step 1: Upload */}
         <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-blue-100 dark:bg-blue-900 p-2">
-              <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-xl font-semibold">Gabung PDF</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Gabungkan CV, Portfolio, dan Sertifikat menjadi satu PDF profesional
-              </p>
-            </div>
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 font-bold text-sm">1</div>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Upload Dokumen</h3>
           </div>
-
-          {/* Use Case Examples */}
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription className="text-sm">
-              <strong>Kapan digunakan:</strong> Saat HR meminta "1 PDF berisi CV + Portfolio + Sertifikat". 
-              Tools ini akan menggabungkan semua file dengan page numbering profesional.
-            </AlertDescription>
-          </Alert>
-        </div>
-      </Card>
-
-      {/* Upload Zone */}
-      <Card className="p-6">
-        <div className="space-y-4">
-          <h3 className="font-semibold">Upload File PDF</h3>
           <UploadZone
             accept={{ 'application/pdf': ['.pdf'] }}
             maxFiles={20}
             onFilesUploaded={setUploadedFiles}
             uploadedFiles={uploadedFiles}
           />
+          {uploadedFiles.length > 0 && uploadedFiles.length < 2 && (
+            <p className="text-sm text-amber-500 flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
+              Minimal 2 file diperlukan untuk menggabungkan PDF.
+            </p>
+          )}
         </div>
-      </Card>
 
-      {/* Options */}
-      {uploadedFiles.length >= 2 && (
-        <Card className="p-6">
-          <div className="space-y-6">
-            <h3 className="font-semibold">Opsi Penggabungan</h3>
+        {/* Step 2: Options (Only visible if files uploaded) */}
+        {uploadedFiles.length >= 2 && (
+          <div className="space-y-6 pt-6 border-t border-slate-200 dark:border-white/10 animate-in fade-in slide-in-from-top-4 duration-500">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 font-bold text-sm">2</div>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Pengaturan Halaman</h3>
+            </div>
 
-            {/* Page Numbers */}
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Tambah Nomor Halaman</Label>
-                <p className="text-xs text-muted-foreground">
-                  Tambahkan nomor halaman pada PDF hasil
-                </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-2xl bg-slate-50 dark:bg-zinc-900/50 border border-slate-200 dark:border-white/5">
+              {/* Page Numbers Toggle */}
+              <div className="flex items-center justify-between col-span-1 md:col-span-2">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Nomor Halaman</Label>
+                  <p className="text-sm text-slate-500 dark:text-zinc-400">
+                    Otomatis tambahkan nomor halaman di setiap lembar
+                  </p>
+                </div>
+                <Switch
+                  checked={addPageNumbers}
+                  onCheckedChange={setAddPageNumbers}
+                  className="data-[state=checked]:bg-red-500"
+                />
               </div>
-              <Switch 
-                checked={addPageNumbers} 
-                onCheckedChange={setAddPageNumbers}
-              />
-            </div>
 
-            {addPageNumbers && (
-              <>
-                {/* Position */}
-                <div className="space-y-3">
-                  <Label>Posisi Nomor Halaman</Label>
-                  <RadioGroup 
-                    value={pageNumberPosition} 
-                    onValueChange={(v) => setPageNumberPosition(v as any)}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="top" id="top" />
-                      <Label htmlFor="top" className="font-normal">
-                        Atas Halaman
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="bottom" id="bottom" />
-                      <Label htmlFor="bottom" className="font-normal">
-                        Bawah Halaman (Recommended)
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-
-                {/* Alignment */}
-                <div className="space-y-3">
-                  <Label>Perataan</Label>
-                  <RadioGroup 
-                    value={pageNumberAlignment} 
-                    onValueChange={(v) => setPageNumberAlignment(v as any)}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="left" id="left" />
-                      <Label htmlFor="left" className="font-normal">Kiri</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="center" id="center" />
-                      <Label htmlFor="center" className="font-normal">
-                        Tengah (Recommended)
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="right" id="right" />
-                      <Label htmlFor="right" className="font-normal">Kanan</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-
-                {/* Exclude First Page */}
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Kecualikan Halaman Pertama</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Tidak menambahkan nomor pada halaman pertama (cover page)
-                    </p>
+              {addPageNumbers && (
+                <>
+                  {/* Position */}
+                  <div className="space-y-3">
+                    <Label>Posisi</Label>
+                    <RadioGroup
+                      value={pageNumberPosition}
+                      onValueChange={(v) => setPageNumberPosition(v as any)}
+                      className="flex gap-4"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="top" id="top" />
+                        <Label htmlFor="top" className="font-normal cursor-pointer">Atas</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="bottom" id="bottom" />
+                        <Label htmlFor="bottom" className="font-normal cursor-pointer">Bawah</Label>
+                      </div>
+                    </RadioGroup>
                   </div>
-                  <Switch 
-                    checked={excludeFirstPage} 
-                    onCheckedChange={setExcludeFirstPage}
-                  />
-                </div>
-              </>
-            )}
 
-            {/* Summary */}
-            <div className="rounded-lg bg-muted p-4">
-              <p className="text-sm font-medium">Ringkasan:</p>
-              <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                <li>• {uploadedFiles.length} file akan digabung</li>
-                <li>
-                  • Total ukuran: {formatFileSize(
-                    uploadedFiles.reduce((sum, f) => sum + f.size, 0)
-                  )}
-                </li>
-                <li>
-                  • {addPageNumbers 
-                    ? `Page numbers: ${pageNumberPosition}, ${pageNumberAlignment}${excludeFirstPage ? ', skip first page' : ''}`
-                    : 'Tanpa page numbers'
-                  }
-                </li>
-              </ul>
-            </div>
+                  {/* Alignment */}
+                  <div className="space-y-3">
+                    <Label>Perataan</Label>
+                    <RadioGroup
+                      value={pageNumberAlignment}
+                      onValueChange={(v) => setPageNumberAlignment(v as any)}
+                      className="flex gap-4"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="left" id="left" />
+                        <Label htmlFor="left" className="font-normal cursor-pointer">Kiri</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="center" id="center" />
+                        <Label htmlFor="center" className="font-normal cursor-pointer">Tengah</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="right" id="right" />
+                        <Label htmlFor="right" className="font-normal cursor-pointer">Kanan</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
 
-            {/* Action Button */}
-            <Button 
-              onClick={handleMerge}
-              disabled={processing || uploadedFiles.length < 2}
-              className="w-full"
-              size="lg"
-            >
-              {processing ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  Menggabungkan PDF...
-                </>
-              ) : (
-                <>
-                  <FileText className="h-4 w-4 mr-2" />
-                  Gabungkan {uploadedFiles.length} File
+                  {/* Exclude First Page */}
+                  <div className="flex items-center justify-between col-span-1 md:col-span-2 pt-4 border-t border-slate-200 dark:border-white/5">
+                    <div className="space-y-0.5">
+                      <Label>Skip Halaman Pertama</Label>
+                      <p className="text-xs text-slate-500 dark:text-zinc-400">
+                        Jangan beri nomor di halaman cover/depan
+                      </p>
+                    </div>
+                    <Switch
+                      checked={excludeFirstPage}
+                      onCheckedChange={setExcludeFirstPage}
+                      className="data-[state=checked]:bg-red-500"
+                    />
+                  </div>
                 </>
               )}
-            </Button>
-          </div>
-        </Card>
-      )}
+            </div>
 
-      {/* Result */}
-      {result && <ResultCard result={result} operation="merge" />}
-    </div>
+            {/* Summary & Action */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between text-sm text-slate-500 dark:text-zinc-400 px-2">
+                <span>Total {uploadedFiles.length} file</span>
+                <span>{formatFileSize(uploadedFiles.reduce((sum, f) => sum + f.size, 0))}</span>
+              </div>
+
+              <Button
+                onClick={handleMerge}
+                disabled={processing}
+                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white shadow-xl shadow-red-500/20 rounded-xl transition-all hover:scale-[1.01]"
+              >
+                {processing ? (
+                  <span className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                    Memproses...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    Gabungkan PDF Sekarang <ArrowRight className="h-5 w-5" />
+                  </span>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Result */}
+        {result && (
+          <div className="pt-8 border-t border-slate-200 dark:border-white/10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <ResultCard result={result} operation="merge" />
+          </div>
+        )}
+      </div>
+    </PDFToolLayout>
   );
 }

@@ -5,7 +5,7 @@ import { PDFToolsClient } from "@/components/pdf-tools/PDFToolsClient";
 
 export default function PDFToolsPage() {
   return (
-    <AppShell>
+    <AppShell isFullScreen>
       <PDFToolsClient />
     </AppShell>
   );
