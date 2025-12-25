@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Bell, Search, User, LogOut, FileText, Briefcase, Mail, MessageCircle, X } from "lucide-react";
+import { Bell, Search, User, LogOut, FileText, Briefcase, Mail, MessageCircle, X, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { signOut } from "@/actions/auth";
 import { createClient } from "@/lib/supabase/client";
 import { FollowUpNotificationPanel } from "@/components/followup/FollowUpNotificationPanel";
+import { cn } from "@/lib/utils";
 
 interface TopbarProps {
   user?: {
@@ -27,12 +28,16 @@ export function Topbar({ user }: TopbarProps) {
   const [isSearching, setIsSearching] = React.useState(false);
   const debouncedSearch = useDebounce(searchQuery, 300);
   const searchRef = React.useRef<HTMLDivElement>(null);
+  const userMenuRef = React.useRef<HTMLDivElement>(null);
 
   // Close search results when clicking outside
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setShowSearchResults(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -64,7 +69,7 @@ export function Topbar({ user }: TopbarProps) {
       try {
         const supabase = createClient();
         const { data: { user: currentUser } } = await supabase.auth.getUser();
-        
+
         if (!currentUser) return;
 
         const query = debouncedSearch.toLowerCase();
@@ -77,7 +82,7 @@ export function Topbar({ user }: TopbarProps) {
           .eq("user_id", currentUser.id)
           .or(`company.ilike.%${query}%,position.ilike.%${query}%`)
           .limit(5);
-        
+
         if (apps) {
           results.push(...apps.map(app => ({
             type: "application",
@@ -96,7 +101,7 @@ export function Topbar({ user }: TopbarProps) {
           .eq("user_id", currentUser.id)
           .or(`nama_perusahaan.ilike.%${query}%,posisi_lowongan.ilike.%${query}%`)
           .limit(5);
-        
+
         if (coverLetters) {
           results.push(...coverLetters.map(cl => ({
             type: "cover_letter",
@@ -115,7 +120,7 @@ export function Topbar({ user }: TopbarProps) {
           .eq("user_id", currentUser.id)
           .or(`company.ilike.%${query}%,position.ilike.%${query}%`)
           .limit(5);
-        
+
         if (emails) {
           results.push(...emails.map(email => ({
             type: "email",
@@ -134,7 +139,7 @@ export function Topbar({ user }: TopbarProps) {
           .eq("user_id", currentUser.id)
           .or(`company.ilike.%${query}%,position.ilike.%${query}%`)
           .limit(5);
-        
+
         if (waMessages) {
           results.push(...waMessages.map(wa => ({
             type: "whatsapp",
@@ -178,13 +183,13 @@ export function Topbar({ user }: TopbarProps) {
       // Clear client-side session FIRST
       const supabase = createClient();
       await supabase.auth.signOut();
-      
+
       // Clear server-side session
       await signOut();
-      
+
       // Small delay to ensure cookies are cleared
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       // Force a hard redirect to clear all state
       window.location.href = "/sign-in";
     } catch (error) {
@@ -195,56 +200,67 @@ export function Topbar({ user }: TopbarProps) {
   };
 
   return (
-    <header className="hidden lg:flex sticky top-0 z-10 h-16 items-center gap-4 border-b bg-card px-4 md:px-6">
+    <header className="hidden lg:flex sticky top-0 z-30 h-16 items-center gap-4 border-b border-border/40 bg-background/60 backdrop-blur-xl px-4 md:px-6 transition-all duration-300">
       <div className="flex flex-1 items-center gap-4">
+        {/* Search Bar - Glassy Pill Design */}
         <div className="relative max-w-md flex-1" ref={searchRef}>
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <input
-            id="global-search"
-            type="search"
-            placeholder="Search applications, documents... (Ctrl+K)"
-            className="w-full rounded-lg border bg-background pl-8 pr-9 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => searchQuery && setShowSearchResults(true)}
-          />
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-1 top-1 h-6 w-6"
-              onClick={clearSearch}
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          )}
+          <div className={cn(
+            "relative group transition-all duration-300",
+            showSearchResults ? "shadow-lg ring-2 ring-primary/20 rounded-2xl" : ""
+          )}>
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <input
+              id="global-search"
+              type="search"
+              placeholder="Search..."
+              className="w-full rounded-2xl border border-border/50 bg-muted/30 pl-10 pr-10 py-2 text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:bg-background/80 hover:bg-muted/50"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery && setShowSearchResults(true)}
+            />
+            {searchQuery ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1 h-7 w-7 rounded-full hover:bg-background/80"
+                onClick={clearSearch}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            ) : (
+              <div className="absolute right-3 top-2.5 flex items-center gap-1 pointer-events-none">
+                <span className="text-[10px] text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded border border-border/50">⌘ K</span>
+              </div>
+            )}
+
+          </div>
 
           {/* Search Results Dropdown */}
           {showSearchResults && (
-            <div className="absolute top-full mt-2 w-full max-w-2xl rounded-lg border bg-card shadow-lg z-50 max-h-96 overflow-y-auto">
+            <div className="absolute top-full mt-2 w-full max-w-2xl rounded-xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-2xl z-50 max-h-96 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2 duration-200">
               {isSearching ? (
-                <div className="p-4 text-center text-sm text-muted-foreground">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary mx-auto mb-2"></div>
-                  Searching...
+                <div className="p-8 text-center text-sm text-muted-foreground flex flex-col items-center gap-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary border-t-transparent"></div>
+                  <span>Running search...</span>
                 </div>
               ) : searchResults.length > 0 ? (
-                <div className="p-2">
+                <div className="p-2 space-y-1">
                   {searchResults.map((result, index) => {
                     const Icon = result.icon;
                     return (
                       <button
                         key={`${result.type}-${index}`}
                         onClick={() => handleSearchResultClick(result.href)}
-                        className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors text-left"
+                        className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-primary/5 hover:scale-[0.99] transition-all duration-200 text-left group"
                       >
-                        <div className="flex-shrink-0 mt-0.5">
-                          <Icon className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex-shrink-0 mt-0.5 p-2 rounded-full bg-muted/50 group-hover:bg-primary/10 transition-colors">
+                          <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{result.title}</p>
+                          <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">{result.title}</p>
                           <p className="text-xs text-muted-foreground truncate">{result.subtitle}</p>
                         </div>
-                        <div className="text-xs text-muted-foreground whitespace-nowrap">
+                        <div className="text-[10px] text-muted-foreground/60 p-1 bg-muted/30 rounded">
                           {result.date.toLocaleDateString('id-ID', { month: 'short', day: 'numeric' })}
                         </div>
                       </button>
@@ -252,7 +268,7 @@ export function Topbar({ user }: TopbarProps) {
                   })}
                 </div>
               ) : (
-                <div className="p-4 text-center text-sm text-muted-foreground">
+                <div className="p-8 text-center text-sm text-muted-foreground">
                   No results found for "{searchQuery}"
                 </div>
               )}
@@ -261,39 +277,45 @@ export function Topbar({ user }: TopbarProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 md:gap-3">
         <FollowUpNotificationPanel />
 
         <ThemeToggle />
 
-        <div className="relative">
+        <div className="relative" ref={userMenuRef}>
           <Button
             variant="ghost"
-            size="icon"
+            className="flex items-center gap-2 rounded-full pl-2 pr-3 py-1 hover:bg-muted/50 transition-all border border-transparent hover:border-border/40"
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="rounded-full"
           >
-            <User className="h-5 w-5" />
+            <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-primary/20 to-secondary/20 flex items-center justify-center border border-primary/10 shadow-inner">
+              <User className="h-4 w-4 text-primary" />
+            </div>
+            <span className="text-sm font-medium hidden md:block max-w-[100px] truncate">
+              {user?.name?.split(' ')[0] || "User"}
+            </span>
+            <ChevronDown className="h-3 w-3 text-muted-foreground" />
           </Button>
 
           {showUserMenu && (
-            <div className="absolute right-0 mt-2 w-56 rounded-lg border bg-card p-2 shadow-lg">
-              <div className="px-2 py-2 border-b">
-                <p className="text-sm font-medium">{user?.name || "User"}</p>
-                <p className="text-xs text-muted-foreground">{user?.email}</p>
+            <div className="absolute right-0 mt-2 w-60 rounded-xl border border-border/50 bg-background/95 backdrop-blur-xl p-2 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200 ring-1 ring-black/5">
+              <div className="px-3 py-3 border-b border-border/50 mb-1">
+                <p className="text-sm font-semibold truncate">{user?.name || "User"}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
               </div>
-              <div className="mt-2 space-y-1">
+              <div className="space-y-1">
                 <Button
                   variant="ghost"
-                  className="w-full justify-start"
+                  className="w-full justify-start rounded-lg hover:bg-primary/5 hover:text-primary transition-colors h-9 px-3"
                   onClick={() => router.push("/settings")}
                 >
                   <User className="mr-2 h-4 w-4" />
-                  Profile
+                  Profile Settings
                 </Button>
+                <div className="my-1 border-t border-border/50 mx-2" />
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-destructive"
+                  className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg h-9 px-3"
                   onClick={handleSignOut}
                   disabled={isLoggingOut}
                 >
