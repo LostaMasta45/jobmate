@@ -569,3 +569,133 @@
     print-color-adjust: exact;
   }
 }
+
+/* =====================================================
+   PWA STANDALONE MODE STYLES
+   ===================================================== */
+
+/* Safe Area CSS Variables */
+@supports (padding: env(safe-area-inset-top)) {
+  :root {
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
+  }
+}
+
+/* PWA Standalone Mode - Fullscreen UI */
+@media all and (display-mode: standalone) {
+  /* Header extends to notch/status bar area */
+  .pwa-header {
+    padding-top: env(safe-area-inset-top, 0px);
+    min-height: calc(60px + env(safe-area-inset-top, 0px));
+  }
+  
+  /* Bottom bar accounts for home indicator */
+  .pwa-bottom-bar {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  
+  /* Main content area adjustment */
+  .pwa-main {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  
+  /* Fullscreen cards in PWA mode */
+  .pwa-card {
+    border-radius: 0;
+    margin: 0;
+  }
+  
+  /* PWA status bar background - extends color to notch */
+  .pwa-status-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top, 0px);
+    z-index: 9999;
+  }
+}
+
+/* iOS Safari Standalone specific */
+@supports (-webkit-touch-callout: none) {
+  /* Disable text selection on interactive elements */
+  .pwa-no-select {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  
+  /* Prevent rubber-banding on scroll */
+  .pwa-no-bounce {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* PWA Install Prompt Styles */
+.pwa-install-prompt {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 9998;
+}
+
+@media (min-width: 640px) {
+  .pwa-install-prompt {
+    left: auto;
+    right: 20px;
+    max-width: 360px;
+  }
+}
+
+/* PWA Loading Skeleton */
+.pwa-skeleton {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
+  animation: pwa-skeleton-shimmer 1.5s infinite;
+}
+
+@keyframes pwa-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Touch-friendly button sizes for PWA */
+.pwa-touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* PWA Notification Badge */
+.pwa-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: #ef4444;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}

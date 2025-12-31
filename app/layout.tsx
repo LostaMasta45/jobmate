@@ -38,6 +38,19 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
+        {/* PWA Manifest */}
+        <link rel="manifest" href="/manifest.json" />
+
+        {/* PWA Meta Tags */}
+        <meta name="theme-color" content="#6366f1" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="JobMate" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+
+        {/* Viewport with safe area for notch devices */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+
         {/* Prevent theme flash by setting theme BEFORE React hydrates */}
         <script
           dangerouslySetInnerHTML={{
@@ -59,7 +72,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body 
+      <body
         className={`${inter.variable} ${poppins.variable} antialiased`}
         style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}
         suppressHydrationWarning

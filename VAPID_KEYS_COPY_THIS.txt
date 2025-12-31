@@ -1,0 +1,8 @@
+
+# =====================================================
+# Push Notifications (VAPID)
+# Copy these lines to your .env.local file
+# =====================================================
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=BPsDSNOsu_FdTREQiqL0NStM-5F4sB9BgOac_Ocj-af832bHPZr2qs-71zKyd13uqgf5VRrOe70RFcuM0SvyhZY
+VAPID_PRIVATE_KEY=KrD_moIOdPCHUicSuozT-SpUWQ9DjA-DYGtDoJMsoOw
+VAPID_SUBJECT=mailto:admin@infolokerjombang.net

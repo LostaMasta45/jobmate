@@ -1,19 +1,46 @@
 import type { NextConfig } from "next";
 
+// PWA Configuration - conditionally loaded to avoid MODULE_NOT_FOUND in Docker standalone
+let withPWA: (config: NextConfig) => NextConfig = (config) => config;
+
+try {
+  // Only load PWA wrapper during build time, not in standalone runtime
+  // In Docker standalone, this package won't be available
+  const withPWAInit = require("@ducanh2912/next-pwa").default;
+  withPWA = withPWAInit({
+    dest: "public",
+    register: true,
+    disable: process.env.NODE_ENV === "development",
+    fallbacks: {
+      document: "/offline",
+    },
+    cacheOnFrontEndNav: true,
+    reloadOnOnline: true,
+    workboxOptions: {
+      disableDevLogs: true,
+      skipWaiting: true,
+      clientsClaim: true,
+    },
+  });
+} catch {
+  // Package not available in standalone build - this is expected
+  console.log("PWA wrapper not available (standalone mode)");
+}
+
 // Forced rebuild for cache clearance: 2025-11-28
 const nextConfig: NextConfig = {
   // Required for Docker standalone deployment
   output: "standalone",
-  
+
   // Compression for better performance
   compress: true,
-  
+
   // Production source maps (disable untuk faster build & smaller bundle)
   productionBrowserSourceMaps: false,
-  
+
   // Optimize for mobile-first
   poweredByHeader: false,
-  
+
   images: {
     remotePatterns: [
       {
@@ -49,7 +76,7 @@ const nextConfig: NextConfig = {
     // Loader config for better optimization
     loader: 'default',
   },
-  
+
   experimental: {
     serverActions: {
       bodySizeLimit: "10mb", // Increased from default 1mb for CV with photos
@@ -64,7 +91,7 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-tabs',
     ],
   },
-  
+
   // Webpack optimizations
   webpack: (config, { dev, isServer, webpack }) => {
     // Polyfill for Edge Runtime (required by @supabase/supabase-js and realtime-js)
@@ -74,7 +101,7 @@ const nextConfig: NextConfig = {
         'global': 'globalThis',
       })
     );
-    
+
     // Add fallbacks for Node.js modules not available in Edge Runtime
     config.resolve.fallback = {
       ...config.resolve.fallback,
@@ -87,7 +114,7 @@ const nextConfig: NextConfig = {
       net: false,
       tls: false,
     };
-    
+
     // Production optimizations only
     if (!dev && !isServer) {
       config.optimization = {
@@ -149,7 +176,7 @@ const nextConfig: NextConfig = {
     }
     return config
   },
-  
+
   // Headers for caching and security
   async headers() {
     return [
@@ -188,4 +215,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);
