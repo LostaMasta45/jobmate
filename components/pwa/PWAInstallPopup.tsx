@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 interface PWAInstallPopupProps {
     /**
      * Delay before showing popup (in ms)
-     * @default 1500
+     * @default 1000
      */
     delay?: number;
     /**
@@ -24,7 +24,7 @@ interface PWAInstallPopupProps {
 }
 
 export function PWAInstallPopup({
-    delay = 1500,
+    delay = 1000,
     storageKey = "pwa-popup-dismissed",
     dismissDays = 3,
 }: PWAInstallPopupProps) {
@@ -66,37 +66,22 @@ export function PWAInstallPopup({
             }
         }
 
-        // Show popup after delay - regardless of canInstall for iOS
-        // For Android, show if canInstall is available OR after longer delay as fallback
+        // Show popup after delay - immediately for both iOS and Android
         const timer = setTimeout(() => {
-            // Show for iOS (doesn't support beforeinstallprompt)
-            if (isIOS) {
-                setShowPopup(true);
-                return;
-            }
-            // Show for Android if canInstall is true
-            if (isAndroid && canInstall) {
-                setShowPopup(true);
-                return;
-            }
-            // Fallback: show anyway after delay for other mobile browsers
-            if (isMobile && !isIOS && !isAndroid) {
+            // Show for all mobile devices after 1 second
+            if (isMobile) {
                 setShowPopup(true);
             }
         }, delay);
 
         return () => clearTimeout(timer);
-    }, [canInstall, isPWA, isMobile, isIOS, isAndroid, delay, storageKey, dismissDays]);
+    }, [isPWA, isMobile, delay, storageKey, dismissDays]);
 
-    // For Android: also show when canInstall becomes true later
+    // Also update canInstall state when it becomes available (for Android native prompt)
     useEffect(() => {
-        if (!isPWA && isMobile && isAndroid && canInstall && !showPopup) {
-            const dismissedTime = localStorage.getItem(storageKey);
-            if (!dismissedTime) {
-                setShowPopup(true);
-            }
-        }
-    }, [canInstall, isPWA, isMobile, isAndroid, showPopup, storageKey]);
+        // This effect just ensures the component re-renders when canInstall changes
+        // The actual popup is already shown, but we need canInstall for the install button to work
+    }, [canInstall]);
 
     const handleDismiss = () => {
         localStorage.setItem(storageKey, Date.now().toString());
