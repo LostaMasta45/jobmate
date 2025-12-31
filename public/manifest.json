@@ -5,6 +5,10 @@
     "start_url": "/sign-in",
     "id": "/sign-in",
     "display": "standalone",
+    "display_override": [
+        "standalone",
+        "fullscreen"
+    ],
     "orientation": "portrait",
     "background_color": "#000000",
     "theme_color": "#6366f1",
@@ -14,6 +18,17 @@
     ],
     "lang": "id",
     "dir": "ltr",
+    "scope": "/",
+    "handle_links": "preferred",
+    "launch_handler": {
+        "client_mode": [
+            "navigate-existing",
+            "auto"
+        ]
+    },
+    "edge_side_panel": {
+        "preferred_width": 480
+    },
     "icons": [
         {
             "src": "/icons/icon-72x72.png?v=2",
@@ -71,5 +86,44 @@
         }
     ],
     "screenshots": [],
-    "prefer_related_applications": false
+    "prefer_related_applications": false,
+    "related_applications": [],
+    "shortcuts": [
+        {
+            "name": "Cari Loker",
+            "short_name": "Loker",
+            "description": "Cari lowongan kerja terbaru",
+            "url": "/vip/loker",
+            "icons": [
+                {
+                    "src": "/icons/icon-96x96.png",
+                    "sizes": "96x96"
+                }
+            ]
+        },
+        {
+            "name": "Dashboard",
+            "short_name": "Dashboard",
+            "description": "Buka dashboard",
+            "url": "/vip",
+            "icons": [
+                {
+                    "src": "/icons/icon-96x96.png",
+                    "sizes": "96x96"
+                }
+            ]
+        },
+        {
+            "name": "Tools",
+            "short_name": "Tools",
+            "description": "Akses semua tools",
+            "url": "/tools",
+            "icons": [
+                {
+                    "src": "/icons/icon-96x96.png",
+                    "sizes": "96x96"
+                }
+            ]
+        }
+    ]
 }

@@ -571,10 +571,10 @@
 }
 
 /* =====================================================
-   PWA STANDALONE MODE STYLES
+   PWA STANDALONE MODE STYLES - FULLSCREEN NATIVE-LIKE UI
    ===================================================== */
 
-/* Safe Area CSS Variables */
+/* Safe Area CSS Variables - Dynamic Island & Notch Support */
 @supports (padding: env(safe-area-inset-top)) {
   :root {
     --safe-area-top: env(safe-area-inset-top, 0px);
@@ -584,12 +584,46 @@
   }
 }
 
-/* PWA Standalone Mode - Fullscreen UI */
+/* PWA Fullscreen Mode - Maximum native-like experience */
+@media all and (display-mode: fullscreen) {
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  /* Konten extend sampai tepi layar */
+  body {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+}
+
+/* PWA Standalone Mode - Normal app-like experience */
 @media all and (display-mode: standalone) {
-  /* Header extends to notch/status bar area */
+  /* Header extends to notch/status bar area - DYNAMIC ISLAND SUPPORT */
   .pwa-header {
     padding-top: env(safe-area-inset-top, 0px);
     min-height: calc(60px + env(safe-area-inset-top, 0px));
+    /* Gradient bg extends behind Dynamic Island/notch */
+    background-clip: padding-box;
+  }
+  
+  /* Status bar area background - fills the notch/Dynamic Island space */
+  .pwa-status-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top, 0px);
+    z-index: 9999;
+    /* Match theme color from manifest */
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  }
+  
+  .dark .pwa-status-bg {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
   }
   
   /* Bottom bar accounts for home indicator */
@@ -610,19 +644,9 @@
     border-radius: 0;
     margin: 0;
   }
-  
-  /* PWA status bar background - extends color to notch */
-  .pwa-status-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: env(safe-area-inset-top, 0px);
-    z-index: 9999;
-  }
 }
 
-/* iOS Safari Standalone specific */
+/* iOS Safari Standalone specific - NATIVE-LIKE BEHAVIOR */
 @supports (-webkit-touch-callout: none) {
   /* Disable text selection on interactive elements */
   .pwa-no-select {
@@ -631,11 +655,75 @@
     -webkit-touch-callout: none;
   }
   
-  /* Prevent rubber-banding on scroll */
+  /* Prevent rubber-banding on scroll - native feel */
   .pwa-no-bounce {
     overscroll-behavior: none;
     -webkit-overflow-scrolling: touch;
   }
+  
+  /* Disable long-press context menu */
+  .pwa-no-context {
+    -webkit-touch-callout: none;
+  }
+  
+  /* Fix iOS keyboard viewport issue */
+  @media all and (display-mode: standalone) {
+    body {
+      min-height: -webkit-fill-available;
+    }
+  }
+}
+
+/* Dynamic Island Specific Styling (iPhone 14 Pro+) */
+@media (device-width: 393px) and (device-height: 852px),
+       (device-width: 430px) and (device-height: 932px) {
+  @media all and (display-mode: standalone) {
+    .pwa-dynamic-island-aware {
+      /* Extra padding for Dynamic Island */
+      padding-top: max(env(safe-area-inset-top, 47px), 47px);
+    }
+  }
+}
+
+/* Safe Area Utility Classes */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pl-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.pr-safe {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.p-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.mt-safe {
+  margin-top: env(safe-area-inset-top, 0px);
+}
+
+.mb-safe {
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Height utilities accounting for safe areas */
+.h-screen-safe {
+  height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+}
+
+.min-h-screen-safe {
+  min-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
 }
 
 /* PWA Install Prompt Styles */
@@ -645,6 +733,8 @@
   left: 20px;
   right: 20px;
   z-index: 9998;
+  /* Account for safe area */
+  margin-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @media (min-width: 640px) {
@@ -655,7 +745,7 @@
   }
 }
 
-/* PWA Loading Skeleton */
+/* PWA Loading Skeleton - Smoother animation */
 .pwa-skeleton {
   background: linear-gradient(
     90deg,
@@ -699,3 +789,43 @@
   justify-content: center;
   padding: 0 4px;
 }
+
+/* Native-like page transition */
+.pwa-page-transition {
+  animation: pwa-page-fade-in 0.2s ease-out;
+}
+
+@keyframes pwa-page-fade-in {
+  from {
+    opacity: 0.8;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Native-like tap highlight */
+.pwa-tap-highlight {
+  -webkit-tap-highlight-color: rgba(99, 102, 241, 0.2);
+  tap-highlight-color: rgba(99, 102, 241, 0.2);
+}
+
+/* Disable tap highlight for cleaner look */
+.pwa-no-tap-highlight {
+  -webkit-tap-highlight-color: transparent;
+  tap-highlight-color: transparent;
+}
+
+/* PWA Status bar text color helper (add to body) */
+.pwa-light-status-text {
+  /* For dark backgrounds - use with black-translucent status bar */
+  color-scheme: dark;
+}
+
+.pwa-dark-status-text {
+  /* For light backgrounds */
+  color-scheme: light;
+}
+
