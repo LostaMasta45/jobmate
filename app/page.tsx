@@ -1,5 +1,14 @@
 import { Metadata } from "next";
-import LandingPageClient from "./LandingPageClient";
+import dynamic from "next/dynamic";
+import { LandingHeroCosmic } from "@/components/landing-v2/LandingHeroCosmic";
+import { NavbarDynamic } from "@/components/landing-v2/NavbarDynamic";
+import { StickyNotification } from "@/components/landing-v2/StickyNotification";
+
+// Lazy load below-fold content
+const LandingBelowFold = dynamic(() => import("./LandingBelowFold"), {
+  ssr: false,
+  loading: () => <div className="h-screen bg-black" /> // Simple placeholder
+});
 
 export const metadata: Metadata = {
   title: "Career VIP InfoLokerJombang — Siap Kerja Setiap Hari",
@@ -13,5 +22,21 @@ export const metadata: Metadata = {
 };
 
 export default function LandingPage() {
-  return <LandingPageClient />;
+  return (
+    <main className="min-h-screen bg-black text-white overflow-x-hidden selection:bg-brand selection:text-white font-sans">
+      <StickyNotification />
+      <NavbarDynamic />
+
+      {/* Background Global Effects */}
+      <div className="fixed inset-0 z-[-1] bg-black pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]" />
+      </div>
+
+      {/* Critical above-fold content - Rendered Immediately (SSR Friendly) */}
+      <LandingHeroCosmic />
+
+      {/* Below-fold content - Lazy loaded on client */}
+      <LandingBelowFold />
+    </main>
+  );
 }

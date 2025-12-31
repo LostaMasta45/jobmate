@@ -2,10 +2,6 @@
 
 import dynamic from "next/dynamic";
 
-// Critical above-fold components - load immediately
-import { LandingHeroCosmic } from "@/components/landing-v2/LandingHeroCosmic";
-import { NavbarDynamic } from "@/components/landing-v2/NavbarDynamic";
-
 // Below-fold components - lazy load for better LCP & TBT
 const CompanyLogoMarquee = dynamic(
     () => import("@/components/landing-v2/CompanyLogoMarquee").then(mod => ({ default: mod.CompanyLogoMarquee })),
@@ -82,31 +78,14 @@ const SimpleFooter = dynamic(
     { ssr: false }
 );
 
-const StickyNotification = dynamic(
-    () => import("@/components/landing-v2/StickyNotification").then(mod => ({ default: mod.StickyNotification })),
-    { ssr: false }
-);
-
 const StickyBottomCTA = dynamic(
     () => import("@/components/landing-v2/StickyBottomCTA").then(mod => ({ default: mod.StickyBottomCTA })),
     { ssr: false }
 );
 
-export default function LandingPageClient() {
+export default function LandingBelowFold() {
     return (
-        <main className="min-h-screen bg-black text-white overflow-x-hidden selection:bg-brand selection:text-white font-sans">
-            <StickyNotification />
-            <NavbarDynamic />
-
-            {/* Background Global Effects */}
-            <div className="fixed inset-0 z-[-1] bg-black pointer-events-none">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]" />
-            </div>
-
-            {/* Critical above-fold content */}
-            <LandingHeroCosmic />
-
-            {/* Below-fold content - lazy loaded */}
+        <>
             <CompanyLogoMarquee />
             <UserSegmentation />
             <PainPointsMeteor />
@@ -124,6 +103,6 @@ export default function LandingPageClient() {
 
             <SimpleFooter />
             <StickyBottomCTA />
-        </main>
+        </>
     );
 }
