@@ -1,10 +1,11 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Home, Grid, Search, Clock, User, Briefcase, LayoutGrid } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useEffect, useCallback } from "react";
 
 // Project Color Palette from colorpallate.md
 const COLORS = {
@@ -16,36 +17,50 @@ const COLORS = {
 };
 
 const navItems = [
-  { 
-    icon: Home, 
+  {
+    icon: Home,
     href: "/vip",
     label: "Home"
   },
-  { 
-    icon: LayoutGrid, 
+  {
+    icon: LayoutGrid,
     href: "/tools",
     label: "Tools"
   },
-  { 
-    icon: Search, 
-    href: "/vip/loker", 
+  {
+    icon: Search,
+    href: "/vip/loker",
     isCenter: true,
     label: "Cari"
   },
-  { 
-    icon: Briefcase, 
+  {
+    icon: Briefcase,
     href: "/vip/history",
     label: "History"
   },
-  { 
-    icon: User, 
-    href: "/vip/profile", 
+  {
+    icon: User,
+    href: "/vip/profile",
     label: "Profile"
   }
 ];
 
 export function VIPBottomBarV2() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  // AGGRESSIVE PREFETCHING: Prefetch all navigation routes on mount
+  useEffect(() => {
+    navItems.forEach(item => {
+      router.prefetch(item.href);
+    });
+    // Also prefetch common sub-routes
+    router.prefetch('/vip/saved');
+    router.prefetch('/vip/perusahaan');
+    router.prefetch('/vip/alerts');
+    router.prefetch('/dashboard');
+    router.prefetch('/settings');
+  }, [router]);
 
   // Helper to check active state
   const isActive = (href: string) => {
@@ -54,26 +69,31 @@ export function VIPBottomBarV2() {
     if (href === '/vip') return pathname === '/vip';
     return pathname.startsWith(href);
   };
-  
+
+  // Touch handler for instant feedback - prefetch on touch start
+  const handleTouchStart = useCallback((href: string) => {
+    router.prefetch(href);
+  }, [router]);
+
   return (
     <>
       {/* Bottom Navigation Bar - Full Width Fixed */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
         {/* Gradient Top Border Line for that 'Premium' feel */}
         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#8e68fd] to-transparent opacity-50" />
-        
+
         {/* Main Bar Background */}
         <div className="bg-white/95 dark:bg-[#0f0f0f]/95 backdrop-blur-xl pb-safe-area-bottom">
           <div className="flex items-end justify-between px-4 h-[70px] pb-2">
             {navItems.map((item, index) => {
               const active = isActive(item.href);
               const Icon = item.icon;
-              
+
               // CENTER BUTTON - High Premium Gradient Orb
               if (item.isCenter) {
                 return (
                   <div key={index} className="relative -top-8 px-2 flex justify-center items-center">
-                    
+
                     {/* RIPPLE EFFECT BACKGROUND (Only when active) */}
                     {active && (
                       <>
@@ -94,13 +114,18 @@ export function VIPBottomBarV2() {
                       </>
                     )}
 
-                    <Link href="/vip/loker" className="relative z-10"> 
-                       <motion.div
+                    <Link
+                      href="/vip/loker"
+                      className="relative z-10"
+                      prefetch={true}
+                      onTouchStart={() => handleTouchStart("/vip/loker")}
+                    >
+                      <motion.div
                         className={cn(
-                          "flex items-center justify-center w-[68px] h-[68px] rounded-full", 
+                          "flex items-center justify-center w-[68px] h-[68px] rounded-full",
                           "text-white",
-                          "shadow-[0_8px_25px_-5px_rgba(142,104,253,0.5)]", 
-                          "border-[6px] border-white dark:border-[#0f0f0f]" 
+                          "shadow-[0_8px_25px_-5px_rgba(142,104,253,0.5)]",
+                          "border-[6px] border-white dark:border-[#0f0f0f]"
                         )}
                         style={{
                           background: `linear-gradient(135deg, ${COLORS.heliotrope}, ${COLORS.purpleHeart})`
@@ -135,26 +160,28 @@ export function VIPBottomBarV2() {
                 <Link
                   key={index}
                   href={item.href}
+                  prefetch={true}
+                  onTouchStart={() => handleTouchStart(item.href)}
                   className="flex flex-1 flex-col items-center justify-end pb-2 h-full relative group"
                 >
                   <div className="relative flex flex-col items-center gap-1">
-                    <Icon 
+                    <Icon
                       className={cn(
                         "w-[22px] h-[22px] transition-all duration-300", // Slightly smaller icon to make room for text
                         active ? "text-[#8e68fd] -translate-y-0.5" : "text-gray-400 dark:text-gray-500"
                       )}
                       style={{ color: active ? COLORS.heliotrope : undefined }}
-                      strokeWidth={active ? 2.5 : 2} 
+                      strokeWidth={active ? 2.5 : 2}
                     />
-                    
+
                     {/* Text Label */}
                     <span className={cn(
                       "text-[10px] font-medium tracking-tight transition-all duration-300",
-                      active 
-                        ? "text-[#8e68fd] font-semibold" 
+                      active
+                        ? "text-[#8e68fd] font-semibold"
                         : "text-gray-400 dark:text-gray-500"
                     )}
-                    style={{ color: active ? COLORS.heliotrope : undefined }}
+                      style={{ color: active ? COLORS.heliotrope : undefined }}
                     >
                       {item.label}
                     </span>
