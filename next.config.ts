@@ -20,6 +20,22 @@ try {
       disableDevLogs: true,
       skipWaiting: true,
       clientsClaim: true,
+      // Exclude icons from precache to allow updates
+      exclude: [/icons\/.*\.png$/],
+      runtimeCaching: [
+        {
+          // Cache icons with network-first strategy for fresh updates
+          urlPattern: /\/icons\/.*\.png$/,
+          handler: "NetworkFirst",
+          options: {
+            cacheName: "pwa-icons",
+            expiration: {
+              maxEntries: 20,
+              maxAgeSeconds: 60 * 60 * 24, // 1 day
+            },
+          },
+        },
+      ],
     },
   });
 } catch {
@@ -27,7 +43,7 @@ try {
   console.log("PWA wrapper not available (standalone mode)");
 }
 
-// Forced rebuild for cache clearance: 2025-11-28
+// Forced rebuild for cache clearance: 2025-12-31 (logo update)
 const nextConfig: NextConfig = {
   // Required for Docker standalone deployment
   output: "standalone",
