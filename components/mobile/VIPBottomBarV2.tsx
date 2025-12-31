@@ -39,11 +39,12 @@ const navItems = [
     label: "History"
   },
   {
-    icon: User,
-    href: "/vip/profile",
-    label: "Profile"
+    icon: Home,
+    href: "/dashboard",
+    label: "JobMate"
   }
 ];
+
 
 export function VIPBottomBarV2() {
   const pathname = usePathname();
