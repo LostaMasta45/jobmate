@@ -48,8 +48,9 @@ export default function RootLayout({
 
         {/* iOS PWA Settings */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        {/* default = status bar transparent, follows content color beneath */}
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        {/* black-translucent = content extends behind status bar, no boundary */}
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
         <meta name="apple-mobile-web-app-title" content="JobMate" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
 
