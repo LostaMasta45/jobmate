@@ -100,11 +100,11 @@ export function VIPHeader({ onMenuToggle }: VIPHeaderProps) {
 
   return (
     <>
-      {/* PWA Status Bar Background - extends theme color to notch/Dynamic Island */}
-      <div className="pwa-status-bg" aria-hidden="true" />
+      {/* PWA Status Bar Background - Hidden div that extends color behind notch/Dynamic Island */}
+      {/* This sits behind the header and provides color continuity */}
 
       <header
-        className={`fixed top-0 left-0 right-0 z-50 pwa-header pwa-no-tap-highlight
+        className={`fixed top-0 left-0 right-0 z-50 pt-safe pwa-no-tap-highlight
           ${mobileHidden ? '-translate-y-full' : 'translate-y-0'} 
           lg:!translate-y-0
           transition-all duration-300

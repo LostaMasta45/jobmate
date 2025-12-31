@@ -42,14 +42,19 @@ export default function RootLayout({
         {/* PWA Manifest */}
         <link rel="manifest" href="/manifest.json" />
 
-        {/* PWA Meta Tags */}
-        <meta name="theme-color" content="#6366f1" />
+        {/* PWA Meta Tags - Theme color matches header for seamless look */}
+        {/* Light mode: white header, Dark mode: slate-900 */}
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+
+        {/* iOS PWA Settings */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        {/* black-translucent makes content extend behind status bar */}
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="JobMate" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
 
-        {/* Viewport with safe area for notch devices */}
+        {/* Viewport with safe area for notch/Dynamic Island devices */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
 
         {/* Prevent theme flash by setting theme BEFORE React hydrates */}
