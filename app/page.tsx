@@ -1,24 +1,96 @@
 import { Metadata } from "next";
-import { LandingHeroCosmic } from "@/components/landing-v2/LandingHeroCosmic";
-import { PainPointsMeteor } from "@/components/landing-v2/PainPointsMeteor";
-import { BentoGridPro } from "@/components/landing-v2/BentoGridPro";
-import { AboutSectionV2 } from "@/components/landing-v2/AboutSectionV2";
-import { WhyInfoLokerSectionV2 } from "@/components/landing-v2/WhyInfoLokerSectionV2";
-import { WhyInfoLokerOriginal } from "@/components/landing-v2/WhyInfoLokerOriginal";
-import { MotivationCosmic } from "@/components/landing-v2/MotivationCosmic";
-import { NavbarDynamic } from "@/components/landing-v2/NavbarDynamic";
-import { CompanyLogoMarquee } from "@/components/landing-v2/CompanyLogoMarquee";
-import { SimpleFooter } from "@/components/landing-v2/SimpleFooter";
-import { ComparisonSticky } from "@/components/landing-v2/ComparisonSticky";
-import { PricingBeams } from "@/components/landing-v2/PricingBeams";
-import { TestimonialMarquee } from "@/components/landing-v2/TestimonialMarquee";
-import { FAQGlass } from "@/components/landing-v2/FAQGlass";
-import { CTAExplosion } from "@/components/landing-v2/CTAExplosion";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 
-import { StickyNotification } from "@/components/landing-v2/StickyNotification";
-import { UserSegmentation } from "@/components/landing-v2/UserSegmentation";
-import { WallOfLove } from "@/components/landing-v2/WallOfLove";
-import { StickyBottomCTA } from "@/components/landing-v2/StickyBottomCTA";
+// Critical above-fold components - load immediately
+import { LandingHeroCosmic } from "@/components/landing-v2/LandingHeroCosmic";
+import { NavbarDynamic } from "@/components/landing-v2/NavbarDynamic";
+
+// Below-fold components - lazy load for better LCP & TBT
+const CompanyLogoMarquee = dynamic(
+  () => import("@/components/landing-v2/CompanyLogoMarquee").then(mod => ({ default: mod.CompanyLogoMarquee })),
+  { ssr: false }
+);
+
+const UserSegmentation = dynamic(
+  () => import("@/components/landing-v2/UserSegmentation").then(mod => ({ default: mod.UserSegmentation })),
+  { ssr: false }
+);
+
+const PainPointsMeteor = dynamic(
+  () => import("@/components/landing-v2/PainPointsMeteor").then(mod => ({ default: mod.PainPointsMeteor })),
+  { ssr: false }
+);
+
+const AboutSectionV2 = dynamic(
+  () => import("@/components/landing-v2/AboutSectionV2").then(mod => ({ default: mod.AboutSectionV2 })),
+  { ssr: false }
+);
+
+const WhyInfoLokerOriginal = dynamic(
+  () => import("@/components/landing-v2/WhyInfoLokerOriginal").then(mod => ({ default: mod.WhyInfoLokerOriginal })),
+  { ssr: false }
+);
+
+const WhyInfoLokerSectionV2 = dynamic(
+  () => import("@/components/landing-v2/WhyInfoLokerSectionV2").then(mod => ({ default: mod.WhyInfoLokerSectionV2 })),
+  { ssr: false }
+);
+
+const MotivationCosmic = dynamic(
+  () => import("@/components/landing-v2/MotivationCosmic").then(mod => ({ default: mod.MotivationCosmic })),
+  { ssr: false }
+);
+
+const WallOfLove = dynamic(
+  () => import("@/components/landing-v2/WallOfLove").then(mod => ({ default: mod.WallOfLove })),
+  { ssr: false }
+);
+
+const ComparisonSticky = dynamic(
+  () => import("@/components/landing-v2/ComparisonSticky").then(mod => ({ default: mod.ComparisonSticky })),
+  { ssr: false }
+);
+
+const PricingBeams = dynamic(
+  () => import("@/components/landing-v2/PricingBeams").then(mod => ({ default: mod.PricingBeams })),
+  { ssr: false }
+);
+
+const BentoGridPro = dynamic(
+  () => import("@/components/landing-v2/BentoGridPro").then(mod => ({ default: mod.BentoGridPro })),
+  { ssr: false }
+);
+
+const TestimonialMarquee = dynamic(
+  () => import("@/components/landing-v2/TestimonialMarquee").then(mod => ({ default: mod.TestimonialMarquee })),
+  { ssr: false }
+);
+
+const FAQGlass = dynamic(
+  () => import("@/components/landing-v2/FAQGlass").then(mod => ({ default: mod.FAQGlass })),
+  { ssr: false }
+);
+
+const CTAExplosion = dynamic(
+  () => import("@/components/landing-v2/CTAExplosion").then(mod => ({ default: mod.CTAExplosion })),
+  { ssr: false }
+);
+
+const SimpleFooter = dynamic(
+  () => import("@/components/landing-v2/SimpleFooter").then(mod => ({ default: mod.SimpleFooter })),
+  { ssr: false }
+);
+
+const StickyNotification = dynamic(
+  () => import("@/components/landing-v2/StickyNotification").then(mod => ({ default: mod.StickyNotification })),
+  { ssr: false }
+);
+
+const StickyBottomCTA = dynamic(
+  () => import("@/components/landing-v2/StickyBottomCTA").then(mod => ({ default: mod.StickyBottomCTA })),
+  { ssr: false }
+);
 
 export const metadata: Metadata = {
   title: "Career VIP InfoLokerJombang — Siap Kerja Setiap Hari",
@@ -34,32 +106,35 @@ export const metadata: Metadata = {
 export default function LandingPage() {
   return (
     <main className="min-h-screen bg-black text-white overflow-x-hidden selection:bg-brand selection:text-white font-sans">
-       <StickyNotification />
-       <NavbarDynamic />
-       
-       {/* Background Global Effects */}
-       <div className="fixed inset-0 z-[-1] bg-black pointer-events-none">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]" />
-       </div>
+      <StickyNotification />
+      <NavbarDynamic />
 
-       <LandingHeroCosmic />
-       <CompanyLogoMarquee />
-       <UserSegmentation />
-       <PainPointsMeteor />
-       <AboutSectionV2 />
-       <WhyInfoLokerOriginal />
-       <WhyInfoLokerSectionV2 />
-       <MotivationCosmic />
-       <WallOfLove />
-       <ComparisonSticky />
-       <PricingBeams />
-       <BentoGridPro />
-       <TestimonialMarquee />
-       <FAQGlass />
-       <CTAExplosion />
+      {/* Background Global Effects */}
+      <div className="fixed inset-0 z-[-1] bg-black pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]" />
+      </div>
 
-       <SimpleFooter />
-       <StickyBottomCTA />
+      {/* Critical above-fold content */}
+      <LandingHeroCosmic />
+
+      {/* Below-fold content - lazy loaded */}
+      <CompanyLogoMarquee />
+      <UserSegmentation />
+      <PainPointsMeteor />
+      <AboutSectionV2 />
+      <WhyInfoLokerOriginal />
+      <WhyInfoLokerSectionV2 />
+      <MotivationCosmic />
+      <WallOfLove />
+      <ComparisonSticky />
+      <PricingBeams />
+      <BentoGridPro />
+      <TestimonialMarquee />
+      <FAQGlass />
+      <CTAExplosion />
+
+      <SimpleFooter />
+      <StickyBottomCTA />
     </main>
   );
 }

@@ -39,8 +39,15 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
+        {/* Preconnect to critical external origins for faster loading */}
+        <link rel="preconnect" href="https://gyamsjmrrntwwcqljene.supabase.co" />
+        <link rel="dns-prefetch" href="https://gyamsjmrrntwwcqljene.supabase.co" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+
         {/* PWA Manifest */}
         <link rel="manifest" href="/manifest.json" />
+
 
         {/* PWA Meta Tags - Transparent status bar follows UI beneath */}
         <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
