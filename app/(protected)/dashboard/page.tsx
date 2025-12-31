@@ -14,6 +14,7 @@ import { RecentWhatsAppMessages } from "@/components/dashboard/RecentWhatsAppMes
 import { RecentFollowUps } from "@/components/dashboard/RecentFollowUps";
 import { RecentCreativeCVs } from "@/components/dashboard/RecentCreativeCVs";
 import { RecentInterviewPrep } from "@/components/dashboard/RecentInterviewPrep";
+import { PWAInstallWrapper } from "@/components/pwa";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Mail, Sparkles, MessageCircle, TrendingUp, Activity, Bell, Palette, Target } from "lucide-react";
 
@@ -22,7 +23,7 @@ export const revalidate = 30;
 
 export default async function DashboardPage() {
   const profile = await getProfile();
-  
+
   const [stats, pipeline, recent, alerts] = await Promise.all([
     getStats(),
     getPipeline(),
@@ -35,7 +36,7 @@ export default async function DashboardPage() {
   const userEmail = profile?.email || "";
 
   return (
-    <AppShell 
+    <AppShell
       isAdmin={isAdmin}
       user={{
         name: userName,
@@ -45,7 +46,7 @@ export default async function DashboardPage() {
     >
       <div className="space-y-6 sm:space-y-8">
         {/* Welcome Header */}
-        <WelcomeHero 
+        <WelcomeHero
           userName={userName}
           userEmail={userEmail}
           avatarUrl={profile?.avatar_url}
@@ -91,7 +92,7 @@ export default async function DashboardPage() {
           <div className="mb-5 sm:mb-6">
             <RecentFollowUps />
           </div>
-          
+
           <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full">
             {/* Cover Letters History */}
             <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-l-4 border-l-[#8e68fd] bg-gradient-to-br from-[#8e68fd]/10 via-[#8e68fd]/5 to-transparent dark:from-[#8e68fd]/20 dark:via-[#8e68fd]/10 relative overflow-hidden">
@@ -193,6 +194,9 @@ export default async function DashboardPage() {
 
         {/* Tools Grid */}
         <ToolsGrid />
+
+        {/* PWA Install Popup - Mobile Only */}
+        <PWAInstallWrapper />
       </div>
     </AppShell>
   );

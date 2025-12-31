@@ -10,8 +10,9 @@ import { LoadingScreen } from "@/components/ui/loading-screen";
 import { RocketLoader } from "@/components/auth/RocketLoader";
 import { createClient } from "@/lib/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  Eye, EyeOff, AlertCircle, Mail, KeyRound, 
+import { PWAInstallPopup } from "@/components/pwa";
+import {
+  Eye, EyeOff, AlertCircle, Mail, KeyRound,
   ArrowLeft, Shield, Briefcase, User, CheckCircle2, Search, ArrowRight, Lock
 } from "lucide-react";
 
@@ -88,7 +89,7 @@ const fadeInUp = {
 export default function MobileSignInView() {
   const [view, setView] = React.useState<'welcome' | 'login'>('welcome');
   const [direction, setDirection] = React.useState(0);
-  
+
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [rememberMe, setRememberMe] = React.useState(false);
@@ -97,7 +98,7 @@ export default function MobileSignInView() {
   const [error, setError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
   const [capsLock, setCapsLock] = React.useState(false);
-  
+
   const emailInputRef = React.useRef<HTMLInputElement>(null);
 
   // Load saved email from localStorage on mount
@@ -182,12 +183,12 @@ export default function MobileSignInView() {
 
       // Success state trigger
       setLoadingStatus('success');
-      
+
       // WAIT for animation to complete (3 seconds) before redirecting
       setTimeout(() => {
         window.location.replace(redirectPath);
       }, 3500); // 3.5s allows the success animation to play fully
-      
+
     } catch (err) {
       console.error("Login error:", err);
       setError("Terjadi kesalahan sistem.");
@@ -208,15 +209,15 @@ export default function MobileSignInView() {
     <>
       <AnimatePresence>
         {loadingStatus && (
-          <RocketLoader 
-            status={loadingStatus === 'loading' || loadingStatus === 'success' ? loadingStatus : 'error'} 
+          <RocketLoader
+            status={loadingStatus === 'loading' || loadingStatus === 'success' ? loadingStatus : 'error'}
           />
         )}
       </AnimatePresence>
-      
+
       <div className="fixed inset-0 w-full h-full bg-white overflow-hidden font-sans text-slate-900 selection:bg-[#00acc7] selection:text-white">
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
-          
+
           {/* === PAGE 1: WELCOME SCREEN === */}
           {view === 'welcome' && (
             <motion.div
@@ -233,7 +234,7 @@ export default function MobileSignInView() {
               <div className="absolute inset-0 bg-gradient-to-b from-[#6e52e0] via-[#5547d0] to-[#3d2fa8] z-0">
                 {/* Subtle Pattern Overlay */}
                 <div className="absolute inset-0 opacity-[0.03] bg-[url('/grid.svg')] bg-center" />
-                
+
                 {/* Soft Glow Effects */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-[#8e68fd] rounded-full blur-[150px] opacity-30" />
                 <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-[#00acc7] rounded-full blur-[120px] opacity-20" />
@@ -241,24 +242,24 @@ export default function MobileSignInView() {
 
               {/* Main Content */}
               <div className="flex-1 relative z-10 flex flex-col px-6 pt-12 pb-8 h-full">
-                
+
                 {/* Logo Section */}
-                <motion.div 
+                <motion.div
                   variants={logoVariants}
                   initial="hidden"
                   animate="visible"
                   className="flex justify-center -mt-8 -mb-8"
                 >
-                  <img 
-                    src="/Logo/x.png" 
-                    alt="JobMate" 
-                    className="w-64 h-64 object-contain drop-shadow-2xl" 
+                  <img
+                    src="/Logo/x.png"
+                    alt="JobMate"
+                    className="w-64 h-64 object-contain drop-shadow-2xl"
                   />
                 </motion.div>
 
                 {/* Hero Illustration - Simplified & Elegant */}
                 <div className="flex-1 flex flex-col items-center justify-center">
-                  <motion.div 
+                  <motion.div
                     variants={floatAnimation}
                     animate="animate"
                     className="relative w-56 h-56 mb-6"
@@ -266,10 +267,10 @@ export default function MobileSignInView() {
                     {/* Outer Ring */}
                     <div className="absolute inset-0 rounded-full border-2 border-white/10" />
                     <div className="absolute inset-3 rounded-full border border-white/5" />
-                    
+
                     {/* Central Card */}
                     <div className="absolute inset-6 flex items-center justify-center">
-                      <motion.div 
+                      <motion.div
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
@@ -288,7 +289,7 @@ export default function MobileSignInView() {
                           <div className="h-1.5 w-12 bg-slate-100 rounded-full mx-auto" />
                         </div>
                         {/* Verified Badge */}
-                        <motion.div 
+                        <motion.div
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           transition={{ delay: 0.7, type: "spring" }}
@@ -300,7 +301,7 @@ export default function MobileSignInView() {
                     </div>
 
                     {/* Floating Icons */}
-                    <motion.div 
+                    <motion.div
                       animate={{ y: [0, -8, 0] }}
                       transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                       className="absolute -top-2 right-4 bg-white p-2.5 rounded-xl shadow-lg"
@@ -308,7 +309,7 @@ export default function MobileSignInView() {
                       <Search className="w-5 h-5 text-[#00acc7]" />
                     </motion.div>
 
-                    <motion.div 
+                    <motion.div
                       animate={{ y: [0, 8, 0] }}
                       transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
                       className="absolute bottom-4 -left-2 bg-white p-2.5 rounded-xl shadow-lg"
@@ -316,7 +317,7 @@ export default function MobileSignInView() {
                       <Briefcase className="w-5 h-5 text-[#6e52e0]" />
                     </motion.div>
 
-                    <motion.div 
+                    <motion.div
                       animate={{ y: [0, -6, 0] }}
                       transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
                       className="absolute top-1/2 -right-3 bg-white p-2 rounded-lg shadow-lg"
@@ -327,7 +328,7 @@ export default function MobileSignInView() {
 
                   {/* Headlines - Clean & Impactful */}
                   <div className="text-center space-y-4 px-4">
-                    <motion.h1 
+                    <motion.h1
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
@@ -335,7 +336,7 @@ export default function MobileSignInView() {
                     >
                       Raih Karir Impianmu
                     </motion.h1>
-                    <motion.p 
+                    <motion.p
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 }}
@@ -347,31 +348,31 @@ export default function MobileSignInView() {
                 </div>
 
                 {/* Bottom Actions - Clean Layout */}
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
                   className="space-y-4 mt-auto"
                 >
-                  <Button 
+                  <Button
                     onClick={goToLogin}
                     className="w-full h-14 rounded-2xl bg-white text-[#5547d0] font-semibold text-base shadow-xl active:scale-[0.98] transition-transform"
                   >
                     Masuk ke Akun
                   </Button>
-                  
+
                   <div className="flex items-center justify-center gap-1 text-sm">
                     <span className="text-white/60">Belum punya akun?</span>
-                    <Link 
-                      href="/ajukan-akun" 
+                    <Link
+                      href="/ajukan-akun"
                       className="text-white font-semibold hover:underline"
                     >
                       Daftar Sekarang
                     </Link>
                   </div>
-                  
-                  <Link 
-                    href="/cek-status-pengajuan" 
+
+                  <Link
+                    href="/cek-status-pengajuan"
                     className="flex items-center justify-center gap-1.5 text-sm text-white/50 hover:text-white/80 transition-colors"
                   >
                     <span>Cek status pengajuan</span>
@@ -399,9 +400,9 @@ export default function MobileSignInView() {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(142,104,253,0.5),transparent_50%)] mix-blend-overlay" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(0,209,220,0.4),transparent_50%)] mix-blend-soft-light" />
                 <div className="absolute inset-0 opacity-30 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
-                
+
                 {/* Animated Background Orbs */}
-                <motion.div 
+                <motion.div
                   animate={{ y: [0, -30, 0], opacity: [0.4, 0.7, 0.4] }}
                   transition={{ duration: 8, repeat: Infinity }}
                   className="absolute top-[-10%] right-[-10%] w-80 h-80 bg-[#00d1dc] rounded-full blur-[100px] opacity-40 mix-blend-overlay"
@@ -412,15 +413,15 @@ export default function MobileSignInView() {
               <div className="relative z-10 pt-6 px-6 shrink-0 flex flex-col items-center w-full">
                 {/* Navigation */}
                 <div className="w-full flex items-center justify-between mb-6 relative h-10">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={backToWelcome}
                     className="relative z-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-sm hover:bg-white/20 text-white"
                   >
                     <ArrowLeft className="w-5 h-5" />
                   </Button>
-                  
+
                   {/* Top Logo - Perfectly Centered & Larger */}
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0">
                     <motion.div
@@ -432,91 +433,91 @@ export default function MobileSignInView() {
                       <img src="/Logo/x.png" alt="JobMate" className="w-64 h-64 object-contain drop-shadow-2xl" />
                     </motion.div>
                   </div>
-                  
+
                   {/* Placeholder to maintain spacing balance (optional with absolute center but good for flex structure) */}
-                  <div className="w-10" /> 
+                  <div className="w-10" />
                 </div>
 
                 {/* Cool Illustration - Floating Lock/Security Concept */}
                 <div className="w-full flex justify-center items-center mb-6 mt-4">
-                    <motion.div 
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ type: "spring", duration: 0.8 }}
-                      className="relative w-[280px] h-[200px] flex items-center justify-center mx-auto"
-                    >
-                      {/* Main Illustration Container */}
-                      <div className="relative w-full h-full flex items-center justify-center">
-                        {/* Background Glow */}
-                        <div className="absolute w-48 h-48 bg-white/5 rounded-full blur-[60px]" />
-                        
-                        {/* Floating Central Element */}
-                        <motion.div 
-                          animate={{ y: [-10, 10, -10] }}
-                          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                          className="relative z-20"
-                        >
-                          <div className="w-32 h-32 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-[2rem] shadow-2xl flex items-center justify-center transform -rotate-6 relative overflow-hidden group">
-                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <div className="w-20 h-20 bg-gradient-to-tr from-[#00acc7] to-[#00d1dc] rounded-2xl flex items-center justify-center shadow-inner shadow-white/20">
-                              <Lock className="w-10 h-10 text-white drop-shadow-md" />
-                            </div>
-                            {/* Decorative lines */}
-                            <div className="absolute top-4 right-4 w-2 h-2 bg-white/40 rounded-full" />
-                            <div className="absolute bottom-4 left-4 w-16 h-1.5 bg-white/10 rounded-full" />
-                          </div>
-                        </motion.div>
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", duration: 0.8 }}
+                    className="relative w-[280px] h-[200px] flex items-center justify-center mx-auto"
+                  >
+                    {/* Main Illustration Container */}
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      {/* Background Glow */}
+                      <div className="absolute w-48 h-48 bg-white/5 rounded-full blur-[60px]" />
 
-                        {/* Orbiting Elements - Simplified and Centered */}
-                        <motion.div 
-                          className="absolute inset-0"
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                        >
-                           <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                              <motion.div 
-                                animate={{ rotate: -360 }}
-                                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                                className="w-12 h-12 bg-[#8e68fd] rounded-2xl flex items-center justify-center shadow-lg border border-white/20 backdrop-blur-md"
-                              >
-                                <KeyRound className="w-6 h-6 text-white" />
-                              </motion.div>
-                           </div>
-                        </motion.div>
-
-                        <motion.div 
-                          className="absolute inset-0 w-full h-full"
-                          animate={{ rotate: -360 }}
-                          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                        >
-                          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
-                              <motion.div 
-                                animate={{ rotate: 360 }}
-                                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                                className="w-10 h-10 bg-[#00acc7] rounded-full flex items-center justify-center shadow-lg border border-white/20 backdrop-blur-md"
-                              >
-                                <CheckCircle2 className="w-5 h-5 text-white" />
-                              </motion.div>
+                      {/* Floating Central Element */}
+                      <motion.div
+                        animate={{ y: [-10, 10, -10] }}
+                        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                        className="relative z-20"
+                      >
+                        <div className="w-32 h-32 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-[2rem] shadow-2xl flex items-center justify-center transform -rotate-6 relative overflow-hidden group">
+                          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                          <div className="w-20 h-20 bg-gradient-to-tr from-[#00acc7] to-[#00d1dc] rounded-2xl flex items-center justify-center shadow-inner shadow-white/20">
+                            <Lock className="w-10 h-10 text-white drop-shadow-md" />
                           </div>
-                        </motion.div>
-                        
-                        {/* Orbit Rings */}
-                        <div className="absolute inset-0 border border-white/5 rounded-full scale-[1.2]" />
-                        <div className="absolute inset-0 border border-white/5 rounded-full scale-[0.8]" />
-                      </div>
-                    </motion.div>
+                          {/* Decorative lines */}
+                          <div className="absolute top-4 right-4 w-2 h-2 bg-white/40 rounded-full" />
+                          <div className="absolute bottom-4 left-4 w-16 h-1.5 bg-white/10 rounded-full" />
+                        </div>
+                      </motion.div>
+
+                      {/* Orbiting Elements - Simplified and Centered */}
+                      <motion.div
+                        className="absolute inset-0"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                      >
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                          <motion.div
+                            animate={{ rotate: -360 }}
+                            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                            className="w-12 h-12 bg-[#8e68fd] rounded-2xl flex items-center justify-center shadow-lg border border-white/20 backdrop-blur-md"
+                          >
+                            <KeyRound className="w-6 h-6 text-white" />
+                          </motion.div>
+                        </div>
+                      </motion.div>
+
+                      <motion.div
+                        className="absolute inset-0 w-full h-full"
+                        animate={{ rotate: -360 }}
+                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      >
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                            className="w-10 h-10 bg-[#00acc7] rounded-full flex items-center justify-center shadow-lg border border-white/20 backdrop-blur-md"
+                          >
+                            <CheckCircle2 className="w-5 h-5 text-white" />
+                          </motion.div>
+                        </div>
+                      </motion.div>
+
+                      {/* Orbit Rings */}
+                      <div className="absolute inset-0 border border-white/5 rounded-full scale-[1.2]" />
+                      <div className="absolute inset-0 border border-white/5 rounded-full scale-[0.8]" />
+                    </div>
+                  </motion.div>
                 </div>
 
                 {/* Welcome Text */}
                 <div className="text-center mb-4">
-                  <motion.h2 
+                  <motion.h2
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="text-2xl font-bold text-white"
                   >
                     Selamat Datang!
                   </motion.h2>
-                  <motion.p 
+                  <motion.p
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
@@ -528,21 +529,21 @@ export default function MobileSignInView() {
               </div>
 
               {/* Form Section */}
-              <motion.div 
+              <motion.div
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ 
-                  type: "tween", 
-                  duration: 0.5, 
+                transition={{
+                  type: "tween",
+                  duration: 0.5,
                   ease: [0.32, 0.72, 0, 1],
-                  delay: 0.15 
+                  delay: 0.15
                 }}
                 className="flex-1 bg-white rounded-t-[2.5rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] relative z-20 flex flex-col overflow-hidden will-change-transform"
               >
                 {/* Scrollable Form Area */}
                 <div className="flex-1 overflow-y-auto px-8 pt-8 pb-4 scrollbar-hide">
                   <form onSubmit={handleSignIn} className="space-y-6">
-                    
+
                     {/* Email Field */}
                     <div className="space-y-2">
                       <Label className="text-xs font-semibold text-slate-600 ml-1">Email Address</Label>
@@ -608,9 +609,9 @@ export default function MobileSignInView() {
 
                     {/* Remember Me */}
                     <div className="flex items-center space-x-3 px-1">
-                      <Checkbox 
-                        id="remember" 
-                        checked={rememberMe} 
+                      <Checkbox
+                        id="remember"
+                        checked={rememberMe}
                         onCheckedChange={(c) => setRememberMe(!!c)}
                         className="border-slate-300 data-[state=checked]:bg-[#00acc7] data-[state=checked]:border-[#00acc7] w-5 h-5 rounded-md"
                       />
@@ -625,9 +626,9 @@ export default function MobileSignInView() {
                     {/* Error Message */}
                     <AnimatePresence>
                       {error && (
-                        <motion.div 
-                          initial={{ opacity: 0, height: 0 }} 
-                          animate={{ opacity: 1, height: 'auto' }} 
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
                           exit={{ opacity: 0, height: 0 }}
                           className="bg-red-50/80 border border-red-100 text-red-600 rounded-xl p-3 flex items-center gap-3 text-sm"
                         >
@@ -639,7 +640,7 @@ export default function MobileSignInView() {
 
                     {/* Submit Button */}
                     <div className="pt-2">
-                      <Button 
+                      <Button
                         type="submit"
                         disabled={loading}
                         className="w-full h-14 rounded-2xl text-lg font-bold text-white bg-gradient-to-r from-[#00acc7] to-[#009eb5] hover:from-[#00bed1] hover:to-[#00acc7] shadow-lg shadow-[#00acc7]/25 active:scale-[0.98] transition-all duration-300"
@@ -672,6 +673,9 @@ export default function MobileSignInView() {
 
         </AnimatePresence>
       </div>
+
+      {/* PWA Install Popup - Mobile Only */}
+      <PWAInstallPopup />
     </>
   );
 }

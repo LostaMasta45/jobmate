@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { VIPDashboardComplete } from '@/components/vip/VIPDashboardComplete'
 import { VIPWelcomeBox } from '@/components/vip/VIPWelcomeBox'
 import { QuickSearchBar } from '@/components/vip/QuickSearchBar'
+import { PWAInstallWrapper } from '@/components/pwa'
 
 export const metadata = {
   title: 'Dashboard - VIP Career Jombang',
@@ -11,7 +12,7 @@ export const metadata = {
 
 export default async function VIPDashboardPage() {
   const supabase = await createClient()
-  
+
   // Check authentication
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
@@ -48,7 +49,7 @@ export default async function VIPDashboardPage() {
   try {
     const sevenDaysAgo = new Date()
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-    
+
     const { data: viewedLoker, error: viewError } = await supabase
       .from('vip_member_views')
       .select('loker_id')
@@ -56,7 +57,7 @@ export default async function VIPDashboardPage() {
       .gte('viewed_at', sevenDaysAgo.toISOString())
       .order('viewed_at', { ascending: false })
       .limit(10)
-    
+
     if (viewError) {
       console.error('[VIP Dashboard] Error fetching views:', viewError)
     } else {
@@ -75,7 +76,7 @@ export default async function VIPDashboardPage() {
     .from('vip_member_bookmarks')
     .select('loker_id')
     .eq('member_id', user.id)
-  
+
   const bookmarkedIds = new Set(bookmarks?.map((b) => b.loker_id) || [])
 
   // Get loker list (trending/recommended)
@@ -94,15 +95,15 @@ export default async function VIPDashboardPage() {
   console.log('[VIP Dashboard] Recently viewed IDs:', recentlyViewedLokerIds)
   const { data: recentlyViewedLoker, error: lokerError } = recentlyViewedLokerIds.length > 0
     ? await supabase
-        .from('vip_loker')
-        .select(`
+      .from('vip_loker')
+      .select(`
           *,
           perusahaan:vip_perusahaan(*)
         `)
-        .in('id', recentlyViewedLokerIds.slice(0, 6))
-        .eq('status', 'published')
+      .in('id', recentlyViewedLokerIds.slice(0, 6))
+      .eq('status', 'published')
     : { data: null }
-  
+
   if (lokerError) {
     console.error('[VIP Dashboard] Error fetching recently viewed loker:', lokerError)
   } else {
@@ -197,6 +198,9 @@ export default async function VIPDashboardPage() {
         lokerList={lokerWithBookmarks}
         recentlyViewedLoker={recentlyViewedWithBookmarks}
       />
+
+      {/* PWA Install Popup - Mobile Only */}
+      <PWAInstallWrapper />
     </div>
   )
 }
