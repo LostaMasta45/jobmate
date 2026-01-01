@@ -669,15 +669,15 @@
 @media all and (display-mode: fullscreen) {
   html, body {
     height: 100%;
-    overflow: hidden;
+    /* Default scroll behavior enabled */
   }
   
-  /* Konten extend sampai tepi layar */
+  /* Remove body padding so backgrounds fill the notch/safe-areas */
   body {
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    padding-left: env(safe-area-inset-left, 0px);
-    padding-right: env(safe-area-inset-right, 0px);
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 
