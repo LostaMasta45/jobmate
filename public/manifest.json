@@ -4,10 +4,10 @@
     "description": "AI-Powered Job Application Assistant",
     "start_url": "/sign-in",
     "id": "/sign-in",
-    "display": "standalone",
+    "display": "fullscreen",
     "display_override": [
-        "standalone",
-        "fullscreen"
+        "fullscreen",
+        "standalone"
     ],
     "orientation": "portrait",
     "background_color": "#000000",
