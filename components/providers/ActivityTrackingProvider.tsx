@@ -14,7 +14,7 @@ export function ActivityTrackingProvider({ children }: { children: React.ReactNo
     const initTracking = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser()
-        
+
         if (user) {
           // Get user profile
           const { data: profile } = await supabase
@@ -41,10 +41,14 @@ export function ActivityTrackingProvider({ children }: { children: React.ReactNo
       }
     }
 
-    initTracking()
+    // Initialize tracking on mount with delay to prioritize LCP
+    const timer = setTimeout(() => {
+      initTracking()
+    }, 2000)
 
     // Cleanup on unmount
     return () => {
+      clearTimeout(timer)
       try {
         stopTracking()
       } catch (error) {

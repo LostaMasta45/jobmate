@@ -6,7 +6,7 @@ import { TypewriterEffect } from "./Typewriter";
 // --- Simple Hero Visual (Server Component Friendly) ---
 const HeroVisual = () => {
     return (
-        <div className="relative w-full aspect-[4/5] md:aspect-square max-w-sm mx-auto animate-fade-in-up">
+        <div className="relative w-full aspect-[4/5] md:aspect-square max-w-sm mx-auto">
             {/* Main Glass Card - VIP Pass */}
             <div className="absolute inset-0 rounded-3xl border border-white/10 bg-gradient-to-b from-neutral-900/90 to-black/90 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col">
                 {/* Card Header */}
@@ -114,12 +114,12 @@ export function LandingHeroCosmic() {
                             </h1>
                         </div>
 
-                        <p className="mt-6 font-light text-lg text-neutral-300 max-w-lg leading-relaxed animate-fade-in-up animation-delay-200">
+                        <p className="mt-6 font-light text-lg text-neutral-300 max-w-lg leading-relaxed">
                             Kini Kamu <strong className="text-white font-semibold">NGGAK PERLU CAPEK</strong> scroll IG, FB, Telegram, atau platform lain.
                             <span className="text-brand font-medium"> Semua loker valid & update setiap hari</span> langsung dikirim ke <strong className="text-white">GRUP WA PREMIUM!</strong>
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-5 pt-4 animate-fade-in-up animation-delay-400">
+                        <div className="flex flex-col sm:flex-row gap-5 pt-4">
                             <Button
                                 size="lg"
                                 className="bg-brand hover:bg-brand-600 text-white rounded-full px-8 h-14 text-lg shadow-[0_0_30px_rgba(0,172,199,0.4)] hover:shadow-[0_0_50px_rgba(0,172,199,0.6)] transition-all duration-300 group"
@@ -136,7 +136,7 @@ export function LandingHeroCosmic() {
                             </Button>
                         </div>
 
-                        <div className="pt-8 flex items-center gap-6 text-sm font-medium text-neutral-400 flex-wrap animate-fade-in-up animation-delay-800">
+                        <div className="pt-8 flex items-center gap-6 text-sm font-medium text-neutral-400 flex-wrap">
                             <div className="flex items-center gap-2">
                                 <div className="p-1 bg-green-500/20 rounded-full">
                                     <CheckCircle2 className="w-3 h-3 text-green-500" />
@@ -160,7 +160,7 @@ export function LandingHeroCosmic() {
 
                     {/* Right Content: Visual */}
                     <div className="flex-1 w-full flex justify-center md:justify-end">
-                        <div className="relative w-full max-w-md animate-fade-in-up animation-delay-200">
+                        <div className="relative w-full max-w-md">
                             <HeroVisual />
                         </div>
                     </div>
