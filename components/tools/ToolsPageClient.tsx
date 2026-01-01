@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import {
   FileText,
   MessageSquare,
@@ -19,7 +18,6 @@ import {
   Rocket,
   ChevronRight,
   Sparkles,
-  Clock,
   Star
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -204,8 +202,8 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
   };
 
   // Filter tools by category
-  const filteredTools = selectedCategory === "all" 
-    ? tools 
+  const filteredTools = selectedCategory === "all"
+    ? tools
     : tools.filter(t => t.category === selectedCategory);
 
   const popularTools = tools.filter(t => t.popular);
@@ -253,7 +251,7 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
             {categories.map((category) => {
               const Icon = category.icon;
               const isActive = selectedCategory === category.id;
-              
+
               return (
                 <button
                   key={category.id}
@@ -290,20 +288,15 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
                 Top {popularTools.length}
               </Badge>
             </div>
-            
+
             <div className="flex gap-2.5 sm:gap-3 overflow-x-auto pb-2 px-4 sm:px-6 scrollbar-hide">
-              {popularTools.map((tool, index) => {
+              {popularTools.map((tool) => {
                 const Icon = tool.icon;
-                
+
                 return (
                   <Link key={tool.id} href={tool.href}>
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="w-[260px] sm:w-[280px] flex-shrink-0"
-                    >
-                      <Card className="border-0 bg-white dark:bg-gray-900 shadow-md hover:shadow-xl transition-all overflow-hidden">
+                    <div className="w-[260px] sm:w-[280px] flex-shrink-0">
+                      <Card className="border-0 bg-white dark:bg-gray-900 shadow-md hover:shadow-xl transition-all overflow-hidden active:scale-[0.98] duration-200">
                         <div className={cn("h-2", tool.bgColor)} />
                         <div className="p-3.5 sm:p-4">
                           <div className="flex items-start gap-2.5 sm:gap-3 mb-2.5 sm:mb-3">
@@ -328,7 +321,7 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
                           </div>
                         </div>
                       </Card>
-                    </motion.div>
+                    </div>
                   </Link>
                 );
               })}
@@ -348,17 +341,13 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
           </div>
 
           <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
-            {filteredTools.map((tool, index) => {
+            {filteredTools.map((tool) => {
               const Icon = tool.icon;
-              
+
               return (
                 <Link key={tool.id} href={tool.href}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Card className="border-0 bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition-all active:scale-[0.98]">
+                  <div className="transition-all active:scale-[0.98] duration-200">
+                    <Card className="border-0 bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition-all">
                       <div className="p-3.5 sm:p-4 flex items-start gap-3 sm:gap-4">
                         <div className={cn("w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center flex-shrink-0", tool.bgColor)}>
                           <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
@@ -386,7 +375,7 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
                         <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0 self-center" />
                       </div>
                     </Card>
-                  </motion.div>
+                  </div>
                 </Link>
               );
             })}
@@ -405,8 +394,8 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
                   💡 Tips Sukses
                 </h3>
                 <p className="text-xs sm:text-sm text-white/95 leading-relaxed">
-                  Gunakan <span className="font-bold">CV ATS</span> untuk melamar online, 
-                  <span className="font-bold"> CV Creative</span> untuk industri kreatif, dan 
+                  Gunakan <span className="font-bold">CV ATS</span> untuk melamar online,
+                  <span className="font-bold"> CV Creative</span> untuk industri kreatif, dan
                   <span className="font-bold"> Interview Prep</span> untuk persiapan wawancara!
                 </p>
               </div>
@@ -462,7 +451,7 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
             {categories.map((category) => {
               const Icon = category.icon;
               const isActive = selectedCategory === category.id;
-              
+
               return (
                 <button
                   key={category.id}
@@ -491,17 +480,13 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
 
           {/* Tools Grid - Desktop 3 Columns */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredTools.map((tool, index) => {
+            {filteredTools.map((tool) => {
               const Icon = tool.icon;
-              
+
               return (
                 <Link key={tool.id} href={tool.href}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Card className="border-0 bg-white dark:bg-gray-900 shadow-sm hover:shadow-xl transition-all h-full group">
+                  <div className="h-full group transition-all hover:-translate-y-1 duration-200">
+                    <Card className="border-0 bg-white dark:bg-gray-900 shadow-sm hover:shadow-xl transition-all h-full overflow-hidden">
                       <div className={cn("h-2", tool.bgColor)} />
                       <div className="p-6">
                         <div className="flex items-start gap-4 mb-4">
@@ -533,7 +518,7 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
                         </div>
                       </div>
                     </Card>
-                  </motion.div>
+                  </div>
                 </Link>
               );
             })}
@@ -550,8 +535,8 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
                   💡 Tips Sukses untuk Persiapan Karir
                 </h3>
                 <p className="text-base text-white/95 leading-relaxed">
-                  Maksimalkan peluang karirmu! Gunakan <span className="font-bold">CV ATS</span> untuk melamar ke perusahaan besar (lolos screening otomatis), 
-                  <span className="font-bold"> CV Creative</span> untuk industri kreatif dan startup, dan <span className="font-bold">Interview Prep</span> untuk 
+                  Maksimalkan peluang karirmu! Gunakan <span className="font-bold">CV ATS</span> untuk melamar ke perusahaan besar (lolos screening otomatis),
+                  <span className="font-bold"> CV Creative</span> untuk industri kreatif dan startup, dan <span className="font-bold">Interview Prep</span> untuk
                   persiapan wawancara yang lebih matang dan percaya diri!
                 </p>
               </div>
