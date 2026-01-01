@@ -60,7 +60,7 @@ export function AppShell({ children, user, isAdmin = false, hideMobileHeader = f
         {/* VIP Header with theme toggle & notifications - Replaces MobileHeader */}
         {!hideMobileHeader && (
           <div className="lg:hidden">
-            <VIPHeader />
+            <VIPHeader user={user} />
           </div>
         )}
 

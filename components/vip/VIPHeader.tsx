@@ -21,13 +21,29 @@ import { NotificationDropdown } from './NotificationDropdown'
 
 interface VIPHeaderProps {
   onMenuToggle?: () => void
+  user?: {
+    name: string;
+    email: string;
+    avatar?: string | null;
+    role?: string;
+    membership_tier?: string;
+  } | null
 }
 
-export function VIPHeader({ onMenuToggle }: VIPHeaderProps) {
+export function VIPHeader({ onMenuToggle, user }: VIPHeaderProps) {
   const [scrolled, setScrolled] = useState(false)
-  const [mobileHidden, setMobileHidden] = useState(false) // Renamed: only for mobile
+  const [mobileHidden, setMobileHidden] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
-  const [profile, setProfile] = useState<Partial<MemberProfile> | null>(null)
+  // Use passed user prop as initial profile or fallback to null (fetches later if needed)
+  const [profile, setProfile] = useState<Partial<MemberProfile> | null>(user ? {
+    full_name: user.name,
+    email: user.email,
+    avatar_url: user.avatar,
+    // Default to basic if not provided, assuming safe default
+    membership_tier: user.membership_tier || 'basic',
+    role: user.role || 'user'
+  } : null)
+
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const router = useRouter()
@@ -35,23 +51,25 @@ export function VIPHeader({ onMenuToggle }: VIPHeaderProps) {
   useEffect(() => {
     setMounted(true)
 
-    const loadProfile = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+    // Only fetch if user prop wasn't valid or incomplete
+    if (!user) {
+      const loadProfile = async () => {
+        const supabase = createClient()
+        const { data: { user: authUser } } = await supabase.auth.getUser()
 
-      if (user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('id, email, full_name, avatar_url, role, membership_tier, membership_status')
-          .eq('id', user.id)
-          .single()
+        if (authUser) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('id, email, full_name, avatar_url, role, membership_tier, membership_status')
+            .eq('id', authUser.id)
+            .single()
 
-        setProfile(data)
+          setProfile(data)
+        }
       }
+      loadProfile()
     }
-
-    loadProfile()
-  }, [])
+  }, [user])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -96,7 +114,6 @@ export function VIPHeader({ onMenuToggle }: VIPHeaderProps) {
   const isPremium = profile?.membership_tier === 'premium'
   const isBasic = profile?.membership_tier === 'basic'
 
-  if (!mounted) return null
 
   return (
     <>
