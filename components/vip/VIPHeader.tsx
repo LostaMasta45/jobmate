@@ -38,10 +38,10 @@ export function VIPHeader({ onMenuToggle, user }: VIPHeaderProps) {
   const [profile, setProfile] = useState<Partial<MemberProfile> | null>(user ? {
     full_name: user.name,
     email: user.email,
-    avatar_url: user.avatar,
+    avatar_url: user.avatar || undefined,
     // Default to basic if not provided, assuming safe default
-    membership_tier: user.membership_tier || 'basic',
-    role: user.role || 'user'
+    membership_tier: (user.membership_tier as any) || 'basic',
+    role: (user.role as any) || 'user'
   } : null)
 
   const { theme, setTheme } = useTheme()
