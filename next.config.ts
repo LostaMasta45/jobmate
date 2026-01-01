@@ -150,65 +150,6 @@ const nextConfig: NextConfig = {
       tls: false,
     };
 
-    // Production optimizations only
-    if (!dev && !isServer) {
-      config.optimization = {
-        ...config.optimization,
-        moduleIds: 'deterministic',
-        runtimeChunk: 'single',
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            default: false,
-            vendors: false,
-            // Vendor chunk for node_modules
-            vendor: {
-              name: 'vendor',
-              chunks: 'all',
-              test: /node_modules/,
-              priority: 20,
-            },
-            // Separate chunk for framer-motion (heavy library)
-            framer: {
-              name: 'framer',
-              test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
-              chunks: 'all',
-              priority: 30,
-            },
-            // Separate chunk for Radix UI
-            radix: {
-              name: 'radix',
-              test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
-              chunks: 'all',
-              priority: 30,
-            },
-            // Separate chunk for PDF libraries
-            pdf: {
-              name: 'pdf',
-              test: /[\\/]node_modules[\\/](html2canvas|jspdf|html2pdf)[\\/]/,
-              chunks: 'async', // Lazy load PDF libraries
-              priority: 25,
-            },
-            // Separate chunk for chart libraries
-            charts: {
-              name: 'charts',
-              test: /[\\/]node_modules[\\/](recharts|apexcharts)[\\/]/,
-              chunks: 'async', // Lazy load charts
-              priority: 25,
-            },
-            // Common chunk for shared code
-            common: {
-              name: 'common',
-              minChunks: 2,
-              chunks: 'all',
-              priority: 10,
-              reuseExistingChunk: true,
-              enforce: true,
-            },
-          },
-        },
-      }
-    }
     return config
   },
 
