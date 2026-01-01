@@ -28,7 +28,7 @@ const HeroVisual = () => {
                 {/* Card Body - Notification Stream */}
                 <div className="flex-1 p-4 space-y-3 overflow-hidden relative">
                     {/* Notification 1 */}
-                    <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex gap-3 items-start animate-slide-in-left">
+                    <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex gap-3 items-start">
                         <div className="bg-brand/20 p-2 rounded-full mt-1">
                             <MessageSquare className="w-4 h-4 text-brand" />
                         </div>
@@ -40,7 +40,7 @@ const HeroVisual = () => {
                     </div>
 
                     {/* Notification 2 */}
-                    <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex gap-3 items-start animate-slide-in-left animation-delay-500">
+                    <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex gap-3 items-start">
                         <div className="bg-purple-500/20 p-2 rounded-full mt-1">
                             <Mail className="w-4 h-4 text-purple-400" />
                         </div>
@@ -52,7 +52,7 @@ const HeroVisual = () => {
                     </div>
 
                     {/* Notification 3 */}
-                    <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex gap-3 items-start animate-slide-in-left animation-delay-1000">
+                    <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex gap-3 items-start">
                         <div className="bg-green-500/20 p-2 rounded-full mt-1">
                             <CheckCircle2 className="w-4 h-4 text-green-400" />
                         </div>
@@ -68,11 +68,11 @@ const HeroVisual = () => {
             </div>
 
             {/* Floating Elements */}
-            <div className="absolute -right-4 top-20 bg-white text-black px-4 py-2 rounded-full shadow-xl flex items-center gap-2 z-20 animate-float">
+            <div className="absolute -right-4 top-20 bg-white text-black px-4 py-2 rounded-full shadow-xl flex items-center gap-2 z-20">
                 <span className="text-xs font-bold">🔥 Priority Access</span>
             </div>
 
-            <div className="absolute -left-4 bottom-20 bg-neutral-800 border border-white/10 text-white px-4 py-2 rounded-full shadow-xl flex items-center gap-2 z-20 animate-float animation-delay-1000">
+            <div className="absolute -left-4 bottom-20 bg-neutral-800 border border-white/10 text-white px-4 py-2 rounded-full shadow-xl flex items-center gap-2 z-20">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 <span className="text-xs font-medium">Live Updates</span>
             </div>
