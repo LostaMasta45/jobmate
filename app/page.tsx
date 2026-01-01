@@ -1,14 +1,10 @@
 import { Metadata } from "next";
-import dynamic from "next/dynamic";
+
 import { LandingHeroCosmic } from "@/components/landing-v2/LandingHeroCosmic";
 import { NavbarDynamic } from "@/components/landing-v2/NavbarDynamic";
 import { StickyNotification } from "@/components/landing-v2/StickyNotification";
 
-// Lazy load below-fold content
-const LandingBelowFold = dynamic(() => import("@/components/landing-v2/LandingBelowFold"), {
-  ssr: false,
-  loading: () => <div className="h-screen bg-black" /> // Simple placeholder
-});
+import LandingBelowFoldWrapper from "@/components/landing-v2/LandingBelowFoldWrapper";
 
 
 export const metadata: Metadata = {
@@ -37,7 +33,7 @@ export default function LandingPage() {
       <LandingHeroCosmic />
 
       {/* Below-fold content - Lazy loaded on client */}
-      <LandingBelowFold />
+      <LandingBelowFoldWrapper />
     </main>
   );
 }
