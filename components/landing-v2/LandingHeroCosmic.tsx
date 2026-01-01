@@ -1,49 +1,9 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, Sparkles, MessageSquare, Mail } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { TypewriterEffect } from "./Typewriter";
 
-// --- Typewriter Effect Component (Pure CSS/JS, no framer-motion) ---
-const TypewriterEffect = ({ words }: { words: { text: string; className?: string }[] }) => {
-    const [currentWordIndex, setCurrentWordIndex] = useState(0);
-    const [currentText, setCurrentText] = useState("");
-    const [isDeleting, setIsDeleting] = useState(false);
-
-    useEffect(() => {
-        const word = words[currentWordIndex].text;
-        const typeSpeed = isDeleting ? 50 : 100;
-        const deleteSpeed = 50;
-        const pauseTime = 2000;
-
-        const timer = setTimeout(() => {
-            if (!isDeleting) {
-                setCurrentText(word.substring(0, currentText.length + 1));
-                if (currentText.length === word.length) {
-                    setTimeout(() => setIsDeleting(true), pauseTime);
-                }
-            } else {
-                setCurrentText(word.substring(0, currentText.length - 1));
-                if (currentText.length === 0) {
-                    setIsDeleting(false);
-                    setCurrentWordIndex((prev) => (prev + 1) % words.length);
-                }
-            }
-        }, isDeleting ? deleteSpeed : typeSpeed);
-
-        return () => clearTimeout(timer);
-    }, [currentText, isDeleting, currentWordIndex, words]);
-
-    return (
-        <span className={cn("inline-block", words[currentWordIndex].className)}>
-            {currentText}
-            <span className="animate-pulse">|</span>
-        </span>
-    );
-};
-
-// --- Simple Hero Visual (CSS animations only, no framer-motion) ---
+// --- Simple Hero Visual (Server Component Friendly) ---
 const HeroVisual = () => {
     return (
         <div className="relative w-full aspect-[4/5] md:aspect-square max-w-sm mx-auto animate-fade-in-up">
