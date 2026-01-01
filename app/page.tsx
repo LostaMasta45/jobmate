@@ -2,10 +2,7 @@ import { Metadata } from "next";
 
 import { LandingHeroCosmic } from "@/components/landing-v2/LandingHeroCosmic";
 import { NavbarDynamic } from "@/components/landing-v2/NavbarDynamic";
-import { StickyNotification } from "@/components/landing-v2/StickyNotification";
-
 import LandingBelowFoldWrapper from "@/components/landing-v2/LandingBelowFoldWrapper";
-
 
 export const metadata: Metadata = {
   title: "Career VIP InfoLokerJombang — Siap Kerja Setiap Hari",
@@ -21,7 +18,6 @@ export const metadata: Metadata = {
 export default function LandingPage() {
   return (
     <main className="min-h-screen bg-black text-white overflow-x-hidden selection:bg-brand selection:text-white font-sans">
-      <StickyNotification />
       <NavbarDynamic />
 
       {/* Background Global Effects */}
