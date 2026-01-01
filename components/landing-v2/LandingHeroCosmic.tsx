@@ -133,7 +133,7 @@ export function LandingHeroCosmic() {
 
                     {/* Left Content: Text - CSS animations only */}
                     <div className="flex-1 text-left space-y-8">
-                        <div className="animate-fade-in-up">
+                        <div>
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand/30 bg-brand/10 backdrop-blur-md mb-8 shadow-[0_0_15px_rgba(0,172,199,0.2)]">
                                 <Sparkles className="w-4 h-4 text-brand" />
                                 <span className="text-sm font-medium text-brand-100">Dipercaya 203.000+ Pencari Kerja</span>
