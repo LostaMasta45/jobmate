@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
-import { ConditionalSessionTimeout } from "@/components/auth/ConditionalSessionTimeout";
 import { ActivityTrackingProvider } from "@/components/providers/ActivityTrackingProvider";
-import { Toaster } from "sonner";
-import { ToastContainer } from "@/components/mobile/ToastNotification";
+import { DelayedScripts } from "@/components/OptimizedScripts";
 
 
 const inter = Inter({
@@ -93,10 +91,8 @@ export default function RootLayout({
       >
         <ThemeProvider defaultTheme="system" storageKey="jobmate_theme">
           <ActivityTrackingProvider>
-            <ConditionalSessionTimeout />
             {children}
-            <Toaster position="top-center" richColors />
-            <ToastContainer />
+            <DelayedScripts />
           </ActivityTrackingProvider>
         </ThemeProvider>
         <div id="dnd-portal" />
