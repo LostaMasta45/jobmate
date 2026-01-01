@@ -51,7 +51,7 @@ export default function RootLayout({
 
         {/* PWA Meta Tags - Transparent status bar follows UI beneath */}
         <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-        <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
 
         {/* iOS PWA Settings */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
