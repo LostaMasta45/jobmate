@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { Design1Immersive } from '@/components/vip/designs/Design1Immersive'
+import Design1Immersive from '@/components/vip/designs/Design1Immersive'
 import { notFound } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
