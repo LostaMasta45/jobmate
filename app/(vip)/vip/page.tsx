@@ -36,7 +36,7 @@ export default async function VIPDashboardPage() {
     // Query 1: User profile
     supabase
       .from('profiles')
-      .select('full_name, email, avatar_url, membership, membership_status, membership_expiry')
+      .select('full_name, email, avatar_url, membership, membership_status, membership_expiry, skills')
       .eq('id', user.id)
       .single(),
 
@@ -139,6 +139,7 @@ export default async function VIPDashboardPage() {
     poster_url: l.poster_url,
     is_featured: l.is_featured || false,
     view_count: l.view_count || 0,
+    skills: l.skills || [],
     published_at: l.published_at,
     created_at: l.created_at,
     is_bookmarked: bookmarkedIds.has(l.id),
@@ -169,6 +170,7 @@ export default async function VIPDashboardPage() {
     poster_url: l.poster_url,
     is_featured: l.is_featured || false,
     view_count: l.view_count || 0,
+    skills: l.skills || [],
     published_at: l.published_at,
     created_at: l.created_at,
     is_bookmarked: bookmarkedIds.has(l.id),
@@ -201,6 +203,7 @@ export default async function VIPDashboardPage() {
         }}
         lokerList={lokerWithBookmarks}
         recentlyViewedLoker={recentlyViewedWithBookmarks}
+        userSkills={(profile as any)?.skills || []}
       />
 
       {/* PWA Install Popup - Mobile Only */}

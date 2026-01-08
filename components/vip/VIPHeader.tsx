@@ -210,6 +210,7 @@ export function VIPHeader({ onMenuToggle, user }: VIPHeaderProps) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
+                    suppressHydrationWarning
                     variant="ghost"
                     className="gap-1 sm:gap-2 lg:gap-3 rounded-xl sm:rounded-2xl h-8 sm:h-9 lg:h-10 px-1.5 sm:px-2 lg:px-3 hover:bg-gradient-to-br hover:from-[#5547d0]/10 hover:to-[#00acc7]/10 transition-all duration-200 border border-transparent hover:border-[#5547d0]/20"
                   >

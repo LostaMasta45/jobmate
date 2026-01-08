@@ -3,6 +3,7 @@
 import { useState, useEffect, useTransition, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ModernLokerCard } from './ModernLokerCard'
+import { DesktopCard2Overlay } from '@/components/vip/designs/desktop-variants/DesktopCard2Overlay'
 import { JobCardMobile } from '@/components/mobile/JobCardMobile'
 import { JobCardModern } from '@/components/mobile/JobCardModern'
 import { QuickFilterChips } from '@/components/mobile/QuickFilterChips'
@@ -31,18 +32,18 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
-  
+
   const [lokerList, setLokerList] = useState<Loker[]>(initialLoker)
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [quickFilters, setQuickFilters] = useState<string[]>([])
-  
+
   // Scroll state for dynamic header
   const [scrollY, setScrollY] = useState(0)
   const [isHeaderVisible, setIsHeaderVisible] = useState(true)
   const lastScrollY = useRef(0)
   const ticking = useRef(false)
-  
+
   // Initialize mobile filters from URL params
   const [mobileFilters, setMobileFilters] = useState<FilterState>({
     locations: searchParams.getAll('lokasi'),
@@ -59,11 +60,11 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   // Handle scroll for dynamic header with RAF throttling - Improved for mobile app feel
   useEffect(() => {
     lastScrollY.current = window.scrollY
-    
+
     const updateHeader = () => {
       const currentScrollY = window.scrollY
       const scrollDifference = currentScrollY - lastScrollY.current
-      
+
       // Always show header at the very top (within 50px)
       if (currentScrollY < 50) {
         setIsHeaderVisible(true)
@@ -76,7 +77,7 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
       else if (scrollDifference > 5 && currentScrollY > 80) {
         setIsHeaderVisible(false)
       }
-      
+
       lastScrollY.current = currentScrollY
       setScrollY(currentScrollY)
       ticking.current = false
@@ -102,7 +103,7 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   const getNewJobsCount = () => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    
+
     return lokerList.filter((loker) => {
       if (!loker.published_at) return false
       const publishedDate = new Date(loker.published_at)
@@ -117,7 +118,7 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   const getTodayJobs = () => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    
+
     return lokerList.filter((loker) => {
       if (!loker.published_at) return false
       const publishedDate = new Date(loker.published_at)
@@ -131,7 +132,7 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
     const today = new Date()
     const weekFromNow = new Date(today)
     weekFromNow.setDate(weekFromNow.getDate() + 7)
-    
+
     return lokerList.filter((loker) => {
       if (!loker.deadline) return false
       const deadline = new Date(loker.deadline)
@@ -167,15 +168,15 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
     return {
       remote: lokerList.filter(l => l.tipe_pekerjaan?.toLowerCase().includes('remote')).length,
       fulltime: lokerList.filter(l => l.tipe_pekerjaan?.toLowerCase().includes('full') || l.tipe_pekerjaan?.toLowerCase().includes('penuh')).length,
-      freshgrad: lokerList.filter(l => 
-        l.title?.toLowerCase().includes('fresh graduate') || 
+      freshgrad: lokerList.filter(l =>
+        l.title?.toLowerCase().includes('fresh graduate') ||
         l.title?.toLowerCase().includes('freshgraduate')
       ).length,
       salaryHigh: lokerList.filter(l => l.gaji_min && l.gaji_min >= 5000000).length,
       today: todayJobs.length,
       urgent: urgentJobsCount,
-      internship: lokerList.filter(l => 
-        l.title?.toLowerCase().includes('magang') || 
+      internship: lokerList.filter(l =>
+        l.title?.toLowerCase().includes('magang') ||
         l.title?.toLowerCase().includes('intern') ||
         l.tipe_pekerjaan?.toLowerCase().includes('magang') ||
         l.tipe_pekerjaan?.toLowerCase().includes('intern')
@@ -186,28 +187,28 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   // Calculate real counts for categories
   const getCategoryCounts = () => {
     return {
-      it: lokerList.filter(l => 
+      it: lokerList.filter(l =>
         l.kategori?.some(k => ['IT', 'Technology', 'Web Development', 'Mobile Development', 'Software', 'Developer'].some(tech => k.includes(tech)))
       ).length,
-      marketing: lokerList.filter(l => 
+      marketing: lokerList.filter(l =>
         l.kategori?.some(k => ['Marketing', 'Content', 'Design', 'Creative'].some(mark => k.includes(mark)))
       ).length,
-      sales: lokerList.filter(l => 
+      sales: lokerList.filter(l =>
         l.kategori?.some(k => ['Sales', 'Penjualan'].some(s => k.includes(s)))
       ).length,
-      fnb: lokerList.filter(l => 
+      fnb: lokerList.filter(l =>
         l.kategori?.some(k => ['F&B', 'Food', 'Beverage', 'Restaurant', 'Cafe'].some(f => k.includes(f)))
       ).length,
-      retail: lokerList.filter(l => 
+      retail: lokerList.filter(l =>
         l.kategori?.some(k => ['Retail', 'Store', 'Toko'].some(r => k.includes(r)))
       ).length,
-      admin: lokerList.filter(l => 
+      admin: lokerList.filter(l =>
         l.kategori?.some(k => ['Admin', 'Administration', 'Office'].some(a => k.includes(a)))
       ).length,
-      engineer: lokerList.filter(l => 
+      engineer: lokerList.filter(l =>
         l.kategori?.some(k => ['Engineer', 'Engineering', 'Technical'].some(e => k.includes(e)))
       ).length,
-      hrd: lokerList.filter(l => 
+      hrd: lokerList.filter(l =>
         l.kategori?.some(k => ['HRD', 'HR', 'Human Resource', 'Recruitment'].some(h => k.includes(h)))
       ).length,
     }
@@ -220,16 +221,16 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   // Update URL params function
   const updateFilters = (updates: Record<string, string | string[] | null>) => {
     const params = new URLSearchParams(searchParams.toString())
-    
+
     Object.entries(updates).forEach(([key, value]) => {
       // Remove existing params with this key
       params.delete(key)
-      
+
       if (value === null || value === '' || (Array.isArray(value) && value.length === 0)) {
         // Remove param if null/empty
         return
       }
-      
+
       if (Array.isArray(value)) {
         // Add multiple values for array params
         value.forEach((v) => params.append(key, v))
@@ -238,10 +239,10 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         params.set(key, value)
       }
     })
-    
+
     // Reset to page 1 when filters change
     params.delete('page')
-    
+
     startTransition(() => {
       router.push(`/vip/loker?${params.toString()}`, { scroll: false })
     })
@@ -291,7 +292,7 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
     if (searchQuery === (searchParams.get('search') || '')) {
       return
     }
-    
+
     const timer = setTimeout(() => {
       updateFilters({ search: searchQuery || null })
     }, 500)
@@ -305,16 +306,16 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
 
     const publishedDate = new Date(publishedAt)
     publishedDate.setHours(0, 0, 0, 0)
-    
+
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    
+
     const yesterday = new Date(today)
     yesterday.setDate(yesterday.getDate() - 1)
-    
+
     const weekStart = new Date(today)
     weekStart.setDate(weekStart.getDate() - 7)
-    
+
     const monthStart = new Date(today)
     monthStart.setMonth(monthStart.getMonth() - 1)
 
@@ -397,10 +398,10 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   // Apply mobile filters - update URL params
   const handleApplyMobileFilters = (newFilters: FilterState) => {
     setMobileFilters(newFilters)
-    
+
     // Convert job types array to single value for tipe_kerja param
     const tipeKerja = newFilters.jobTypes.length > 0 ? newFilters.jobTypes[0] : null
-    
+
     updateFilters({
       lokasi: newFilters.locations.length > 0 ? newFilters.locations : null,
       kategori: newFilters.categories.length > 0 ? newFilters.categories : null,
@@ -418,15 +419,13 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   return (
     <div className="lg:space-y-8 pb-safe overflow-x-hidden -mt-20 sm:-mt-24">
       {/* Mobile: Dynamic Sticky Search Bar - Full to top when scrolled */}
-      <div className={`lg:hidden fixed left-0 right-0 z-40 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] transition-all duration-300 ease-in-out ${
-        scrollY > 50 
-          ? 'top-0 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl' 
-          : 'top-12 sm:top-14 shadow-lg'
-      }`}>
-        {/* Header Row - Slides up when scrolling */}
-        <div className={`flex items-center justify-between px-3 transition-all duration-300 ease-in-out ${
-          isHeaderVisible ? 'pt-1.5 pb-1.5 opacity-100 max-h-20' : 'pt-0 pb-0 opacity-0 max-h-0 overflow-hidden pointer-events-none'
+      <div className={`lg:hidden fixed left-0 right-0 z-40 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] transition-all duration-300 ease-in-out ${scrollY > 50
+        ? 'top-0 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl'
+        : 'top-12 sm:top-14 shadow-lg'
         }`}>
+        {/* Header Row - Slides up when scrolling */}
+        <div className={`flex items-center justify-between px-3 transition-all duration-300 ease-in-out ${isHeaderVisible ? 'pt-1.5 pb-1.5 opacity-100 max-h-20' : 'pt-0 pb-0 opacity-0 max-h-0 overflow-hidden pointer-events-none'
+          }`}>
           {/* Location Selector */}
           <button className="flex items-center gap-1 text-white hover:bg-white/10 active:bg-white/20 rounded-lg px-1.5 py-0.5 -ml-1.5 transition-all">
             <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
@@ -448,37 +447,32 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         </div>
 
         {/* Search Bar - Always visible, ultra compact when scrolled to top */}
-        <div className={`px-3 transition-all duration-300 ease-in-out ${
-          scrollY > 50 ? 'pt-safe py-2.5' : (isHeaderVisible ? 'pt-0 pb-2' : 'py-2')
-        }`}>
+        <div className={`px-3 transition-all duration-300 ease-in-out ${scrollY > 50 ? 'pt-safe py-2.5' : (isHeaderVisible ? 'pt-0 pb-2' : 'py-2')
+          }`}>
           <div className="flex items-center gap-1.5">
             <div className="flex-1 relative">
               <div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-10">
-                <Search className={`transition-all duration-300 text-gray-400 ${
-                  scrollY > 50 ? 'w-4 h-4' : 'w-3.5 h-3.5'
-                }`} />
+                <Search className={`transition-all duration-300 text-gray-400 ${scrollY > 50 ? 'w-4 h-4' : 'w-3.5 h-3.5'
+                  }`} />
               </div>
               <input
                 type="text"
                 placeholder="Cari pekerjaan, perusahaan..."
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className={`w-full pr-3 rounded-lg bg-white dark:bg-gray-800 border-0 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300 ${
-                  scrollY > 50 
-                    ? 'h-10 pl-10 shadow-md font-medium' 
-                    : 'h-9 pl-9 shadow-sm'
-                }`}
+                className={`w-full pr-3 rounded-lg bg-white dark:bg-gray-800 border-0 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300 ${scrollY > 50
+                  ? 'h-10 pl-10 shadow-md font-medium'
+                  : 'h-9 pl-9 shadow-sm'
+                  }`}
               />
             </div>
-            <button 
+            <button
               onClick={() => setIsFilterOpen(true)}
-              className={`relative rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 active:scale-95 transition-all duration-300 flex-shrink-0 ${
-                scrollY > 50 ? 'w-10 h-10' : 'w-9 h-9'
-              }`}
+              className={`relative rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 active:scale-95 transition-all duration-300 flex-shrink-0 ${scrollY > 50 ? 'w-10 h-10' : 'w-9 h-9'
+                }`}
             >
-              <SlidersHorizontal className={`text-white transition-all duration-300 ${
-                scrollY > 50 ? 'w-4 h-4' : 'w-3.5 h-3.5'
-              }`} />
+              <SlidersHorizontal className={`text-white transition-all duration-300 ${scrollY > 50 ? 'w-4 h-4' : 'w-3.5 h-3.5'
+                }`} />
               {activeFilterCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] bg-red-500 rounded-full flex items-center justify-center text-white text-[8px] font-bold border border-white px-0.5">
                   {activeFilterCount}
@@ -490,9 +484,8 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
       </div>
 
       {/* Dynamic Spacer - Adjusts based on scroll position */}
-      <div className={`lg:hidden transition-all duration-300 ${
-        scrollY > 50 ? 'h-[60px] sm:h-[60px]' : 'h-[130px] sm:h-[134px]'
-      }`} />
+      <div className={`lg:hidden transition-all duration-300 ${scrollY > 50 ? 'h-[60px] sm:h-[60px]' : 'h-[130px] sm:h-[134px]'
+        }`} />
 
       {/* New Jobs Banner */}
       {newJobsCount > 0 && <NewJobsBanner count={newJobsCount} />}
@@ -530,7 +523,7 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
 
       {/* 3. Kategori Populer - Mobile Only - REDUCED SPACING */}
       <div className="mt-3">
-        <KategoriPopuler 
+        <KategoriPopuler
           onKategoriSelect={handleKategoriSelect}
           counts={categoryCounts}
         />
@@ -573,7 +566,7 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         <h2 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
           Lowongan Disarankan
         </h2>
-        <button 
+        <button
           onClick={() => {
             // Navigate to all loker with recommended sorting
             updateFilters({ sort: 'paling_dilihat', timeFilter: 'week' })
@@ -594,7 +587,7 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
       {/* Suggested Jobs Carousel - Mobile Only */}
       {!isPending && filteredLoker.length > 5 && (
         <div className="lg:hidden">
-          <SuggestedJobsCarousel 
+          <SuggestedJobsCarousel
             jobs={filteredLoker.slice(0, 10)}
           />
         </div>
@@ -642,7 +635,7 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
           {/* Desktop: Grid layout */}
           <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredLoker.map((loker) => (
-              <ModernLokerCard key={loker.id} loker={loker} />
+              <DesktopCard2Overlay key={loker.id} loker={loker} />
             ))}
           </div>
         </>

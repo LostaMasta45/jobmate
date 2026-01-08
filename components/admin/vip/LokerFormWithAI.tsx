@@ -33,9 +33,15 @@ interface ParsedData {
   deskripsi?: string;
   persyaratan?: string;
   kualifikasi: string[];
+  skills: string[];
+  benefit: string[];
   deadline?: string;
+  kontak_person?: string;
   kontak_wa?: string;
+  kontak_phone?: string;
   kontak_email?: string;
+  apply_link?: string;
+  apply_method?: 'whatsapp' | 'email' | 'link' | 'walk_in' | 'multiple';
   confidence_score: number;
   poster_url?: string | null;
 }
@@ -85,7 +91,7 @@ export function LokerFormWithAI() {
       // Pre-check: Verify we have a valid session
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         toast.error('Sesi login tidak ditemukan. Silakan login kembali.');
         window.location.href = '/admin-login';
@@ -106,7 +112,7 @@ export function LokerFormWithAI() {
       if (!response.ok) {
         const error = await response.json();
         console.error('API error response:', error);
-        
+
         // Show specific error messages
         if (response.status === 401) {
           throw new Error('Sesi login expired. Silakan login kembali.');
@@ -118,11 +124,11 @@ export function LokerFormWithAI() {
       }
 
       const result = await response.json();
-      
+
       setParsedData(result.data);
       setEditedData(result.data); // Clone untuk editing
       setStep('review');
-      
+
       toast.success(`✨ Poster berhasil di-parse! (Confidence: ${result.data.confidence_score}%)`);
     } catch (error: any) {
       console.error('Parse error:', error);
@@ -155,7 +161,7 @@ export function LokerFormWithAI() {
 
       toast.success('✅ Loker berhasil disimpan!');
       setStep('done');
-      
+
       setTimeout(() => {
         router.push('/admin/vip-loker');
       }, 1500);
@@ -174,9 +180,9 @@ export function LokerFormWithAI() {
 
   const addKualifikasi = () => {
     if (!editedData) return;
-    setEditedData({ 
-      ...editedData, 
-      kualifikasi: [...editedData.kualifikasi, ''] 
+    setEditedData({
+      ...editedData,
+      kualifikasi: [...editedData.kualifikasi, '']
     });
   };
 
@@ -217,7 +223,7 @@ export function LokerFormWithAI() {
             <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
               <Upload className="w-10 h-10 text-white" />
             </div>
-            
+
             <div>
               <h2 className="text-2xl font-bold mb-2">Upload Poster Loker</h2>
               <p className="text-gray-600">
@@ -256,7 +262,7 @@ export function LokerFormWithAI() {
                     className="w-full h-auto"
                   />
                 </div>
-                
+
                 <div className="flex gap-3 justify-center">
                   <Button
                     variant="outline"
@@ -268,7 +274,7 @@ export function LokerFormWithAI() {
                     <X className="w-4 h-4 mr-2" />
                     Ganti Poster
                   </Button>
-                  
+
                   <Button
                     onClick={handleParsePoster}
                     disabled={isProcessing}
@@ -463,72 +469,169 @@ export function LokerFormWithAI() {
                         </div>
                       ))}
                     </div>
+
+                    {/* Skills */}
+                    <div>
+                      <Label>Skills (Technical)</Label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {editedData.skills?.map((skill: string, idx: number) => (
+                          <Badge key={idx} variant="secondary" className="px-3 py-1 bg-blue-100 text-blue-700">
+                            {skill}
+                            <button
+                              onClick={() => {
+                                const newSkills = editedData.skills?.filter((_: any, i: number) => i !== idx) || [];
+                                updateEditedData('skills', newSkills);
+                              }}
+                              className="ml-2 text-blue-500 hover:text-red-600"
+                            >
+                              ×
+                            </button>
+                          </Badge>
+                        ))}
+                        {(!editedData.skills || editedData.skills.length === 0) && (
+                          <span className="text-sm text-muted-foreground">Tidak ada skills terdeteksi</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Benefit */}
+                    <div>
+                      <Label>Benefit / Fasilitas</Label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {editedData.benefit?.map((ben: string, idx: number) => (
+                          <Badge key={idx} variant="secondary" className="px-3 py-1 bg-green-100 text-green-700">
+                            {ben}
+                            <button
+                              onClick={() => {
+                                const newBenefit = editedData.benefit?.filter((_: any, i: number) => i !== idx) || [];
+                                updateEditedData('benefit', newBenefit);
+                              }}
+                              className="ml-2 text-green-500 hover:text-red-600"
+                            >
+                              ×
+                            </button>
+                          </Badge>
+                        ))}
+                        {(!editedData.benefit || editedData.benefit.length === 0) && (
+                          <span className="text-sm text-muted-foreground">Tidak ada benefit terdeteksi</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Kontak */}
-              <div>
-                <h3 className="text-lg font-semibold mb-4">📞 Kontak</h3>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="kontak_wa">WhatsApp</Label>
-                    <Input
-                      id="kontak_wa"
-                      value={editedData.kontak_wa || ''}
-                      onChange={(e) => updateEditedData('kontak_wa', e.target.value)}
-                      placeholder="081234567890"
-                    />
-                  </div>
+                {/* Kontak */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">📞 Kontak</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="kontak_person">Contact Person</Label>
+                      <Input
+                        id="kontak_person"
+                        value={editedData.kontak_person || ''}
+                        onChange={(e) => updateEditedData('kontak_person', e.target.value)}
+                        placeholder="Contoh: Ibu Sari, HRD"
+                      />
+                    </div>
 
-                  <div>
-                    <Label htmlFor="kontak_email">Email</Label>
-                    <Input
-                      id="kontak_email"
-                      value={editedData.kontak_email || ''}
-                      onChange={(e) => updateEditedData('kontak_email', e.target.value)}
-                      placeholder="hr@perusahaan.com"
-                    />
-                  </div>
+                    <div>
+                      <Label htmlFor="kontak_wa">WhatsApp</Label>
+                      <Input
+                        id="kontak_wa"
+                        value={editedData.kontak_wa || ''}
+                        onChange={(e) => updateEditedData('kontak_wa', e.target.value)}
+                        placeholder="081234567890"
+                      />
+                    </div>
 
-                  <div>
-                    <Label htmlFor="deadline">Deadline (Optional)</Label>
-                    <Input
-                      id="deadline"
-                      type="date"
-                      value={editedData.deadline || ''}
-                      onChange={(e) => updateEditedData('deadline', e.target.value)}
-                    />
+                    <div>
+                      <Label htmlFor="kontak_phone">Telepon (Non-WA)</Label>
+                      <Input
+                        id="kontak_phone"
+                        value={editedData.kontak_phone || ''}
+                        onChange={(e) => updateEditedData('kontak_phone', e.target.value)}
+                        placeholder="(0321) 123456"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="kontak_email">Email</Label>
+                      <Input
+                        id="kontak_email"
+                        value={editedData.kontak_email || ''}
+                        onChange={(e) => updateEditedData('kontak_email', e.target.value)}
+                        placeholder="hr@perusahaan.com"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="apply_link">Link Apply (URL)</Label>
+                      <Input
+                        id="apply_link"
+                        value={editedData.apply_link || ''}
+                        onChange={(e) => updateEditedData('apply_link', e.target.value)}
+                        placeholder="bit.ly/lamarkerja, forms.gle/xxx"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="apply_method">Cara Melamar</Label>
+                      <Select
+                        value={editedData.apply_method || ''}
+                        onValueChange={(value) => updateEditedData('apply_method', value)}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Pilih cara melamar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                          <SelectItem value="email">Email</SelectItem>
+                          <SelectItem value="link">Link/URL</SelectItem>
+                          <SelectItem value="walk_in">Walk-in Interview</SelectItem>
+                          <SelectItem value="multiple">Multiple (Ada beberapa cara)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="deadline">Deadline (Optional)</Label>
+                      <Input
+                        id="deadline"
+                        type="date"
+                        value={editedData.deadline || ''}
+                        onChange={(e) => updateEditedData('deadline', e.target.value)}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Actions */}
-              <div className="flex gap-3 pt-6 border-t">
-                <Button
-                  variant="outline"
-                  onClick={() => setStep('upload')}
-                  disabled={isProcessing}
-                >
-                  Kembali
-                </Button>
-                <Button
-                  onClick={handleSaveLoker}
-                  disabled={isProcessing}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Menyimpan...
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4 mr-2" />
-                      Simpan Loker
-                    </>
-                  )}
-                </Button>
+                {/* Actions */}
+                <div className="flex gap-3 pt-6 border-t">
+                  <Button
+                    variant="outline"
+                    onClick={() => setStep('upload')}
+                    disabled={isProcessing}
+                  >
+                    Kembali
+                  </Button>
+                  <Button
+                    onClick={handleSaveLoker}
+                    disabled={isProcessing}
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Menyimpan...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4 mr-2" />
+                        Simpan Loker
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

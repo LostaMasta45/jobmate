@@ -5,16 +5,22 @@ import { Bookmark } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 
+import { cn } from '@/lib/utils'
+
 interface BookmarkButtonProps {
   lokerId: string
   initialBookmarked: boolean
   iconOnly?: boolean
+  className?: string
+  children?: React.ReactNode
 }
 
 export function BookmarkButton({
   lokerId,
   initialBookmarked,
   iconOnly = false,
+  className,
+  children,
 }: BookmarkButtonProps) {
   const router = useRouter()
   const [isBookmarked, setIsBookmarked] = useState(initialBookmarked)
@@ -53,7 +59,7 @@ export function BookmarkButton({
         size="icon"
         onClick={handleToggle}
         disabled={isLoading}
-        className={isBookmarked ? 'bg-blue-50 border-blue-300' : ''}
+        className={cn(isBookmarked ? 'bg-blue-50 border-blue-300' : '', className)}
       >
         <Bookmark
           className={`w-4 h-4 ${isBookmarked ? 'fill-blue-600 text-blue-600' : ''}`}
@@ -68,10 +74,10 @@ export function BookmarkButton({
       size="sm"
       onClick={handleToggle}
       disabled={isLoading}
-      className="gap-2"
+      className={cn("gap-2", className)}
     >
       <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-white' : ''}`} />
-      {isBookmarked ? 'Tersimpan' : 'Simpan'}
+      {children ? children : (isBookmarked ? 'Tersimpan' : 'Simpan')}
     </Button>
   )
 }

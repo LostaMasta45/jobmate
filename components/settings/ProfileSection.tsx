@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import * as z from "zod";
+import { SkillTagInput } from "@/components/ui/SkillTagInput";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ const profileSchema = z.object({
   linkedin: z.string().refine((val) => !val || val === "" || z.string().url().safeParse(val).success, {
     message: "URL tidak valid"
   }).optional().or(z.literal("")),
+  skills: z.array(z.string()).optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -43,6 +45,7 @@ export function ProfileSection({ profile }: { profile: any }) {
       whatsapp: profile?.whatsapp || "",
       website: profile?.website || "",
       linkedin: profile?.linkedin || "",
+      skills: profile?.skills || [],
     },
   });
 
@@ -217,6 +220,29 @@ export function ProfileSection({ profile }: { profile: any }) {
                 </p>
               )}
             </div>
+          </div>
+
+          {/* Skills Section */}
+          <div className="space-y-4 pt-4 border-t">
+            <div className="space-y-1">
+              <Label>Keahlian & Skill <span className="text-purple-600 text-xs ml-2">(Penting untuk Match Score)</span></Label>
+              <p className="text-sm text-gray-500">
+                Masukkan skill teknis Anda (contoh: React, Excel, Supir, Marketing).
+              </p>
+            </div>
+
+            <Controller
+              control={form.control}
+              name="skills"
+              render={({ field }) => (
+                <SkillTagInput
+                  value={field.value || []}
+                  onChange={field.onChange}
+                  placeholder="Ketik skill lalu tekan Enter..."
+                  maxTags={15}
+                />
+              )}
+            />
           </div>
 
           <div className="flex items-center gap-3 pt-4">

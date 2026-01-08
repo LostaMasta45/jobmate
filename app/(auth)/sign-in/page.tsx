@@ -12,11 +12,15 @@ import { LoadingScreen } from "@/components/ui/loading-screen";
 import { createClient } from "@/lib/supabase/client";
 import {
   Eye, EyeOff, AlertCircle, Mail, KeyRound,
-  Shield, CheckCircle2, Star, Briefcase, Users, TrendingUp, ArrowRight, Rocket
+  Shield, CheckCircle2, Star, Briefcase, Users, TrendingUp, ArrowRight, Rocket, ArrowLeft
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import MobileSignInView from "@/components/auth/MobileSignInView";
+import { useSavedAccounts } from "@/hooks/useSavedAccounts";
+import { SavedAccountCard, AddAccountCard } from "@/components/auth/SavedAccountCard";
+import { SaveLoginPrompt } from "@/components/auth/SaveLoginPrompt";
+import { SavedAccount } from "@/types/saved-account";
 
 export default function SignInPage() {
   const isMobile = useIsMobile();
@@ -30,6 +34,12 @@ export default function SignInPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
   const [rememberMe, setRememberMe] = React.useState(false);
+
+  // Saved Accounts State
+  const { accounts: savedAccounts, saveAccount, removeAccount, isLoaded: savedAccountsLoaded, isAccountSaved } = useSavedAccounts();
+  const [selectedAccount, setSelectedAccount] = React.useState<SavedAccount | null>(null);
+  const [showSavePrompt, setShowSavePrompt] = React.useState(false);
+  const [pendingRedirect, setPendingRedirect] = React.useState<{ path: string; userData: { id: string; email: string; name: string; avatar_url?: string } } | null>(null);
 
   // Validation State
   const [emailError, setEmailError] = React.useState<string | null>(null);
@@ -49,14 +59,14 @@ export default function SignInPage() {
     setIsMounted(true);
   }, []);
 
-  // Load saved email from localStorage on mount
+  // When selecting a saved account, pre-fill email
   React.useEffect(() => {
-    const savedEmail = localStorage.getItem('jobmate_remembered_email');
-    if (savedEmail) {
-      setEmail(savedEmail);
-      setRememberMe(true);
+    if (selectedAccount) {
+      setEmail(selectedAccount.email);
+      setPassword("");
+      setError(null);
     }
-  }, []);
+  }, [selectedAccount]);
 
   // Auto-focus
   React.useEffect(() => {
@@ -153,18 +163,12 @@ export default function SignInPage() {
         return;
       }
 
-      // Handle Remember Me - save or remove email from localStorage
-      if (rememberMe) {
-        localStorage.setItem('jobmate_remembered_email', email);
-      } else {
-        localStorage.removeItem('jobmate_remembered_email');
-      }
-
       setLoginAttempts(0);
 
+      // Fetch full profile for saved accounts feature
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role, membership")
+        .select("role, membership, full_name, avatar_url")
         .eq("id", authData.user.id)
         .maybeSingle();
 
@@ -173,9 +177,28 @@ export default function SignInPage() {
       else if (["vip_premium", "premium"].includes(profile?.membership)) redirectPath = "/dashboard";
       else if (["vip_basic", "basic"].includes(profile?.membership)) redirectPath = "/vip";
 
-      setShowLoadingScreen(true);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      window.location.replace(redirectPath);
+      // Check if account is already saved - if so, skip prompt
+      const alreadySaved = isAccountSaved(authData.user.id);
+
+      if (alreadySaved) {
+        // Account already saved, proceed directly
+        setShowLoadingScreen(true);
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        window.location.replace(redirectPath);
+      } else {
+        // Show save prompt for new accounts
+        setLoading(false);
+        setPendingRedirect({
+          path: redirectPath,
+          userData: {
+            id: authData.user.id,
+            email: authData.user.email || email,
+            name: profile?.full_name || email.split('@')[0],
+            avatar_url: profile?.avatar_url,
+          }
+        });
+        setShowSavePrompt(true);
+      }
 
     } catch (err) {
       console.error("Login error:", err);
@@ -183,6 +206,47 @@ export default function SignInPage() {
       setLoading(false);
       setShowLoadingScreen(false);
     }
+  };
+
+  // Handle save prompt actions
+  const handleSaveAccount = () => {
+    if (pendingRedirect) {
+      saveAccount({
+        id: pendingRedirect.userData.id,
+        email: pendingRedirect.userData.email,
+        name: pendingRedirect.userData.name,
+        avatar_url: pendingRedirect.userData.avatar_url,
+        savedAt: Date.now(),
+      });
+      setShowSavePrompt(false);
+      setShowLoadingScreen(true);
+      setTimeout(() => {
+        window.location.replace(pendingRedirect.path);
+      }, 1500);
+    }
+  };
+
+  const handleSkipSave = () => {
+    if (pendingRedirect) {
+      setShowSavePrompt(false);
+      setShowLoadingScreen(true);
+      setTimeout(() => {
+        window.location.replace(pendingRedirect.path);
+      }, 1500);
+    }
+  };
+
+  // Handle selecting a saved account
+  const handleSelectAccount = (account: SavedAccount) => {
+    setSelectedAccount(account);
+  };
+
+  // Handle going back to account list
+  const handleBackToAccountList = () => {
+    setSelectedAccount(null);
+    setEmail("");
+    setPassword("");
+    setError(null);
   };
 
   // Show loading skeleton during hydration to prevent blank page flash
@@ -221,6 +285,15 @@ export default function SignInPage() {
     <>
       {showLoadingScreen && <LoadingScreen message="Memuat dashboard..." />}
 
+      {/* Save Login Prompt */}
+      <SaveLoginPrompt
+        isOpen={showSavePrompt}
+        userName={pendingRedirect?.userData.name || ""}
+        onSave={handleSaveAccount}
+        onSkip={handleSkipSave}
+        variant="default"
+      />
+
       <div className="flex min-h-screen w-full overflow-hidden bg-background">
 
         {/* === LEFT SIDE: FORM === */}
@@ -242,162 +315,253 @@ export default function SignInPage() {
           </div>
 
           <div className="mx-auto w-full max-w-sm space-y-8 py-12">
-            {/* Header */}
+            {/* Header - Changes based on saved accounts state */}
             <div className="space-y-2">
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-3xl font-bold tracking-tight sm:text-4xl"
-              >
-                Welcome Back
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="text-muted-foreground"
-              >
-                Masuk untuk mengakses dashboard karir Anda
-              </motion.p>
+              {savedAccounts.length > 0 && !selectedAccount ? (
+                <>
+                  <motion.h1
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-3xl font-bold tracking-tight sm:text-4xl"
+                  >
+                    Pilih Akun
+                  </motion.h1>
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-muted-foreground"
+                  >
+                    Ketuk akun untuk login cepat
+                  </motion.p>
+                </>
+              ) : selectedAccount ? (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleBackToAccountList}
+                      className="h-8 w-8 rounded-full hover:bg-muted"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
+                    <span className="text-sm text-muted-foreground">Kembali</span>
+                  </motion.div>
+                  <motion.h1
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-2xl font-bold tracking-tight"
+                  >
+                    Masuk sebagai
+                  </motion.h1>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-muted/50"
+                  >
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-brand to-brand/70 flex items-center justify-center text-white font-semibold">
+                      {selectedAccount.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-semibold">{selectedAccount.name}</p>
+                      <p className="text-sm text-muted-foreground">{selectedAccount.email}</p>
+                    </div>
+                  </motion.div>
+                </>
+              ) : (
+                <>
+                  <motion.h1
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-3xl font-bold tracking-tight sm:text-4xl"
+                  >
+                    Welcome Back
+                  </motion.h1>
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-muted-foreground"
+                  >
+                    Masuk untuk mengakses dashboard karir Anda
+                  </motion.p>
+                </>
+              )}
             </div>
 
-            {/* Login Form */}
-            <form onSubmit={handleSignIn} className="space-y-5">
-              <AnimatePresence mode="wait">
-                {error && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive"
-                  >
-                    <AlertCircle className="h-4 w-4" />
-                    <p>{error}</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <div className="space-y-4">
-                {/* Email */}
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative group">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-brand">
-                      <Mail className="h-4 w-4" />
-                    </div>
-                    <Input
-                      ref={emailInputRef}
-                      id="email"
-                      type="email"
-                      placeholder="nama@email.com"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        validateEmail(e.target.value);
-                      }}
-                      onFocus={() => setIsFocused("email")}
-                      onBlur={handleEmailBlur}
-                      className={`pl-10 h-11 transition-all ${emailError ? 'border-destructive focus-visible:ring-destructive' : 'focus-visible:border-brand focus-visible:ring-brand/20'}`}
-                      required
+            {/* Saved Accounts List */}
+            {savedAccountsLoaded && savedAccounts.length > 0 && !selectedAccount && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="space-y-3"
+              >
+                <AnimatePresence mode="popLayout">
+                  {savedAccounts.map((account) => (
+                    <SavedAccountCard
+                      key={account.id}
+                      account={account}
+                      onSelect={handleSelectAccount}
+                      onRemove={removeAccount}
+                      variant="default"
                     />
+                  ))}
+                </AnimatePresence>
+                <AddAccountCard
+                  onClick={() => setSelectedAccount({ id: '', email: '', name: '', savedAt: 0 } as SavedAccount)}
+                  variant="default"
+                />
+              </motion.div>
+            )}
+
+            {/* Login Form - Show when no saved accounts or account is selected */}
+            {(savedAccounts.length === 0 || selectedAccount) && (
+              <form onSubmit={handleSignIn} className="space-y-5">
+                <AnimatePresence mode="wait">
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive"
+                    >
+                      <AlertCircle className="h-4 w-4" />
+                      <p>{error}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <div className="space-y-4">
+                  {/* Email - Hide when selecting from a saved account */}
+                  {(!selectedAccount || !selectedAccount.id) && (
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <div className="relative group">
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-brand">
+                          <Mail className="h-4 w-4" />
+                        </div>
+                        <Input
+                          ref={emailInputRef}
+                          id="email"
+                          type="email"
+                          placeholder="nama@email.com"
+                          value={email}
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                            validateEmail(e.target.value);
+                          }}
+                          onFocus={() => setIsFocused("email")}
+                          onBlur={handleEmailBlur}
+                          className={`pl-10 h-11 transition-all ${emailError ? 'border-destructive focus-visible:ring-destructive' : 'focus-visible:border-brand focus-visible:ring-brand/20'}`}
+                          required
+                        />
+                        <AnimatePresence>
+                          {email && !emailError && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500"
+                            >
+                              <CheckCircle2 className="h-4 w-4" />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                      {emailError && <p className="text-xs text-destructive">{emailError}</p>}
+                    </div>
+                  )}
+
+                  {/* Password */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password">Password</Label>
+                      <Link
+                        href="/reset"
+                        className="text-xs font-medium text-brand hover:text-brand/80 hover:underline"
+                      >
+                        Lupa password?
+                      </Link>
+                    </div>
+                    <div className="relative group">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-brand">
+                        <KeyRound className="h-4 w-4" />
+                      </div>
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onKeyDown={checkCapsLock}
+                        onFocus={() => setIsFocused("password")}
+                        onBlur={() => {
+                          setIsFocused(null);
+                          setCapsLock(false);
+                        }}
+                        className="pl-10 pr-10 h-11 transition-all focus-visible:border-brand focus-visible:ring-brand/20"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                     <AnimatePresence>
-                      {email && !emailError && (
+                      {capsLock && (
                         <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="flex items-center gap-2 text-xs text-yellow-600 mt-1 font-medium"
                         >
-                          <CheckCircle2 className="h-4 w-4" />
+                          <AlertCircle className="h-3 w-3" />
+                          Caps Lock aktif
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
-                  {emailError && <p className="text-xs text-destructive">{emailError}</p>}
                 </div>
 
-                {/* Password */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link
-                      href="/reset"
-                      className="text-xs font-medium text-brand hover:text-brand/80 hover:underline"
-                    >
-                      Lupa password?
-                    </Link>
-                  </div>
-                  <div className="relative group">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-brand">
-                      <KeyRound className="h-4 w-4" />
-                    </div>
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      onKeyDown={checkCapsLock}
-                      onFocus={() => setIsFocused("password")}
-                      onBlur={() => {
-                        setIsFocused(null);
-                        setCapsLock(false);
-                      }}
-                      className="pl-10 pr-10 h-11 transition-all focus-visible:border-brand focus-visible:ring-brand/20"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                  <AnimatePresence>
-                    {capsLock && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="flex items-center gap-2 text-xs text-yellow-600 mt-1 font-medium"
-                      >
-                        <AlertCircle className="h-3 w-3" />
-                        Caps Lock aktif
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="remember"
+                    checked={rememberMe}
+                    onCheckedChange={(c) => setRememberMe(!!c)}
+                  />
+                  <label
+                    htmlFor="remember"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Ingat saya di perangkat ini
+                  </label>
                 </div>
-              </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="remember"
-                  checked={rememberMe}
-                  onCheckedChange={(c) => setRememberMe(!!c)}
-                />
-                <label
-                  htmlFor="remember"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                <Button
+                  type="submit"
+                  disabled={loading || isRateLimited}
+                  className="w-full h-11 bg-brand hover:bg-brand/90 text-base shadow-lg shadow-brand/20 transition-all hover:-translate-y-0.5 active:translate-y-0"
                 >
-                  Ingat saya di perangkat ini
-                </label>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={loading || isRateLimited}
-                className="w-full h-11 bg-brand hover:bg-brand/90 text-base shadow-lg shadow-brand/20 transition-all hover:-translate-y-0.5 active:translate-y-0"
-              >
-                {loading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    <span>Masuk...</span>
-                  </div>
-                ) : (
-                  "Masuk Sekarang"
-                )}
-              </Button>
-            </form>
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      <span>Masuk...</span>
+                    </div>
+                  ) : (
+                    "Masuk Sekarang"
+                  )}
+                </Button>
+              </form>
+            )}
 
             {/* Footer Links */}
             <div className="space-y-4 text-center text-sm">

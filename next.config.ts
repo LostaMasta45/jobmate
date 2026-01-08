@@ -80,8 +80,16 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "cdn-icons-png.flaticon.com",
+      },
+      {
+        protocol: "https",
+        hostname: "ui-avatars.com",
+      },
     ],
-    unoptimized: process.env.NODE_ENV === 'development',
+    // unoptimized: process.env.NODE_ENV === 'development', // Enabled optimization in dev for testing speed
     minimumCacheTTL: 7200, // 2 hours for aggressive caching
     deviceSizes: [640, 750, 828, 1080, 1200], // Reduced sizes for mobile-first
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384], // Added 384 for better thumbnail sizing
@@ -97,6 +105,7 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "10mb", // Increased from default 1mb for CV with photos
     },
+    serverComponentsExternalPackages: ['pdf-parse'],
     // Optimize package imports
     optimizePackageImports: [
       'lucide-react',

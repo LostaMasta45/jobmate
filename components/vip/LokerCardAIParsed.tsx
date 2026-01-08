@@ -17,9 +17,9 @@ export function LokerCardAIParsed({ loker }: LokerCardAIParsedProps) {
   const getTimeAgo = (date?: string) => {
     if (!date) return ''
     try {
-      return formatDistanceToNow(new Date(date), { 
+      return formatDistanceToNow(new Date(date), {
         addSuffix: true,
-        locale: idLocale 
+        locale: idLocale
       })
     } catch {
       return ''
@@ -32,14 +32,14 @@ export function LokerCardAIParsed({ loker }: LokerCardAIParsedProps) {
       const deadlineDate = new Date(deadline)
       const today = new Date()
       const diffDays = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-      
+
       if (diffDays < 0) return 'Ditutup'
       if (diffDays === 0) return 'Hari ini'
       if (diffDays === 1) return 'Besok'
       if (diffDays <= 7) return `${diffDays} hari lagi`
-      
-      return deadlineDate.toLocaleDateString('id-ID', { 
-        day: 'numeric', 
+
+      return deadlineDate.toLocaleDateString('id-ID', {
+        day: 'numeric',
         month: 'short',
         year: 'numeric'
       })
@@ -89,7 +89,7 @@ export function LokerCardAIParsed({ loker }: LokerCardAIParsedProps) {
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <Link 
+            <Link
               href={`/vip/loker/${loker.id}`}
               className="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 block mb-2 group-hover:text-blue-600"
             >
@@ -155,17 +155,17 @@ export function LokerCardAIParsed({ loker }: LokerCardAIParsedProps) {
         {/* Tags */}
         <div className="flex flex-wrap gap-2">
           {loker.kategori?.slice(0, 2).map((kat) => (
-            <Badge 
-              key={kat} 
-              variant="outline" 
+            <Badge
+              key={kat}
+              variant="outline"
               className="text-xs border-blue-200 text-blue-700 bg-blue-50"
             >
               {kat}
             </Badge>
           ))}
           {loker.tipe_pekerjaan && (
-            <Badge 
-              variant="outline" 
+            <Badge
+              variant="outline"
               className="text-xs border-purple-200 text-purple-700 bg-purple-50"
             >
               {loker.tipe_pekerjaan}
@@ -200,7 +200,7 @@ export function LokerCardAIParsed({ loker }: LokerCardAIParsedProps) {
 
         <div className="grid grid-cols-2 gap-2">
           {/* CTA WhatsApp */}
-          {loker.kontak_phone && (
+          {loker.kontak_wa && (
             <Button
               asChild
               size="sm"
@@ -208,7 +208,7 @@ export function LokerCardAIParsed({ loker }: LokerCardAIParsedProps) {
               className="border-green-500 text-green-700 hover:bg-green-50 hover:border-green-600 active:bg-green-100 transition-all shadow-sm hover:shadow"
             >
               <a
-                href={`https://wa.me/${loker.kontak_phone.replace(/\D/g, '')}`}
+                href={`https://wa.me/${loker.kontak_wa.replace(/\D/g, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -235,7 +235,7 @@ export function LokerCardAIParsed({ loker }: LokerCardAIParsedProps) {
           )}
 
           {/* View Detail - full width if only one contact */}
-          {(!loker.kontak_phone || !loker.kontak_email) && (
+          {(!loker.kontak_wa || !loker.kontak_email) && (
             <Button
               asChild
               size="sm"
@@ -251,7 +251,7 @@ export function LokerCardAIParsed({ loker }: LokerCardAIParsedProps) {
         </div>
 
         {/* View Detail button if both contacts exist */}
-        {loker.kontak_phone && loker.kontak_email && (
+        {loker.kontak_wa && loker.kontak_email && (
           <Button
             asChild
             size="sm"
@@ -271,26 +271,26 @@ export function LokerCardAIParsed({ loker }: LokerCardAIParsedProps) {
 
 function Building({ className }: { className?: string }) {
   return (
-    <svg 
+    <svg
       className={className}
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
-      <path d="M9 22v-4h6v4"/>
-      <path d="M8 6h.01"/>
-      <path d="M16 6h.01"/>
-      <path d="M12 6h.01"/>
-      <path d="M12 10h.01"/>
-      <path d="M12 14h.01"/>
-      <path d="M16 10h.01"/>
-      <path d="M16 14h.01"/>
-      <path d="M8 10h.01"/>
-      <path d="M8 14h.01"/>
+      <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+      <path d="M9 22v-4h6v4" />
+      <path d="M8 6h.01" />
+      <path d="M16 6h.01" />
+      <path d="M12 6h.01" />
+      <path d="M12 10h.01" />
+      <path d="M12 14h.01" />
+      <path d="M16 10h.01" />
+      <path d="M16 14h.01" />
+      <path d="M8 10h.01" />
+      <path d="M8 14h.01" />
     </svg>
   )
 }

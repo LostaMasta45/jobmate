@@ -1,679 +1,411 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import {
-  MapPin,
-  Briefcase,
-  Calendar,
-  DollarSign,
-  Eye,
-  Share2,
   ArrowLeft,
-  ExternalLink,
   Building2,
+  MapPin,
   Clock,
-  CheckCircle2,
-  Brain,
+  Share2,
   FileImage,
-  X,
+  Briefcase,
   MessageCircle,
   Mail,
-  Users,
-  Sparkles,
+  Sparkles
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ModernLokerCard } from './ModernLokerCard'
-import { BookmarkButton } from './BookmarkButton'
-import type { Loker } from '@/types/vip'
+import { BookmarkButton } from '@/components/vip/BookmarkButton'
+import { LokerCardGlass } from '@/components/vip/LokerCardGlass'
+import { OptimizedPosterImage } from '@/components/vip/OptimizedPosterImage'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { formatDistanceToNow } from 'date-fns'
 import { id as idLocale } from 'date-fns/locale'
+
+import type { Loker } from '@/types/vip'
 
 interface LokerDetailRedesignedProps {
   loker: Loker
   similarLoker: Loker[]
-  userId: string
+  userSkills?: string[]
 }
 
 export function LokerDetailRedesigned({
   loker,
   similarLoker,
-  userId,
+  userSkills = [],
 }: LokerDetailRedesignedProps) {
-  const router = useRouter()
-  const [isSharing, setIsSharing] = useState(false)
-  const [showPosterLightbox, setShowPosterLightbox] = useState(false)
+  const [isSticky, setIsSticky] = useState(false)
+  const heroRef = useRef<HTMLDivElement>(null)
 
-  const isAIParsed = loker.sumber === 'Poster' && loker.poster_url
+  // Standardize contact fields if they vary in backend - kontak_wa is the primary field
+  const contactPhone = loker.kontak_wa || (loker as any).contact_wa || (loker as any).kontak_phone || (loker as any).phone
+  const contactEmail = loker.kontak_email || (loker as any).contact_email || (loker as any).email
 
-  const formatSalary = (gaji_text?: string, gaji_min?: number, gaji_max?: number) => {
-    if (gaji_text) return gaji_text
-    if (gaji_min && gaji_max) {
-      return `Rp ${gaji_min.toLocaleString('id-ID')} - Rp ${gaji_max.toLocaleString('id-ID')}`
-    }
-    if (gaji_min) {
-      return `Rp ${gaji_min.toLocaleString('id-ID')}`
-    }
-    return 'Gaji Negotiable'
+  // Formatting helpers
+  const formatSalary = (text?: string, min?: number, max?: number) => {
+    if (text) return text
+    if (min && max) return `Rp ${(min / 1000000).toFixed(1)} - ${(max / 1000000).toFixed(1)} Juta`
+    if (min) return `Rp ${(min / 1000000).toFixed(1)} Juta+`
+    return 'Gaji Kompetitif'
   }
 
   const getTimeAgo = (date?: string) => {
     if (!date) return ''
     try {
-      return formatDistanceToNow(new Date(date), {
-        addSuffix: true,
-        locale: idLocale,
-      })
+      return formatDistanceToNow(new Date(date), { addSuffix: true, locale: idLocale })
     } catch {
       return ''
     }
   }
 
-  const getDeadlineText = (deadline?: string) => {
-    if (!deadline) return null
-    try {
-      const deadlineDate = new Date(deadline)
-      const today = new Date()
-      const diffDays = Math.ceil(
-        (deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-      )
-
-      if (diffDays < 0) return 'Sudah Ditutup'
-      if (diffDays === 0) return 'Hari Ini'
-      if (diffDays === 1) return 'Besok'
-      if (diffDays <= 7) return `${diffDays} hari lagi`
-
-      return deadlineDate.toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      })
-    } catch {
-      return null
-    }
-  }
-
-  // Calculate active time progress
-  const getActiveProgress = () => {
-    if (!loker.published_at || !loker.deadline) return null
-    
-    const publishedDate = new Date(loker.published_at).getTime()
-    const deadlineDate = new Date(loker.deadline).getTime()
-    const now = Date.now()
-    
-    const totalDuration = deadlineDate - publishedDate
-    const elapsed = now - publishedDate
-    const progress = Math.min(Math.max((elapsed / totalDuration) * 100, 0), 100)
-    
-    return {
-      progress,
-      daysLeft: Math.ceil((deadlineDate - now) / (1000 * 60 * 60 * 24)),
-    }
-  }
-
-  const handleApply = async (method: 'whatsapp' | 'email') => {
-    try {
-      const response = await fetch('/api/vip/loker/apply', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          loker_id: loker.id,
-          method,
-        }),
-      })
-
-      if (!response.ok) {
-        console.error('Failed to track application')
+  // Handle Scroll for Sticky Sidebar Effect check
+  useEffect(() => {
+    const handleScroll = () => {
+      if (heroRef.current) {
+        setIsSticky(window.scrollY > heroRef.current.offsetHeight)
       }
-    } catch (error) {
-      console.error('Error tracking application:', error)
     }
-
-    if (method === 'whatsapp' && loker.kontak_phone) {
-      const message = `Halo, saya tertarik dengan lowongan ${loker.title} di ${loker.perusahaan_name}`
-      const waNumber = loker.kontak_phone.replace(/[^0-9]/g, '')
-      window.open(
-        `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`,
-        '_blank'
-      )
-    } else if (method === 'email' && loker.kontak_email) {
-      const subject = `Lamaran: ${loker.title}`
-      const body = `Kepada HRD ${loker.perusahaan_name},\n\nSaya tertarik untuk melamar posisi ${loker.title}.\n\nTerima kasih.`
-      window.open(
-        `mailto:${loker.kontak_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
-        '_blank'
-      )
-    }
-  }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const handleShare = async () => {
-    setIsSharing(true)
-    const shareData = {
-      title: `${loker.title} - ${loker.perusahaan_name}`,
-      text: `Lowongan kerja: ${loker.title} di ${loker.perusahaan_name}`,
-      url: window.location.href,
-    }
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData)
-      } else {
-        await navigator.clipboard.writeText(window.location.href)
-        alert('Link berhasil disalin!')
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${loker.title} di ${loker.perusahaan_name}`,
+          text: `Cek lowongan ${loker.title} di JobMate!`,
+          url: window.location.href,
+        })
+      } catch (err) {
+        console.error('Error sharing:', err)
       }
-    } catch (error) {
-      console.error('Error sharing:', error)
-    } finally {
-      setIsSharing(false)
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+      // Could add toast here
     }
   }
 
-  const deadlineText = getDeadlineText(loker.deadline)
-  const isUrgent =
-    deadlineText &&
-    (deadlineText.includes('hari') ||
-      deadlineText === 'Besok' ||
-      deadlineText === 'Hari Ini')
-  const activeProgress = getActiveProgress()
+  const handleApply = (method: 'wa' | 'email') => {
+    if (method === 'wa' && contactPhone) {
+      const message = `Halo, saya tertarik melamar posisi ${loker.title} di ${loker.perusahaan_name} yang saya lihat di JobMate.`
+      // Clean phone number
+      const cleanPhone = contactPhone.toString().replace(/\D/g, '').replace(/^0/, '62')
+      window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank')
+    } else if (method === 'email' && contactEmail) {
+      const subject = `Lamaran Pekerjaan: ${loker.title}`
+      window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}`
+    }
+  }
 
   return (
-    <>
-      <div className="space-y-6">
-        {/* Back Button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => router.back()}
-          className="gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="font-medium">Kembali ke Daftar Loker</span>
-        </Button>
+    <div className="min-h-screen bg-gray-50 dark:bg-black font-sans selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 pb-24 lg:pb-6">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6 order-2 lg:order-1">
-            {/* Hero Header Card - Modern & Clean */}
-            <div className="bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 dark:from-gray-900 dark:via-blue-950/20 dark:to-purple-950/20 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 lg:p-8 shadow-lg">
-              {/* Company Logo & Title Section */}
-              <div className="flex items-start gap-6 mb-6">
-                {loker.perusahaan?.logo_url && (
-                  <div className="flex-shrink-0 w-20 h-20 lg:w-24 lg:h-24 rounded-2xl bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 p-3 shadow-md">
-                    <img
-                      src={loker.perusahaan.logo_url}
-                      alt={loker.perusahaan_name}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                )}
-                
-                <div className="flex-1 min-w-0">
-                  {/* Badges */}
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
-                    {loker.is_featured && (
-                      <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-md">
-                        <Sparkles className="w-3 h-3 mr-1" />
-                        Featured
-                      </Badge>
-                    )}
-                    {isAIParsed && (
-                      <Badge className="bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 shadow-md">
-                        <Brain className="w-3 h-3 mr-1" />
-                        AI Parsed
-                      </Badge>
-                    )}
-                    {loker.sumber && (
-                      <Badge variant="outline" className="text-xs border-gray-300 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50">
-                        {loker.sumber}
-                      </Badge>
-                    )}
-                    {isUrgent && (
-                      <Badge className="bg-red-500 text-white border-0 shadow-md animate-pulse">
-                        🔥 Segera Ditutup
-                      </Badge>
-                    )}
-                  </div>
+      {/* Background Mesh Gradient - Fixed */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-30 dark:opacity-20 overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-teal-400/40 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-500/40 rounded-full blur-[120px] animate-pulse delay-1000" />
+        <div className="absolute top-[40%] left-[40%] w-[40%] h-[40%] bg-blue-400/30 rounded-full blur-[100px] animate-ping duration-[5000ms]" />
+      </div>
 
-                  {/* Title */}
-                  <h1 className="text-2xl lg:text-4xl font-poppins font-bold text-gray-900 dark:text-white mb-3 leading-tight">
-                    {loker.title}
-                  </h1>
+      <main className="relative z-10 container mx-auto px-4 pt-4 sm:pt-6 pb-28 lg:pb-12 max-w-7xl">
 
-                  {/* Company */}
-                  <Link
-                    href={`/vip/perusahaan/${loker.perusahaan?.slug || loker.perusahaan_id}`}
-                    className="inline-flex items-center gap-2 text-base lg:text-lg text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group"
-                  >
-                    <Building2 className="w-5 h-5 text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-                    <span className="font-semibold">{loker.perusahaan_name}</span>
-                    <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </Link>
-                </div>
-              </div>
+        {/* Navigation - Top Bar */}
+        <div className="flex items-center justify-between mb-6">
+          <Button asChild variant="ghost" className="rounded-full hover:bg-white/50 hover:backdrop-blur-sm -ml-2">
+            <Link href="/vip/loker" className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+              <ArrowLeft className="w-5 h-5" />
+              <span className="font-medium hidden sm:inline">Kembali</span>
+            </Link>
+          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/50" onClick={handleShare}>
+              <Share2 className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            </Button>
+          </div>
+        </div>
 
-              {/* Meta Info Row */}
-              <div className="flex flex-wrap items-center gap-4 mb-6 text-sm text-gray-600 dark:text-gray-400">
-                {loker.published_at && (
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    <span>Diposting {getTimeAgo(loker.published_at)}</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <Eye className="w-4 h-4" />
-                  <span>{loker.view_count || 0} views</span>
-                </div>
-                {(loker.apply_count || 0) > 0 && (
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    <span>{loker.apply_count} applicants</span>
-                  </div>
-                )}
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
 
-              {/* Action Buttons */}
-              <div className="flex items-center gap-3 mb-6">
-                <BookmarkButton
-                  lokerId={loker.id}
-                  initialBookmarked={loker.is_bookmarked || false}
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleShare}
-                  disabled={isSharing}
-                  className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shadow-sm"
-                >
-                  <Share2 className="w-4 h-4" />
-                </Button>
-              </div>
+          {/* LEFT CONTENT (8 cols) */}
+          <div className="lg:col-span-8 space-y-6 order-2 lg:order-1">
 
-              {/* Active Time Progress Bar */}
-              {activeProgress && activeProgress.daysLeft > 0 && (
-                <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      ⏱️ Waktu Aktif Lowongan
-                    </span>
-                    <span className={`text-sm font-bold ${
-                      activeProgress.daysLeft <= 3 
-                        ? 'text-red-600 dark:text-red-400' 
-                        : activeProgress.daysLeft <= 7 
-                        ? 'text-orange-600 dark:text-orange-400'
-                        : 'text-blue-600 dark:text-blue-400'
-                    }`}>
-                      {activeProgress.daysLeft} hari tersisa
-                    </span>
-                  </div>
-                  <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
-                    <div
-                      className={`h-full rounded-full transition-all duration-700 ${
-                        activeProgress.daysLeft <= 3
-                          ? 'bg-gradient-to-r from-red-500 via-red-600 to-red-500'
-                          : activeProgress.daysLeft <= 7
-                          ? 'bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500'
-                          : 'bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500'
-                      } animate-pulse`}
-                      style={{ width: `${activeProgress.progress}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* HERO SECTION */}
+            <div ref={heroRef} className="relative bg-white/60 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/5 rounded-3xl p-5 sm:p-8 overflow-hidden shadow-sm">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
 
-            {/* Tags & Categories */}
-            <div className="flex flex-wrap gap-2">
-              {loker.kategori?.map((kat) => (
-                <Badge
-                  key={kat}
-                  variant="outline"
-                  className="border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/30 px-3 py-1.5 text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors cursor-pointer"
-                >
-                  {kat}
-                </Badge>
-              ))}
-              {loker.tipe_pekerjaan && (
-                <Badge variant="outline" className="border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/30 px-3 py-1.5 text-sm font-medium">
-                  <Briefcase className="w-3 h-3 mr-1" />
-                  {loker.tipe_pekerjaan}
-                </Badge>
-              )}
-            </div>
-
-            {/* Key Info Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex items-center gap-4 p-5 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-14 h-14 rounded-xl bg-blue-100 dark:bg-blue-950 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    Lokasi
-                  </div>
-                  <div className="font-semibold text-gray-900 dark:text-white truncate">
-                    {loker.lokasi}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 p-5 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-14 h-14 rounded-xl bg-green-100 dark:bg-green-950 flex items-center justify-center flex-shrink-0">
-                  <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    Gaji
-                  </div>
-                  <div className="font-semibold text-green-600 dark:text-green-400 truncate">
-                    {formatSalary(loker.gaji_text, loker.gaji_min, loker.gaji_max)}
-                  </div>
-                </div>
-              </div>
-
-              {deadlineText && (
-                <div className="flex items-center gap-4 p-5 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
-                  <div
-                    className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      isUrgent 
-                        ? 'bg-red-100 dark:bg-red-950' 
-                        : 'bg-gray-100 dark:bg-gray-800'
-                    }`}
-                  >
-                    <Calendar className={`w-6 h-6 ${isUrgent ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'}`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                      Deadline
+              <div className="flex flex-col sm:flex-row gap-5 sm:gap-6 relative z-10">
+                {/* Logo / Poster Thumbnail */}
+                <div className="flex-shrink-0 mx-auto sm:mx-0">
+                  {loker.poster_url ? (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shadow-lg border-2 border-white dark:border-gray-800 cursor-pointer hover:scale-105 transition-transform bg-gray-100 relative group">
+                          <OptimizedPosterImage
+                            src={loker.poster_url}
+                            alt={loker.title}
+                            fill
+                            className="object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <FileImage className="w-8 h-8 text-white drop-shadow-md" />
+                          </div>
+                        </div>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl p-0 bg-transparent border-0 shadow-none overflow-hidden flex justify-center items-center">
+                        <div className="relative w-full max-h-[90vh] aspect-[3/4] sm:aspect-auto">
+                          <img src={loker.poster_url} alt="Poster" className="w-full h-full object-contain rounded-lg shadow-2xl" />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  ) : loker.perusahaan?.logo_url ? (
+                    <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-white p-2 flex items-center justify-center">
+                      <Image src={loker.perusahaan.logo_url} alt={loker.perusahaan_name} width={100} height={100} className="w-full h-full object-contain" />
                     </div>
-                    <div className={`font-semibold truncate ${isUrgent ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
-                      {deadlineText}
+                  ) : (
+                    <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 flex items-center justify-center text-blue-600 dark:text-blue-300 shadow-inner">
+                      <Building2 className="w-10 h-10" />
                     </div>
-                  </div>
+                  )}
                 </div>
-              )}
 
-              <div className="flex items-center gap-4 p-5 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-14 h-14 rounded-xl bg-purple-100 dark:bg-purple-950 flex items-center justify-center flex-shrink-0">
-                  <Eye className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    Dilihat
-                  </div>
-                  <div className="font-semibold text-gray-900 dark:text-white">
-                    {loker.view_count || 0} kali
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* AI Summary Section (if AI parsed) */}
-            {isAIParsed && (
-              <div className="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-950/20 dark:via-blue-950/20 dark:to-indigo-950/20 rounded-2xl border-2 border-purple-200 dark:border-purple-800 p-6 shadow-lg">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-md">
-                    <Brain className="w-5 h-5 text-white" />
-                  </div>
+                {/* Title & Info */}
+                <div className="flex-1 text-center sm:text-left space-y-3">
                   <div>
-                    <h2 className="text-xl font-poppins font-bold text-gray-900 dark:text-white">
-                      AI Summary
-                    </h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Informasi diekstrak dari poster menggunakan AI
-                    </p>
+                    <h1 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white leading-tight font-poppins">
+                      {loker.title}
+                    </h1>
+                    <div className="flex items-center justify-center sm:justify-start gap-2 mt-2 text-gray-600 dark:text-gray-400 font-medium text-sm sm:text-base">
+                      <Building2 className="w-4 h-4 text-blue-500" />
+                      <span>{loker.perusahaan_name}</span>
+                    </div>
+                  </div>
+
+                  {/* Badges / Meta */}
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 text-xs sm:text-sm">
+                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 border-0">
+                      {loker.kategori?.[0] || 'Umum'}
+                    </Badge>
+                    <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                      <MapPin className="w-3.5 h-3.5" />
+                      <span>{loker.lokasi}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>{getTimeAgo(loker.published_at || loker.created_at)}</span>
+                    </div>
                   </div>
                 </div>
-
-                {loker.poster_url && (
-                  <button
-                    onClick={() => setShowPosterLightbox(true)}
-                    className="relative w-full max-w-sm mx-auto block rounded-xl overflow-hidden border-2 border-purple-300 dark:border-purple-700 hover:border-purple-500 dark:hover:border-purple-500 transition-all group mb-6 shadow-lg hover:shadow-2xl"
-                  >
-                    <Image
-                      src={loker.poster_url}
-                      alt={`Poster ${loker.title}`}
-                      width={400}
-                      height={600}
-                      className="w-full h-auto"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-6">
-                      <div className="flex items-center gap-2 text-white font-semibold">
-                        <FileImage className="w-5 h-5" />
-                        <span>Lihat Poster Lengkap</span>
-                      </div>
-                    </div>
-                  </button>
-                )}
               </div>
-            )}
 
-            {/* Description & Requirements */}
+              {/* Stats Grid inside Hero - Responsive Fix */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
+                <div className="space-y-1">
+                  <p className="text-[10px] sm:text-xs text-gray-500 uppercase font-semibold tracking-wider">Gaji</p>
+                  <p className="font-bold text-gray-900 dark:text-white text-sm sm:text-base leading-tight">
+                    {formatSalary(loker.gaji_text, loker.gaji_min, loker.gaji_max)}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] sm:text-xs text-gray-500 uppercase font-semibold tracking-wider">Tipe</p>
+                  <div className="font-bold text-gray-900 dark:text-white text-sm sm:text-base flex items-center gap-1.5">
+                    <Briefcase className="w-3.5 h-3.5 text-orange-500 flex-shrink-0" />
+                    <span className="truncate">{loker.tipe_pekerjaan || 'Full Time'}</span>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] sm:text-xs text-gray-500 uppercase font-semibold tracking-wider">Pendidikan</p>
+                  <p className="font-bold text-gray-900 dark:text-white text-sm sm:text-base">Min. SMA/SMK</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] sm:text-xs text-gray-500 uppercase font-semibold tracking-wider">Pengalaman</p>
+                  <p className="font-bold text-gray-900 dark:text-white text-sm sm:text-base">Min. 1 Tahun</p>
+                </div>
+              </div>
+            </div>
+
+            {/* DESCRIPTION */}
             {loker.deskripsi && (
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 lg:p-8 shadow-sm">
-                <h2 className="text-xl font-poppins font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
-                  <div className="w-1.5 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full" />
+              <div className="bg-white/60 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/5 rounded-3xl p-5 sm:p-8 shadow-sm">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <FileImage className="w-5 h-5 text-purple-500" />
                   Deskripsi Pekerjaan
-                </h2>
-                <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                </h3>
+                <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
                   {loker.deskripsi}
                 </div>
               </div>
             )}
 
+            {/* REQUIREMENTS */}
             {loker.kualifikasi && loker.kualifikasi.length > 0 && (
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 lg:p-8 shadow-sm">
-                <h2 className="text-xl font-poppins font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
-                  <div className="w-1.5 h-6 bg-gradient-to-b from-green-500 to-teal-500 rounded-full" />
-                  Kualifikasi & Persyaratan
-                </h2>
+              <div className="bg-white/60 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/5 rounded-3xl p-5 sm:p-8 shadow-sm">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Briefcase className="w-5 h-5 text-indigo-500" />
+                  Kualifikasi
+                </h3>
                 <ul className="space-y-3">
-                  {loker.kualifikasi.map((kual, index) => (
-                    <li key={index} className="flex items-start gap-3 group">
-                      <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-950 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
-                        <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
-                      </div>
-                      <span className="text-gray-700 dark:text-gray-300 leading-relaxed">{kual}</span>
+                  {loker.kualifikasi.map((req, idx) => (
+                    <li key={idx} className="flex items-start gap-3 text-gray-600 dark:text-gray-300">
+                      <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 flex-shrink-0" />
+                      <span className="leading-relaxed">{req}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             )}
 
-            {/* Similar Jobs */}
+            {/* SIMILAR JOBS - HORIZONTAL SCROLL (Redesign) */}
             {similarLoker.length > 0 && (
-              <div className="pt-6">
-                <h2 className="text-2xl font-poppins font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                  <Sparkles className="w-6 h-6 text-yellow-500" />
-                  Loker Serupa
-                </h2>
-                <div className="grid grid-cols-1 gap-4">
-                  {similarLoker.map((similar) => (
-                    <ModernLokerCard key={similar.id} loker={similar} />
+              <div className="space-y-4 pt-4">
+                <div className="flex items-center justify-between px-4 sm:px-0">
+                  <h3 className="text-xl font-bold font-poppins text-gray-900 dark:text-white">Lowongan Serupa</h3>
+                </div>
+
+                {/* Horizontal Scroll Area - Improved Mobile Bleed */}
+                <div className="flex overflow-x-auto pb-6 gap-4 px-4 sm:px-0 -mx-4 sm:mx-0 snap-x scrollbar-hide">
+                  {similarLoker.map((sim, idx) => (
+                    <div key={sim.id} className="min-w-[260px] sm:min-w-[300px] snap-center h-full first:pl-0">
+                      <LokerCardGlass loker={sim} priority={idx < 2} />
+                    </div>
                   ))}
                 </div>
               </div>
             )}
+
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6 order-1 lg:order-2">
-            {/* Apply Card - Sticky */}
-            <div className="bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-850 dark:to-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg p-6 sticky top-24">
-              <h3 className="text-lg font-poppins font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
-                <div className="w-2 h-8 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 rounded-full" />
-                Lamar Sekarang
-              </h3>
+          {/* RIGHT SIDEBAR (4 cols) - Sticky */}
+          <div className="lg:col-span-4 space-y-6 order-1 lg:order-2">
+            <div className="hidden lg:block sticky top-24 space-y-6">
 
-              <div className="space-y-3">
-                {isAIParsed && loker.poster_url && (
-                  <Button
-                    onClick={() => setShowPosterLightbox(true)}
-                    variant="outline"
-                    size="lg"
-                    className="w-full gap-2 border-2 border-purple-500 dark:border-purple-600 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/30 hover:border-purple-600 dark:hover:border-purple-500 transition-all shadow-sm hover:shadow-md font-semibold"
-                  >
-                    <FileImage className="w-4 h-4" />
-                    Lihat Poster Lengkap
-                  </Button>
-                )}
-                
-                {loker.kontak_phone && (
-                  <Button
-                    onClick={() => handleApply('whatsapp')}
-                    size="lg"
-                    className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 gap-2 shadow-md hover:shadow-xl transition-all text-white font-semibold"
-                  >
-                    <MessageCircle className="w-5 h-5" />
-                    Lamar via WhatsApp
-                  </Button>
-                )}
+              {/* Apply Card - Desktop Only */}
+              <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-white/10 shadow-lg p-6 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10" />
 
-                {loker.kontak_email && (
-                  <Button
-                    onClick={() => handleApply('email')}
-                    variant="outline"
-                    size="lg"
-                    className="w-full gap-2 border-2 border-blue-500 dark:border-blue-600 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:border-blue-600 dark:hover:border-blue-500 transition-all shadow-sm hover:shadow-md font-semibold"
-                  >
-                    <Mail className="w-5 h-5" />
-                    Lamar via Email
-                  </Button>
-                )}
-
-                {!loker.kontak_phone && !loker.kontak_email && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-6">
-                    Informasi kontak belum tersedia
-                  </p>
-                )}
-              </div>
-
-              {(loker.apply_count || 0) > 0 && (
-                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-3">
-                    <div className="flex -space-x-2">
-                      {[1, 2, 3].map((i) => (
-                        <div
-                          key={i}
-                          className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 border-2 border-white dark:border-gray-900 flex items-center justify-center text-xs font-bold text-white shadow-md"
-                        >
-                          {String.fromCharCode(64 + i)}
-                        </div>
-                      ))}
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-1 bg-blue-500 h-8 rounded-full" />
+                    <div>
+                      <h3 className="font-bold text-xl text-gray-900 dark:text-white">Lamar Sekarang</h3>
+                      <p className="text-xs text-gray-500">Pilih metode pelamaran</p>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      <span className="font-bold text-blue-600 dark:text-blue-400">{loker.apply_count}</span>{' '}
-                      orang sudah melamar
-                    </p>
+                  </div>
+
+                  <div className="space-y-3">
+                    {/* View Poster Button */}
+                    {loker.poster_url && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start h-12 rounded-xl bg-white/50 border-dashed border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-all group/poster">
+                            <FileImage className="w-5 h-5 mr-3 text-gray-400 group-hover/poster:text-blue-500" />
+                            Lihat Poster Original
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl p-0 bg-transparent border-0 shadow-none overflow-hidden flex justify-center items-center">
+                          <div className="relative w-full max-h-[90vh]">
+                            <img src={loker.poster_url} alt="Poster" className="w-full h-full object-contain rounded-lg" />
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <BookmarkButton lokerId={loker.id} initialBookmarked={loker.is_bookmarked || false} className="w-full h-12 rounded-xl text-sm" />
+                      <Button variant="outline" size="icon" className="w-full h-12 rounded-xl" onClick={handleShare}>
+                        <Share2 className="w-5 h-5" />
+                      </Button>
+                    </div>
+
+                    <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
+                      {contactPhone ? (
+                        <Button
+                          onClick={() => handleApply('wa')}
+                          className="w-full h-12 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-lg shadow-green-500/20 font-bold text-base transition-transform active:scale-95"
+                        >
+                          <MessageCircle className="w-5 h-5 mr-2" />
+                          Lamar via WhatsApp
+                        </Button>
+                      ) : contactEmail ? (
+                        <Button
+                          onClick={() => handleApply('email')}
+                          className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 font-bold text-base transition-transform active:scale-95"
+                        >
+                          <Mail className="w-5 h-5 mr-2" />
+                          Lamar via Email
+                        </Button>
+                      ) : (
+                        <div className="p-4 bg-orange-50 dark:bg-orange-900/20 text-orange-800 dark:text-orange-200 rounded-xl text-center text-sm font-medium border border-orange-100 dark:border-orange-800">
+                          Kontak tidak tersedia. Silakan cek deskripsi atau poster.
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              )}
-            </div>
-
-            {/* Company Info Card */}
-            {loker.perusahaan && (
-              <div className="bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-850 dark:to-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg p-6">
-                <h3 className="text-lg font-poppins font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-gray-500" />
-                  Tentang Perusahaan
-                </h3>
-
-                {loker.perusahaan.logo_url && (
-                  <div className="w-20 h-20 mx-auto mb-5 rounded-xl border-2 border-gray-200 dark:border-gray-700 p-2 bg-white dark:bg-gray-800 shadow-sm">
-                    <img
-                      src={loker.perusahaan.logo_url}
-                      alt={loker.perusahaan.name}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                )}
-
-                <h4 className="font-poppins font-semibold text-gray-900 dark:text-white text-center mb-3">
-                  {loker.perusahaan.name}
-                </h4>
-
-                {loker.perusahaan.deskripsi && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-5 line-clamp-4 leading-relaxed text-center">
-                    {loker.perusahaan.deskripsi}
-                  </p>
-                )}
-
-                {loker.perusahaan_id && (
-                  <Button 
-                    asChild 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full border-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-600 transition-all shadow-sm hover:shadow-md font-semibold"
-                  >
-                    <Link href={`/vip/perusahaan/${loker.perusahaan.slug}`} className="flex items-center justify-center gap-2">
-                      <Building2 className="w-4 h-4" />
-                      Lihat Semua Loker
-                      <ExternalLink className="w-3 h-3" />
-                    </Link>
-                  </Button>
-                )}
               </div>
+
+              {/* Company Mini Profile - Desktop */}
+              <div className="bg-white/60 dark:bg-black/40 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-white/5 p-6 shadow-sm">
+                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">PERUSAHAAN</h4>
+                <div className="flex items-center gap-4 mb-4">
+                  {loker.perusahaan?.logo_url ? (
+                    <div className="w-12 h-12 rounded-lg bg-white border border-gray-100 p-1 flex items-center justify-center">
+                      <Image src={loker.perusahaan.logo_url} alt={loker.perusahaan_name} width={40} height={40} className="object-contain" />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <Building2 className="w-6 h-6 text-gray-400" />
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="font-bold text-gray-900 dark:text-white leading-tight">{loker.perusahaan_name}</h3>
+                    {/* Placeholder for future company detail link */}
+                  </div>
+                </div>
+                <Button variant="link" className="p-0 h-auto text-blue-600 font-semibold" asChild>
+                  {/* Would link to company profile page if available */}
+                  <span className="cursor-not-allowed opacity-50">Lihat Profil Lengkap <ArrowLeft className="w-4 h-4 rotate-180 ml-1 inline" /></span>
+                </Button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* MOBILE BOTTOM ACTION BAR (Sticky Full Width) */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 z-50">
+        <div className="container mx-auto max-w-lg">
+          {/* Quick Actions */}
+          <div className="flex gap-3 items-stretch h-12">
+            <BookmarkButton lokerId={loker.id} initialBookmarked={loker.is_bookmarked || false} iconOnly className="h-full w-12 rounded-xl flex-shrink-0" />
+
+            {contactPhone ? (
+              <Button onClick={() => handleApply('wa')} className="flex-1 h-full rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-sm shadow-sm">
+                <MessageCircle className="w-5 h-5 mr-2" />
+                Lamar (WA)
+              </Button>
+            ) : contactEmail ? (
+              <Button onClick={() => handleApply('email')} className="flex-1 h-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm">
+                <Mail className="w-5 h-5 mr-2" />
+                Lamar (Email)
+              </Button>
+            ) : (
+              <Button disabled className="flex-1 h-full rounded-xl bg-gray-100 text-gray-400 font-medium border border-gray-200">
+                Kontak di Deskripsi
+              </Button>
             )}
           </div>
         </div>
+        {/* Safe area padding */}
+        <div className="h-safe-bottom w-full bg-white dark:bg-gray-900"></div>
       </div>
 
-      {/* Sticky Mobile Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/98 dark:bg-gray-900/98 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 p-4 shadow-2xl lg:hidden z-50">
-        <div className="flex items-center gap-2 max-w-screen-sm mx-auto">
-          <BookmarkButton
-            lokerId={loker.id}
-            initialBookmarked={loker.is_bookmarked || false}
-          />
-          {loker.kontak_phone && (
-            <Button
-              onClick={() => handleApply('whatsapp')}
-              className="flex-1 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 active:scale-95 text-white gap-2 shadow-lg hover:shadow-xl transition-all font-semibold"
-            >
-              <MessageCircle className="w-5 h-5" />
-              <span className="hidden xs:inline">WhatsApp</span>
-              <span className="xs:hidden">WA</span>
-            </Button>
-          )}
-          {loker.kontak_email && (
-            <Button
-              onClick={() => handleApply('email')}
-              variant="outline"
-              className="flex-1 border-2 border-blue-500 dark:border-blue-600 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/30 active:scale-95 gap-2 shadow-md hover:shadow-lg transition-all font-semibold"
-            >
-              <Mail className="w-5 h-5" />
-              <span className="hidden xs:inline">Email</span>
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Poster Lightbox */}
-      {showPosterLightbox && loker.poster_url && (
-        <div
-          className="fixed inset-0 bg-black/95 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-200"
-          onClick={() => setShowPosterLightbox(false)}
-        >
-          <button
-            onClick={() => setShowPosterLightbox(false)}
-            className="absolute top-4 right-4 bg-white dark:bg-gray-800 rounded-full p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-xl z-10"
-          >
-            <X className="w-6 h-6 text-gray-900 dark:text-white" />
-          </button>
-          <div className="max-w-4xl max-h-[90vh] overflow-auto">
-            <Image
-              src={loker.poster_url}
-              alt={`Poster ${loker.title}`}
-              width={800}
-              height={1200}
-              className="w-full h-auto rounded-xl shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   )
 }
+

@@ -129,6 +129,11 @@ export async function PUT(
 
     const body = await request.json();
 
+    // Parse numeric fields and handle empty strings
+    const gajiMin = body.gaji_min ? parseInt(body.gaji_min, 10) : null;
+    const gajiMax = body.gaji_max ? parseInt(body.gaji_max, 10) : null;
+    const deadline = body.deadline && body.deadline.trim() !== '' ? body.deadline : null;
+
     // Update loker
     const { data: updatedLoker, error: updateError } = await supabase
       .from('vip_loker')
@@ -139,12 +144,12 @@ export async function PUT(
         kategori: body.kategori,
         tipe_kerja: body.tipe_kerja,
         gaji_text: body.gaji_text,
-        gaji_min: body.gaji_min,
-        gaji_max: body.gaji_max,
+        gaji_min: gajiMin,
+        gaji_max: gajiMax,
         deskripsi: body.deskripsi,
         persyaratan: body.persyaratan,
         kualifikasi: body.kualifikasi,
-        deadline: body.deadline,
+        deadline: deadline,
         kontak_wa: body.kontak_wa,
         kontak_email: body.kontak_email,
         status: body.status || 'draft',

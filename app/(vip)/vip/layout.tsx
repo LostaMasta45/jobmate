@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { NavigationPrefetcher } from '@/components/providers/NavigationPrefetcher'
+import { usePathname } from 'next/navigation'
 
 // Lazy load heavy components for better initial load performance
 const VIPSidebarImproved = dynamic(
@@ -38,6 +39,10 @@ export default function VIPLayout({
   children: React.ReactNode
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const pathname = usePathname()
+
+  // Routes that should be full width (no max-w-7xl container)
+  const isFullWidth = pathname === '/vip/profile/edit' || pathname?.includes('/vip/loker/design-')
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
@@ -66,8 +71,9 @@ export default function VIPLayout({
         </aside>
 
         {/* Main Content Area - Proper spacing + bottom padding for mobile nav + overflow handling */}
-        <main className="flex-1 w-full pt-20 sm:pt-24 pb-24 lg:pb-8 lg:ml-72 bg-gray-50 dark:bg-slate-950 min-h-screen overflow-y-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <main className={`flex-1 w-full lg:ml-72 bg-gray-50 dark:bg-slate-950 min-h-screen overflow-y-auto ${isFullWidth ? 'pt-16 pb-0' : 'pt-20 sm:pt-24 pb-24 lg:pb-8'
+          }`}>
+          <div className={isFullWidth ? "w-full" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6"}>
             {children}
           </div>
         </main>

@@ -59,10 +59,17 @@ interface JobPosition {
   gaji_min?: number;
   gaji_max?: number;
   deskripsi?: string;
-  kualifikasi: string[]; // Array of requirements
+  persyaratan?: string;
+  kualifikasi: string[];
+  skills: string[];
+  benefit: string[];
   deadline?: string;
+  kontak_person?: string;
   kontak_wa?: string;
+  kontak_phone?: string;
   kontak_email?: string;
+  apply_link?: string;
+  apply_method?: 'whatsapp' | 'email' | 'link' | 'walk_in' | 'multiple';
 }
 
 interface PosterResult {
@@ -79,9 +86,14 @@ interface PosterResult {
     gaji_min?: number;
     gaji_max?: number;
     deskripsi?: string;
+    persyaratan?: string;
     kualifikasi?: string[];
+    skills?: string[];
+    benefit?: string[];
     deadline?: string;
+    kontak_person?: string;
     kontak_wa?: string;
+    kontak_phone?: string;
     kontak_email?: string;
   }>;
   has_multiple_positions: boolean;
@@ -202,10 +214,17 @@ export function BatchPosterUpload() {
             gaji_min: position.gaji_min || undefined,
             gaji_max: position.gaji_max || undefined,
             deskripsi: position.deskripsi || undefined,
+            persyaratan: position.persyaratan || undefined,
             kualifikasi: Array.isArray(position.kualifikasi) ? position.kualifikasi : [],
+            skills: Array.isArray(position.skills) ? position.skills : [],
+            benefit: Array.isArray(position.benefit) ? position.benefit : [],
             deadline: position.deadline || undefined,
+            kontak_person: position.kontak_person || undefined,
             kontak_wa: position.kontak_wa || undefined,
+            kontak_phone: position.kontak_phone || undefined,
             kontak_email: position.kontak_email || undefined,
+            apply_link: position.apply_link || undefined,
+            apply_method: position.apply_method || undefined,
             poster_url: posterResult.poster_url,
             poster_filename: posterResult.poster_filename,
           });
@@ -293,13 +312,13 @@ export function BatchPosterUpload() {
           const isActive = s.id === step;
           const isCompleted = STEPS.findIndex(stp => stp.id === step) > idx;
           const Icon = s.icon;
-          
+
           return (
             <div key={s.id} className="flex items-center gap-2">
               <div className={cn(
                 "flex items-center justify-center h-8 w-8 rounded-full transition-colors",
-                isActive ? "bg-primary text-primary-foreground" : 
-                isCompleted ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"
+                isActive ? "bg-primary text-primary-foreground" :
+                  isCompleted ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"
               )}>
                 <Icon className="h-4 w-4" />
               </div>
@@ -320,12 +339,12 @@ export function BatchPosterUpload() {
     return (
       <div className="max-w-4xl mx-auto">
         {renderSteps()}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }} 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-6"
         >
-          <div 
+          <div
             className={cn(
               "relative group border-2 border-dashed rounded-xl p-10 transition-all duration-200 text-center cursor-pointer overflow-hidden",
               dragActive ? "border-primary bg-primary/5 scale-[1.01]" : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/30",
@@ -346,7 +365,7 @@ export function BatchPosterUpload() {
               onChange={handleFilesChange}
               disabled={isParsing}
             />
-            
+
             <div className="flex flex-col items-center gap-4 z-10 relative">
               <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
                 <Upload className="h-8 w-8 text-primary" />
@@ -366,8 +385,8 @@ export function BatchPosterUpload() {
           {/* Preview Section */}
           <AnimatePresence>
             {files.length > 0 && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }} 
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 className="space-y-4"
@@ -378,10 +397,10 @@ export function BatchPosterUpload() {
                     Clear All
                   </Button>
                 </div>
-                
+
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {previews.map((preview, index) => (
-                    <motion.div 
+                    <motion.div
                       key={index}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -395,9 +414,9 @@ export function BatchPosterUpload() {
                         unoptimized
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <Button 
-                          variant="destructive" 
-                          size="icon" 
+                        <Button
+                          variant="destructive"
+                          size="icon"
                           className="h-8 w-8"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -413,7 +432,7 @@ export function BatchPosterUpload() {
                         </Button>
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-                         <p className="text-[10px] text-white truncate font-medium">{files[index].name}</p>
+                        <p className="text-[10px] text-white truncate font-medium">{files[index].name}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -434,9 +453,9 @@ export function BatchPosterUpload() {
                     </div>
                   )}
                   <div className="flex justify-end">
-                    <Button 
-                      size="lg" 
-                      onClick={handleParse} 
+                    <Button
+                      size="lg"
+                      onClick={handleParse}
                       disabled={isParsing}
                       className="w-full md:w-auto bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/25"
                     >
@@ -468,9 +487,9 @@ export function BatchPosterUpload() {
     setEditedJobs((prev) => {
       const updated = [...prev];
       const job = updated[jobIndex];
-      updated[jobIndex] = { 
-        ...job, 
-        kualifikasi: [...(job.kualifikasi || []), ''] 
+      updated[jobIndex] = {
+        ...job,
+        kualifikasi: [...(job.kualifikasi || []), '']
       };
       return updated;
     });
@@ -513,7 +532,7 @@ export function BatchPosterUpload() {
     return (
       <div className="max-w-7xl mx-auto px-4 md:px-6 pb-32">
         {renderSteps()}
-        
+
         {/* Sticky Header for Actions */}
         <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md py-4 mb-8 border-b -mx-4 md:-mx-6 px-4 md:px-6 shadow-sm transition-all">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -542,7 +561,7 @@ export function BatchPosterUpload() {
 
         <div className="grid gap-10">
           {editedJobs.map((job, index) => (
-            <motion.div 
+            <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -558,36 +577,36 @@ export function BatchPosterUpload() {
                           #{index + 1}
                         </Badge>
                         <div className="flex gap-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => duplicateJob(index)} 
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => duplicateJob(index)}
                             className="h-8 text-xs"
                           >
                             <Plus className="h-3 w-3 mr-1" /> Copy
                           </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => removeJob(index)} 
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeJob(index)}
                             className="h-8 text-xs text-destructive hover:text-destructive"
                           >
                             <Trash2 className="h-3 w-3 mr-1" /> Hapus
                           </Button>
                         </div>
                       </div>
-                      
+
                       {job.poster_url ? (
-                        <div 
+                        <div
                           className="relative aspect-[3/4] rounded-lg overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-primary transition-colors"
                           onClick={() => setPreviewImage(job.poster_url!)}
                         >
-                          <Image 
-                            src={job.poster_url} 
-                            alt="Poster" 
-                            fill 
+                          <Image
+                            src={job.poster_url}
+                            alt="Poster"
+                            fill
                             className="object-contain bg-white"
-                            unoptimized 
+                            unoptimized
                           />
                           <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
                             <span className="text-white text-sm font-medium bg-black/50 px-3 py-1 rounded-full">
@@ -608,7 +627,7 @@ export function BatchPosterUpload() {
 
                   {/* Right: Form Fields */}
                   <div className="lg:col-span-2 p-6 space-y-6">
-                    
+
                     {/* 📋 Informasi Dasar */}
                     <div>
                       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -838,24 +857,24 @@ export function BatchPosterUpload() {
               <DialogTitle>Preview Poster</DialogTitle>
             </VisuallyHidden>
             <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/60 to-transparent z-50 flex items-center justify-between px-6">
-               <span className="text-white/90 font-medium text-sm">Preview Poster</span>
-               <Button 
-                 variant="secondary" 
-                 size="icon" 
-                 className="rounded-full h-9 w-9 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/10"
-                 onClick={() => setPreviewImage(null)}
-               >
-                 <X className="h-4 w-4" />
-               </Button>
+              <span className="text-white/90 font-medium text-sm">Preview Poster</span>
+              <Button
+                variant="secondary"
+                size="icon"
+                className="rounded-full h-9 w-9 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/10"
+                onClick={() => setPreviewImage(null)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
             {previewImage && (
               <div className="w-full h-full relative bg-black/95 flex items-center justify-center p-4 md:p-8">
-                <Image 
-                  src={previewImage} 
-                  alt="Full Preview" 
-                  fill 
+                <Image
+                  src={previewImage}
+                  alt="Full Preview"
+                  fill
                   className="object-contain"
-                  unoptimized 
+                  unoptimized
                 />
               </div>
             )}
@@ -869,22 +888,22 @@ export function BatchPosterUpload() {
   // --- Done Step Render ---
   return (
     <div className="max-w-2xl mx-auto text-center pt-10">
-       <motion.div 
-          initial={{ scale: 0.8, opacity: 0 }} 
-          animate={{ scale: 1, opacity: 1 }}
-          className="bg-card rounded-2xl shadow-lg p-12 border"
-       >
-          <div className="h-20 w-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-            <Check className="h-10 w-10 text-green-600" />
-          </div>
-          <h2 className="text-3xl font-bold mb-4">Upload Successful!</h2>
-          <p className="text-muted-foreground mb-8">
-            Semua lowongan berhasil dipublish ke portal VIP. Anda akan dialihkan dalam beberapa detik...
-          </p>
-          <Button size="lg" onClick={() => router.push('/admin/vip-loker')} className="w-full md:w-auto">
-            Kembali ke Dashboard
-          </Button>
-       </motion.div>
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="bg-card rounded-2xl shadow-lg p-12 border"
+      >
+        <div className="h-20 w-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+          <Check className="h-10 w-10 text-green-600" />
+        </div>
+        <h2 className="text-3xl font-bold mb-4">Upload Successful!</h2>
+        <p className="text-muted-foreground mb-8">
+          Semua lowongan berhasil dipublish ke portal VIP. Anda akan dialihkan dalam beberapa detik...
+        </p>
+        <Button size="lg" onClick={() => router.push('/admin/vip-loker')} className="w-full md:w-auto">
+          Kembali ke Dashboard
+        </Button>
+      </motion.div>
     </div>
   );
 }

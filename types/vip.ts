@@ -44,6 +44,7 @@ export interface Loker {
   is_featured: boolean
   view_count: number
   apply_count?: number
+  kontak_wa?: string
   kontak_person?: string
   kontak_phone?: string
   kontak_email?: string
@@ -52,6 +53,9 @@ export interface Loker {
   updated_at?: string
   published_at?: string
   is_bookmarked?: boolean
+  skills?: string[]
+  apply_link?: string
+  apply_method?: 'whatsapp' | 'email' | 'link' | 'walk_in' | 'multiple'
 }
 
 export interface Bookmark {

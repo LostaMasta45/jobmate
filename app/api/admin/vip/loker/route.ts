@@ -85,6 +85,18 @@ export async function POST(request: NextRequest) {
       perusahaanId = newPerusahaan.id;
     }
 
+    // Helper to sanitize date fields (handles "null" string, empty string, undefined)
+    const sanitizeDate = (value: any): string | null => {
+      if (!value || value === 'null' || value === '') return null;
+      return value;
+    };
+
+    // Helper to sanitize optional string fields
+    const sanitizeString = (value: any): string | null => {
+      if (!value || value === 'null' || value === '') return null;
+      return value;
+    };
+
     // Prepare loker data
     const lokerData = {
       title: data.title,
@@ -92,18 +104,18 @@ export async function POST(request: NextRequest) {
       perusahaan_name: data.perusahaan_name, // CRITICAL: Must include this!
       lokasi: data.lokasi,
       kategori: data.kategori || [],
-      tipe_kerja: data.tipe_kerja || null,
-      gaji_text: data.gaji_text || null,
+      tipe_kerja: sanitizeString(data.tipe_kerja),
+      gaji_text: sanitizeString(data.gaji_text),
       gaji_min: data.gaji_min || null,
       gaji_max: data.gaji_max || null,
-      deskripsi: data.deskripsi || null,
-      persyaratan: data.persyaratan || null,
+      deskripsi: sanitizeString(data.deskripsi),
+      persyaratan: sanitizeString(data.persyaratan),
       kualifikasi: data.kualifikasi || [],
-      deadline: data.deadline || null,
-      kontak_wa: data.kontak_wa || null,
-      kontak_email: data.kontak_email || null,
+      deadline: sanitizeDate(data.deadline),
+      kontak_wa: sanitizeString(data.kontak_wa),
+      kontak_email: sanitizeString(data.kontak_email),
       sumber: data.sumber || 'Poster',
-      poster_url: data.poster_url || null,
+      poster_url: sanitizeString(data.poster_url),
       status: 'published', // Must be: 'draft', 'published', 'expired', or 'archived'
       created_by: user.id,
     };
@@ -119,8 +131,13 @@ export async function POST(request: NextRequest) {
 
     if (lokerError) {
       console.error('Error creating loker:', lokerError);
+      console.error('Error details:', JSON.stringify(lokerError, null, 2));
       return NextResponse.json(
-        { error: 'Failed to create loker' },
+        {
+          error: `Failed to create loker: ${lokerError.message}`,
+          details: lokerError.details || lokerError.hint,
+          code: lokerError.code
+        },
         { status: 500 }
       );
     }
@@ -152,7 +169,7 @@ export async function POST(request: NextRequest) {
         viewUrl,
         addedBy: adminName,
       }).catch(err => console.error('[Telegram] Failed to send job notification:', err));
-      
+
       console.log('[API] Telegram notification triggered');
     } catch (error) {
       console.error('[API] Error triggering Telegram notification:', error);

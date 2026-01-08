@@ -16,6 +16,10 @@ type ProfilePayload = {
   notify_telegram?: boolean;
   telegram_chat_id?: string | null;
   avatar_url?: string | null;
+  skills?: string[];
+  headline?: string | null;
+  bio?: string | null;
+  portfolio?: string | null;
 };
 
 export async function updateProfile(payload: ProfilePayload) {

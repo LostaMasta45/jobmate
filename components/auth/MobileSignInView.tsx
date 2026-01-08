@@ -15,6 +15,10 @@ import {
   Eye, EyeOff, AlertCircle, Mail, KeyRound,
   ArrowLeft, Shield, Briefcase, User, CheckCircle2, Search, ArrowRight, Lock
 } from "lucide-react";
+import { useSavedAccounts } from "@/hooks/useSavedAccounts";
+import { SavedAccountCard, AddAccountCard } from "@/components/auth/SavedAccountCard";
+import { SaveLoginPrompt } from "@/components/auth/SaveLoginPrompt";
+import { SavedAccount } from "@/types/saved-account";
 
 // --- ANIMATION VARIANTS ---
 // Smooth iOS/Android-like page transition
@@ -99,16 +103,22 @@ export default function MobileSignInView() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [capsLock, setCapsLock] = React.useState(false);
 
+  // Saved Accounts State
+  const { accounts: savedAccounts, saveAccount, removeAccount, isLoaded: savedAccountsLoaded, isAccountSaved } = useSavedAccounts();
+  const [selectedAccount, setSelectedAccount] = React.useState<SavedAccount | null>(null);
+  const [showSavePrompt, setShowSavePrompt] = React.useState(false);
+  const [pendingRedirect, setPendingRedirect] = React.useState<{ path: string; userData: { id: string; email: string; name: string; avatar_url?: string } } | null>(null);
+
   const emailInputRef = React.useRef<HTMLInputElement>(null);
 
-  // Load saved email from localStorage on mount
+  // When selecting a saved account, pre-fill email
   React.useEffect(() => {
-    const savedEmail = localStorage.getItem('jobmate_remembered_email');
-    if (savedEmail) {
-      setEmail(savedEmail);
-      setRememberMe(true);
+    if (selectedAccount && selectedAccount.id) {
+      setEmail(selectedAccount.email);
+      setPassword("");
+      setError(null);
     }
-  }, []);
+  }, [selectedAccount]);
 
   // Auto-focus logic
   React.useEffect(() => {
@@ -126,6 +136,7 @@ export default function MobileSignInView() {
   const backToWelcome = () => {
     setDirection(-1);
     setView('welcome');
+    setSelectedAccount(null);
     setError(null);
   };
 
@@ -162,17 +173,10 @@ export default function MobileSignInView() {
         return;
       }
 
-      // Handle Remember Me - save or remove email from localStorage
-      if (rememberMe) {
-        localStorage.setItem('jobmate_remembered_email', email);
-      } else {
-        localStorage.removeItem('jobmate_remembered_email');
-      }
-
       // Check profile for redirection
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role, membership")
+        .select("role, membership, full_name, avatar_url")
         .eq("id", authData.user.id)
         .maybeSingle();
 
@@ -181,13 +185,30 @@ export default function MobileSignInView() {
       else if (["vip_premium", "premium"].includes(profile?.membership)) redirectPath = "/dashboard";
       else if (["vip_basic", "basic"].includes(profile?.membership)) redirectPath = "/vip";
 
-      // Success state trigger
-      setLoadingStatus('success');
+      // Check if account is already saved
+      const alreadySaved = isAccountSaved(authData.user.id);
 
-      // WAIT for animation to complete (3 seconds) before redirecting
-      setTimeout(() => {
-        window.location.replace(redirectPath);
-      }, 3500); // 3.5s allows the success animation to play fully
+      if (alreadySaved) {
+        // Account already saved, proceed directly
+        setLoadingStatus('success');
+        setTimeout(() => {
+          window.location.replace(redirectPath);
+        }, 3500);
+      } else {
+        // Show save prompt for new accounts
+        setLoading(false);
+        setLoadingStatus(null);
+        setPendingRedirect({
+          path: redirectPath,
+          userData: {
+            id: authData.user.id,
+            email: authData.user.email || email,
+            name: profile?.full_name || email.split('@')[0],
+            avatar_url: profile?.avatar_url,
+          }
+        });
+        setShowSavePrompt(true);
+      }
 
     } catch (err) {
       console.error("Login error:", err);
@@ -195,6 +216,41 @@ export default function MobileSignInView() {
       setLoading(false);
       setLoadingStatus(null);
     }
+  };
+
+  // Handle save prompt actions
+  const handleSaveAccount = () => {
+    if (pendingRedirect) {
+      saveAccount({
+        id: pendingRedirect.userData.id,
+        email: pendingRedirect.userData.email,
+        name: pendingRedirect.userData.name,
+        avatar_url: pendingRedirect.userData.avatar_url,
+        savedAt: Date.now(),
+      });
+      setShowSavePrompt(false);
+      setLoadingStatus('success');
+      setTimeout(() => {
+        window.location.replace(pendingRedirect.path);
+      }, 3500);
+    }
+  };
+
+  const handleSkipSave = () => {
+    if (pendingRedirect) {
+      setShowSavePrompt(false);
+      setLoadingStatus('success');
+      setTimeout(() => {
+        window.location.replace(pendingRedirect.path);
+      }, 3500);
+    }
+  };
+
+  // Handle selecting a saved account
+  const handleSelectAccount = (account: SavedAccount) => {
+    setSelectedAccount(account);
+    setDirection(1);
+    setView('login');
   };
 
   const checkCapsLock = (e: React.KeyboardEvent | React.MouseEvent) => {
@@ -214,6 +270,15 @@ export default function MobileSignInView() {
           />
         )}
       </AnimatePresence>
+
+      {/* Save Login Prompt */}
+      <SaveLoginPrompt
+        isOpen={showSavePrompt}
+        userName={pendingRedirect?.userData.name || ""}
+        onSave={handleSaveAccount}
+        onSkip={handleSkipSave}
+        variant="mobile"
+      />
 
       <div className="fixed inset-0 w-full h-full bg-white overflow-hidden font-sans text-slate-900 selection:bg-[#00acc7] selection:text-white">
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
@@ -354,12 +419,34 @@ export default function MobileSignInView() {
                   transition={{ delay: 0.6 }}
                   className="space-y-4 mt-auto"
                 >
-                  <Button
-                    onClick={goToLogin}
-                    className="w-full h-14 rounded-2xl bg-white text-[#5547d0] font-semibold text-base shadow-xl active:scale-[0.98] transition-transform"
-                  >
-                    Masuk ke Akun
-                  </Button>
+                  {/* Saved Accounts Section */}
+                  {savedAccountsLoaded && savedAccounts.length > 0 && (
+                    <div className="space-y-3 mb-4">
+                      <p className="text-white/80 text-sm font-medium text-center">Akun Tersimpan</p>
+                      <AnimatePresence mode="popLayout">
+                        {savedAccounts.slice(0, 3).map((account) => (
+                          <SavedAccountCard
+                            key={account.id}
+                            account={account}
+                            onSelect={handleSelectAccount}
+                            onRemove={removeAccount}
+                            variant="mobile"
+                          />
+                        ))}
+                      </AnimatePresence>
+                      <AddAccountCard onClick={goToLogin} variant="mobile" />
+                    </div>
+                  )}
+
+                  {/* Show standard button only if no saved accounts */}
+                  {(!savedAccountsLoaded || savedAccounts.length === 0) && (
+                    <Button
+                      onClick={goToLogin}
+                      className="w-full h-14 rounded-2xl bg-white text-[#5547d0] font-semibold text-base shadow-xl active:scale-[0.98] transition-transform"
+                    >
+                      Masuk ke Akun
+                    </Button>
+                  )}
 
                   <div className="flex items-center justify-center gap-1 text-sm">
                     <span className="text-white/60">Belum punya akun?</span>
@@ -508,23 +595,51 @@ export default function MobileSignInView() {
                   </motion.div>
                 </div>
 
-                {/* Welcome Text */}
+                {/* Welcome Text - Show selected account or default */}
                 <div className="text-center mb-4">
-                  <motion.h2
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-2xl font-bold text-white"
-                  >
-                    Selamat Datang!
-                  </motion.h2>
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="text-white/80 text-sm mt-1 max-w-[240px]"
-                  >
-                    Masuk ke akun JobMate Anda
-                  </motion.p>
+                  {selectedAccount && selectedAccount.id ? (
+                    <>
+                      <motion.h2
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-xl font-bold text-white"
+                      >
+                        Masuk sebagai
+                      </motion.h2>
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="flex items-center justify-center gap-3 mt-3 p-3 rounded-xl bg-white/10 backdrop-blur-md mx-auto max-w-[240px]"
+                      >
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#00acc7] to-[#00d1dc] flex items-center justify-center text-white font-semibold">
+                          {selectedAccount.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="text-left">
+                          <p className="font-semibold text-white text-sm">{selectedAccount.name}</p>
+                          <p className="text-xs text-white/70">{selectedAccount.email}</p>
+                        </div>
+                      </motion.div>
+                    </>
+                  ) : (
+                    <>
+                      <motion.h2
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-2xl font-bold text-white"
+                      >
+                        Selamat Datang!
+                      </motion.h2>
+                      <motion.p
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-white/80 text-sm mt-1 max-w-[240px]"
+                      >
+                        Masuk ke akun JobMate Anda
+                      </motion.p>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -544,24 +659,26 @@ export default function MobileSignInView() {
                 <div className="flex-1 overflow-y-auto px-8 pt-8 pb-4 scrollbar-hide">
                   <form onSubmit={handleSignIn} className="space-y-6">
 
-                    {/* Email Field */}
-                    <div className="space-y-2">
-                      <Label className="text-xs font-semibold text-slate-600 ml-1">Email Address</Label>
-                      <div className="relative group">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#00acc7] transition-colors">
-                          <Mail className="w-5 h-5" />
+                    {/* Email Field - Hide when saved account is selected */}
+                    {(!selectedAccount || !selectedAccount.id) && (
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold text-slate-600 ml-1">Email Address</Label>
+                        <div className="relative group">
+                          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#00acc7] transition-colors">
+                            <Mail className="w-5 h-5" />
+                          </div>
+                          <Input
+                            ref={emailInputRef}
+                            type="email"
+                            value={email}
+                            onChange={(e) => { setEmail(e.target.value); setError(null); }}
+                            onBlur={() => setEmail(prev => prev.trim())}
+                            placeholder="nama@email.com"
+                            className="h-14 pl-12 rounded-2xl bg-slate-50 border-slate-100 focus:bg-white focus:border-[#00acc7] focus:ring-4 focus:ring-[#00acc7]/10 transition-all font-medium text-base"
+                          />
                         </div>
-                        <Input
-                          ref={emailInputRef}
-                          type="email"
-                          value={email}
-                          onChange={(e) => { setEmail(e.target.value); setError(null); }}
-                          onBlur={() => setEmail(prev => prev.trim())}
-                          placeholder="nama@email.com"
-                          className="h-14 pl-12 rounded-2xl bg-slate-50 border-slate-100 focus:bg-white focus:border-[#00acc7] focus:ring-4 focus:ring-[#00acc7]/10 transition-all font-medium text-base"
-                        />
                       </div>
-                    </div>
+                    )}
 
                     {/* Password Field */}
                     <div className="space-y-2">

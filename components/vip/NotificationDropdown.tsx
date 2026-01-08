@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Bell, Briefcase, Building2, X, CheckCheck } from 'lucide-react'
+import { Bell, Briefcase, Building2, CheckCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -32,15 +32,17 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
   const [unreadCount, setUnreadCount] = useState(0)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     loadNotifications()
   }, [])
 
   const loadNotifications = async () => {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     if (!user) {
       setLoading(false)
       return
@@ -113,17 +115,31 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
     }
   }
 
+  // Prevent hydration mismatch by mocking the trigger button until mounted
+  if (!mounted) {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        className={`relative h-8 w-8 sm:h-9 sm:w-9 ${className}`}
+        aria-label="Notifications"
+      >
+        <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+      </Button>
+    )
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className={`relative h-8 w-8 sm:h-9 sm:w-9 ${className}`}
         >
           <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           {unreadCount > 0 && (
-            <Badge 
+            <Badge
               className="absolute -top-0.5 -right-0.5 h-4 w-4 sm:h-5 sm:w-5 p-0 flex items-center justify-center bg-red-500 text-white text-[9px] sm:text-[10px] border-2 border-white dark:border-slate-900"
             >
               {unreadCount > 9 ? '9+' : unreadCount}
@@ -131,7 +147,7 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
           )}
         </Button>
       </DropdownMenuTrigger>
-      
+
       <DropdownMenuContent align="end" className="w-80 sm:w-96 p-0">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
@@ -173,9 +189,8 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
                 <Link
                   key={notification.id}
                   href={notification.link || '#'}
-                  className={`block p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${
-                    !notification.read ? 'bg-blue-50/50 dark:bg-blue-950/20' : ''
-                  }`}
+                  className={`block p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${!notification.read ? 'bg-blue-50/50 dark:bg-blue-950/20' : ''
+                    }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="mt-1 flex-shrink-0">
@@ -210,7 +225,7 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
         {/* Footer */}
         {notifications.length > 0 && (
           <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-            <Link 
+            <Link
               href="/vip/alerts"
               className="block text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
             >
