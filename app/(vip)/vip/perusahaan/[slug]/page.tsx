@@ -15,7 +15,11 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { ClassicJobCard } from '@/components/vip/ClassicJobCard'
+import dynamic from 'next/dynamic'
+
+const ClassicJobCard = dynamic(() => import('@/components/vip/ClassicJobCard').then(mod => mod.ClassicJobCard), {
+  loading: () => <div className="h-[400px] w-full bg-gray-100 rounded-xl animate-pulse" />
+})
 import type { Metadata } from 'next'
 
 export async function generateMetadata({

@@ -76,26 +76,7 @@ interface PosterResult {
   poster_index: number;
   poster_filename: string;
   poster_url?: string;
-  positions: Array<{
-    title: string;
-    perusahaan_name: string;
-    lokasi: string;
-    kategori?: string[];
-    tipe_kerja?: string;
-    gaji_text?: string;
-    gaji_min?: number;
-    gaji_max?: number;
-    deskripsi?: string;
-    persyaratan?: string;
-    kualifikasi?: string[];
-    skills?: string[];
-    benefit?: string[];
-    deadline?: string;
-    kontak_person?: string;
-    kontak_wa?: string;
-    kontak_phone?: string;
-    kontak_email?: string;
-  }>;
+  positions: JobPosition[];
   has_multiple_positions: boolean;
   confidence_score: number;
   error?: string;
