@@ -60,7 +60,7 @@ function ClassicJobCard({ job }: { job: Loker }) {
                         <Clock className="w-4 h-4 text-gray-400" />
                         <span>Posted recently</span>
                     </div>
-                    {job.gaji_min && (
+                    {job.gaji_min && job.gaji_max && (
                         <div className="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-200">
                             <DollarSign className="w-4 h-4 text-green-500" />
                             <span>IDR {(job.gaji_min / 1000000).toFixed(0)} - {(job.gaji_max / 1000000).toFixed(0)} Juta</span>
