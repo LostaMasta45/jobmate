@@ -42,7 +42,7 @@ export default function VIPLayout({
   const pathname = usePathname()
 
   // Routes that should be full width (no max-w-7xl container)
-  const isFullWidth = pathname === '/vip/profile/edit' || pathname?.includes('/vip/loker/design-')
+  const isFullWidth = pathname === '/vip/profile/edit' || pathname?.startsWith('/vip/loker')
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">

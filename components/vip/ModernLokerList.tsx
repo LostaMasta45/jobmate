@@ -1,11 +1,25 @@
 'use client'
 
 import { useState, useEffect, useTransition, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import Image from 'next/image'
+import { User } from '@supabase/supabase-js'
 import { ModernLokerCard } from './ModernLokerCard'
 import { DesktopCard2Overlay } from '@/components/vip/designs/desktop-variants/DesktopCard2Overlay'
 import { JobCardMobile } from '@/components/mobile/JobCardMobile'
 import { JobCardModern } from '@/components/mobile/JobCardModern'
+import { JobCardGlass } from '@/components/mobile/JobCardGlass'
+import { MatchRecommendations } from '@/components/mobile/MatchRecommendations'
+import { JobsTodayHorizontal } from '@/components/mobile/JobsTodayHorizontal'
+// New Card Components
+import { JobCardTicket } from '@/components/mobile/cards/JobCardTicket'
+import { JobCardStacked } from '@/components/mobile/cards/JobCardStacked'
+import { JobCardBubble } from '@/components/mobile/cards/JobCardBubble'
+import { JobCardBanner } from '@/components/mobile/cards/JobCardBanner'
+import { JobCardCompact } from '@/components/mobile/cards/JobCardCompact'
+
 import { QuickFilterChips } from '@/components/mobile/QuickFilterChips'
 import { QuickFilterChipsAdvanced } from '@/components/mobile/QuickFilterChipsAdvanced'
 import { JobStatistics } from '@/components/mobile/JobStatistics'
@@ -20,20 +34,28 @@ import { NewJobsBanner } from './NewJobsBanner'
 import { LokerCardSkeleton } from './LokerCardSkeleton'
 import { toast } from '@/components/mobile/ToastNotification'
 import { Button } from '@/components/ui/button'
-import { SlidersHorizontal, Sparkles, MapPin, Search, Bell, ChevronDown } from 'lucide-react'
+import { SlidersHorizontal, Sparkles, MapPin, Search, Bell, ChevronDown, ArrowUpRight } from 'lucide-react'
 import type { Loker } from '@/types/vip'
 
 interface ModernLokerListProps {
   initialLoker: Loker[]
   totalResults: number
+  user?: User | null
 }
 
-export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListProps) {
+export function ModernLokerList({ initialLoker, totalResults, user }: ModernLokerListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
 
   const [lokerList, setLokerList] = useState<Loker[]>(initialLoker)
+  const [mounted, setMounted] = useState(false)
+
+  // Initialize mounted state for portals
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [quickFilters, setQuickFilters] = useState<string[]>([])
@@ -162,6 +184,30 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   const todayJobs = getTodayJobs()
   const urgentJobsCount = getUrgentJobs()
   const companies = getUniqueCompanies()
+
+  // New Logic for Categories - WITH FALLBACKS to ensure UI visibility
+  let trendingJobs = [...lokerList].sort((a, b) => b.view_count - a.view_count).slice(0, 6)
+  if (trendingJobs.length === 0) trendingJobs = lokerList.slice(0, 6)
+
+  let topCompanyJobs = lokerList.filter(l =>
+    l.is_featured || (l.gaji_min && l.gaji_min >= 5000000)
+  ).slice(0, 6)
+  if (topCompanyJobs.length === 0) topCompanyJobs = lokerList.slice(0, 6) // Fallback
+
+  let freshGradJobs = lokerList.filter(l =>
+    (l.tipe_pekerjaan as string) === 'Internship' ||
+    (l.tipe_pekerjaan as string) === 'Magang' ||
+    l.title?.toLowerCase().includes('magang') ||
+    l.title?.toLowerCase().includes('intern') ||
+    l.title?.toLowerCase().includes('fresh')
+  ).slice(0, 6)
+  if (freshGradJobs.length === 0) freshGradJobs = [...lokerList].reverse().slice(0, 6) // Fallback
+
+  let featuredJobs = lokerList.filter(l => l.is_featured).slice(0, 3)
+  if (featuredJobs.length === 0) featuredJobs = lokerList.slice(0, 2) // Fallback
+
+  // Mock History (Last Viewed) - using random subset for now as requested
+  const historyJobs = lokerList.slice(4, 7)
 
   // Calculate real counts for filters
   const getFilterCounts = () => {
@@ -415,77 +461,121 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
   const filteredLoker = lokerList
 
   const activeFilterCount = mobileFilters.locations.length + mobileFilters.categories.length + mobileFilters.jobTypes.length + (mobileFilters.timeRange !== 'all' ? 1 : 0)
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'
+  const userAvatar = user?.user_metadata?.avatar_url
 
   return (
-    <div className="lg:space-y-8 pb-safe overflow-x-hidden -mt-20 sm:-mt-24">
-      {/* Mobile: Dynamic Sticky Search Bar - Full to top when scrolled */}
-      <div className={`lg:hidden fixed left-0 right-0 z-40 bg-gradient-to-br from-[#4F46E5] to-[#6366F1] dark:from-[#5547d0] dark:to-[#6366F1] transition-all duration-300 ease-in-out ${scrollY > 50
-        ? 'top-0 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl'
-        : 'top-12 sm:top-14 shadow-lg'
-        }`}>
-        {/* Header Row - Slides up when scrolling */}
-        <div className={`flex items-center justify-between px-3 transition-all duration-300 ease-in-out ${isHeaderVisible ? 'pt-1.5 pb-1.5 opacity-100 max-h-20' : 'pt-0 pb-0 opacity-0 max-h-0 overflow-hidden pointer-events-none'
-          }`}>
-          {/* Location Selector */}
-          <button className="flex items-center gap-1 text-white hover:bg-white/10 active:bg-white/20 rounded-lg px-1.5 py-0.5 -ml-1.5 transition-all">
-            <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
-              <MapPin className="w-3 h-3" />
-            </div>
-            <div className="flex items-center gap-0.5 min-w-0">
-              <span className="text-[11px] font-semibold truncate">
-                {searchParams.get('lokasi') || 'Jombang, Indonesia'}
-              </span>
-              <ChevronDown className="w-2.5 h-2.5 flex-shrink-0" />
-            </div>
-          </button>
+    <div className="space-y-6 pb-safe overflow-x-hidden">
 
-          {/* Notification Icon */}
-          <button className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 active:scale-95 transition-all flex-shrink-0 relative">
-            <Bell className="w-3.5 h-3.5 text-white" />
-            <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full border border-indigo-600" />
-          </button>
-        </div>
+      {/* 2. STATIC HERO Header - Perusahaan Style */}
+      {/* Placed FIRST to avoid space-y margin gap */}
+      <div className="lg:hidden bg-gradient-to-br from-[#00acc7] to-[#00d1dc] dark:from-[#155e75] dark:to-[#0e7490] rounded-b-[2.5rem] pt-32 pb-12 px-6 shadow-xl -mt-20 relative z-10">
+        <div className="space-y-6">
 
-        {/* Search Bar - Always visible, ultra compact when scrolled to top */}
-        <div className={`px-3 transition-all duration-300 ease-in-out ${scrollY > 50 ? 'pt-safe py-2.5' : (isHeaderVisible ? 'pt-0 pb-2' : 'py-2')
-          }`}>
-          <div className="flex items-center gap-1.5">
-            <div className="flex-1 relative">
-              <div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-10">
-                <Search className={`transition-all duration-300 text-gray-400 ${scrollY > 50 ? 'w-4 h-4' : 'w-3.5 h-3.5'
-                  }`} />
+          {/* Top Row: Brand/Headline & User */}
+          <div className="flex justify-between items-start text-white">
+            <div>
+              <div className="flex items-center gap-1.5 opacity-90 mb-1">
+                <span className="bg-white/20 p-1 rounded-md backdrop-blur-sm">
+                  <Sparkles className="w-3 h-3 text-yellow-300" />
+                </span>
+                <p className="text-xs font-medium text-blue-50 tracking-wide uppercase">Bursa Kerja Jombang</p>
               </div>
+              <h2 className="text-2xl font-bold leading-tight tracking-tight">Temukan<br />Karir Impian</h2>
+              <p className="text-xs text-blue-100 mt-1.5 flex items-center gap-1.5 font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                {totalResults} Lowongan Aktif
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button className="relative p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 border-2 border-blue-600 rounded-full"></span>
+              </button>
+              <div className="relative w-10 h-10 rounded-full bg-white/20 border border-white/30 overflow-hidden shadow-sm">
+                {userAvatar ? (
+                  <Image src={userAvatar} alt={userName} fill className="object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center font-bold text-lg bg-gradient-to-br from-indigo-500 to-purple-500">
+                    {userName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Search Bar - Integrated in Blue Card */}
+          <div className="flex gap-3">
+            <div className="flex-1 relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-300 group-focus-within:text-blue-200 transition-colors" />
               <input
                 type="text"
                 placeholder="Cari pekerjaan, perusahaan..."
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className={`w-full pr-3 rounded-lg bg-white dark:bg-gray-800 border-0 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300 ${scrollY > 50
-                  ? 'h-10 pl-10 shadow-md font-medium'
-                  : 'h-9 pl-9 shadow-sm'
-                  }`}
+                className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-black/20 hover:bg-black/25 focus:bg-black/30 border-none text-white placeholder:text-blue-200/70 focus:ring-2 focus:ring-white/20 transition-all shadow-inner"
+              />
+            </div>
+
+            <Button
+              size="icon"
+              onClick={() => setIsFilterOpen(true)}
+              className="w-12 h-12 rounded-2xl bg-yellow-400 hover:bg-yellow-500 text-yellow-950 shadow-lg border-2 border-yellow-300 relative"
+            >
+              <SlidersHorizontal className="w-5 h-5" />
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center border-2 border-yellow-300 shadow-sm">
+                  {activeFilterCount}
+                </span>
+              )}
+            </Button>
+          </div>
+
+          {/* Location Badge */}
+          <div className="flex items-center gap-1.5 px-1">
+            <MapPin className="w-3.5 h-3.5 text-blue-200" />
+            <span className="text-xs font-medium text-blue-100/90 truncate max-w-[200px]">
+              {searchParams.get('lokasi') || 'Lokasi: Seluruh Jombang'}
+            </span>
+            <ChevronDown className="w-3 h-3 text-blue-200" />
+          </div>
+
+        </div>
+      </div>
+
+      {/* 1. FIXED Header (Portal to Body for Perfect Positioning) */}
+      {mounted && createPortal(
+        <div className={`lg:hidden fixed top-0 left-0 right-0 z-[9999] !bg-gradient-to-r !from-[#00acc7] !to-[#00d1dc] dark:!from-[#155e75] dark:!to-[#0e7490] shadow-xl transition-all duration-300 ease-in-out ${scrollY > 80
+          ? 'translate-y-0 !opacity-100'
+          : '-translate-y-full opacity-0 pointer-events-none'
+          }`}>
+          <div className="px-4 py-3 flex items-center gap-3">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300" />
+              <input
+                type="text"
+                placeholder="Cari..."
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 rounded-full bg-black/20 border-none text-sm text-white placeholder:text-blue-300 focus:ring-2 focus:ring-white/20"
               />
             </div>
             <button
               onClick={() => setIsFilterOpen(true)}
-              className={`relative rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 active:scale-95 transition-all duration-300 flex-shrink-0 ${scrollY > 50 ? 'w-10 h-10' : 'w-9 h-9'
-                }`}
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-black/20 text-white relative"
             >
-              <SlidersHorizontal className={`text-white transition-all duration-300 ${scrollY > 50 ? 'w-4 h-4' : 'w-3.5 h-3.5'
-                }`} />
+              <SlidersHorizontal className="w-4 h-4" />
               {activeFilterCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] bg-red-500 rounded-full flex items-center justify-center text-white text-[8px] font-bold border border-white px-0.5">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center border-2 border-blue-600">
                   {activeFilterCount}
                 </span>
               )}
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* Dynamic Spacer - Adjusts based on scroll position */}
-      <div className={`lg:hidden transition-all duration-300 ${scrollY > 50 ? 'h-[60px] sm:h-[60px]' : 'h-[130px] sm:h-[134px]'
-        }`} />
+        </div>,
+        document.body
+      )}
 
       {/* New Jobs Banner */}
       {newJobsCount > 0 && <NewJobsBanner count={newJobsCount} />}
@@ -517,81 +607,159 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         <JobStatistics
           newJobsCount={newJobsCount}
           totalCompanies={companies.length}
-          urgentJobsCount={urgentJobsCount}
+          totalJobsCount={totalResults}
         />
       </div>
 
-      {/* 3. Kategori Populer - Mobile Only - REDUCED SPACING */}
-      <div className="mt-3">
-        <KategoriPopuler
-          onKategoriSelect={handleKategoriSelect}
-          counts={categoryCounts}
-        />
-      </div>
+      {/* PROPOSAL ORDER:
+          1. Header & Search (Sticky) - ALREADY AT TOP
+          2. Stories Perusahaan (Top Companies)
+          3. Hero/Welcome Message - ALREADY AT TOP
+          4. Rekomendasi Match
+          5. Sedang Tren
+          6. Lanjutkan Melihat (History)
+          7. Highlight
+          8. Perusahaan Top
+          9. Fresh Graduate
+          10. Lowongan Terbaru
+      */}
 
-      {/* 4. Perusahaan Sedang Hiring - Mobile Only - REDUCED SPACING */}
-      {companies.length > 0 && (
-        <div className="mt-3">
-          <PerusahaanHiring companies={companies} />
-        </div>
-      )}
+      {/* 2. STORIES PERUSAHAAN (Moved Up) */}
+      {
+        companies.length > 0 && (
+          <div className="mt-3">
+            <PerusahaanHiring companies={companies} />
+          </div>
+        )
+      }
 
-      {/* 5. Lowongan Terbaru Hari Ini - Mobile Only - REDUCED SPACING */}
-      {todayJobs.length > 0 && (
-        <div className="lg:hidden px-4 py-2 mt-3">
-          <div className="flex items-center justify-between mb-2.5">
-            <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <span className="text-xl">⚡</span>
-              Lowongan Baru Hari Ini
-            </h3>
-            <span className="text-xs font-bold bg-gradient-to-r from-[#00d1dc] to-[#00acc7] text-white px-2.5 py-1 rounded-full">
-              {todayJobs.length} loker
-            </span>
+      {/* 3. HERO/WELCOME is at the top (lines 440-513) */}
+
+      {/* 4. MATCH RECOMMENDATIONS (AI Picks) */}
+      {
+        !isPending && filteredLoker.length > 5 && (
+          <div className="lg:hidden mt-0">
+            <MatchRecommendations jobs={filteredLoker} />
           </div>
-          <div className="space-y-2.5">
-            {todayJobs.slice(0, 3).map((loker) => (
-              <JobCardModern
-                key={loker.id}
-                loker={loker}
-                onBookmark={handleBookmark}
-                onShare={handleShare}
-              />
-            ))}
+        )
+      }
+
+      {/* 5. SEDANG TREN (Ticket Style) */}
+      {
+        trendingJobs.length > 0 && (
+          <div className="lg:hidden px-4 mt-6">
+            <div className="flex items-center justify-between mb-3 px-2">
+              <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                🔥 Sedang Tren
+              </h3>
+              <span className="text-xs text-gray-400">Paling Dilihat</span>
+            </div>
+            <div className="flex overflow-x-auto gap-4 py-2 scrollbar-hide -mx-4 px-6 snap-x snap-mandatory">
+              {trendingJobs.map(job => (
+                <div key={job.id} className="snap-center">
+                  <JobCardTicket loker={job} />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
+
+      {/* 6. LANJUTKAN MELIHAT (History - Compact Style) */}
+      {
+        historyJobs.length > 0 && (
+          <div className="lg:hidden px-6 mt-6">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                ↺ Lanjutkan
+              </h3>
+              <span className="text-xs text-gray-400">Terakhir Dilihat</span>
+            </div>
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+              {historyJobs.map(job => (
+                <JobCardCompact key={job.id} loker={job} />
+              ))}
+            </div>
+          </div>
+        )
+      }
+
+      {/* 7. HIGHLIGHT (Banner Style) */}
+      {
+        featuredJobs.length > 0 && (
+          <div className="lg:hidden px-4 mt-8">
+            <div className="flex items-center justify-between mb-3 px-2">
+              <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                ⭐ Highlight
+              </h3>
+            </div>
+            <div className="space-y-4">
+              {featuredJobs.slice(0, 2).map(job => (
+                <JobCardBanner key={job.id} loker={job} />
+              ))}
+            </div>
+          </div>
+        )
+      }
+
+      {/* 8. PERUSAHAAN TOP (Stacked Style) */}
+      {
+        topCompanyJobs.length > 0 && (
+          <div className="lg:hidden px-4 mt-8">
+            <div className="flex items-center justify-between mb-3 px-2">
+              <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                🏢 Perusahaan Top
+              </h3>
+              <span className="text-xs text-gray-400">Verified</span>
+            </div>
+            <div className="flex overflow-x-auto gap-4 py-2 pb-4 scrollbar-hide -mx-4 px-6 snap-x snap-mandatory">
+              {topCompanyJobs.map(job => (
+                <div key={job.id} className="snap-center">
+                  <JobCardStacked loker={job} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      }
+
+      {/* 9. FRESH GRADUATE (Bubble Style) */}
+      {
+        freshGradJobs.length > 0 && (
+          <div className="lg:hidden px-4 mt-6 mb-4">
+            <div className="flex items-center justify-between mb-3 px-2">
+              <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                🎓 Fresh Graduate
+              </h3>
+              <span className="text-xs text-gray-400">Start Here</span>
+            </div>
+            <div className="flex overflow-x-auto gap-4 py-2 scrollbar-hide -mx-4 px-6 snap-x snap-mandatory">
+              {freshGradJobs.map(job => (
+                <div key={job.id} className="snap-center">
+                  <JobCardBubble loker={job} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      }
+
+      {/* 10. Lowongan Terbaru Hari Ini - Mobile Only - REDUCED SPACING */}
+      {
+        todayJobs.length > 0 && (
+          <div className="lg:hidden px-4 py-2 mt-3">
+            {/* Header Removed - Included in Component */}
+            <div className="lg:-mx-4">
+              <JobsTodayHorizontal jobs={todayJobs} />
+            </div>
+          </div>
+        )
+      }
 
       {/* 6. Mobile: Suggested Jobs Section Header - REDUCED SPACING */}
-      <div className="lg:hidden flex items-center justify-between px-4 py-2 mt-2 mb-1">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
-          Lowongan Disarankan
-        </h2>
-        <button
-          onClick={() => {
-            // Navigate to all loker with recommended sorting
-            updateFilters({ sort: 'paling_dilihat', timeFilter: 'week' })
-            // Then scroll to the section
-            setTimeout(() => {
-              const allJobsSection = document.getElementById('semua-lowongan')
-              if (allJobsSection) {
-                allJobsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-              }
-            }, 100)
-          }}
-          className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors active:scale-95"
-        >
-          Lihat semua
-        </button>
-      </div>
+      <div className="hidden"></div>
 
-      {/* Suggested Jobs Carousel - Mobile Only */}
-      {!isPending && filteredLoker.length > 5 && (
-        <div className="lg:hidden">
-          <SuggestedJobsCarousel
-            jobs={filteredLoker.slice(0, 10)}
-          />
-        </div>
-      )}
+      {/* Suggested Jobs Carousel - MOVED UP - REPLACED BY NEW SECTIONS */}
 
       {/* 7. Semua Lowongan Header - Mobile Only - REDUCED SPACING */}
       <div id="semua-lowongan" className="lg:hidden px-4 py-2 mt-2 scroll-mt-16">
@@ -606,53 +774,62 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
       </div>
 
       {/* Loading Overlay */}
-      {isPending && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl">
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 border-3 border-cyan-500 border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm font-medium text-gray-900 dark:text-white">Memuat data...</p>
+      {
+        isPending && (
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 flex items-center justify-center">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl">
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 border-3 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Memuat data...</p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Loker Grid - Mobile: Stack, Desktop: Grid - REDUCED SPACING */}
-      {filteredLoker.length > 0 ? (
-        <>
-          {/* Mobile: Modern Stack Cards - TIGHTER SPACING */}
-          <div className="lg:hidden space-y-2.5 px-4 pb-24">
-            {filteredLoker.map((loker) => (
-              <JobCardModern
-                key={loker.id}
-                loker={loker}
-                onBookmark={handleBookmark}
-                onShare={handleShare}
-              />
-            ))}
-          </div>
+      {
+        filteredLoker.length > 0 ? (
+          <>
+            <div className="lg:hidden space-y-4 px-4 pb-24">
+              {filteredLoker.map((loker) => (
+                <JobCardStacked
+                  key={loker.id}
+                  loker={loker}
+                  className="w-full"
+                />
+              ))}
 
-          {/* Desktop: Grid layout */}
-          <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredLoker.map((loker) => (
-              <DesktopCard2Overlay key={loker.id} loker={loker} />
-            ))}
+              <div className="pt-4">
+                <Link href="/vip/loker/semua" className="flex items-center justify-center w-full py-3.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-bold text-gray-900 dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                  Lihat Semuanya
+                  <ArrowUpRight className="w-4 h-4 ml-2 text-gray-400" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Desktop: Grid layout */}
+            <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredLoker.map((loker) => (
+                <DesktopCard2Overlay key={loker.id} loker={loker} />
+              ))}
+            </div>
+          </>
+        ) : (
+          /* Empty State */
+          <div className="flex flex-col items-center justify-center py-20 px-4">
+            <div className="w-32 h-32 mb-6 rounded-full bg-gradient-to-br from-[#8e68fd]/20 to-[#00d1dc]/20 dark:from-[#5547d0]/30 dark:to-[#00acc7]/30 flex items-center justify-center">
+              <svg className="w-16 h-16 text-[#00d1dc]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Tidak ada lowongan ditemukan</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-center max-w-md">
+              Coba ubah filter atau kata kunci pencarian untuk hasil yang lebih baik
+            </p>
           </div>
-        </>
-      ) : (
-        /* Empty State */
-        <div className="flex flex-col items-center justify-center py-20 px-4">
-          <div className="w-32 h-32 mb-6 rounded-full bg-gradient-to-br from-[#8e68fd]/20 to-[#00d1dc]/20 dark:from-[#5547d0]/30 dark:to-[#00acc7]/30 flex items-center justify-center">
-            <svg className="w-16 h-16 text-[#00d1dc]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Tidak ada lowongan ditemukan</h3>
-          <p className="text-gray-600 dark:text-gray-400 text-center max-w-md">
-            Coba ubah filter atau kata kunci pencarian untuk hasil yang lebih baik
-          </p>
-        </div>
-      )}
+        )
+      }
 
       {/* Floating Action Button - Desktop only */}
       <div className="hidden lg:block">
@@ -669,6 +846,6 @@ export function ModernLokerList({ initialLoker, totalResults }: ModernLokerListP
         onApply={handleApplyMobileFilters}
         initialFilters={mobileFilters}
       />
-    </div>
+    </div >
   )
 }

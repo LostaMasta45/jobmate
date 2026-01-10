@@ -6,6 +6,9 @@ import { Badge } from '@/components/ui/badge'
 import { Briefcase, ChevronRight, Heart } from 'lucide-react'
 import { OptimizedPosterImage } from '@/components/vip/OptimizedPosterImage'
 import type { Loker } from '@/types/vip'
+import { usePathname } from 'next/navigation'
+import { useToast } from '@/hooks/use-toast'
+import { toggleBookmark } from '@/actions/loker/toggle-bookmark'
 
 interface LokerCardGlassProps {
     loker: Loker
@@ -15,6 +18,44 @@ interface LokerCardGlassProps {
 
 export function LokerCardGlass({ loker, priority = false, matchScore }: LokerCardGlassProps) {
     const [isBookmarked, setIsBookmarked] = useState(loker.is_bookmarked || false)
+    const [isLoading, setIsLoading] = useState(false)
+    const pathname = usePathname()
+    const { toast } = useToast()
+
+    const handleBookmark = async (e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+
+        setIsLoading(true)
+        const newState = !isBookmarked
+        setIsBookmarked(newState)
+
+        try {
+            const result = await toggleBookmark(loker.id, pathname)
+            if (result.error) {
+                setIsBookmarked(!newState)
+                toast({
+                    title: "Gagal",
+                    description: "Gagal mengubah status bookmark",
+                    variant: "destructive"
+                })
+            } else {
+                toast({
+                    title: newState ? "Tersimpan" : "Dihapus",
+                    description: newState ? "Lowongan berhasil disimpan" : "Lowongan dihapus dari tersimpan",
+                })
+            }
+        } catch (error) {
+            setIsBookmarked(!newState)
+            toast({
+                title: "Error",
+                description: "Terjadi kesalahan sistem",
+                variant: "destructive"
+            })
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
     return (
         <div className="relative h-[320px] w-full rounded-2xl overflow-hidden group shadow-md hover:shadow-xl transition-all duration-300">
@@ -71,11 +112,9 @@ export function LokerCardGlass({ loker, priority = false, matchScore }: LokerCar
 
             {/* Bookmark Button (Outside Link to avoid nested interactivity issues, positioned absolutely) */}
             <button
-                onClick={(e) => {
-                    e.stopPropagation()
-                    setIsBookmarked(!isBookmarked)
-                }}
-                className="absolute top-3 right-3 z-20 p-2 rounded-full bg-black/20 hover:bg-white hover:text-red-500 text-white backdrop-blur-md transition-all group-hover:scale-110"
+                onClick={handleBookmark}
+                disabled={isLoading}
+                className="absolute top-3 right-3 z-20 p-2 rounded-full bg-black/20 hover:bg-white hover:text-red-500 text-white backdrop-blur-md transition-all group-hover:scale-110 disabled:opacity-50"
             >
                 <Heart className={`w-4 h-4 ${isBookmarked ? 'fill-red-500 text-red-500' : ''}`} />
             </button>

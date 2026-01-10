@@ -46,7 +46,7 @@ export default async function LokerListPage({
   const getTimeFilterDate = (filter: string): string | null => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    
+
     switch (filter) {
       case 'today':
         return today.toISOString()
@@ -156,6 +156,7 @@ export default async function LokerListPage({
     <ModernLokerList
       initialLoker={lokerWithBookmarks || []}
       totalResults={count || 0}
+      user={user}
     />
   )
 }

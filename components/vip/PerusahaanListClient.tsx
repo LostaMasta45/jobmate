@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Search, Building2, MapPin, Briefcase, Command } from 'lucide-react'
+import Image from 'next/image'
+import { Search, Building2, MapPin, Briefcase, Command, Bell, SlidersHorizontal } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { CompanyCardModern } from './CompanyCardModern'
 import type { Perusahaan } from '@/types/vip'
+import { User } from '@supabase/supabase-js'
 
 interface PerusahaanWithCount extends Perusahaan {
   loker_count: number
@@ -18,12 +20,14 @@ interface PerusahaanListClientProps {
   perusahaan: PerusahaanWithCount[]
   totalResults: number
   initialSearch: string
+  user: User
 }
 
 export function PerusahaanListClient({
   perusahaan,
   totalResults,
   initialSearch,
+  user,
 }: PerusahaanListClientProps) {
   const router = useRouter()
   const [search, setSearch] = useState(initialSearch)
@@ -38,42 +42,68 @@ export function PerusahaanListClient({
     }
   }
 
-  return (
-    <div className="space-y-8 overflow-x-hidden">
-      {/* Modern Floating Search Bar */}
-      <div className="relative max-w-2xl mx-auto -mt-8 lg:-mt-12 z-30 px-4">
-        <div className={`relative group transition-all duration-300 ${isFocused ? 'scale-[1.02]' : ''}`}>
-          {/* Enhanced Glow Effect */}
-          <div className={`absolute -inset-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-2xl blur-lg transition-all duration-500 ${isFocused ? 'opacity-40 group-hover:opacity-60' : 'opacity-20 group-hover:opacity-40'}`} />
+  // Get user initials or name
+  const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'
+  const userAvatar = user.user_metadata?.avatar_url
 
-          <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex items-center p-2 border border-white/20 dark:border-gray-700/50 backdrop-blur-xl ring-1 ring-black/5 dark:ring-white/10">
-            <div className="pl-4 pr-3 text-gray-400 group-focus-within:text-blue-500 transition-colors">
-              <Search className="w-5 h-5" />
+  return (
+    <div className="space-y-6">
+      {/* Native Blue Header Container */}
+      <div className="bg-gradient-to-br from-[#5547d0] to-[#8e68fd] dark:from-[#1e1b4b] dark:to-[#4c1d95] rounded-b-[2.5rem] pt-6 pb-12 px-6 shadow-xl -mx-4 -mt-12 sm:-mx-6 sm:-mt-16 lg:-mx-8 lg:-mt-14">
+        <div className="max-w-5xl mx-auto space-y-6">
+
+          {/* Top Row: User & Notifications */}
+          <div className="flex items-center justify-between text-white">
+            <div className="flex items-center gap-3">
+              <div className="relative w-10 h-10 rounded-full bg-white/20 border border-white/30 overflow-hidden">
+                {userAvatar ? (
+                  <Image src={userAvatar} alt={userName} fill className="object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center font-bold text-lg">
+                    {userName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 bg-green-400 border-2 border-[#5547d0] rounded-full"></span>
+              </div>
+              <div>
+                <p className="text-xs text-purple-100 font-medium opacity-90">Selamat Datang,</p>
+                <h2 className="text-lg font-bold leading-tight">{userName}</h2>
+              </div>
             </div>
-            <input
-              type="text"
-              placeholder="Cari perusahaan impianmu..."
-              value={search}
-              onChange={(e) => handleSearch(e.target.value)}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              className="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder:text-gray-400 text-sm sm:text-base h-11"
-            />
-            {search && (
-              <button
-                onClick={() => handleSearch('')}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-400 transition-colors"
-                aria-label="Hapus pencarian"
-              >
-                <span className="text-xs font-bold">✕</span>
-              </button>
-            )}
-            <div className="hidden sm:flex items-center gap-2 px-3 border-l border-gray-100 dark:border-gray-700 ml-2">
-              <kbd className="hidden sm:inline-flex h-6 select-none items-center gap-1 rounded bg-gray-50 dark:bg-gray-900 px-2 font-mono text-[10px] font-medium text-gray-500 ring-1 ring-inset ring-gray-200 dark:ring-gray-700">
-                <span className="text-xs">⌘</span>K
-              </kbd>
-            </div>
+
+            <Button size="icon" variant="ghost" className="rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/10">
+              <Bell className="w-5 h-5" />
+            </Button>
           </div>
+
+          {/* Search Row */}
+          <div className="flex gap-3">
+            <div className="relative flex-1 group">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+                <Search className="w-5 h-5" />
+              </div>
+              <input
+                type="text"
+                placeholder="Cari perusahaan..."
+                value={search}
+                onChange={(e) => handleSearch(e.target.value)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-gray-900 border-none outline-none text-gray-900 dark:text-white placeholder:text-gray-400 shadow-lg ring-2 ring-transparent focus:ring-purple-300/50 transition-all font-medium"
+              />
+            </div>
+
+            <Button size="icon" className="w-12 h-12 rounded-2xl bg-yellow-400 hover:bg-yellow-500 text-yellow-950 shadow-lg border-2 border-yellow-300">
+              <SlidersHorizontal className="w-5 h-5" />
+            </Button>
+          </div>
+
+          {/* Optional: Location / Badge Row (like reference image) */}
+          <div className="flex items-center gap-2 text-blue-100 text-sm opacity-80 pl-1">
+            <MapPin className="w-4 h-4" />
+            <span>Jombang, Jawa Timur</span>
+          </div>
+
         </div>
       </div>
 
@@ -90,7 +120,7 @@ export function PerusahaanListClient({
 
       {/* Premium Company Grid */}
       {perusahaan.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 min-[450px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
           {perusahaan.map((company) => (
             <CompanyCardModern key={company.id} company={company} />
           ))}

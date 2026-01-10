@@ -6,15 +6,15 @@ import { Flame, Building2, Clock } from 'lucide-react'
 interface JobStatisticsProps {
   newJobsCount: number
   totalCompanies: number
-  urgentJobsCount: number
+  totalJobsCount: number
 }
 
-export function JobStatistics({ 
-  newJobsCount, 
-  totalCompanies, 
-  urgentJobsCount 
+export function JobStatistics({
+  newJobsCount,
+  totalCompanies,
+  totalJobsCount
 }: JobStatisticsProps) {
-  
+
   const stats = [
     {
       icon: Flame,
@@ -34,8 +34,8 @@ export function JobStatistics({
     },
     {
       icon: Clock,
-      label: 'Deadline Minggu Ini',
-      value: urgentJobsCount,
+      label: 'Total Lowongan',
+      value: totalJobsCount,
       color: 'from-emerald-500 to-teal-500',
       bgColor: 'bg-emerald-50 dark:bg-emerald-950/30',
       iconColor: 'text-emerald-600 dark:text-emerald-400'
@@ -47,7 +47,7 @@ export function JobStatistics({
       <div className="grid grid-cols-3 gap-2">
         {stats.map((stat, index) => {
           const Icon = stat.icon
-          
+
           return (
             <motion.div
               key={stat.label}

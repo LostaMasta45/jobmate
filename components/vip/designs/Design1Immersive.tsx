@@ -35,8 +35,49 @@ interface DesignProps {
     recommendedLoker?: (Loker & { matchScore?: number })[]
 }
 
+import { toggleBookmark } from '@/actions/loker/toggle-bookmark'
+import { usePathname } from 'next/navigation'
+import { useToast } from '@/hooks/use-toast'
+
 export default function Design1Immersive({ loker, similar, todayLoker = [], recommendedLoker = [] }: DesignProps) {
-    const [isBookmarked, setIsBookmarked] = useState(false)
+    const [isBookmarked, setIsBookmarked] = useState(loker.is_bookmarked || false)
+    const [isLoading, setIsLoading] = useState(false)
+    const pathname = usePathname()
+    const { toast } = useToast()
+
+    const handleBookmark = async () => {
+        setIsLoading(true)
+        // Optimistic update
+        const newState = !isBookmarked
+        setIsBookmarked(newState)
+
+        try {
+            const result = await toggleBookmark(loker.id, pathname)
+            if (result.error) {
+                // Revert on error
+                setIsBookmarked(!newState)
+                toast({
+                    title: "Gagal menyimpan",
+                    description: "Silakan login terlebih dahulu",
+                    variant: "destructive"
+                })
+            } else {
+                toast({
+                    title: newState ? "Tersimpan" : "Dihapus",
+                    description: newState ? "Lowongan berhasil disimpan ke favorit" : "Lowongan dihapus dari favorit",
+                })
+            }
+        } catch (error) {
+            setIsBookmarked(!newState)
+            toast({
+                title: "Terjadi kesalahan",
+                description: "Gagal memproses permintaan",
+                variant: "destructive"
+            })
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
     return (
         <div className="relative min-h-screen bg-gray-50 dark:bg-slate-950 overflow-hidden font-sans text-slate-900 dark:text-white transition-colors duration-300">
@@ -125,7 +166,8 @@ export default function Design1Immersive({ loker, similar, todayLoker = [], reco
                                             size="icon"
                                             variant="ghost"
                                             className="rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 dark:text-white h-8 w-8 sm:h-10 sm:w-10"
-                                            onClick={() => setIsBookmarked(!isBookmarked)}
+                                            onClick={handleBookmark}
+                                            disabled={isLoading}
                                         >
                                             <Bookmark className={cn("w-5 h-5 sm:w-6 sm:h-6", isBookmarked && "fill-yellow-400 text-yellow-400")} />
                                         </Button>
@@ -193,16 +235,18 @@ export default function Design1Immersive({ loker, similar, todayLoker = [], reco
 
                             {/* Sticky Action Footer inside Card */}
                             <div className="mt-8 pt-6 border-t border-gray-200 dark:border-white/10 space-y-4">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+                                {/* Action Buttons Container - Responsive Stack/Grid */}
+                                <div className="flex flex-col gap-3 w-full">
+
                                     {/* WhatsApp Button */}
                                     {(loker.kontak_wa || loker.perusahaan?.whatsapp) && (
                                         <Button
                                             asChild
-                                            className="w-full h-12 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-base shadow-lg shadow-green-500/20"
+                                            className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-base shadow-lg shadow-green-500/20 whitespace-normal"
                                         >
-                                            <a href={`https://wa.me/${(loker.kontak_wa || loker.perusahaan?.whatsapp)?.replace(/^0/, '62').replace(/\D/g, '')}?text=Halo, saya tertarik dengan lowongan ${loker.title} di ${loker.perusahaan_name}`} target="_blank" rel="noopener noreferrer">
-                                                <Send className="w-5 h-5 mr-2" />
-                                                Lamar via WhatsApp
+                                            <a href={`https://wa.me/${(loker.kontak_wa || loker.perusahaan?.whatsapp)?.replace(/^0/, '62').replace(/\D/g, '')}?text=Halo, saya tertarik dengan lowongan ${loker.title} di ${loker.perusahaan_name}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+                                                <Send className="w-5 h-5 flex-shrink-0" />
+                                                <span className="truncate">Lamar via WhatsApp</span>
                                             </a>
                                         </Button>
                                     )}
@@ -213,20 +257,22 @@ export default function Design1Immersive({ loker, similar, todayLoker = [], reco
                                             asChild
                                             variant={loker.kontak_wa || loker.perusahaan?.whatsapp ? "outline" : "default"}
                                             className={cn(
-                                                "w-full h-12 rounded-xl font-bold text-base",
-                                                !(loker.kontak_wa || loker.perusahaan?.whatsapp) ? "bg-slate-900 dark:bg-white text-white dark:text-black hover:bg-slate-800" : "border-slate-200 dark:border-white/20 text-slate-700 dark:text-white"
+                                                "flex-1 h-12 rounded-xl font-bold text-base whitespace-normal",
+                                                !(loker.kontak_wa || loker.perusahaan?.whatsapp) ?
+                                                    "bg-slate-900 dark:bg-white text-white dark:text-black hover:bg-slate-800" :
+                                                    "border-slate-200 dark:border-white/20 text-slate-700 dark:text-white"
                                             )}
                                         >
-                                            <a href={`mailto:${loker.kontak_email || loker.perusahaan?.email}?subject=Lamaran Pekerjaan: ${loker.title}`} target="_blank" rel="noopener noreferrer">
-                                                <Mail className="w-5 h-5 mr-2" />
-                                                Kirim Email
+                                            <a href={`mailto:${loker.kontak_email || loker.perusahaan?.email}?subject=Lamaran Pekerjaan: ${loker.title}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+                                                <Mail className="w-5 h-5 flex-shrink-0" />
+                                                <span className="truncate">Kirim Email</span>
                                             </a>
                                         </Button>
                                     )}
 
                                     {/* Fallback if no specific contact */}
                                     {!loker.kontak_wa && !loker.kontak_email && !loker.perusahaan?.whatsapp && !loker.perusahaan?.email && (
-                                        <Button className="w-full h-12 bg-slate-900 dark:bg-white text-white dark:text-black hover:bg-slate-800 rounded-xl font-bold text-base shadow-lg col-span-1 sm:col-span-2">
+                                        <Button className="w-full h-12 bg-slate-900 dark:bg-white text-white dark:text-black hover:bg-slate-800 rounded-xl font-bold text-base shadow-lg">
                                             Lamar Sekarang
                                         </Button>
                                     )}

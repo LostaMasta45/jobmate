@@ -53,11 +53,10 @@ export default function SignInPage() {
   const [capsLock, setCapsLock] = React.useState(false);
 
   const emailInputRef = React.useRef<HTMLInputElement>(null);
-  const [isMounted, setIsMounted] = React.useState(false);
 
-  React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  // Combined mounting state - waits for both component mount AND isMobile determination
+  // This prevents the loading screen from getting stuck
+  const isReady = isMobile !== undefined;
 
   // When selecting a saved account, pre-fill email
   React.useEffect(() => {
@@ -70,10 +69,10 @@ export default function SignInPage() {
 
   // Auto-focus
   React.useEffect(() => {
-    if (!isMobile && isMounted) {
+    if (!isMobile && isReady) {
       emailInputRef.current?.focus();
     }
-  }, [isMobile, isMounted]);
+  }, [isMobile, isReady]);
 
   // Timer Logic
   React.useEffect(() => {
@@ -250,7 +249,9 @@ export default function SignInPage() {
   };
 
   // Show loading skeleton during hydration to prevent blank page flash
-  if (!isMounted || isMobile === undefined) {
+  // Only check isReady (which is isMobile !== undefined)
+  // This ensures we wait for the media query to be evaluated
+  if (!isReady) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">

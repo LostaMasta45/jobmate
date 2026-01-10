@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Home, Grid, Search, Clock, User, Briefcase, LayoutGrid } from "lucide-react";
+import { Home, Grid, Search, Clock, User, Briefcase, LayoutGrid, Bookmark } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useEffect, useCallback } from "react";
@@ -34,9 +34,9 @@ const navItems = [
     label: "Cari"
   },
   {
-    icon: Briefcase,
-    href: "/vip/history",
-    label: "History"
+    icon: Bookmark,
+    href: "/vip/saved",
+    label: "Disimpan"
   },
   {
     icon: Home,
