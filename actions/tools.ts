@@ -32,9 +32,9 @@ export async function createCoverLetter(data: {
         content: content,
         metadata: { ...data, generated_at: new Date().toISOString() },
       };
-      
+
       console.log("[Server] Inserting template:", { ...templateData, content: `${content.substring(0, 50)}...` });
-      
+
       const { data: insertedData, error } = await supabase.from("templates").insert(templateData).select();
 
       if (error) {
@@ -44,18 +44,8 @@ export async function createCoverLetter(data: {
         console.log("[Server] Template saved successfully:", insertedData);
       }
 
-      // 🆕 MONITORING: Log tool usage
-      try {
-        const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
-        await logToolUsageWithNotification(
-          "Cover Letter Generator",
-          `${data.position} at ${data.company}`,
-          { tone: data.tone }
-        );
-      } catch (monitorError) {
-        console.error("[Monitoring] Failed to log cover letter usage:", monitorError);
-        // Don't throw - monitoring failure shouldn't break functionality
-      }
+      // NOTE: Tool usage tracking moved to copy/download handlers in cover-letter page.tsx
+      // This avoids duplicate notifications (generate != actual usage)
     } else {
       console.warn("[Server] No user found, skipping database save");
     }
@@ -215,7 +205,7 @@ export async function getTemplates(type?: string) {
       console.error("Get templates error:", error);
       return [];
     }
-    
+
     return data || [];
   } catch (error) {
     console.error("Get templates error:", error);
@@ -313,8 +303,8 @@ export async function createJobApplication(data: {
     .order("order_index", { ascending: false })
     .limit(1);
 
-  const nextOrderIndex = maxOrderData?.[0]?.order_index != null 
-    ? maxOrderData[0].order_index + 1 
+  const nextOrderIndex = maxOrderData?.[0]?.order_index != null
+    ? maxOrderData[0].order_index + 1
     : 0;
 
   const { error } = await supabase.from("applications").insert({

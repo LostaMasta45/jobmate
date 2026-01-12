@@ -47,6 +47,12 @@ export function StepPreview({
             setCopied(true);
             toast.success("Email dicopy ke clipboard!");
             setTimeout(() => setCopied(false), 2000);
+
+            // Track copy usage
+            try {
+                const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+                await logToolUsageWithNotification("Email Template Copy", `${formData.position} at ${formData.companyName}`);
+            } catch (e) { console.error("[Tracking] Failed:", e); }
         } catch {
             toast.error("Gagal copy email");
         }

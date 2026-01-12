@@ -166,6 +166,12 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+
+      // Track tool usage on copy
+      try {
+        const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+        await logToolUsageWithNotification("CV ATS Copy", resume.title || "Untitled CV");
+      } catch (e) { console.error("[Tracking] Failed:", e); }
     } catch (error) {
       alert("Gagal copy: " + (error as Error).message);
     }
@@ -182,9 +188,9 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
       console.log("Attempting to save resume...");
       const result = await saveResumeToDatabase(resume);
       console.log("Save result:", result);
-      
+
       alert("✅ CV berhasil disimpan! Kembali ke history...");
-      
+
       // Auto-close wizard after 1 second
       setTimeout(() => {
         if (onSaveSuccess) {
@@ -200,7 +206,7 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
     }
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     if (validationErrors.length > 0) {
       alert("Perbaiki error validasi terlebih dahulu");
       return;
@@ -210,6 +216,12 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
     try {
       downloadResumeAsPDF(resume);
       alert(`✅ PDF berhasil diunduh`);
+
+      // Track tool usage on PDF download
+      try {
+        const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+        await logToolUsageWithNotification("CV ATS Download PDF", resume.title || "Untitled CV");
+      } catch (e) { console.error("[Tracking] Failed:", e); }
     } catch (error) {
       alert("Gagal export PDF: " + (error as Error).message);
     } finally {
@@ -227,6 +239,12 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
     try {
       await downloadResumeAsWord(resume);
       alert(`✅ Word berhasil diunduh`);
+
+      // Track tool usage on Word download
+      try {
+        const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+        await logToolUsageWithNotification("CV ATS Download Word", resume.title || "Untitled CV");
+      } catch (e) { console.error("[Tracking] Failed:", e); }
     } catch (error) {
       alert("Gagal export Word: " + (error as Error).message);
     } finally {
@@ -372,7 +390,7 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
           {atsMode === "poster" && (
             <div className="animate-in fade-in slide-in-from-top-2 duration-200 space-y-3">
               <Label>Upload Poster Lowongan</Label>
-              
+
               {!posterImage ? (
                 <div
                   onClick={() => posterInputRef.current?.click()}
@@ -455,7 +473,7 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
           <Button
             onClick={handleAnalyzeATS}
             disabled={
-              analyzingATS || 
+              analyzingATS ||
               validationErrors.length > 0 ||
               (atsMode === "poster" && !jobDescription)
             }
@@ -561,7 +579,7 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
                   <p className="mb-2 text-sm font-semibold">
                     🔑 Keyword Match: {atsAnalysis.keywordMatchPercent || 0}%
                   </p>
-                  
+
                   {atsAnalysis.matchedKeywords && atsAnalysis.matchedKeywords.length > 0 && (
                     <div className="mb-2">
                       <p className="text-xs text-muted-foreground mb-1">Sudah ada:</p>
@@ -577,7 +595,7 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
                       </div>
                     </div>
                   )}
-                  
+
                   {atsAnalysis.missingKeywords && atsAnalysis.missingKeywords.length > 0 && (
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">Perlu ditambahkan:</p>
@@ -617,34 +635,32 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
                   <p className="mb-3 text-sm font-semibold">💡 Saran Perbaikan Detail:</p>
                   <div className="space-y-3">
                     {atsAnalysis.suggestions.map((suggestion, idx) => (
-                      <div 
-                        key={idx} 
-                        className={`rounded-lg border p-3 ${
-                          suggestion.priority === "high" 
-                            ? "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950" 
+                      <div
+                        key={idx}
+                        className={`rounded-lg border p-3 ${suggestion.priority === "high"
+                            ? "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950"
                             : suggestion.priority === "medium"
-                            ? "border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950"
-                            : "border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
-                        }`}
+                              ? "border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950"
+                              : "border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
+                          }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${
-                            suggestion.priority === "high" 
-                              ? "bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-100" 
+                          <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${suggestion.priority === "high"
+                              ? "bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-100"
                               : suggestion.priority === "medium"
-                              ? "bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100"
-                              : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-100"
-                          }`}>
+                                ? "bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100"
+                                : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-100"
+                            }`}>
                             {suggestion.priority === "high" ? "HIGH" : suggestion.priority === "medium" ? "MEDIUM" : "LOW"}
                           </span>
                           <span className="text-xs text-muted-foreground capitalize">
                             {suggestion.section}
                           </span>
                         </div>
-                        
+
                         <p className="text-sm font-medium mb-1">{suggestion.issue}</p>
                         <p className="text-sm text-muted-foreground">{suggestion.suggestion}</p>
-                        
+
                         {suggestion.example && (
                           <div className="mt-2 text-xs space-y-1">
                             {suggestion.example.before && (
@@ -807,7 +823,7 @@ function generatePlainText(resume: Resume): string {
   // Header
   text += `${resume.basics.firstName} ${resume.basics.lastName}\n`;
   text += `${resume.basics.headline}\n\n`;
-  
+
   // Contact
   text += `Email: ${resume.basics.email}\n`;
   if (resume.basics.phone) text += `Phone: ${resume.basics.phone}\n`;

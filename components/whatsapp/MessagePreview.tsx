@@ -41,6 +41,12 @@ export function MessagePreview({
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
     onCopy?.();
+
+    // Track copy usage
+    try {
+      const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+      await logToolUsageWithNotification("WhatsApp Template Copy", hrdName || "HRD");
+    } catch (e) { console.error("[Tracking] Failed:", e); }
   };
 
   const formatPhoneNumber = (phone: string): string => {
@@ -55,7 +61,7 @@ export function MessagePreview({
     return cleaned;
   };
 
-  const handleSendWhatsApp = () => {
+  const handleSendWhatsApp = async () => {
     const encodedMessage = encodeURIComponent(content);
     if (hrdPhone) {
       const formattedPhone = formatPhoneNumber(hrdPhone);
@@ -64,6 +70,12 @@ export function MessagePreview({
       window.open(`https://wa.me/?text=${encodedMessage}`, "_blank");
     }
     onSendWhatsApp?.();
+
+    // Track send usage
+    try {
+      const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+      await logToolUsageWithNotification("WhatsApp Template Send", hrdName || "HRD");
+    } catch (e) { console.error("[Tracking] Failed:", e); }
   };
 
   if (!content) {
@@ -90,10 +102,10 @@ export function MessagePreview({
         <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[124px] rounded-l-lg"></div>
         <div className="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[178px] rounded-l-lg"></div>
         <div className="h-[64px] w-[3px] bg-gray-800 absolute -right-[17px] top-[142px] rounded-r-lg"></div>
-        
+
         {/* Screen */}
         <div className="rounded-[2rem] overflow-hidden w-full h-full bg-[#E5DDD5] dark:bg-[#0b141a] relative flex flex-col">
-          
+
           {/* Status Bar */}
           <div className="bg-[#075E54] dark:bg-[#1f2c34] text-white px-4 pt-2 pb-1 flex justify-between items-end text-xs">
             <span>09:41</span>
@@ -203,10 +215,10 @@ export function MessagePreview({
               Save Draft
             </Button>
           </div>
-          
+
           <div className="flex justify-between text-xs text-muted-foreground pt-2 border-t">
-             <span>{wordCount} Words</span>
-             <span>{charCount} Characters</span>
+            <span>{wordCount} Words</span>
+            <span>{charCount} Characters</span>
           </div>
         </CardContent>
       </Card>

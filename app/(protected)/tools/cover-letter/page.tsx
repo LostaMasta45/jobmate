@@ -51,12 +51,12 @@ export default function CoverLetterPage() {
 
     try {
       const { content } = await createCoverLetter(formData);
-      
+
       if (!content || content.trim() === "") {
         throw new Error("Tidak ada hasil yang dihasilkan. Silakan coba lagi.");
       }
       setResult(content);
-      
+
       // Refresh templates after successful generation
       setTimeout(() => {
         loadTemplates();
@@ -76,13 +76,19 @@ export default function CoverLetterPage() {
         await navigator.clipboard.writeText(result);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+
+        // Track copy usage
+        try {
+          const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+          await logToolUsageWithNotification("Cover Letter Copy", `${formData.position} at ${formData.company}`);
+        } catch (e) { console.error("[Tracking] Failed:", e); }
       } catch (err) {
         alert("Gagal menyalin. Silakan copy manual.");
       }
     }
   };
 
-  const handleDownloadText = () => {
+  const handleDownloadText = async () => {
     if (result) {
       const blob = new Blob([result], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
@@ -93,14 +99,26 @@ export default function CoverLetterPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+
+      // Track download usage
+      try {
+        const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+        await logToolUsageWithNotification("Cover Letter Download TXT", `${formData.position} at ${formData.company}`);
+      } catch (e) { console.error("[Tracking] Failed:", e); }
     }
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (result) {
       try {
         const filename = `Cover_Letter_${formData.position}_${formData.company}.pdf`;
         generateCoverLetterPDF(result, filename);
+
+        // Track PDF download usage
+        try {
+          const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+          await logToolUsageWithNotification("Cover Letter Download PDF", `${formData.position} at ${formData.company}`);
+        } catch (e) { console.error("[Tracking] Failed:", e); }
       } catch (error) {
         alert("Gagal download PDF: " + (error as Error).message);
       }
@@ -120,7 +138,7 @@ export default function CoverLetterPage() {
         title="Cover Letter"
         description="Generator cover letter"
       />
-      
+
       <PageHeader
         title="Cover Letter Generator"
         description="Buat surat lamaran profesional dengan AI dalam Bahasa Indonesia"
@@ -233,9 +251,9 @@ export default function CoverLetterPage() {
                 </select>
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full gap-2" 
+              <Button
+                type="submit"
+                className="w-full gap-2"
                 disabled={loading}
               >
                 {loading ? (
@@ -272,9 +290,9 @@ export default function CoverLetterPage() {
               </div>
               {result && (
                 <div className="flex gap-2 flex-shrink-0">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={handleCopy}
                     className="gap-1.5 sm:gap-2"
                   >
@@ -290,18 +308,18 @@ export default function CoverLetterPage() {
                       </>
                     )}
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={handleDownloadText}
                     className="gap-1.5 sm:gap-2"
                   >
                     <Download className="h-4 w-4 shrink-0" />
                     <span className="text-xs sm:text-sm hidden sm:inline">TXT</span>
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={handleDownloadPDF}
                     className="gap-1.5 sm:gap-2"
                   >
@@ -334,9 +352,9 @@ export default function CoverLetterPage() {
                 </div>
                 {/* Mobile: Sticky bottom buttons */}
                 <div className="sticky bottom-0 sm:hidden flex gap-2 p-3 bg-card border-t -mx-6 -mb-6">
-                  <Button 
-                    variant="default" 
-                    size="sm" 
+                  <Button
+                    variant="default"
+                    size="sm"
                     onClick={handleCopy}
                     className="gap-1.5 flex-1"
                   >
@@ -352,18 +370,18 @@ export default function CoverLetterPage() {
                       </>
                     )}
                   </Button>
-                  <Button 
-                    variant="default" 
-                    size="sm" 
+                  <Button
+                    variant="default"
+                    size="sm"
                     onClick={handleDownloadText}
                     className="gap-1.5 flex-1"
                   >
                     <Download className="h-4 w-4" />
                     <span className="text-xs">TXT</span>
                   </Button>
-                  <Button 
-                    variant="default" 
-                    size="sm" 
+                  <Button
+                    variant="default"
+                    size="sm"
                     onClick={handleDownloadPDF}
                     className="gap-1.5 flex-1"
                   >
@@ -389,8 +407,8 @@ export default function CoverLetterPage() {
 
       {/* History Section */}
       <div className="mt-6">
-        <HistoryList 
-          templates={templates} 
+        <HistoryList
+          templates={templates}
           onRefresh={loadTemplates}
           onLoadTemplate={handleLoadTemplate}
         />

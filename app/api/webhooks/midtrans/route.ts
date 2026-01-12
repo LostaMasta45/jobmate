@@ -190,6 +190,24 @@ export async function POST(request: NextRequest) {
                 console.error('[Midtrans Webhook] Error sending payment confirmation email:', emailError);
             }
 
+            // Send Telegram notification for successful payment
+            try {
+                const { notifyPaymentSuccess } = await import('@/lib/telegram');
+                await notifyPaymentSuccess({
+                    customerName: finalCustomerName,
+                    customerEmail: finalCustomerEmail,
+                    customerPhone: finalCustomerPhone,
+                    planType: planType as 'basic' | 'premium',
+                    amount: amount,
+                    paymentMethod: paymentType || 'unknown',
+                    paymentGateway: 'midtrans',
+                    orderId: orderId,
+                });
+                console.log('[Midtrans Webhook] Telegram notification sent');
+            } catch (telegramError) {
+                console.error('[Midtrans Webhook] Error sending Telegram notification:', telegramError);
+            }
+
             return NextResponse.json({
                 success: true,
                 message: 'Payment updated to PAID',
@@ -212,6 +230,25 @@ export async function POST(request: NextRequest) {
 
             console.log('[Midtrans Webhook] Payment marked as EXPIRED');
 
+            // Send Telegram notification for expired payment
+            try {
+                const { notifyPaymentExpired } = await import('@/lib/telegram');
+                const planType = orderId.includes('premium') ? 'premium' : 'basic';
+                const amount = parseInt(grossAmount) || (planType === 'premium' ? 39000 : 10000);
+
+                await notifyPaymentExpired({
+                    customerName: 'Unknown',
+                    customerEmail: 'unknown@email.com',
+                    planType: planType as 'basic' | 'premium',
+                    amount: amount,
+                    orderId: orderId,
+                    paymentGateway: 'midtrans',
+                });
+                console.log('[Midtrans Webhook] Expired notification sent');
+            } catch (telegramError) {
+                console.error('[Midtrans Webhook] Error sending expired notification:', telegramError);
+            }
+
             return NextResponse.json({
                 success: true,
                 message: 'Payment marked as expired',
@@ -233,6 +270,26 @@ export async function POST(request: NextRequest) {
             }
 
             console.log('[Midtrans Webhook] Payment marked as FAILED');
+
+            // Send Telegram notification for failed payment
+            try {
+                const { notifyPaymentFailed } = await import('@/lib/telegram');
+                const planType = orderId.includes('premium') ? 'premium' : 'basic';
+                const amount = parseInt(grossAmount) || (planType === 'premium' ? 39000 : 10000);
+
+                await notifyPaymentFailed({
+                    customerName: 'Unknown',
+                    customerEmail: 'unknown@email.com',
+                    planType: planType as 'basic' | 'premium',
+                    amount: amount,
+                    orderId: orderId,
+                    paymentGateway: 'midtrans',
+                    failureReason: transactionStatus,
+                });
+                console.log('[Midtrans Webhook] Failed notification sent');
+            } catch (telegramError) {
+                console.error('[Midtrans Webhook] Error sending failed notification:', telegramError);
+            }
 
             return NextResponse.json({
                 success: true,
@@ -259,6 +316,19 @@ export async function POST(request: NextRequest) {
 
     } catch (error: any) {
         console.error('[Midtrans Webhook] Error:', error);
+
+        // Send System Error Alert to admin
+        try {
+            const { notifySystemError } = await import('@/lib/telegram');
+            await notifySystemError({
+                errorType: 'Payment Webhook Error',
+                errorMessage: error.message || 'Unknown error',
+                location: '/api/webhooks/midtrans',
+                severity: 'HIGH',
+            });
+        } catch (telegramError) {
+            console.error('[Midtrans Webhook] Failed to send error alert:', telegramError);
+        }
 
         // Return 200 to prevent Midtrans from retrying
         return NextResponse.json({

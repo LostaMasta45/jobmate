@@ -131,7 +131,7 @@ Jika tidak bisa membaca gambar atau bukan poster lowongan, kembalikan pesan erro
     });
 
     const extractedText = response.choices[0]?.message?.content;
-    
+
     if (!extractedText) {
       throw new Error("Tidak bisa membaca poster lowongan");
     }
@@ -194,18 +194,10 @@ export async function saveResumeToDatabase(resume: Resume) {
     }
 
     console.log("Save successful! Data:", data);
-    
-    // 🆕 MONITORING: Log CV ATS generation
-    try {
-      const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
-      await logToolUsageWithNotification(
-        "CV ATS Generator",
-        resume.title || `${resume.basics.firstName} ${resume.basics.lastName} - Resume`
-      );
-    } catch (monitorError) {
-      console.error("[Monitoring] Failed to log CV ATS:", monitorError);
-    }
-    
+
+    // NOTE: Tool usage tracking moved to download/copy handlers in StepReview.tsx
+    // This avoids duplicate notifications (save != actual usage)
+
     revalidatePath("/tools/cv-ats");
     return data;
   } catch (error: any) {

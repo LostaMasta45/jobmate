@@ -23,10 +23,16 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
       toast.error("Preview belum tersedia")
       return
     }
-    
+
     try {
       await navigator.clipboard.writeText(element.innerText)
       toast.success("Surat lamaran berhasil disalin ke clipboard")
+
+      // Track copy usage
+      try {
+        const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+        await logToolUsageWithNotification("Surat Lamaran Copy", `${formData.perusahaan.posisiLowongan} at ${formData.perusahaan.namaPerusahaan}`);
+      } catch (e) { console.error("[Tracking] Failed:", e); }
     } catch (error) {
       toast.error("Gagal menyalin ke clipboard")
     }
@@ -46,7 +52,7 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
 
     try {
       toast.info("Membuat PDF...")
-      
+
       const html2pdf = (await import('html2pdf.js')).default
       const filename = `Surat_Lamaran_${formData.biodata.namaLengkap || "User"}_${formData.perusahaan.posisiLowongan || "Position"}.pdf`
 
@@ -55,16 +61,16 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
           filename,
           margin: [20, 20, 20, 20], // top, right, bottom, left in mm - presisi A4
           image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { 
-            scale: 2, 
+          html2canvas: {
+            scale: 2,
             useCORS: true,
             letterRendering: true,
             logging: false,
             backgroundColor: '#ffffff'
           },
-          jsPDF: { 
-            unit: 'mm', 
-            format: 'a4', 
+          jsPDF: {
+            unit: 'mm',
+            format: 'a4',
             orientation: 'portrait',
             compress: true
           },
@@ -74,6 +80,12 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
         .save()
 
       toast.success("PDF berhasil diunduh")
+
+      // Track PDF download
+      try {
+        const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+        await logToolUsageWithNotification("Surat Lamaran Download PDF", `${formData.perusahaan.posisiLowongan} at ${formData.perusahaan.namaPerusahaan}`);
+      } catch (e) { console.error("[Tracking] Failed:", e); }
     } catch (error) {
       console.error("PDF Error:", error)
       toast.error("Gagal mengunduh PDF: " + (error as Error).message)
@@ -89,7 +101,7 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
 
     try {
       const html2canvas = (await import("html2canvas")).default
-      
+
       // Create canvas from element
       const canvas = await html2canvas(element, {
         scale: 2,
@@ -98,24 +110,24 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
         width: 794,
         height: 1123
       } as any)
-      
+
       // Convert to blob
       canvas.toBlob((blob) => {
         if (!blob) {
           toast.error("Gagal membuat gambar")
           return
         }
-        
+
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
         a.download = `Surat_Lamaran_${formData.perusahaan.namaPerusahaan || "Company"}_${formData.perusahaan.posisiLowongan || "Position"}.${format}`
         a.click()
         URL.revokeObjectURL(url)
-        
+
         toast.success(`${format.toUpperCase()} berhasil diunduh`)
       }, `image/${format}`, 0.98)
-      
+
     } catch (error) {
       console.error("Image Error:", error)
       toast.error("Gagal mengunduh gambar")
@@ -131,7 +143,7 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
 
     try {
       const { Document, Packer, Paragraph, TextRun, AlignmentType, Table, TableRow, TableCell, WidthType } = await import("docx")
-      
+
       const mmToTwip = (mm: number) => Math.round((mm / 25.4) * 1440)
       const { biodata, perusahaan } = formData
 
@@ -267,7 +279,7 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
 
       const blob = await Packer.toBlob(doc)
       const filename = `Surat_Lamaran_${biodata.namaLengkap || "User"}_${perusahaan.posisiLowongan || "Position"}.docx`
-      
+
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -276,6 +288,12 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
       URL.revokeObjectURL(url)
 
       toast.success("File Word berhasil diunduh")
+
+      // Track Word download
+      try {
+        const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+        await logToolUsageWithNotification("Surat Lamaran Download Word", `${formData.perusahaan.posisiLowongan} at ${formData.perusahaan.namaPerusahaan}`);
+      } catch (e) { console.error("[Tracking] Failed:", e); }
     } catch (error) {
       console.error("Word Error:", error)
       toast.error("Gagal mengunduh Word")
@@ -299,7 +317,7 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
       }
 
       const generatedContent = replacePlaceholders(template.body, formData)
-      
+
       const result = await saveSuratLamaran({
         biodata: formData.biodata,
         perusahaan: formData.perusahaan,
@@ -328,10 +346,10 @@ export function ToolbarActions({ formData, templateId, onReset }: Props) {
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2">
-        <Button 
-          onClick={handleSave} 
-          variant="default" 
-          size="sm" 
+        <Button
+          onClick={handleSave}
+          variant="default"
+          size="sm"
           className="flex-1 min-w-[100px] bg-green-600 hover:bg-green-700"
           disabled={isSaving}
         >

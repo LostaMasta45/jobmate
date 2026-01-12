@@ -187,6 +187,25 @@ export async function POST(request: NextRequest) {
             console.error('[Midtrans Create Invoice] Error sending invoice email:', emailError);
         }
 
+        // Send Telegram notification for new invoice
+        try {
+            const { notifyNewInvoice } = await import('@/lib/telegram');
+            await notifyNewInvoice({
+                customerName: fullName,
+                customerEmail: email,
+                customerPhone: whatsapp,
+                planType: plan as 'basic' | 'premium',
+                amount: amount,
+                invoiceUrl: snapResponse.redirect_url,
+                orderId: orderId,
+                paymentGateway: 'midtrans',
+                expiresAt: expiryDate,
+            });
+            console.log('[Midtrans Create Invoice] Telegram notification sent');
+        } catch (telegramError) {
+            console.error('[Midtrans Create Invoice] Error sending Telegram notification:', telegramError);
+        }
+
         // Return response in same format as Xendit for frontend compatibility
         return NextResponse.json({
             success: true,

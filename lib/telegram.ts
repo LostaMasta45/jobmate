@@ -22,7 +22,7 @@ export async function sendTelegramMessage(
     console.log("[Telegram] Message preview:", message.substring(0, 150));
 
     const url = `https://api.telegram.org/bot${token}/sendMessage`;
-    
+
     // Attempt with retry logic
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
@@ -55,14 +55,14 @@ export async function sendTelegramMessage(
 
         if (!response.ok) {
           console.error(`[Telegram] API Error (attempt ${attempt + 1}/${retries + 1}):`, result);
-          
+
           // Retry on server errors (5xx)
           if (response.status >= 500 && attempt < retries) {
             console.log(`[Telegram] Retrying in ${(attempt + 1) * 1000}ms...`);
             await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 1000));
             continue;
           }
-          
+
           return false;
         }
 
@@ -70,14 +70,14 @@ export async function sendTelegramMessage(
         return true;
       } catch (fetchError: any) {
         console.error(`[Telegram] Fetch error (attempt ${attempt + 1}/${retries + 1}):`, fetchError.message);
-        
+
         // Retry on network errors
         if (attempt < retries) {
           console.log(`[Telegram] Retrying in ${(attempt + 1) * 1000}ms...`);
           await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 1000));
           continue;
         }
-        
+
         throw fetchError;
       }
     }
@@ -140,7 +140,7 @@ export async function sendAdminNotification(message: string): Promise<boolean> {
     try {
       const { createClient } = await import("@/lib/supabase/server");
       const supabase = await createClient();
-      
+
       const { data: settings, error } = await supabase
         .from("admin_settings")
         .select("telegram_bot_token, telegram_admin_chat_id")
@@ -150,8 +150,8 @@ export async function sendAdminNotification(message: string): Promise<boolean> {
       if (!error && settings && settings.telegram_admin_chat_id) {
         console.log("[Telegram] Using settings from database");
         return await sendTelegramMessage(
-          settings.telegram_admin_chat_id, 
-          message, 
+          settings.telegram_admin_chat_id,
+          message,
           settings.telegram_bot_token
         );
       }
@@ -159,16 +159,16 @@ export async function sendAdminNotification(message: string): Promise<boolean> {
       // Ignore database errors (happens in standalone scripts)
       console.log("[Telegram] Database unavailable, using environment variables");
     }
-    
+
     // Fallback to env (works everywhere)
     const adminChatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    
+
     if (!adminChatId || !botToken) {
       console.error("[Telegram] Admin chat ID not configured in env or database");
       return false;
     }
-    
+
     return await sendTelegramMessage(adminChatId, message, botToken);
   } catch (error) {
     console.error("[Telegram] sendAdminNotification error:", error);
@@ -353,7 +353,7 @@ export async function notifyAdminVIPUpgrade(data: {
 }): Promise<boolean> {
   const membershipEmoji = data.membershipType === 'vip_premium' ? '👑' : '⭐';
   const membershipLabel = data.membershipType === 'vip_premium' ? 'VIP PREMIUM' : 'VIP BASIC';
-  const expiryText = data.membershipExpiry 
+  const expiryText = data.membershipExpiry
     ? `📅 Expired: ${new Date(data.membershipExpiry).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`
     : '♾️ Lifetime Access';
 
@@ -399,7 +399,7 @@ export async function notifyAdminAccountDeleted(data: {
   applicationId: string;
 }): Promise<boolean> {
   const reasonText = data.reason ? `\n\n📝 *Alasan*\n${data.reason}` : '';
-  
+
   const message = `🗑️ *APLIKASI DIHAPUS*
 
 ━━━━━━━━━━━━━━━━━━━━━
@@ -450,10 +450,10 @@ export async function notifyToolUsage(data: {
 }): Promise<boolean> {
   try {
     // Get membership emoji
-    const membershipEmoji = 
+    const membershipEmoji =
       data.membershipType === 'vip_premium' ? '👑' :
-      data.membershipType === 'vip_basic' ? '⭐' :
-      '🆓';
+        data.membershipType === 'vip_basic' ? '⭐' :
+          '🆓';
 
     // Format quota info
     let quotaText = '';
@@ -527,8 +527,8 @@ export async function sendDailyAdminSummary(stats: {
     const fmt = (num: number) => num.toLocaleString('id-ID');
 
     // Pending applications alert
-    const pendingAlert = stats.pendingApplications > 0 
-      ? ` ⚠️` 
+    const pendingAlert = stats.pendingApplications > 0
+      ? ` ⚠️`
       : '';
 
     // Growth indicators
@@ -575,11 +575,11 @@ ${revenueSection}
 ⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`;
 
     const success = await sendAdminNotification(message);
-    
+
     if (success) {
       console.log('[Telegram] Daily summary sent successfully');
     }
-    
+
     return success;
   } catch (error) {
     console.error('[Telegram] Failed to send daily summary:', error);
@@ -652,7 +652,7 @@ export async function notifyNewJobPosting(data: {
     };
 
     // Format salary
-    const salaryText = data.salary 
+    const salaryText = data.salary
       ? `\n💰 *Gaji:* ${escapeMarkdown(data.salary)}`
       : '';
 
@@ -663,7 +663,7 @@ export async function notifyNewJobPosting(data: {
         const deadlineDate = new Date(data.deadline);
         const today = new Date();
         const diffDays = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays > 0) {
           const urgencyEmoji = diffDays <= 3 ? '🔥' : diffDays <= 7 ? '⏰' : '📅';
           deadlineText = `\n${urgencyEmoji} *Deadline:* ${diffDays} hari lagi (${deadlineDate.toLocaleDateString('id-ID')})`;
@@ -683,13 +683,13 @@ export async function notifyNewJobPosting(data: {
     }
 
     // Job type emoji
-    const jobTypeEmoji = data.jobType?.toLowerCase().includes('remote') 
-      ? '🏠' 
+    const jobTypeEmoji = data.jobType?.toLowerCase().includes('remote')
+      ? '🏠'
       : data.jobType?.toLowerCase().includes('hybrid')
-      ? '🔄'
-      : '🏢';
+        ? '🔄'
+        : '🏢';
 
-    const jobTypeText = data.jobType 
+    const jobTypeText = data.jobType
       ? `\n${jobTypeEmoji} *Tipe:* ${escapeMarkdown(data.jobType)}`
       : '';
 
@@ -724,14 +724,14 @@ ${escapeMarkdown(data.location)}${jobTypeText}${salaryText}${deadlineText}${cate
     if (data.posterUrl) {
       try {
         const caption = `🚀 *LOWONGAN BARU!*\n\n💼 ${escapeMarkdown(data.jobTitle)}\n🏢 ${escapeMarkdown(data.companyName)}\n📍 ${escapeMarkdown(data.location)}\n\n[Lihat Detail](${data.viewUrl})`;
-        
+
         await sendTelegramPhoto(
           process.env.TELEGRAM_ADMIN_CHAT_ID || "",
           data.posterUrl,
           caption
         );
         console.log("[Telegram] Job poster sent successfully");
-        
+
         // Wait a bit before sending detailed message
         await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (error) {
@@ -741,11 +741,11 @@ ${escapeMarkdown(data.location)}${jobTypeText}${salaryText}${deadlineText}${cate
 
     // Send detailed message
     const success = await sendAdminNotification(message);
-    
+
     if (success) {
       console.log('[Telegram] New job notification sent successfully');
     }
-    
+
     return success;
   } catch (error) {
     console.error('[Telegram] Failed to send new job notification:', error);
@@ -779,12 +779,12 @@ export async function notifyBatchJobsPosted(data: {
     const successEmoji = successRate === 100 ? '🎉' : successRate >= 80 ? '✅' : '⚠️';
 
     // Format top jobs (max 5, simplified)
-    const topJobsList = data.topJobs.slice(0, 5).map((job, index) => 
+    const topJobsList = data.topJobs.slice(0, 5).map((job, index) =>
       `${index + 1}. ${cleanText(job.title)}\n   🏢 ${cleanText(job.company)} | 📍 ${cleanText(job.location)}`
     ).join('\n\n');
 
-    const moreJobsText = data.topJobs.length > 5 
-      ? `\n... dan ${data.topJobs.length - 5} lowongan lainnya` 
+    const moreJobsText = data.topJobs.length > 5
+      ? `\n... dan ${data.topJobs.length - 5} lowongan lainnya`
       : '';
 
     // Dashboard link
@@ -796,11 +796,11 @@ export async function notifyBatchJobsPosted(data: {
     message += `${successEmoji} *Upload Summary*\n\n`;
     message += `📊 Total Processed: ${data.totalJobs}\n`;
     message += `✅ Berhasil: ${data.successCount}\n`;
-    
+
     if (data.failedCount > 0) {
       message += `❌ Gagal: ${data.failedCount}\n`;
     }
-    
+
     message += `🏢 Perusahaan Baru: ${data.newCompanies}\n`;
     message += `📈 Success Rate: ${successRate}%\n\n`;
     message += `━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -812,7 +812,7 @@ export async function notifyBatchJobsPosted(data: {
     message += `👨‍💼 Uploaded by: ${cleanText(data.addedBy)}\n`;
     message += `⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n\n`;
     message += `━━━━━━━━━━━━━━━━━━━━━\n`;
-    
+
     if (data.successCount > 0) {
       message += `🎊 Lowongan siap dilihat member VIP!`;
     }
@@ -820,14 +820,385 @@ export async function notifyBatchJobsPosted(data: {
     console.log('[Telegram] Batch notification message prepared, length:', message.length);
 
     const success = await sendAdminNotification(message);
-    
+
     if (success) {
       console.log('[Telegram] Batch jobs summary sent successfully');
     }
-    
+
     return success;
   } catch (error) {
     console.error('[Telegram] Failed to send batch jobs summary:', error);
+    return false;
+  }
+}
+
+/**
+ * Payment Success Notification
+ * Notifikasi ke admin saat ada pembayaran berhasil
+ */
+export async function notifyPaymentSuccess(data: {
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  planType: 'basic' | 'premium';
+  amount: number;
+  paymentMethod: string;
+  paymentGateway: 'midtrans' | 'xendit';
+  orderId: string;
+}): Promise<boolean> {
+  try {
+    const planEmoji = data.planType === 'premium' ? '👑' : '⭐';
+    const planLabel = data.planType === 'premium' ? 'VIP PREMIUM' : 'VIP BASIC';
+    const gatewayLabel = data.paymentGateway === 'midtrans' ? 'Midtrans' : 'Xendit';
+
+    // Format amount
+    const formattedAmount = new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(data.amount);
+
+    // Phone info if available
+    const phoneText = data.customerPhone
+      ? `\n📱 ${data.customerPhone}`
+      : '';
+
+    const message = `💳 *PEMBAYARAN BERHASIL!*
+
+━━━━━━━━━━━━━━━━━━━━━
+${planEmoji} *${planLabel}*
+💰 *Amount:* ${formattedAmount}
+
+👤 *Customer*
+📧 ${data.customerEmail}${phoneText}
+🔤 ${data.customerName}
+
+💳 *Payment Details*
+• Method: ${data.paymentMethod.toUpperCase()}
+• Gateway: ${gatewayLabel}
+• Order ID: \`${data.orderId}\`
+
+━━━━━━━━━━━━━━━━━━━━━
+⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
+
+🎉 User siap menggunakan fitur VIP!`;
+
+    const success = await sendAdminNotification(message);
+
+    if (success) {
+      console.log('[Telegram] Payment success notification sent');
+    }
+
+    return success;
+  } catch (error) {
+    console.error('[Telegram] Failed to send payment success notification:', error);
+    return false;
+  }
+}
+
+/**
+ * New Invoice Created Notification
+ * Notifikasi saat invoice baru dibuat dan menunggu pembayaran
+ */
+export async function notifyNewInvoice(data: {
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  planType: 'basic' | 'premium';
+  amount: number;
+  invoiceUrl: string;
+  orderId: string;
+  paymentGateway: 'midtrans' | 'xendit';
+  expiresAt?: string;
+}): Promise<boolean> {
+  try {
+    const planEmoji = data.planType === 'premium' ? '👑' : '⭐';
+    const planLabel = data.planType === 'premium' ? 'VIP PREMIUM' : 'VIP BASIC';
+    const gatewayLabel = data.paymentGateway === 'midtrans' ? 'Midtrans' : 'Xendit';
+
+    // Format amount
+    const formattedAmount = new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(data.amount);
+
+    // Expiry info
+    let expiryText = '';
+    if (data.expiresAt) {
+      const expiryDate = new Date(data.expiresAt);
+      expiryText = `\n⏰ *Expires:* ${expiryDate.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`;
+    }
+
+    // Phone info
+    const phoneText = data.customerPhone
+      ? `\n📱 ${data.customerPhone}`
+      : '';
+
+    const message = `📝 *INVOICE BARU DIBUAT*
+
+━━━━━━━━━━━━━━━━━━━━━
+${planEmoji} *${planLabel}*
+💰 *Amount:* ${formattedAmount}
+📊 *Status:* ⏳ PENDING
+
+👤 *Customer*
+📧 ${data.customerEmail}${phoneText}
+🔤 ${data.customerName}
+
+💳 *Invoice Details*
+• Gateway: ${gatewayLabel}
+• Order ID: \`${data.orderId}\`${expiryText}
+
+🔗 [Lihat Invoice](${data.invoiceUrl})
+
+━━━━━━━━━━━━━━━━━━━━━
+⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
+
+⏳ Menunggu pembayaran dari customer...`;
+
+    const success = await sendAdminNotification(message);
+
+    if (success) {
+      console.log('[Telegram] New invoice notification sent');
+    }
+
+    return success;
+  } catch (error) {
+    console.error('[Telegram] Failed to send new invoice notification:', error);
+    return false;
+  }
+}
+
+/**
+ * Payment Expired Notification
+ * Notifikasi saat invoice expired/kadaluarsa
+ */
+export async function notifyPaymentExpired(data: {
+  customerName: string;
+  customerEmail: string;
+  planType: 'basic' | 'premium';
+  amount: number;
+  orderId: string;
+  paymentGateway: 'midtrans' | 'xendit';
+}): Promise<boolean> {
+  try {
+    const planLabel = data.planType === 'premium' ? 'VIP PREMIUM' : 'VIP BASIC';
+    const gatewayLabel = data.paymentGateway === 'midtrans' ? 'Midtrans' : 'Xendit';
+
+    // Format amount
+    const formattedAmount = new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(data.amount);
+
+    const message = `⏰ *INVOICE EXPIRED*
+
+━━━━━━━━━━━━━━━━━━━━━
+🕐 *${planLabel}*
+💰 *Amount:* ${formattedAmount}
+📊 *Status:* ❌ EXPIRED
+
+👤 *Customer*
+📧 ${data.customerEmail}
+🔤 ${data.customerName}
+
+💳 *Payment Details*
+• Gateway: ${gatewayLabel}
+• Order ID: \`${data.orderId}\`
+
+━━━━━━━━━━━━━━━━━━━━━
+⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
+
+💡 Customer dapat membuat invoice baru jika masih berminat`;
+
+    const success = await sendAdminNotification(message);
+
+    if (success) {
+      console.log('[Telegram] Payment expired notification sent');
+    }
+
+    return success;
+  } catch (error) {
+    console.error('[Telegram] Failed to send payment expired notification:', error);
+    return false;
+  }
+}
+
+/**
+ * Payment Failed Notification
+ * Notifikasi saat pembayaran gagal
+ */
+export async function notifyPaymentFailed(data: {
+  customerName: string;
+  customerEmail: string;
+  planType: 'basic' | 'premium';
+  amount: number;
+  orderId: string;
+  paymentGateway: 'midtrans' | 'xendit';
+  failureReason?: string;
+}): Promise<boolean> {
+  try {
+    const planLabel = data.planType === 'premium' ? 'VIP PREMIUM' : 'VIP BASIC';
+    const gatewayLabel = data.paymentGateway === 'midtrans' ? 'Midtrans' : 'Xendit';
+
+    // Format amount
+    const formattedAmount = new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(data.amount);
+
+    // Failure reason if available
+    const reasonText = data.failureReason
+      ? `\n📝 *Reason:* ${data.failureReason}`
+      : '';
+
+    const message = `❌ *PEMBAYARAN GAGAL*
+
+━━━━━━━━━━━━━━━━━━━━━
+🚫 *${planLabel}*
+💰 *Amount:* ${formattedAmount}
+📊 *Status:* ❌ FAILED${reasonText}
+
+👤 *Customer*
+📧 ${data.customerEmail}
+🔤 ${data.customerName}
+
+💳 *Payment Details*
+• Gateway: ${gatewayLabel}
+• Order ID: \`${data.orderId}\`
+
+━━━━━━━━━━━━━━━━━━━━━
+⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
+
+⚠️ Customer mungkin perlu bantuan atau retry`;
+
+    const success = await sendAdminNotification(message);
+
+    if (success) {
+      console.log('[Telegram] Payment failed notification sent');
+    }
+
+    return success;
+  } catch (error) {
+    console.error('[Telegram] Failed to send payment failed notification:', error);
+    return false;
+  }
+}
+
+/**
+ * Weekly Admin Summary
+ * Laporan mingguan komprehensif, dikirim setiap Senin pagi
+ */
+export async function sendWeeklyAdminSummary(stats: {
+  weekStart: string;
+  weekEnd: string;
+  totalUsers: number;
+  newUsers: number;
+  activeUsers: number;
+  vipBasic: number;
+  vipPremium: number;
+  // Applications
+  newApplications: number;
+  approvedApplications: number;
+  rejectedApplications: number;
+  pendingApplications: number;
+  // Tool usage
+  totalToolUsage: number;
+  cvGenerated: number;
+  coverLetters: number;
+  emailTemplates: number;
+  // Revenue
+  totalRevenue?: number;
+  totalOrders?: number;
+  // Comparison with last week
+  userGrowthPercent?: number;
+  revenueGrowthPercent?: number;
+  // Jobs
+  newJobs?: number;
+  dashboardUrl?: string;
+}): Promise<boolean> {
+  try {
+    const fmt = (num: number) => num.toLocaleString('id-ID');
+
+    // Growth indicators
+    const userGrowth = stats.userGrowthPercent !== undefined
+      ? (stats.userGrowthPercent >= 0 ? `📈 +${stats.userGrowthPercent}%` : `📉 ${stats.userGrowthPercent}%`)
+      : '';
+
+    const revenueGrowth = stats.revenueGrowthPercent !== undefined
+      ? (stats.revenueGrowthPercent >= 0 ? `📈 +${stats.revenueGrowthPercent}%` : `📉 ${stats.revenueGrowthPercent}%`)
+      : '';
+
+    // Pending alert
+    const pendingAlert = stats.pendingApplications > 0 ? ' ⚠️' : '';
+
+    // Revenue section
+    let revenueSection = '';
+    if (stats.totalRevenue !== undefined) {
+      const formattedRevenue = new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+      }).format(stats.totalRevenue);
+
+      revenueSection = `
+💰 *REVENUE*
+• Total: ${formattedRevenue} ${revenueGrowth}
+• Orders: ${fmt(stats.totalOrders || 0)}
+`;
+    }
+
+    // Jobs section
+    let jobsSection = '';
+    if (stats.newJobs !== undefined && stats.newJobs > 0) {
+      jobsSection = `
+💼 *LOWONGAN*
+• New Jobs: ${fmt(stats.newJobs)}
+`;
+    }
+
+    const dashboardLink = stats.dashboardUrl || process.env.NEXT_PUBLIC_APP_URL + '/admin/dashboard';
+
+    const message = `📈 *WEEKLY ADMIN SUMMARY*
+${stats.weekStart} - ${stats.weekEnd}
+
+━━━━━━━━━━━━━━━━━━━━━
+👥 *USERS*
+• Total Users: ${fmt(stats.totalUsers)} ${userGrowth}
+• New Users: ${fmt(stats.newUsers)}
+• Active Users: ${fmt(stats.activeUsers)}
+• VIP Basic: ${fmt(stats.vipBasic)}
+• VIP Premium: ${fmt(stats.vipPremium)}
+
+📝 *APPLICATIONS*
+• New: ${fmt(stats.newApplications)}
+• ✅ Approved: ${fmt(stats.approvedApplications)}
+• ❌ Rejected: ${fmt(stats.rejectedApplications)}
+• ⏳ Pending: ${fmt(stats.pendingApplications)}${pendingAlert}
+
+🛠️ *TOOL USAGE*
+• Total: ${fmt(stats.totalToolUsage)}
+• CV Generated: ${fmt(stats.cvGenerated)}
+• Cover Letters: ${fmt(stats.coverLetters)}
+• Email Templates: ${fmt(stats.emailTemplates)}
+${revenueSection}${jobsSection}
+━━━━━━━━━━━━━━━━━━━━━
+🔗 [Admin Dashboard](${dashboardLink})
+
+⏰ Generated: ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`;
+
+    const success = await sendAdminNotification(message);
+
+    if (success) {
+      console.log('[Telegram] Weekly summary sent successfully');
+    }
+
+    return success;
+  } catch (error) {
+    console.error('[Telegram] Failed to send weekly summary:', error);
     return false;
   }
 }

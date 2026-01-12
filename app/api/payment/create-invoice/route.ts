@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     // Save payment to database with UPSERT (ensure always succeeds)
     const supabase = await createClient();
-    
+
     console.log('[Create Invoice] Saving to database:', {
       external_id: externalId,
       user_email: email,
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
       plan_type: plan,
       amount: amount,
     });
-    
+
     const { data: paymentData, error: dbError } = await supabase
       .from('payments')
       .upsert({
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
     // Send invoice email
     try {
       console.log('[Create Invoice] Sending invoice email to:', email);
-      
+
       const emailResult = await sendInvoiceEmail({
         toEmail: email,
         userName: fullName || email.split('@')[0],
@@ -176,6 +176,25 @@ export async function POST(request: NextRequest) {
       // Don't fail the request
     }
 
+    // Send Telegram notification for new invoice
+    try {
+      const { notifyNewInvoice } = await import('@/lib/telegram');
+      await notifyNewInvoice({
+        customerName: fullName,
+        customerEmail: email,
+        customerPhone: whatsapp,
+        planType: plan as 'basic' | 'premium',
+        amount: amount,
+        invoiceUrl: invoice.invoice_url,
+        orderId: externalId,
+        paymentGateway: 'xendit',
+        expiresAt: invoice.expiry_date,
+      });
+      console.log('[Create Invoice] Telegram notification sent');
+    } catch (telegramError) {
+      console.error('[Create Invoice] Error sending Telegram notification:', telegramError);
+    }
+
     return NextResponse.json({
       success: true,
       invoiceUrl: invoice.invoice_url,
@@ -189,9 +208,9 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('[Create Invoice] Error:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to create invoice',
-        message: error.message 
+        message: error.message
       },
       { status: 500 }
     );

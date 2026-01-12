@@ -30,7 +30,7 @@ const PaymentSuccessEmail = ({ userName, amount, transactionDate, planType }: an
 // Verify Xendit webhook callback token
 function verifyXenditToken(callbackToken: string): boolean {
   const webhookToken = process.env.XENDIT_WEBHOOK_VERIFICATION_TOKEN;
-  
+
   if (!webhookToken) {
     console.warn('[Xendit Webhook] XENDIT_WEBHOOK_VERIFICATION_TOKEN not set');
     // In development, allow without verification for testing
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
       // Extract plan type from external_id
       const planType = externalId.includes('premium') ? 'premium' : 'basic';
       const amount = planType === 'premium' ? 39000 : 10000;
-      
+
       // STEP 1: Check if payment already exists in database
       const { data: existingPayment } = await supabase
         .from('payments')
@@ -107,10 +107,10 @@ export async function POST(request: NextRequest) {
         .single();
 
       console.log('[Xendit Webhook] Existing payment:', existingPayment ? 'FOUND' : 'NOT FOUND');
-      
+
       // Get customer info from payload
       const customerEmail = payload.payer_email || payload.customer?.email || 'unknown@example.com';
-      
+
       // Extract customer name (combine given_names and surname if available)
       let customerName = 'Unknown User';
       if (payload.customer) {
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
         const surname = payload.customer.surname || '';
         customerName = [givenNames, surname].filter(Boolean).join(' ').trim() || 'Unknown User';
       }
-      
+
       // Extract phone number
       const customerPhone = payload.customer?.mobile_number || payload.customer?.phone_number || '';
 
@@ -126,14 +126,14 @@ export async function POST(request: NextRequest) {
       console.log('[Xendit Webhook] Raw customer data:', payload.customer);
 
       // STEP 2: Preserve existing customer data if available (DON'T OVERWRITE!)
-      const finalCustomerName = existingPayment?.user_name && existingPayment.user_name !== 'Unknown User' 
-        ? existingPayment.user_name 
+      const finalCustomerName = existingPayment?.user_name && existingPayment.user_name !== 'Unknown User'
+        ? existingPayment.user_name
         : customerName;
-      
+
       const finalCustomerEmail = existingPayment?.user_email && existingPayment.user_email !== 'unknown@example.com'
         ? existingPayment.user_email
         : customerEmail;
-      
+
       const finalCustomerPhone = existingPayment?.user_whatsapp && existingPayment.user_whatsapp !== ''
         ? existingPayment.user_whatsapp
         : customerPhone;
@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
 
       if (error) {
         console.error('[Xendit Webhook] Database upsert error:', error);
-        
+
         // Return 200 anyway so Xendit doesn't retry (payment already processed)
         return NextResponse.json({
           success: false,
@@ -184,7 +184,7 @@ export async function POST(request: NextRequest) {
       // Send payment confirmation email directly via Resend
       try {
         console.log('[Xendit Webhook] Sending payment confirmation email to:', customerEmail);
-        
+
         const emailHtml = PaymentSuccessEmail({
           userName: finalCustomerName,  // ← Use preserved name
           amount: amount,
@@ -209,10 +209,23 @@ export async function POST(request: NextRequest) {
         // Don't fail webhook if email fails
       }
 
-      // TODO: Additional actions on successful payment:
-      // - Send WhatsApp notification
-      // - Trigger Telegram notification to admin
-      // - Auto-approve account if enabled
+      // Send Telegram notification for successful payment
+      try {
+        const { notifyPaymentSuccess } = await import('@/lib/telegram');
+        await notifyPaymentSuccess({
+          customerName: finalCustomerName,
+          customerEmail: finalCustomerEmail,
+          customerPhone: finalCustomerPhone,
+          planType: planType as 'basic' | 'premium',
+          amount: amount,
+          paymentMethod: payment_method || payment_channel || 'unknown',
+          paymentGateway: 'xendit',
+          orderId: externalId,
+        });
+        console.log('[Xendit Webhook] Telegram notification sent');
+      } catch (telegramError) {
+        console.error('[Xendit Webhook] Error sending Telegram notification:', telegramError);
+      }
 
       return NextResponse.json({
         success: true,
@@ -237,6 +250,25 @@ export async function POST(request: NextRequest) {
 
       console.log('[Xendit Webhook] Payment marked as EXPIRED');
 
+      // Send Telegram notification for expired payment
+      try {
+        const { notifyPaymentExpired } = await import('@/lib/telegram');
+        const planType = externalId.includes('premium') ? 'premium' : 'basic';
+        const amount = planType === 'premium' ? 39000 : 10000;
+
+        await notifyPaymentExpired({
+          customerName: 'Unknown',
+          customerEmail: 'unknown@email.com',
+          planType: planType as 'basic' | 'premium',
+          amount: amount,
+          orderId: externalId,
+          paymentGateway: 'xendit',
+        });
+        console.log('[Xendit Webhook] Expired notification sent');
+      } catch (telegramError) {
+        console.error('[Xendit Webhook] Error sending expired notification:', telegramError);
+      }
+
       return NextResponse.json({
         success: true,
         message: 'Payment marked as expired',
@@ -260,6 +292,25 @@ export async function POST(request: NextRequest) {
 
       console.log('[Xendit Webhook] Payment marked as FAILED');
 
+      // Send Telegram notification for failed payment
+      try {
+        const { notifyPaymentFailed } = await import('@/lib/telegram');
+        const planType = externalId.includes('premium') ? 'premium' : 'basic';
+        const amount = planType === 'premium' ? 39000 : 10000;
+
+        await notifyPaymentFailed({
+          customerName: 'Unknown',
+          customerEmail: 'unknown@email.com',
+          planType: planType as 'basic' | 'premium',
+          amount: amount,
+          orderId: externalId,
+          paymentGateway: 'xendit',
+        });
+        console.log('[Xendit Webhook] Failed notification sent');
+      } catch (telegramError) {
+        console.error('[Xendit Webhook] Error sending failed notification:', telegramError);
+      }
+
       return NextResponse.json({
         success: true,
         message: 'Payment marked as failed',
@@ -267,7 +318,7 @@ export async function POST(request: NextRequest) {
     } else {
       // Unknown status
       console.log('[Xendit Webhook] Unknown status:', status);
-      
+
       return NextResponse.json({
         success: true,
         message: `Unknown status: ${status}`,
@@ -276,7 +327,20 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('[Xendit Webhook] Error:', error);
-    
+
+    // Send System Error Alert to admin
+    try {
+      const { notifySystemError } = await import('@/lib/telegram');
+      await notifySystemError({
+        errorType: 'Payment Webhook Error',
+        errorMessage: error.message || 'Unknown error',
+        location: '/api/webhooks/xendit',
+        severity: 'HIGH',
+      });
+    } catch (telegramError) {
+      console.error('[Xendit Webhook] Failed to send error alert:', telegramError);
+    }
+
     // Return 200 to prevent Xendit from retrying
     // But log the error for investigation
     return NextResponse.json({
