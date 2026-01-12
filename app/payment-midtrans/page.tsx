@@ -163,7 +163,7 @@ function PaymentFormContent() {
     return (
         <>
             {/* Payment Processing Overlay */}
-            <PaymentProcessingOverlay isOpen={showOverlay} />
+            <PaymentProcessingOverlay isOpen={showOverlay} gatewayName="Midtrans" />
 
             <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-12 px-4 relative overflow-hidden">
                 {/* Decorative Background Elements */}
@@ -392,8 +392,8 @@ function PaymentFormContent() {
                                             required
                                             disabled={loading}
                                             className={`h-12 border-2 transition-colors ${emailError
-                                                    ? 'border-red-500 focus:border-red-500'
-                                                    : 'border-amber-200 focus:border-amber-500 dark:border-amber-800 dark:focus:border-amber-600'
+                                                ? 'border-red-500 focus:border-red-500'
+                                                : 'border-amber-200 focus:border-amber-500 dark:border-amber-800 dark:focus:border-amber-600'
                                                 }`}
                                         />
                                         {emailError && (
@@ -438,8 +438,8 @@ function PaymentFormContent() {
                                             disabled={loading}
                                             inputMode="numeric"
                                             className={`h-12 border-2 transition-colors ${whatsappError
-                                                    ? 'border-red-500 focus:border-red-500'
-                                                    : 'border-amber-200 focus:border-amber-500 dark:border-amber-800 dark:focus:border-amber-600'
+                                                ? 'border-red-500 focus:border-red-500'
+                                                : 'border-amber-200 focus:border-amber-500 dark:border-amber-800 dark:focus:border-amber-600'
                                                 }`}
                                         />
                                         {whatsappError && (
@@ -501,7 +501,7 @@ function PaymentFormContent() {
 
                                 {/* Payment Method Logos */}
                                 <div className="pt-6 border-t-2 border-dashed border-amber-200 dark:border-amber-800">
-                                    <PaymentMethodLogos />
+                                    <PaymentMethodLogos gatewayName="Midtrans" />
                                 </div>
 
                                 {/* Security Badge - Updated for Midtrans */}
@@ -521,7 +521,7 @@ function PaymentFormContent() {
                                 </motion.div>
 
                                 {/* FAQ Accordion */}
-                                <FAQAccordion />
+                                <FAQAccordion gatewayName="Midtrans" />
                             </CardContent>
                         </Card>
                     </motion.div>

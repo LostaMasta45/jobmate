@@ -8,7 +8,7 @@ interface PaymentProcessingOverlayProps {
   isOpen: boolean;
 }
 
-export function PaymentProcessingOverlay({ isOpen }: PaymentProcessingOverlayProps) {
+export function PaymentProcessingOverlay({ isOpen, gatewayName = "Xendit" }: { isOpen: boolean; gatewayName?: string }) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export function PaymentProcessingOverlay({ isOpen }: PaymentProcessingOverlayPro
               {/* Title */}
               <div className="text-center space-y-2">
                 <h3 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 bg-clip-text text-transparent">
-                  Menghubungkan ke Xendit
+                  Menghubungkan ke {gatewayName}
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   Secure Payment Gateway
@@ -118,7 +118,7 @@ export function PaymentProcessingOverlay({ isOpen }: PaymentProcessingOverlayPro
                 {[
                   { icon: "🔐", text: "Enkripsi SSL 256-bit", done: progress > 30 },
                   { icon: "✅", text: "Verifikasi data pembayaran", done: progress > 60 },
-                  { icon: "🚀", text: "Redirect ke halaman Xendit", done: progress > 90 },
+                  { icon: "🚀", text: `Redirect ke halaman ${gatewayName}`, done: progress > 90 },
                 ].map((item, index) => (
                   <motion.div
                     key={index}
@@ -146,11 +146,11 @@ export function PaymentProcessingOverlay({ isOpen }: PaymentProcessingOverlayPro
                 ))}
               </div>
 
-              {/* Xendit Badge */}
+              {/* Gateway Badge */}
               <div className="flex items-center justify-center gap-2 pt-4 border-t border-slate-200 dark:border-slate-700">
                 <Shield className="w-4 h-4 text-emerald-600" />
                 <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                  Powered by Xendit
+                  Powered by {gatewayName}
                 </span>
               </div>
             </div>

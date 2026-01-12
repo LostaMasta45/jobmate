@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HelpCircle } from "lucide-react";
 
-export function FAQAccordion() {
+export function FAQAccordion({ gatewayName = "Xendit" }: { gatewayName?: string }) {
   const faqs = [
     {
       question: "Apakah pembayaran aman?",
-      answer: "Ya, sangat aman! Kami menggunakan Xendit sebagai payment gateway yang sudah terdaftar dan diawasi oleh Bank Indonesia. Semua transaksi dienkripsi dengan SSL 256-bit. Data kartu kredit Anda tidak pernah tersimpan di server kami."
+      answer: `Ya, sangat aman! Kami menggunakan ${gatewayName} sebagai payment gateway yang sudah terdaftar dan diawasi oleh Bank Indonesia. Semua transaksi dienkripsi dengan SSL 256-bit. Data kartu kredit Anda tidak pernah tersimpan di server kami.`
     },
     {
       question: "Kapan akses VIP aktif setelah pembayaran?",
@@ -51,11 +51,11 @@ export function FAQAccordion() {
         <HelpCircle className="w-5 h-5 text-blue-600" />
         <h3 className="text-lg font-bold">Pertanyaan yang Sering Ditanyakan (FAQ)</h3>
       </div>
-      
+
       <Accordion type="single" collapsible className="w-full space-y-2">
         {faqs.map((faq, index) => (
-          <AccordionItem 
-            key={index} 
+          <AccordionItem
+            key={index}
             value={`faq-${index}`}
             className="border-2 border-gray-200 dark:border-gray-700 rounded-lg px-4 bg-white dark:bg-slate-900 hover:border-blue-300 dark:hover:border-blue-600 transition-colors"
           >
@@ -72,12 +72,12 @@ export function FAQAccordion() {
           </AccordionItem>
         ))}
       </Accordion>
-      
+
       <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
         <p className="text-sm text-center">
           <span className="font-semibold">Masih ada pertanyaan?</span>{" "}
-          <a 
-            href="https://wa.me/6281234567890?text=Halo%2C%20saya%20ada%20pertanyaan%20tentang%20VIP%20membership" 
+          <a
+            href="https://wa.me/6281234567890?text=Halo%2C%20saya%20ada%20pertanyaan%20tentang%20VIP%20membership"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-700 font-semibold underline"

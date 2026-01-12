@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
 
-export function PaymentMethodLogos() {
+export function PaymentMethodLogos({ gatewayName = "Xendit" }: { gatewayName?: string }) {
   const paymentMethods = [
     {
       name: "QRIS",
@@ -68,7 +68,7 @@ export function PaymentMethodLogos() {
           Metode Pembayaran Tersedia
         </h3>
         <p className="text-sm text-muted-foreground">
-          Pilih metode pembayaran favorit Anda di halaman Xendit
+          Pilih metode pembayaran favorit Anda di halaman {gatewayName}
         </p>
       </div>
 
@@ -76,7 +76,7 @@ export function PaymentMethodLogos() {
       <div className="grid grid-cols-4 gap-3 sm:gap-4">
         {paymentMethods.map((method, index) => {
           const [imageError, setImageError] = useState(false);
-          
+
           return (
             <motion.div
               key={method.name}
