@@ -6,10 +6,10 @@ import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  CheckCircle2, 
-  Loader2, 
-  ArrowRight, 
+import {
+  CheckCircle2,
+  Loader2,
+  ArrowRight,
   Sparkles,
   Trophy,
   Crown,
@@ -29,7 +29,7 @@ function SuccessPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const externalId = searchParams.get('external_id');
-  
+
   const [loading, setLoading] = useState(true);
   const [paymentData, setPaymentData] = useState<any>(null);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -47,7 +47,7 @@ function SuccessPageContent() {
       return Math.random() * (max - min) + min;
     }
 
-    const interval: any = setInterval(function() {
+    const interval: any = setInterval(function () {
       const timeLeft = animationEnd - Date.now();
 
       if (timeLeft <= 0) {
@@ -55,7 +55,7 @@ function SuccessPageContent() {
       }
 
       const particleCount = 50 * (timeLeft / duration);
-      
+
       // Fire from multiple points
       confetti({
         ...defaults,
@@ -63,7 +63,7 @@ function SuccessPageContent() {
         origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
         colors: ['#fbbf24', '#f59e0b', '#ea580c', '#dc2626']
       });
-      
+
       confetti({
         ...defaults,
         particleCount,
@@ -83,24 +83,24 @@ function SuccessPageContent() {
 
     console.log(`[Success Page] Fetching payment status (attempt ${attempt + 1}/${maxRetries})...`);
     setIsRetrying(attempt > 0);
-    
+
     try {
       const response = await fetch(`/api/payment/check-status?external_id=${externalId}`);
       console.log('[Success Page] API Response status:', response.status);
-      
+
       if (!response.ok) {
         // If 404 and we haven't exceeded retries, retry after delay
         if (response.status === 404 && attempt < maxRetries) {
           console.log(`[Success Page] Payment not found yet, will retry in 3 seconds... (${attempt + 1}/${maxRetries})`);
           setRetryCount(attempt + 1);
-          
+
           setTimeout(() => {
             fetchPaymentStatus(attempt + 1);
           }, 3000); // Retry after 3 seconds
-          
+
           return;
         }
-        
+
         // Max retries exceeded or other error
         throw new Error(`API returned ${response.status}`);
       }
@@ -108,7 +108,7 @@ function SuccessPageContent() {
       const data = await response.json();
       console.log('[Success Page] Raw API Response:', data);
       console.log('[Success Page] Payment data:', data.payment);
-      
+
       if (data.success && data.payment) {
         // Success! Payment found
         console.log('[Success Page] Payment object details:', {
@@ -121,7 +121,7 @@ function SuccessPageContent() {
           planType: data.payment.planType,
           plan_type: data.payment.plan_type,
         });
-        
+
         setPaymentData(data.payment);
         setShowConfetti(true);
         setLoading(false);
@@ -132,15 +132,15 @@ function SuccessPageContent() {
         setLoading(false);
         setIsRetrying(false);
       }
-      
+
     } catch (error: any) {
       console.error('[Success Page] Error fetching payment:', error);
-      
+
       // If we haven't exceeded retries, try again
       if (attempt < maxRetries) {
         console.log(`[Success Page] Error occurred, will retry in 3 seconds... (${attempt + 1}/${maxRetries})`);
         setRetryCount(attempt + 1);
-        
+
         setTimeout(() => {
           fetchPaymentStatus(attempt + 1);
         }, 3000);
@@ -156,7 +156,7 @@ function SuccessPageContent() {
   useEffect(() => {
     // Start fetching payment status when component mounts
     fetchPaymentStatus();
-    
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [externalId]);
 
@@ -186,7 +186,7 @@ function SuccessPageContent() {
             {isRetrying && (
               <div className="space-y-1">
                 <p className="text-xs sm:text-sm text-muted-foreground">
-                  Sedang memproses pembayaran Anda dari Xendit
+                  Sedang memproses pembayaran Anda dari Midtrans
                 </p>
                 <p className="text-xs text-muted-foreground">
                   Percobaan ke-{retryCount} dari {maxRetries}
@@ -252,7 +252,7 @@ function SuccessPageContent() {
   const planType = paymentData?.planType || paymentData?.plan_type || 'premium';
   const planName = planType === 'premium' ? 'Premium' : 'Basic';
   const isPremium = planType === 'premium';
-  
+
   // Debug logging
   console.log('[Success Page] Resolved Customer Data:', {
     userName,
@@ -285,7 +285,7 @@ function SuccessPageContent() {
           <motion.div
             key={i}
             initial={{ opacity: 0, y: -50 }}
-            animate={{ 
+            animate={{
               opacity: [0, 1, 0],
               y: [-50, 100],
               x: Math.random() * 100 - 50
@@ -327,11 +327,11 @@ function SuccessPageContent() {
                   <Trophy className="w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-white" />
                   {/* Pulsing Ring */}
                   <motion.div
-                    animate={{ 
+                    animate={{
                       scale: [1, 1.3, 1],
                       opacity: [0.5, 0, 0.5]
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 2,
                       repeat: Infinity,
                       ease: "easeInOut"
@@ -341,11 +341,11 @@ function SuccessPageContent() {
                 </div>
                 {/* Floating Sparkles - Hidden on small mobile */}
                 <motion.div
-                  animate={{ 
+                  animate={{
                     rotate: 360,
                     scale: [1, 1.2, 1]
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 4,
                     repeat: Infinity,
                     ease: "linear"
@@ -364,7 +364,7 @@ function SuccessPageContent() {
                 className="space-y-2 sm:space-y-3"
               >
                 {/* Personalized Greeting */}
-                <motion.h2 
+                <motion.h2
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
@@ -372,11 +372,11 @@ function SuccessPageContent() {
                 >
                   Terima Kasih{firstName ? `, ${firstName}` : ''}! 🙏
                 </motion.h2>
-                
+
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 bg-clip-text text-transparent px-4">
                   Pembayaran Berhasil!
                 </h1>
-                
+
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -387,12 +387,11 @@ function SuccessPageContent() {
                   <span>✨</span>
                   <span>🚀</span>
                 </motion.div>
-                
-                <div className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-base sm:text-lg lg:text-xl ${
-                  isPremium
+
+                <div className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-base sm:text-lg lg:text-xl ${isPremium
                     ? 'bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-white shadow-lg shadow-amber-500/50'
                     : 'bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-500 text-white shadow-lg shadow-emerald-500/50'
-                }`}>
+                  }`}>
                   <Crown className="w-5 h-5 sm:w-6 sm:h-6" />
                   <span>Member VIP {isPremium ? 'PREMIUM' : 'BASIC'}</span>
                   <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -446,14 +445,12 @@ function SuccessPageContent() {
                     )}
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                       <span className="text-xs sm:text-sm text-muted-foreground">Paket</span>
-                      <div className={`px-3 py-1.5 rounded-lg font-bold text-sm sm:text-base flex items-center gap-2 ${
-                        isPremium 
+                      <div className={`px-3 py-1.5 rounded-lg font-bold text-sm sm:text-base flex items-center gap-2 ${isPremium
                           ? 'bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 text-amber-700 dark:text-amber-400 border-2 border-amber-300 dark:border-amber-700'
                           : 'bg-gradient-to-r from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 text-emerald-700 dark:text-emerald-400 border-2 border-emerald-300 dark:border-emerald-700'
-                      }`}>
-                        <Crown className={`w-4 h-4 sm:w-5 sm:h-5 ${
-                          isPremium ? 'text-amber-500 fill-amber-500' : 'text-emerald-500 fill-emerald-500'
-                        }`} />
+                        }`}>
+                        <Crown className={`w-4 h-4 sm:w-5 sm:h-5 ${isPremium ? 'text-amber-500 fill-amber-500' : 'text-emerald-500 fill-emerald-500'
+                          }`} />
                         VIP {isPremium ? 'PREMIUM' : 'BASIC'}
                       </div>
                     </div>
@@ -483,9 +480,9 @@ function SuccessPageContent() {
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                         <span className="text-xs sm:text-sm text-muted-foreground">Dibayar pada</span>
                         <span className="text-xs sm:text-sm">
-                          {new Date(paymentData.paidAt).toLocaleString('id-ID', { 
-                            dateStyle: 'long', 
-                            timeStyle: 'short' 
+                          {new Date(paymentData.paidAt).toLocaleString('id-ID', {
+                            dateStyle: 'long',
+                            timeStyle: 'short'
                           })}
                         </span>
                       </div>
@@ -494,7 +491,7 @@ function SuccessPageContent() {
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                         <span className="text-xs sm:text-sm text-muted-foreground">Berlaku hingga</span>
                         <span className="text-xs sm:text-sm font-semibold text-amber-600">
-                          {new Date(paymentData.expiredAt).toLocaleDateString('id-ID', { 
+                          {new Date(paymentData.expiredAt).toLocaleDateString('id-ID', {
                             dateStyle: 'long'
                           })}
                         </span>
@@ -513,13 +510,13 @@ function SuccessPageContent() {
               >
                 {/* Decorative Element - Hide on mobile */}
                 <div className="hidden sm:block absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl" />
-                
+
                 <div className="relative z-10">
                   <div className="flex items-center gap-2 mb-3 sm:mb-4">
                     <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0" />
                     <h3 className="font-bold text-lg sm:text-xl">Yang Perlu Anda Lakukan</h3>
                   </div>
-                  
+
                   <div className="grid gap-2 sm:gap-3">
                     {[
                       { icon: Mail, text: "Cek email untuk invoice pembayaran", color: "text-blue-600" },
@@ -553,26 +550,26 @@ function SuccessPageContent() {
               >
                 {/* Pulsing Glow - Hide on mobile */}
                 <motion.div
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.05, 1],
                     opacity: [0.5, 0.8, 0.5]
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 2,
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
                   className="hidden sm:block absolute inset-0 bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 rounded-xl sm:rounded-2xl blur-xl"
                 />
-                
+
                 <div className="relative bg-gradient-to-br from-emerald-500 via-green-500 to-teal-500 rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center space-y-4 sm:space-y-6 shadow-2xl">
                   {/* Trophy + Crowns - Responsive */}
                   <motion.div
-                    animate={{ 
+                    animate={{
                       y: [0, -10, 0],
                       rotate: [0, 5, -5, 0]
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 3,
                       repeat: Infinity,
                       ease: "easeInOut"
@@ -643,9 +640,9 @@ function SuccessPageContent() {
                   size="lg"
                   className="w-full sm:w-auto border-2 border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-950/20 font-bold h-11 sm:h-12"
                 >
-                  <a 
+                  <a
                     href={`https://wa.me/6281234567890?text=Halo,%20saya%20${encodeURIComponent(firstName || paymentData?.userName || '')}%20sudah%20bayar%20VIP%20dengan%20ID:%20${externalId}`}
-                    target="_blank" 
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2"
                   >
@@ -661,26 +658,26 @@ function SuccessPageContent() {
         {/* NEW: Success Page Enhancements */}
         <div className="space-y-6">
           {/* Gamification Badge */}
-          <GamificationBadge 
-            planType={planType} 
+          <GamificationBadge
+            planType={planType}
             memberNumber={10234}
           />
 
           {/* Email Preview */}
-          <EmailPreview 
+          <EmailPreview
             email={userEmail}
             userName={userName || firstName || 'Member'}
           />
 
           {/* Next Steps Checklist */}
-          <NextStepsChecklist 
+          <NextStepsChecklist
             email={userEmail}
             userName={userName || firstName || 'Member'}
             planType={planType}
           />
 
           {/* Social Share & Referral */}
-          <SocialShareReferral 
+          <SocialShareReferral
             userName={userName || firstName || 'Member'}
             userId={paymentData?.user_id}
           />
