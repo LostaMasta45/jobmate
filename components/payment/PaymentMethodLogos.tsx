@@ -3,172 +3,186 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
+import { Zap, Shield, Clock } from "lucide-react";
 
-export function PaymentMethodLogos({ gatewayName = "Xendit" }: { gatewayName?: string }) {
+interface PaymentMethodLogosProps {
+  gatewayName?: string;
+  variant?: "full" | "compact" | "minimal";
+}
+
+export function PaymentMethodLogos({
+  gatewayName = "Midtrans",
+  variant = "full"
+}: PaymentMethodLogosProps) {
   const paymentMethods = [
-    {
-      name: "QRIS",
-      logo: "/payment-logos/qris.png",
-      bg: "from-white to-gray-50 dark:from-slate-800 dark:to-slate-900",
-      border: "border-gray-200 dark:border-gray-700",
-    },
-    {
-      name: "DANA",
-      logo: "/payment-logos/dana.png",
-      bg: "from-blue-50 to-cyan-50 dark:from-blue-950/40 dark:to-cyan-950/40",
-      border: "border-blue-200 dark:border-blue-700",
-    },
-    {
-      name: "OVO",
-      logo: "/payment-logos/ovo.png",
-      bg: "from-purple-50 to-violet-50 dark:from-purple-950/40 dark:to-violet-950/40",
-      border: "border-purple-200 dark:border-purple-700",
-    },
-    {
-      name: "GoPay",
-      logo: "/payment-logos/gopay.png",
-      bg: "from-green-50 to-emerald-50 dark:from-green-950/40 dark:to-emerald-950/40",
-      border: "border-green-200 dark:border-green-700",
-    },
-    {
-      name: "BCA",
-      logo: "/payment-logos/bca.png",
-      bg: "from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40",
-      border: "border-blue-200 dark:border-blue-700",
-    },
-    {
-      name: "Mandiri",
-      logo: "/payment-logos/mandiri.png",
-      bg: "from-yellow-50 to-orange-50 dark:from-yellow-950/40 dark:to-orange-950/40",
-      border: "border-yellow-200 dark:border-yellow-700",
-    },
-    {
-      name: "BNI",
-      logo: "/payment-logos/bni.png",
-      bg: "from-orange-50 to-amber-50 dark:from-orange-950/40 dark:to-amber-950/40",
-      border: "border-orange-200 dark:border-orange-700",
-    },
-    {
-      name: "BRI",
-      logo: "/payment-logos/bri.png",
-      bg: "from-blue-50 to-sky-50 dark:from-blue-950/40 dark:to-sky-950/40",
-      border: "border-blue-200 dark:border-blue-700",
-    },
+    { name: "QRIS", logo: "/payment-logos/qris.png" },
+    { name: "DANA", logo: "/payment-logos/dana.png" },
+    { name: "OVO", logo: "/payment-logos/ovo.png" },
+    { name: "GoPay", logo: "/payment-logos/gopay.png" },
+    { name: "BCA", logo: "/payment-logos/bca.png" },
+    { name: "Mandiri", logo: "/payment-logos/mandiri.png" },
+    { name: "BNI", logo: "/payment-logos/bni.png" },
+    { name: "BRI", logo: "/payment-logos/bri.png" },
   ];
 
+  const features = [
+    { icon: Zap, label: "Instan", color: "text-amber-500" },
+    { icon: Shield, label: "Aman", color: "text-emerald-500" },
+    { icon: Clock, label: "24/7", color: "text-blue-500" },
+  ];
+
+  // Minimal variant - just logos in a row
+  if (variant === "minimal") {
+    return (
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        {paymentMethods.slice(0, 6).map((method) => (
+          <PaymentLogo key={method.name} method={method} size="sm" />
+        ))}
+        <span className="text-xs text-slate-400 ml-1">+lainnya</span>
+      </div>
+    );
+  }
+
+  // Compact variant - smaller grid without header
+  if (variant === "compact") {
+    return (
+      <div className="space-y-3">
+        <div className="grid grid-cols-4 gap-2">
+          {paymentMethods.map((method, index) => (
+            <PaymentLogo key={method.name} method={method} size="md" index={index} />
+          ))}
+        </div>
+        <p className="text-xs text-center text-slate-400">
+          + metode pembayaran lainnya via {gatewayName}
+        </p>
+      </div>
+    );
+  }
+
+  // Full variant - with header and features
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 1.0 }}
-      className="space-y-4"
+      transition={{ delay: 0.3, duration: 0.5 }}
+      className="space-y-5"
     >
-      <div className="text-center space-y-2">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-          Metode Pembayaran Tersedia
+      {/* Header */}
+      <div className="text-center space-y-1.5">
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+          Metode Pembayaran
+        </span>
+        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+          Pilih Metode Favorit Anda
         </h3>
-        <p className="text-sm text-muted-foreground">
-          Pilih metode pembayaran favorit Anda di halaman {gatewayName}
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Pembayaran diproses via {gatewayName}
         </p>
       </div>
 
-      {/* Payment Method Logos Grid */}
-      <div className="grid grid-cols-4 gap-3 sm:gap-4">
-        {paymentMethods.map((method, index) => {
-          const [imageError, setImageError] = useState(false);
-
-          return (
-            <motion.div
-              key={method.name}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.1 + index * 0.05 }}
-              whileHover={{ scale: 1.08, y: -3 }}
-              className={`relative bg-gradient-to-br ${method.bg} rounded-xl p-3 sm:p-4 border-2 ${method.border} shadow-md hover:shadow-xl transition-all duration-300 group cursor-pointer overflow-hidden`}
-            >
-              {/* Logo */}
-              <div className="flex flex-col items-center justify-center gap-2 h-full py-2">
-                {!imageError ? (
-                  <>
-                    {/* Fixed size logo container */}
-                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center">
-                      <Image
-                        src={method.logo}
-                        alt={method.name}
-                        width={80}
-                        height={80}
-                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
-                        onError={() => setImageError(true)}
-                        priority={index < 4}
-                      />
-                    </div>
-                    {/* Method Name Below Logo */}
-                    <span className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">
-                      {method.name}
-                    </span>
-                  </>
-                ) : (
-                  // Fallback to text if image fails
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="text-3xl sm:text-4xl">💳</div>
-                    <span className="text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 text-center">
-                      {method.name}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Checkmark Badge on Hover */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                whileHover={{ opacity: 1, scale: 1 }}
-                className="absolute -top-1.5 -right-1.5 bg-emerald-500 rounded-full p-1 shadow-lg z-10"
-              >
-                <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </motion.div>
-
-              {/* Shine effect on hover */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-xl pointer-events-none"
-                initial={{ x: "-100%" }}
-                whileHover={{ x: "100%" }}
-                transition={{ duration: 0.6 }}
-              />
-            </motion.div>
-          );
-        })}
+      {/* Payment Methods Grid */}
+      <div className="grid grid-cols-4 gap-2 sm:gap-3">
+        {paymentMethods.map((method, index) => (
+          <PaymentLogo key={method.name} method={method} size="lg" index={index} />
+        ))}
       </div>
 
-      {/* Additional Info */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-        className="flex flex-col items-center gap-2 pt-4 border-t border-dashed border-slate-200 dark:border-slate-700"
+      {/* Features Strip */}
+      <div className="flex items-center justify-center gap-4 sm:gap-6 pt-3 border-t border-slate-100 dark:border-slate-800">
+        {features.map((feature, index) => (
+          <motion.div
+            key={feature.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 + index * 0.1 }}
+            className="flex items-center gap-1.5"
+          >
+            <feature.icon className={`w-3.5 h-3.5 ${feature.color}`} />
+            <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
+              {feature.label}
+            </span>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* More Methods Note */}
+      <p className="text-[11px] text-center text-slate-400 dark:text-slate-500">
+        Dan masih banyak metode pembayaran lainnya
+      </p>
+    </motion.div>
+  );
+}
+
+// PaymentLogo component with uniform sizing
+interface PaymentLogoProps {
+  method: { name: string; logo: string };
+  size: "sm" | "md" | "lg";
+  index?: number;
+}
+
+function PaymentLogo({ method, size, index = 0 }: PaymentLogoProps) {
+  const [imageError, setImageError] = useState(false);
+
+  // Fixed uniform container sizes
+  const containerSize = {
+    sm: "w-10 h-10",
+    md: "w-16 h-16 sm:w-[72px] sm:h-[72px]",
+    lg: "w-[72px] h-[72px] sm:w-20 sm:h-20",
+  };
+
+  // Logo size inside the container (with padding)
+  const logoSize = {
+    sm: 28,
+    md: 40,
+    lg: 48,
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 0.05 + index * 0.02, duration: 0.3 }}
+      whileHover={{ scale: 1.05, y: -2 }}
+      whileTap={{ scale: 0.98 }}
+      className="flex flex-col items-center gap-1"
+    >
+      {/* Uniform Square Card */}
+      <div
+        className={`
+          ${containerSize[size]}
+          bg-white
+          rounded-xl
+          border border-slate-200
+          shadow-md
+          transition-all duration-200
+          flex items-center justify-center
+          cursor-pointer
+          group
+        `}
       >
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <span className="text-emerald-600">✓</span> Instant
-          </span>
-          <span className="text-slate-300 dark:text-slate-600">•</span>
-          <span className="flex items-center gap-1">
-            <span className="text-emerald-600">✓</span> Secure
-          </span>
-          <span className="text-slate-300 dark:text-slate-600">•</span>
-          <span className="flex items-center gap-1">
-            <span className="text-emerald-600">✓</span> 24/7
-          </span>
-        </div>
-        <p className="text-xs text-center text-muted-foreground">
-          Dan masih banyak metode pembayaran lainnya
-        </p>
-      </motion.div>
+        {!imageError ? (
+          <div className="w-full h-full p-2 flex items-center justify-center">
+            <Image
+              src={method.logo}
+              alt={method.name}
+              width={logoSize[size]}
+              height={logoSize[size]}
+              className="w-auto h-auto max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-110"
+              onError={() => setImageError(true)}
+              priority={index < 4}
+            />
+          </div>
+        ) : (
+          <span className="text-2xl">💳</span>
+        )}
+      </div>
+
+      {/* Label below card */}
+      {size !== "sm" && (
+        <span className="text-[10px] sm:text-xs font-medium text-slate-600 dark:text-slate-400 text-center">
+          {method.name}
+        </span>
+      )}
     </motion.div>
   );
 }
