@@ -70,9 +70,11 @@ export const NavbarDynamic = () => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2">
-            <Button size="sm" className="rounded-full bg-white text-black hover:bg-neutral-200 font-medium px-5 h-9">
-              Mulai
-            </Button>
+            <Link href="/payment">
+              <Button size="sm" className="rounded-full bg-white text-black hover:bg-neutral-200 font-medium px-5 h-9">
+                Mulai
+              </Button>
+            </Link>
 
             {/* Mobile Menu Toggle */}
             <button

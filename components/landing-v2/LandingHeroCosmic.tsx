@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, Sparkles, MessageSquare, Mail } from "lucide-react";
 import { TypewriterEffect } from "./Typewriter";
@@ -120,20 +121,24 @@ export function LandingHeroCosmic() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-5 pt-4">
-                            <Button
-                                size="lg"
-                                className="bg-brand hover:bg-brand-600 text-white rounded-full px-8 h-14 text-lg shadow-[0_0_30px_rgba(0,172,199,0.4)] hover:shadow-[0_0_50px_rgba(0,172,199,0.6)] transition-all duration-300 group"
-                            >
-                                Gabung Sekarang
-                                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="lg"
-                                className="rounded-full px-8 h-14 text-lg border-white/10 text-white bg-white/5 hover:bg-white/10 backdrop-blur-sm"
-                            >
-                                Lihat Fitur Tools
-                            </Button>
+                            <Link href="/payment">
+                                <Button
+                                    size="lg"
+                                    className="bg-brand hover:bg-brand-600 text-white rounded-full px-8 h-14 text-lg shadow-[0_0_30px_rgba(0,172,199,0.4)] hover:shadow-[0_0_50px_rgba(0,172,199,0.6)] transition-all duration-300 group"
+                                >
+                                    Gabung Sekarang
+                                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                </Button>
+                            </Link>
+                            <Link href="#features">
+                                <Button
+                                    variant="outline"
+                                    size="lg"
+                                    className="rounded-full px-8 h-14 text-lg border-white/10 text-white bg-white/5 hover:bg-white/10 backdrop-blur-sm"
+                                >
+                                    Lihat Fitur Tools
+                                </Button>
+                            </Link>
                         </div>
 
                         <div className="pt-8 flex items-center gap-6 text-sm font-medium text-neutral-400 flex-wrap">
