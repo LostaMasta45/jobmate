@@ -206,8 +206,10 @@ ${data.whatsapp}
 \`${data.applicationId}\`
 
 ━━━━━━━━━━━━━━━━━━━━━
-⚡ *Action Required:*
-Segera review dan approve/reject aplikasi ini di Admin Dashboard
+⚡ *Quick Actions:*
+• Reply \`ACC\` untuk approve langsung
+• Reply \`REJ alasan\` untuk reject
+• Atau review di Admin Dashboard
 
 ⏰ Submitted: ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`;
 
@@ -1200,5 +1202,95 @@ ${revenueSection}${jobsSection}
   } catch (error) {
     console.error('[Telegram] Failed to send weekly summary:', error);
     return false;
+  }
+}
+
+// ================================================
+// 🔗 WEBHOOK MANAGEMENT FUNCTIONS
+// ================================================
+
+/**
+ * Set Telegram Webhook URL
+ * Call this once after deployment to register the webhook
+ */
+export async function setTelegramWebhook(webhookUrl: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    if (!token) {
+      return { success: false, error: "TELEGRAM_BOT_TOKEN not configured" };
+    }
+
+    const url = `https://api.telegram.org/bot${token}/setWebhook`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        url: webhookUrl,
+        allowed_updates: ["message"], // Only receive message updates
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.ok) {
+      console.log("[Telegram] Webhook set successfully:", webhookUrl);
+      return { success: true };
+    } else {
+      console.error("[Telegram] Failed to set webhook:", result);
+      return { success: false, error: result.description || "Unknown error" };
+    }
+  } catch (error) {
+    console.error("[Telegram] setWebhook error:", error);
+    return { success: false, error: String(error) };
+  }
+}
+
+/**
+ * Delete Telegram Webhook
+ * Use this to switch back to polling mode
+ */
+export async function deleteTelegramWebhook(): Promise<{ success: boolean; error?: string }> {
+  try {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    if (!token) {
+      return { success: false, error: "TELEGRAM_BOT_TOKEN not configured" };
+    }
+
+    const url = `https://api.telegram.org/bot${token}/deleteWebhook`;
+    const response = await fetch(url, { method: "POST" });
+    const result = await response.json();
+
+    if (result.ok) {
+      console.log("[Telegram] Webhook deleted successfully");
+      return { success: true };
+    } else {
+      return { success: false, error: result.description || "Unknown error" };
+    }
+  } catch (error) {
+    return { success: false, error: String(error) };
+  }
+}
+
+/**
+ * Get current Telegram Webhook info
+ */
+export async function getTelegramWebhookInfo(): Promise<{ success: boolean; data?: any; error?: string }> {
+  try {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    if (!token) {
+      return { success: false, error: "TELEGRAM_BOT_TOKEN not configured" };
+    }
+
+    const url = `https://api.telegram.org/bot${token}/getWebhookInfo`;
+    const response = await fetch(url, { method: "GET" });
+    const result = await response.json();
+
+    if (result.ok) {
+      return { success: true, data: result.result };
+    } else {
+      return { success: false, error: result.description || "Unknown error" };
+    }
+  } catch (error) {
+    return { success: false, error: String(error) };
   }
 }
