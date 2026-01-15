@@ -77,10 +77,13 @@ export default function CoverLetterPage() {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
 
-        // Track copy usage
+        // Track copy usage via API
         try {
-          const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
-          await logToolUsageWithNotification("Cover Letter Copy", `${formData.position} at ${formData.company}`);
+          await fetch('/api/notifications/track-usage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ toolName: "Cover Letter Copy", documentTitle: `${formData.position} at ${formData.company}` })
+          });
         } catch (e) { console.error("[Tracking] Failed:", e); }
       } catch (err) {
         alert("Gagal menyalin. Silakan copy manual.");
@@ -100,10 +103,13 @@ export default function CoverLetterPage() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      // Track download usage
+      // Track download usage via API
       try {
-        const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
-        await logToolUsageWithNotification("Cover Letter Download TXT", `${formData.position} at ${formData.company}`);
+        await fetch('/api/notifications/track-usage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ toolName: "Cover Letter Download TXT", documentTitle: `${formData.position} at ${formData.company}` })
+        });
       } catch (e) { console.error("[Tracking] Failed:", e); }
     }
   };
@@ -114,10 +120,13 @@ export default function CoverLetterPage() {
         const filename = `Cover_Letter_${formData.position}_${formData.company}.pdf`;
         generateCoverLetterPDF(result, filename);
 
-        // Track PDF download usage
+        // Track PDF download usage via API
         try {
-          const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
-          await logToolUsageWithNotification("Cover Letter Download PDF", `${formData.position} at ${formData.company}`);
+          await fetch('/api/notifications/track-usage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ toolName: "Cover Letter Download PDF", documentTitle: `${formData.position} at ${formData.company}` })
+          });
         } catch (e) { console.error("[Tracking] Failed:", e); }
       } catch (error) {
         alert("Gagal download PDF: " + (error as Error).message);

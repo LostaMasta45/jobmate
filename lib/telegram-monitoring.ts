@@ -1,7 +1,11 @@
 /**
  * Telegram Bot Monitoring Utilities
  * Helper functions untuk tracking dan monitoring
+ * 
+ * NOTE: This file uses server-only imports (next/headers via supabase/server)
+ * Only import this in Server Components or API routes
  */
+"use server";
 
 import { createClient } from "@/lib/supabase/server";
 import { notifyToolUsage } from "@/lib/telegram";
