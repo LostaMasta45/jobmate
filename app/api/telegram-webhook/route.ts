@@ -50,6 +50,235 @@ function extractRejectionReason(text: string): string | null {
     return match ? match[1].trim() : null;
 }
 
+// ================================================
+// 🆕 PHASE 1: FOUNDATION COMMANDS
+// ================================================
+
+// Format time ago helper
+function formatTimeAgo(date: Date): string {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "baru saja";
+    if (diffMins < 60) return `${diffMins} menit lalu`;
+    if (diffHours < 24) return `${diffHours} jam lalu`;
+    return `${diffDays} hari lalu`;
+}
+
+// Format number with comma separator
+function formatNumber(num: number): string {
+    return num.toLocaleString('id-ID');
+}
+
+// HELP command handler
+async function handleHelpCommand(): Promise<string> {
+    return `📋 *DAFTAR COMMAND BOT*
+
+━━━━━━━━━━━━━━━━━━━━━
+👥 *APPROVAL*
+• \`ACC\` - Approve akun (reply atau ACC {uuid})
+• \`REJ alasan\` - Reject akun dengan alasan
+
+📊 *MONITORING*
+• \`PENDING\` - Lihat aplikasi pending
+• \`STATS\` - Statistik hari ini
+• \`PING\` - Cek bot aktif
+• \`HELP\` - Tampilkan menu ini
+
+━━━━━━━━━━━━━━━━━━━━━
+💡 *Tips:* Reply notifikasi pendaftaran untuk aksi cepat!`;
+}
+
+// PING command handler
+async function handlePingCommand(): Promise<string> {
+    const now = new Date().toLocaleString('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    return `🏓 *PONG!* Bot aktif ✅
+⏰ Server time: ${now} WIB`;
+}
+
+// PENDING command handler
+async function handlePendingCommand(): Promise<string> {
+    try {
+        const adminClient = createAdminClient();
+
+        const { data: pendingApps, error } = await adminClient
+            .from("account_applications")
+            .select("id, full_name, email, created_at")
+            .eq("status", "pending")
+            .order("created_at", { ascending: false })
+            .limit(10);
+
+        if (error) {
+            console.error("[TelegramBot] PENDING error:", error);
+            return `❌ *Error*\n\nGagal mengambil data: ${error.message}`;
+        }
+
+        if (!pendingApps || pendingApps.length === 0) {
+            return `✅ *TIDAK ADA APLIKASI PENDING*
+
+━━━━━━━━━━━━━━━━━━━━━
+Semua aplikasi sudah diproses! 🎉
+
+⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`;
+        }
+
+        let message = `⏳ *APLIKASI PENDING*
+
+━━━━━━━━━━━━━━━━━━━━━
+Total: ${pendingApps.length} aplikasi menunggu
+
+`;
+
+        pendingApps.forEach((app, index) => {
+            const timeAgo = formatTimeAgo(new Date(app.created_at));
+            const shortId = app.id.substring(0, 8) + "...";
+            message += `${index + 1}️⃣ *${app.full_name}*
+   📧 ${app.email}
+   ⏰ ${timeAgo}
+   🔑 \`${shortId}\`
+
+`;
+        });
+
+        message += `━━━━━━━━━━━━━━━━━━━━━
+💡 Reply dengan \`ACC\` atau \`REJ alasan\` untuk aksi`;
+
+        return message;
+    } catch (error) {
+        console.error("[TelegramBot] PENDING error:", error);
+        return `❌ *Error*\n\nTerjadi kesalahan: ${error}`;
+    }
+}
+
+// STATS command handler
+async function handleStatsCommand(): Promise<string> {
+    try {
+        const adminClient = createAdminClient();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayISO = today.toISOString();
+
+        // Get user statistics
+        const { count: totalUsers } = await adminClient
+            .from("profiles")
+            .select("*", { count: 'exact', head: true });
+
+        const { count: newUsersToday } = await adminClient
+            .from("profiles")
+            .select("*", { count: 'exact', head: true })
+            .gte("created_at", todayISO);
+
+        const { count: vipBasic } = await adminClient
+            .from("profiles")
+            .select("*", { count: 'exact', head: true })
+            .eq("membership", "vip_basic");
+
+        const { count: vipPremium } = await adminClient
+            .from("profiles")
+            .select("*", { count: 'exact', head: true })
+            .eq("membership", "vip_premium");
+
+        // Get application statistics
+        const { count: pendingApps } = await adminClient
+            .from("account_applications")
+            .select("*", { count: 'exact', head: true })
+            .eq("status", "pending");
+
+        const { count: approvedToday } = await adminClient
+            .from("account_applications")
+            .select("*", { count: 'exact', head: true })
+            .eq("status", "approved")
+            .gte("approved_at", todayISO);
+
+        const { count: rejectedToday } = await adminClient
+            .from("account_applications")
+            .select("*", { count: 'exact', head: true })
+            .eq("status", "rejected")
+            .gte("updated_at", todayISO);
+
+        // Get tool usage statistics (if table exists)
+        let toolStats = { total: 0, cv: 0, coverLetter: 0, email: 0 };
+        try {
+            const { count: totalTools } = await adminClient
+                .from("tool_usage_logs")
+                .select("*", { count: 'exact', head: true })
+                .gte("created_at", todayISO);
+
+            const { count: cvCount } = await adminClient
+                .from("tool_usage_logs")
+                .select("*", { count: 'exact', head: true })
+                .gte("created_at", todayISO)
+                .ilike("tool_name", "%cv%");
+
+            const { count: coverLetterCount } = await adminClient
+                .from("tool_usage_logs")
+                .select("*", { count: 'exact', head: true })
+                .gte("created_at", todayISO)
+                .ilike("tool_name", "%cover%");
+
+            const { count: emailCount } = await adminClient
+                .from("tool_usage_logs")
+                .select("*", { count: 'exact', head: true })
+                .gte("created_at", todayISO)
+                .ilike("tool_name", "%email%");
+
+            toolStats = {
+                total: totalTools || 0,
+                cv: cvCount || 0,
+                coverLetter: coverLetterCount || 0,
+                email: emailCount || 0
+            };
+        } catch (e) {
+            // Table might not exist, ignore
+        }
+
+        const dateStr = new Date().toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            timeZone: 'Asia/Jakarta'
+        });
+
+        const pendingAlert = (pendingApps || 0) > 0 ? ' ⚠️' : '';
+
+        return `📊 *STATISTIK HARI INI*
+${dateStr}
+
+━━━━━━━━━━━━━━━━━━━━━
+👥 *USERS*
+• Total: ${formatNumber(totalUsers || 0)}
+• New Today: +${formatNumber(newUsersToday || 0)}
+• ⭐ VIP Basic: ${formatNumber(vipBasic || 0)}
+• 👑 VIP Premium: ${formatNumber(vipPremium || 0)}
+
+📝 *APPLICATIONS*
+• ⏳ Pending: ${formatNumber(pendingApps || 0)}${pendingAlert}
+• ✅ Approved Today: ${formatNumber(approvedToday || 0)}
+• ❌ Rejected Today: ${formatNumber(rejectedToday || 0)}
+
+🛠️ *TOOL USAGE (Today)*
+• Total: ${formatNumber(toolStats.total)}
+• CV: ${formatNumber(toolStats.cv)} | Cover Letter: ${formatNumber(toolStats.coverLetter)} | Email: ${formatNumber(toolStats.email)}
+
+━━━━━━━━━━━━━━━━━━━━━
+⏰ ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`;
+
+    } catch (error) {
+        console.error("[TelegramBot] STATS error:", error);
+        return `❌ *Error*\n\nGagal mengambil statistik: ${error}`;
+    }
+}
+
 // Approve application function (bot version - no session required)
 async function approveApplicationByBot(applicationId: string): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
@@ -259,6 +488,46 @@ export async function POST(request: NextRequest) {
 
         const text = message.text.trim();
         const replyToMessage = message.reply_to_message;
+
+        // ================================================
+        // 🆕 PHASE 1 COMMANDS: HELP, PING, PENDING, STATS
+        // ================================================
+
+        // HELP command
+        if (text.toUpperCase() === "HELP" || text === "/help" || text === "/start") {
+            console.log("[TelegramBot] Processing HELP command");
+            const response = await handleHelpCommand();
+            await sendTelegramMessage(chatId, response, botToken);
+            return NextResponse.json({ ok: true });
+        }
+
+        // PING command
+        if (text.toUpperCase() === "PING" || text === "/ping") {
+            console.log("[TelegramBot] Processing PING command");
+            const response = await handlePingCommand();
+            await sendTelegramMessage(chatId, response, botToken);
+            return NextResponse.json({ ok: true });
+        }
+
+        // PENDING command
+        if (text.toUpperCase() === "PENDING" || text === "/pending") {
+            console.log("[TelegramBot] Processing PENDING command");
+            const response = await handlePendingCommand();
+            await sendTelegramMessage(chatId, response, botToken);
+            return NextResponse.json({ ok: true });
+        }
+
+        // STATS command
+        if (text.toUpperCase() === "STATS" || text === "/stats") {
+            console.log("[TelegramBot] Processing STATS command");
+            const response = await handleStatsCommand();
+            await sendTelegramMessage(chatId, response, botToken);
+            return NextResponse.json({ ok: true });
+        }
+
+        // ================================================
+        // EXISTING COMMANDS: ACC, REJ
+        // ================================================
 
         // Check for ACC command
         if (text.toUpperCase().startsWith("ACC")) {
