@@ -18,6 +18,7 @@ import {
   Menu,
   ChevronRight,
   MoreVertical,
+  Wallet,
 } from "lucide-react";
 import { AdminThemeToggle } from "@/components/admin/AdminThemeToggle";
 import { signOut } from "@/actions/auth";
@@ -98,6 +99,14 @@ const menuItems: MenuItem[] = [
     section: "Users",
   },
   {
+    title: "Finance",
+    href: "/admin/finance",
+    icon: Wallet,
+    badge: "NEW",
+    badgeColor: "bg-emerald-500",
+    section: "Users",
+  },
+  {
     title: "Tools AI",
     href: "/admin/tools-ai",
     icon: Bot,
@@ -121,12 +130,12 @@ const menuItems: MenuItem[] = [
 
 import Image from "next/image";
 
-function SidebarContent({ 
-  pathname, 
-  isLoggingOut, 
+function SidebarContent({
+  pathname,
+  isLoggingOut,
   handleLogout,
   onNavClick
-}: { 
+}: {
   pathname: string | null;
   isLoggingOut: boolean;
   handleLogout: () => void;
@@ -145,9 +154,9 @@ function SidebarContent({
       {/* Header */}
       <div className="p-4 flex flex-col items-center border-b border-border/40 bg-muted/5">
         <div className="relative w-12 h-12 flex items-center justify-center mb-2">
-          <Image 
-            src="/Logo/x.png" 
-            alt="JobMate Logo" 
+          <Image
+            src="/Logo/x.png"
+            alt="JobMate Logo"
             fill
             className="object-contain"
             priority
@@ -267,9 +276,9 @@ export function AdminSidebar() {
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b px-4 h-16 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2.5">
           <div className="relative w-8 h-8 flex items-center justify-center" suppressHydrationWarning>
-            <Image 
-              src="/Logo/x.png" 
-              alt="JobMate Admin Logo" 
+            <Image
+              src="/Logo/x.png"
+              alt="JobMate Admin Logo"
               fill
               className="object-contain"
               priority
@@ -288,7 +297,7 @@ export function AdminSidebar() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-72 border-r-0">
-             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
             <SidebarContent
               pathname={pathname}
               isLoggingOut={isLoggingOut}
