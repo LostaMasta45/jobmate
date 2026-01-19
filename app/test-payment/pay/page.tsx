@@ -7,16 +7,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Loader2, 
-  CheckCircle2, 
-  Clock, 
-  Smartphone, 
-  Shield, 
+import {
+  Loader2,
+  CheckCircle2,
+  Clock,
+  Smartphone,
+  Shield,
   ArrowLeft,
   RefreshCw,
   Copy,
-  CheckCheck
+  CheckCheck,
+  Zap
 } from "lucide-react";
 import QRCode from "react-qr-code";
 
@@ -49,6 +50,7 @@ function PaymentDisplayContent() {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [checkingStatus, setCheckingStatus] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [simulating, setSimulating] = useState(false);
 
   // Load payment data from sessionStorage
   useEffect(() => {
@@ -131,7 +133,7 @@ function PaymentDisplayContent() {
   // Manual check status
   const handleCheckStatus = async () => {
     if (!orderId || !paymentData) return;
-    
+
     setCheckingStatus(true);
     try {
       const response = await fetch(`/api/test-payment/check-status?order_id=${orderId}&amount=${paymentData.amount}`);
@@ -164,12 +166,43 @@ function PaymentDisplayContent() {
     }
   };
 
+  // Simulate payment (Sandbox mode only)
+  const handleSimulatePayment = async () => {
+    if (!orderId || !paymentData) return;
+
+    setSimulating(true);
+    try {
+      const response = await fetch('/api/test-payment/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: orderId,
+          amount: paymentData.amount,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Simulation successful, redirect to success page
+        router.push(`/test-payment/success?order_id=${orderId}`);
+      } else {
+        alert(`Simulasi gagal: ${data.error || 'Unknown error'}\n\nPastikan project di Pakasir.com dalam mode Sandbox.`);
+      }
+    } catch (err: any) {
+      console.error('Simulation error:', err);
+      alert(`Terjadi kesalahan: ${err.message}\n\nPastikan project di Pakasir.com dalam mode Sandbox.`);
+    } finally {
+      setSimulating(false);
+    }
+  };
+
   // Format time
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    
+
     if (hours > 0) {
       return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
@@ -368,6 +401,41 @@ function PaymentDisplayContent() {
                     </>
                   )}
                 </Button>
+
+                {/* Sandbox Simulation Button */}
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-yellow-400/50"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="px-3 bg-white dark:bg-slate-900 text-yellow-600 font-bold">
+                      🧪 SANDBOX MODE
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleSimulatePayment}
+                  disabled={simulating || isExpired}
+                  variant="outline"
+                  className="w-full border-2 border-yellow-400 text-yellow-700 hover:bg-yellow-50 dark:hover:bg-yellow-950/30"
+                  size="lg"
+                >
+                  {simulating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Simulasi Pembayaran...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-4 h-4 mr-2" />
+                      Simulasi Pembayaran Berhasil
+                    </>
+                  )}
+                </Button>
+                <p className="text-xs text-center text-yellow-600">
+                  Klik tombol di atas untuk mensimulasikan pembayaran berhasil (hanya untuk testing)
+                </p>
               </CardContent>
             </Card>
           </motion.div>
@@ -387,13 +455,12 @@ function PaymentDisplayContent() {
                     <Clock className="w-5 h-5" />
                     <span className="text-sm">Waktu Pembayaran</span>
                   </div>
-                  <div className={`text-5xl font-black font-mono ${
-                    isExpired 
-                      ? 'text-red-600' 
-                      : timeLeft < 300 
-                        ? 'text-amber-600' 
-                        : 'text-purple-600'
-                  }`}>
+                  <div className={`text-5xl font-black font-mono ${isExpired
+                    ? 'text-red-600'
+                    : timeLeft < 300
+                      ? 'text-amber-600'
+                      : 'text-purple-600'
+                    }`}>
                     {isExpired ? '00:00' : formatTime(timeLeft)}
                   </div>
                   <p className="text-xs text-muted-foreground">

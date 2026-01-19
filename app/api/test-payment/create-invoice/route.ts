@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     if (PAKASIR_PROJECT_SLUG === 'SLUG_BELUM_DIKONFIGURASI') {
       console.error('[TEST Payment] Pakasir.com project slug belum dikonfigurasi!');
       return NextResponse.json(
-        { 
+        {
           error: 'Pakasir.com belum dikonfigurasi',
           message: 'Silakan set PAKASIR_PROJECT_SLUG di environment variable atau ubah di route.ts',
           instructions: {
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     // Pakasir.com Payment - Via API Method (Full Custom UI)
     // Docs: https://pakasir.com/p/docs (Section C: Integrasi Via API)
     // API: POST https://app.pakasir.com/api/transactioncreate/{method}
-    
+
     try {
       // Call Pakasir Transaction Create API for QRIS
       const pakasirResponse = await fetch('https://app.pakasir.com/api/transactioncreate/qris', {
@@ -89,6 +89,13 @@ export async function POST(request: NextRequest) {
           order_id: orderId,
           amount: amount,
           api_key: PAKASIR_API_KEY,
+          // Metadata for Webhook/Success Email
+          metadata: {
+            user_email: email,
+            user_name: fullName,
+            plan_name: selectedPlan.name,
+            plan_type: plan // basic or premium
+          },
         }),
       });
 
@@ -98,11 +105,11 @@ export async function POST(request: NextRequest) {
           status: pakasirResponse.status,
           error: errorText,
         });
-        
+
         return NextResponse.json(
-          { 
+          {
             error: 'Failed to create payment with Pakasir',
-            details: errorText 
+            details: errorText
           },
           { status: pakasirResponse.status }
         );
@@ -126,6 +133,30 @@ export async function POST(request: NextRequest) {
         payment_response: paymentData,
       });
 
+      // Send Invoice Email
+      try {
+        const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const invoiceUrl = `${origin}/test-payment/pay?order_id=${orderId}`;
+
+        // Dynamic import to avoid build issues if file doesn't exist yet
+        const { sendInvoiceEmail } = await import('@/lib/send-invoice-email');
+
+        await sendInvoiceEmail({
+          toEmail: email,
+          userName: fullName,
+          invoiceUrl: invoiceUrl,
+          amount: amount,
+          currency: 'Rp',
+          expiryDate: paymentData.payment?.expired_at || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          description: selectedPlan.name,
+        });
+
+        console.log('[TEST Payment] Invoice email sent to:', email);
+      } catch (emailError) {
+        console.error('[TEST Payment] Failed to send invoice email:', emailError);
+        // Don't block the response if email fails
+      }
+
       return NextResponse.json({
         success: true,
         payment: paymentData.payment,
@@ -144,9 +175,9 @@ export async function POST(request: NextRequest) {
     } catch (error: any) {
       console.error('[TEST Payment] Error creating payment:', error);
       return NextResponse.json(
-        { 
+        {
           error: 'Failed to create payment',
-          message: error.message 
+          message: error.message
         },
         { status: 500 }
       );
@@ -155,9 +186,9 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('[TEST Payment] General error:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to process payment',
-        message: error.message 
+        message: error.message
       },
       { status: 500 }
     );

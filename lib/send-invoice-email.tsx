@@ -1,7 +1,7 @@
 // lib/send-invoice-email.ts
 import React from 'react';
 import { resend, FROM_EMAIL } from './resend';
-import { InvoiceEmailTable, InvoiceEmailTableText } from '@/emails/InvoiceEmailTable';
+import { InvoiceEmail, InvoiceEmailText } from '@/emails/InvoiceEmail';
 import { render } from '@react-email/render';
 
 interface SendInvoiceEmailParams {
@@ -16,9 +16,9 @@ interface SendInvoiceEmailParams {
 
 export async function sendInvoiceEmail(params: SendInvoiceEmailParams) {
   try {
-    // Use InvoiceEmailTable (table-based layout with production URL logos)
-    const emailHtml: string = await render(<InvoiceEmailTable {...params} />);
-    const emailText: string = InvoiceEmailTableText(params);
+    // Use InvoiceEmail (standard visual design)
+    const emailHtml: string = await render(<InvoiceEmail {...params} />);
+    const emailText: string = InvoiceEmailText(params);
 
     // No attachments needed - logos loaded from production URL (jobmate.web.id)
     const { data, error } = await resend.emails.send({

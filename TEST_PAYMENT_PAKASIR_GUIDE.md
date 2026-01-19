@@ -32,6 +32,33 @@ POST /api/test-payment/create-invoice
 GET  /api/test-payment/create-invoice (untuk cek status API)
 ```
 
+### 5. Webhook Endpoint (WAJIB DIKONFIGURASI)
+```
+POST /api/test-payment/webhook
+```
+
+## ⚙️ Konfigurasi Webhook di Dashboard Pakasir
+
+> **PENTING:** Webhook URL HARUS dikonfigurasi di dashboard Pakasir.com agar email sukses dapat dikirim!
+
+### Langkah Setup:
+1. Login ke **https://app.pakasir.com**
+2. Pilih proyek **Jobmate**
+3. Klik **Edit Proyek**
+4. Isi field **Webhook URL**:
+   - **Production:** `https://jobmate.web.id/api/test-payment/webhook`
+   - **Local (ngrok):** `https://xxxx.ngrok.io/api/test-payment/webhook`
+5. Klik **Simpan**
+
+### Deploy ke Production (Sama seperti Midtrans):
+Webhook tidak akan berfungsi di `localhost`. Anda harus:
+1. Deploy kode ke production (`jobmate.web.id`), ATAU
+2. Gunakan [ngrok](https://ngrok.com) untuk testing lokal:
+   ```bash
+   ngrok http 3000
+   ```
+   Lalu copy URL ngrok ke dashboard Pakasir.
+
 ## 🎯 Cara Menggunakan
 
 ### Step 1: Jalankan Development Server
