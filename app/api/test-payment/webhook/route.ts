@@ -1,30 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { resend, FROM_EMAIL } from '@/lib/resend';
-
-// Email template untuk payment confirmation (same as Midtrans/Xendit version)
-const PaymentSuccessEmail = ({ userName, amount, transactionDate, planType }: any) => `
-  <html>
-    <body style="font-family: Arial, sans-serif;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: #10B981; color: white; padding: 20px; text-align: center;">
-          <h1>✓ Pembayaran Berhasil!</h1>
-        </div>
-        <div style="padding: 30px; background: #f9fafb;">
-          <p>Halo ${userName},</p>
-          <p>Pembayaran Anda telah berhasil diproses.</p>
-          <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h2>Detail Pembayaran</h2>
-            <p><strong>Jumlah:</strong> IDR ${amount.toLocaleString('id-ID')}</p>
-            <p><strong>Tanggal:</strong> ${new Date(transactionDate).toLocaleString('id-ID')}</p>
-            <p style="color: #10B981; font-weight: bold;">Status: PAID ✓</p>
-          </div>
-          <p>Terima kasih atas pembayaran Anda!</p>
-          <p><strong>Akses VIP Anda telah diaktifkan!</strong></p>
-        </div>
-      </div>
-    </body>
-  </html>
-`;
 
 // Pakasir.com Webhook Handler
 // Docs: https://pakasir.com/p/docs (Section D: Webhook)
@@ -81,33 +55,17 @@ export async function POST(request: NextRequest) {
         if (metadata && metadata.user_email) {
           console.log('[Webhook] Sending success email to:', metadata.user_email);
 
-          const planType = metadata.plan_type || (body.amount > 20000 ? 'premium' : 'basic');
-          const finalCustomerEmail = metadata.user_email;
-          const finalCustomerName = metadata.user_name || 'User';
-          const amount = body.amount;
-          const transactionDate = body.completed_at || new Date().toISOString();
+          // Use existing email notification function (same as production)
+          const { sendUpgradeVIPEmail } = await import('@/lib/email-notifications');
 
-          // Use exact same logic as Midtrans webhook
-          const emailHtml = PaymentSuccessEmail({
-            userName: finalCustomerName,
-            amount: amount,
-            transactionDate: transactionDate,
-            planType: planType,
+          await sendUpgradeVIPEmail({
+            userName: metadata.user_name || 'User',
+            email: metadata.user_email,
+            membershipType: metadata.plan_type === 'premium' ? 'vip_premium' : 'vip_basic',
+            upgradedAt: body.completed_at || new Date().toISOString(),
           });
 
-          await resend.emails.send({
-            from: FROM_EMAIL,
-            to: finalCustomerEmail,
-            subject: `✅ Pembayaran ${planType === 'premium' ? 'VIP Premium' : 'VIP Basic'} Berhasil - JOBMATE`,
-            html: emailHtml,
-            tags: [
-              { name: 'category', value: 'payment-confirmation' },
-              { name: 'plan', value: planType },
-              { name: 'gateway', value: 'pakasir-sandbox' },
-            ],
-          });
-
-          console.log('[Webhook] ✅ Success email sent (Midtrans style)');
+          console.log('[Webhook] ✅ Success email sent using sendUpgradeVIPEmail');
         } else {
           console.warn('[Webhook] ⚠️ Could not send email: User email not found in metadata');
         }
