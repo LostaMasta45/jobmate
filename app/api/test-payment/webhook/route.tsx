@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { resend, FROM_EMAIL } from '@/lib/resend';
+import { PaymentSuccessEmail, PaymentSuccessEmailText } from '@/emails/PaymentSuccessEmail';
+import { render } from '@react-email/render';
 
 // Pakasir.com Webhook Handler
 // Docs: https://pakasir.com/p/docs (Section D: Webhook)
@@ -55,17 +58,33 @@ export async function POST(request: NextRequest) {
         if (metadata && metadata.user_email) {
           console.log('[Webhook] Sending success email to:', metadata.user_email);
 
-          // Use existing email notification function (same as production)
-          const { sendUpgradeVIPEmail } = await import('@/lib/email-notifications');
+          const planType = metadata.plan_type || (body.amount > 20000 ? 'premium' : 'basic');
 
-          await sendUpgradeVIPEmail({
+          const emailProps = {
             userName: metadata.user_name || 'User',
-            email: metadata.user_email,
-            membershipType: metadata.plan_type === 'premium' ? 'vip_premium' : 'vip_basic',
-            upgradedAt: body.completed_at || new Date().toISOString(),
+            amount: body.amount,
+            transactionDate: body.completed_at || new Date().toISOString(),
+            planType: planType,
+            dashboardUrl: 'https://jobmate.web.id/ajukan-akun'
+          };
+
+          const emailHtml = await render(<PaymentSuccessEmail { ...emailProps } />);
+          const emailText = PaymentSuccessEmailText(emailProps);
+
+          await resend.emails.send({
+            from: FROM_EMAIL,
+            to: metadata.user_email,
+            subject: `✅ Pembayaran ${planType === 'premium' ? 'VIP Premium' : 'VIP Basic'} Berhasil - JOBMATE`,
+            html: emailHtml,
+            text: emailText,
+            tags: [
+              { name: 'category', value: 'payment-confirmation' },
+              { name: 'plan', value: planType },
+              { name: 'gateway', value: 'pakasir-sandbox' },
+            ],
           });
 
-          console.log('[Webhook] ✅ Success email sent using sendUpgradeVIPEmail');
+          console.log('[Webhook] ✅ Payment success email sent (Redesigned)');
         } else {
           console.warn('[Webhook] ⚠️ Could not send email: User email not found in metadata');
         }

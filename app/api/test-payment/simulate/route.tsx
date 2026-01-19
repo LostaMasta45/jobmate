@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { resend, FROM_EMAIL } from '@/lib/resend';
+import { PaymentSuccessEmail, PaymentSuccessEmailText } from '@/emails/PaymentSuccessEmail';
+import { render } from '@react-email/render';
 
 // Pakasir.com Configuration
 const PAKASIR_API_KEY = 'teLlWce5MvY8y0YeTqolnZNRveRRRtll';
@@ -59,24 +62,36 @@ export async function POST(request: NextRequest) {
     const data = await response.json();
     console.log('[Payment Simulation] Simulation successful:', data);
 
-    // --- DIRECT EMAIL SENDING (Fallback jika webhook tidak terpanggil) ---
+    // --- DIRECT EMAIL SENDING (Using new PaymentSuccessEmail template) ---
     if (customerEmail) {
       try {
-        console.log('[Payment Simulation] Sending success email directly to:', customerEmail);
+        console.log('[Payment Simulation] Sending success email to:', customerEmail);
 
-        // Use existing email notification function (same as production)
-        const { sendUpgradeVIPEmail } = await import('@/lib/email-notifications');
-
-        const membershipType = planType === 'premium' ? 'vip_premium' : 'vip_basic';
-
-        await sendUpgradeVIPEmail({
+        const emailProps = {
           userName: customerName || 'User',
-          email: customerEmail,
-          membershipType: membershipType,
-          upgradedAt: new Date().toISOString(),
+          amount: amount,
+          transactionDate: new Date().toISOString(),
+          planType: planType || 'basic',
+          dashboardUrl: 'https://jobmate.web.id/ajukan-akun'
+        };
+
+        const emailHtml = await render(<PaymentSuccessEmail { ...emailProps } />);
+        const emailText = PaymentSuccessEmailText(emailProps);
+
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: customerEmail,
+          subject: `✅ Pembayaran ${planType === 'premium' ? 'VIP Premium' : 'VIP Basic'} Berhasil - JOBMATE`,
+          html: emailHtml,
+          text: emailText,
+          tags: [
+            { name: 'category', value: 'payment-confirmation' },
+            { name: 'plan', value: planType || 'basic' },
+            { name: 'gateway', value: 'pakasir-sandbox' },
+          ],
         });
 
-        console.log('[Payment Simulation] ✅ Success email sent directly');
+        console.log('[Payment Simulation] ✅ Payment success email sent (Redesigned)');
       } catch (emailError) {
         console.error('[Payment Simulation] Failed to send email:', emailError);
       }
@@ -92,7 +107,7 @@ export async function POST(request: NextRequest) {
       amount: amount,
       response: data,
       emailSent: !!customerEmail,
-      note: 'Email sent directly. Webhook may also be triggered by Pakasir.',
+      note: 'Payment success email sent directly using Redesigned template.',
     });
 
   } catch (error: any) {
