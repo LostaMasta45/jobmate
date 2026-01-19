@@ -8,7 +8,7 @@ const PAKASIR_PROJECT_SLUG = 'jobmate';
 // Docs: https://pakasir.com/p/docs (Section C.4)
 export async function POST(request: NextRequest) {
   try {
-    const { orderId, amount } = await request.json();
+    const { orderId, amount, customerEmail, customerName, planType } = await request.json();
 
     if (!orderId || !amount) {
       return NextResponse.json(
@@ -20,6 +20,9 @@ export async function POST(request: NextRequest) {
     console.log('[Payment Simulation] Simulating payment:', {
       orderId,
       amount,
+      customerEmail,
+      customerName,
+      planType,
       project: PAKASIR_PROJECT_SLUG,
     });
 
@@ -43,11 +46,11 @@ export async function POST(request: NextRequest) {
         status: response.status,
         error: errorText,
       });
-      
+
       return NextResponse.json(
-        { 
+        {
           error: 'Failed to simulate payment',
-          details: errorText 
+          details: errorText
         },
         { status: response.status }
       );
@@ -56,9 +59,31 @@ export async function POST(request: NextRequest) {
     const data = await response.json();
     console.log('[Payment Simulation] Simulation successful:', data);
 
-    // Pakasir will trigger webhook after simulation
-    // The payment status will change to "completed"
-    // Auto-check in payment page will detect this and redirect to success
+    // --- DIRECT EMAIL SENDING (Fallback jika webhook tidak terpanggil) ---
+    if (customerEmail) {
+      try {
+        console.log('[Payment Simulation] Sending success email directly to:', customerEmail);
+
+        // Use existing email notification function (same as production)
+        const { sendUpgradeVIPEmail } = await import('@/lib/email-notifications');
+
+        const membershipType = planType === 'premium' ? 'vip_premium' : 'vip_basic';
+
+        await sendUpgradeVIPEmail({
+          userName: customerName || 'User',
+          email: customerEmail,
+          membershipType: membershipType,
+          upgradedAt: new Date().toISOString(),
+        });
+
+        console.log('[Payment Simulation] ✅ Success email sent directly');
+      } catch (emailError) {
+        console.error('[Payment Simulation] Failed to send email:', emailError);
+      }
+    } else {
+      console.warn('[Payment Simulation] ⚠️ No customerEmail provided, skipping email');
+    }
+    // -------------------------------------------------------------------
 
     return NextResponse.json({
       success: true,
@@ -66,15 +91,16 @@ export async function POST(request: NextRequest) {
       orderId: orderId,
       amount: amount,
       response: data,
-      note: 'Webhook will be triggered by Pakasir. Check payment page for auto-redirect.',
+      emailSent: !!customerEmail,
+      note: 'Email sent directly. Webhook may also be triggered by Pakasir.',
     });
 
   } catch (error: any) {
     console.error('[Payment Simulation] Error:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to simulate payment',
-        message: error.message 
+        message: error.message
       },
       { status: 500 }
     );

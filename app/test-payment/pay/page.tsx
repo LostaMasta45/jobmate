@@ -178,6 +178,10 @@ function PaymentDisplayContent() {
         body: JSON.stringify({
           orderId: orderId,
           amount: paymentData.amount,
+          // Customer data for direct email sending
+          customerEmail: customerData?.email,
+          customerName: customerData?.fullName,
+          planType: orderId?.includes('premium') ? 'premium' : 'basic',
         }),
       });
 
