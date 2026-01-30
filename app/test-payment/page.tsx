@@ -3,15 +3,45 @@
 import * as React from "react";
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, CreditCard, Loader2, ArrowLeft, Sparkles, Shield, Zap, Crown, Mail, User, Phone } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import {
+  CheckCircle2,
+  Loader2,
+  ArrowLeft,
+  Shield,
+  Zap,
+  Crown,
+  Mail,
+  User,
+  Phone,
+  Lock,
+  CreditCard,
+  Building2,
+  Sparkles
+} from "lucide-react";
 import { validateEmail, validateWhatsApp, formatWhatsApp, formatWhatsAppForAPI } from "@/lib/form-validation";
+
+// --- Components ---
+
+function PremiumInput({ icon: Icon, ...props }: any) {
+  return (
+    <div className="relative group">
+      <div className="absolute left-3.5 top-3.5 text-slate-400 group-focus-within:text-purple-600 transition-colors duration-300">
+        <Icon className="w-5 h-5" />
+      </div>
+      <Input
+        {...props}
+        className={`pl-11 h-12 bg-slate-50 border-slate-200 focus:bg-white focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 rounded-xl ${props.className}`}
+      />
+    </div>
+  );
+}
 
 function TestPaymentFormContent() {
   const router = useRouter();
@@ -28,33 +58,45 @@ function TestPaymentFormContent() {
   const [emailError, setEmailError] = React.useState<string | null>(null);
   const [emailSuggestion, setEmailSuggestion] = React.useState<string | null>(null);
   const [whatsappError, setWhatsappError] = React.useState<string | null>(null);
+  const [isHovered, setIsHovered] = React.useState(false);
 
+  // --- Plan Details Configuration ---
   const planDetails = {
-    basic: { 
-      name: 'VIP Basic (TEST)', 
-      price: 10000, 
-      priceText: 'Rp 10.000', 
+    basic: {
+      name: 'VIP Basic',
+      tagline: 'Mulai karirmu dengan lebih cepat',
+      price: 10000,
+      priceText: 'Rp 10.000',
       originalPrice: 'Rp 19.000',
+      saveAmount: 'Hemat Rp 9.000',
       discount: '47%',
-      duration: '/bulan' 
+      duration: 'Per Bulan',
+      features: ['Akses Dasar ke JobMate', 'Support Standar via Email', 'Update Lowongan Harian'],
+      color: 'from-blue-600 to-cyan-600',
+      shadow: 'shadow-blue-500/20'
     },
-    premium: { 
-      name: 'VIP Premium (TEST)', 
-      price: 39000, 
+    premium: {
+      name: 'VIP Premium',
+      tagline: 'Investasi terbaik untuk masa depanmu',
+      price: 39000,
       priceText: 'Rp 39.000',
-      originalPrice: 'Rp 99.000', 
+      originalPrice: 'Rp 99.000',
+      saveAmount: 'Hemat Rp 60.000',
       discount: '60%',
-      duration: 'Lifetime' 
+      duration: 'Akses Selamanya',
+      features: ['Akses Selamanya (Lifetime)', 'Prioritas Support 24/7', 'Akses Fitur Beta & Eksklusif', 'Konsultasi CV Gratis'],
+      color: 'from-purple-600 via-violet-600 to-indigo-600',
+      shadow: 'shadow-purple-500/20'
     },
   };
 
   const currentPlan = plan && planDetails[plan] ? planDetails[plan] : planDetails.premium;
 
-  // Real-time validation handlers
+  // --- Validation Logic ---
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const email = e.target.value;
     setFormData({ ...formData, email });
-    
+
     if (email) {
       const validation = validateEmail(email);
       if (!validation.valid) {
@@ -74,7 +116,7 @@ function TestPaymentFormContent() {
     const phone = e.target.value;
     const formatted = formatWhatsApp(phone);
     setFormData({ ...formData, whatsapp: formatted });
-    
+
     if (phone) {
       const validation = validateWhatsApp(phone);
       if (!validation.valid) {
@@ -101,23 +143,21 @@ function TestPaymentFormContent() {
     setError(null);
 
     try {
-      // Validate form
       const emailValidation = validateEmail(formData.email);
       const whatsappValidation = validateWhatsApp(formData.whatsapp);
-      
+
       if (!emailValidation.valid) {
         setError(emailValidation.error || 'Email tidak valid');
         setLoading(false);
         return;
       }
-      
+
       if (!whatsappValidation.valid) {
         setError(whatsappValidation.error || 'Nomor WhatsApp tidak valid');
         setLoading(false);
         return;
       }
 
-      // Create invoice via Pakasir.com API
       const response = await fetch('/api/test-payment/create-invoice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -135,13 +175,9 @@ function TestPaymentFormContent() {
         throw new Error(data.error || data.message || 'Gagal membuat invoice');
       }
 
-      // Store payment data in sessionStorage
       sessionStorage.setItem(`payment-${data.orderId}`, JSON.stringify(data));
-      
-      // Also store last order ID for admin panel
       sessionStorage.setItem('last-payment-order-id', data.orderId);
 
-      // Redirect to custom payment display page
       router.push(`/test-payment/pay?order_id=${data.orderId}`);
 
     } catch (err: any) {
@@ -152,350 +188,220 @@ function TestPaymentFormContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-12 px-4 relative overflow-hidden">
-      {/* TEST MODE Banner */}
-      <div className="fixed top-0 left-0 right-0 bg-yellow-500 text-black text-center py-2 font-bold z-50">
-        🧪 TEST MODE - PAKASIR.COM PAYMENT GATEWAY
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 font-sans selection:bg-purple-500/30 selection:text-purple-900 dark:selection:text-purple-100">
+
+      {/* Background Ambience */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-purple-200/20 dark:bg-purple-900/10 blur-[120px] rounded-full mix-blend-multiply dark:mix-blend-screen animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-200/20 dark:bg-blue-900/10 blur-[120px] rounded-full mix-blend-multiply dark:mix-blend-screen animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }} />
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent opacity-50" />
       </div>
 
-      {/* Decorative Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <motion.div
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 0.1, scale: 1 }}
-          transition={{ duration: 1 }}
-          className="absolute top-20 -left-20 w-96 h-96 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full blur-3xl"
-        />
-        <motion.div
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 0.1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.2 }}
-          className="absolute bottom-20 -right-20 w-96 h-96 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full blur-3xl"
-        />
-      </div>
-
-      <div className="container max-w-3xl mx-auto relative z-10 mt-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Button
-            variant="ghost"
-            onClick={() => router.push('/')}
-            className="mb-6 hover:bg-white/50 dark:hover:bg-slate-800/50"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Kembali
-          </Button>
-        </motion.div>
-
+      <div className="relative min-h-screen flex items-center justify-center p-4 lg:p-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-0 bg-white dark:bg-[#111625] rounded-[32px] shadow-2xl shadow-slate-200/50 dark:shadow-black/50 overflow-hidden border border-white/50 dark:border-slate-800/50 backdrop-blur-3xl"
         >
-          <Card className="shadow-2xl border-2 border-purple-200/50 dark:border-purple-900/50 backdrop-blur-sm bg-white/95 dark:bg-slate-900/95">
-            <CardHeader className="text-center space-y-4 pb-6 relative">
-              {/* Test Badge */}
-              <div className="absolute top-4 right-4">
-                <Badge className="bg-yellow-500 text-black font-bold">TEST MODE</Badge>
+          {/* LEFT SIDE: Product Visual & Details */}
+          <div className="lg:col-span-5 relative p-8 lg:p-12 flex flex-col justify-between overflow-hidden group">
+            {/* Dynamic Background for Left Panel */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${currentPlan.color} opacity-[0.03] dark:opacity-[0.05] group-hover:opacity-[0.06] transition-opacity duration-700`} />
+
+            <div className="relative z-10">
+              <div
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/5 dark:bg-white/10 backdrop-blur-md border border-slate-900/5 text-xs font-semibold text-slate-600 dark:text-slate-300 mb-8 cursor-pointer hover:bg-slate-900/10 transition-colors"
+                onClick={() => router.push('/')}
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Kembali ke Beranda
               </div>
 
-              {/* Decorative Crown Icon for Premium */}
-              {plan === 'premium' && (
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ duration: 0.6, type: "spring" }}
-                  className="absolute -top-6 left-1/2 -translate-x-1/2"
-                >
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                    <Crown className="w-6 h-6 text-white" />
-                  </div>
-                </motion.div>
-              )}
-              
               <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, type: "spring" }}
-                className="mx-auto w-20 h-20 bg-gradient-to-br from-purple-400 via-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-4 shadow-xl relative"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                className="space-y-6"
               >
-                <CreditCard className="w-10 h-10 text-white" />
-                <motion.div
-                  animate={{ 
-                    scale: [1, 1.2, 1],
-                    opacity: [0.5, 0, 0.5]
-                  }}
-                  transition={{ 
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="absolute inset-0 rounded-2xl bg-purple-400 blur-xl"
-                />
-              </motion.div>
-              
-              <div className="space-y-2">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <CardTitle className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                    TEST Pembayaran {currentPlan.name}
-                  </CardTitle>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <CardDescription className="text-base sm:text-lg">
-                    🧪 Testing Pakasir.com Payment Gateway
-                  </CardDescription>
-                </motion.div>
-              </div>
-            </CardHeader>
-
-            <CardContent className="space-y-6 px-4 sm:px-8 pb-8">
-              {/* Plan Summary with Animation */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
-                className="bg-gradient-to-br from-purple-50 via-blue-50 to-purple-50 dark:from-purple-950/30 dark:via-blue-950/30 dark:to-purple-950/30 rounded-2xl p-6 border-2 border-purple-300/50 dark:border-purple-700/50 shadow-lg relative overflow-hidden"
-              >
-                {/* Discount Badge */}
-                <div className="absolute top-2 right-2">
-                  <Badge className="bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold px-3 py-1 text-xs shadow-lg border-0">
-                    🔥 DISKON {currentPlan.discount}
-                  </Badge>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold tracking-wider text-purple-600 dark:text-purple-400 uppercase">Secure Checkout</h3>
+                  <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white">
+                    VIP Access <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">.</span>
+                  </h1>
+                  <p className="text-lg text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed">
+                    {currentPlan.tagline}. Tingkatkan peluang karirmu sekarang.
+                  </p>
                 </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <Crown className="w-4 h-4" />
-                      Paket yang dipilih
-                    </span>
-                    <span className="font-bold text-lg">{currentPlan.name}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <Zap className="w-4 h-4" />
-                      Durasi
-                    </span>
-                    <span className="font-semibold">{currentPlan.duration}</span>
-                  </div>
-                  
-                  {/* Price Before Discount */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground">Harga Normal</span>
-                    <span className="text-base font-semibold text-muted-foreground line-through">
-                      {currentPlan.originalPrice}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between pt-4 mt-4 border-t-2 border-purple-300/50 dark:border-purple-700/50">
-                    <span className="font-bold text-lg">Total Pembayaran</span>
-                    <div className="text-right">
-                      <motion.span
-                        initial={{ scale: 1 }}
-                        animate={{ scale: [1, 1.05, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="text-3xl font-black bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent block"
-                      >
-                        {currentPlan.priceText}
-                      </motion.span>
+
+                {/* Plan Card (Visual) */}
+                <div className="relative mt-8 group cursor-default">
+                  <div className={`absolute -inset-1 bg-gradient-to-r ${currentPlan.color} rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200`} />
+                  <div className="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-xl p-6 border border-slate-200/50 dark:border-slate-700/50 shadow-xl">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${currentPlan.color} flex items-center justify-center text-white shadow-lg`}>
+                        {plan === 'basic' ? <Zap className="w-6 h-6" /> : <Crown className="w-6 h-6" />}
+                      </div>
+                      <Badge className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 border-0 px-3 py-1 text-xs font-bold tracking-wide uppercase">
+                        {currentPlan.name}
+                      </Badge>
+                    </div>
+
+                    <div className="space-y-4">
+                      {currentPlan.features.map((feature, i) => (
+                        <div key={i} className="flex items-center gap-3 text-sm font-medium text-slate-600 dark:text-slate-300">
+                          <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+                          </div>
+                          {feature}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
               </motion.div>
+            </div>
 
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+            <div className="relative z-10 mt-12 space-y-4">
+              <div className="flex items-center gap-4 text-xs font-medium text-slate-400 dark:text-slate-500">
+                <div className="flex items-center gap-1.5">
+                  <Shield className="w-4 h-4 text-emerald-500" />
+                  Review 100% Aman
+                </div>
+                <div className="w-1 h-1 bg-slate-300 dark:bg-slate-700 rounded-full" />
+                <div className="flex items-center gap-1.5">
+                  <Lock className="w-4 h-4 text-emerald-500" />
+                  Enkripsi 256-bit
+                </div>
+              </div>
+            </div>
+          </div>
 
-              {/* Payment Form with Animations */}
-              <motion.form
+          {/* RIGHT SIDE: Payment Form */}
+          <div className="lg:col-span-7 bg-white dark:bg-[#111625] p-8 lg:p-12 relative">
+            <div className="absolute top-0 left-0 bottom-0 w-px bg-slate-100 dark:bg-slate-800 hidden lg:block" />
+
+            <div className="max-w-md mx-auto h-full flex flex-col justify-center">
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-                onSubmit={handleSubmit}
-                className="space-y-5"
+                transition={{ delay: 0.3 }}
               >
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="space-y-2"
-                >
-                  <Label htmlFor="fullName" className="text-base font-semibold flex items-center gap-2">
-                    <User className="w-4 h-4 text-purple-600" />
-                    Nama Lengkap *
-                  </Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="Nama lengkap sesuai KTP"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    required
-                    disabled={loading}
-                    className="h-12 border-2 border-purple-200 focus:border-purple-500 dark:border-purple-800 dark:focus:border-purple-600 transition-colors"
-                  />
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.7 }}
-                  className="space-y-2"
-                >
-                  <Label htmlFor="email" className="text-base font-semibold flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-purple-600" />
-                    Email *
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="email@example.com"
-                    value={formData.email}
-                    onChange={handleEmailChange}
-                    required
-                    disabled={loading}
-                    className={`h-12 border-2 transition-colors ${
-                      emailError 
-                        ? 'border-red-500 focus:border-red-500' 
-                        : 'border-purple-200 focus:border-purple-500 dark:border-purple-800 dark:focus:border-purple-600'
-                    }`}
-                  />
-                  {emailError && (
-                    <p className="text-xs text-red-600 flex items-center gap-1">
-                      ⚠️ {emailError}
+                <div className="flex items-end justify-between mb-8 pb-8 border-b border-slate-100 dark:border-slate-800">
+                  <div>
+                    <p className="text-sm text-slate-500 font-medium mb-1">Total Pembayaran</p>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">{currentPlan.priceText}</span>
+                      <span className="text-lg text-slate-400 line-through decoration-slate-300 dark:decoration-slate-700">{currentPlan.originalPrice}</span>
+                    </div>
+                    <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded w-fit">
+                      {currentPlan.saveAmount}
                     </p>
-                  )}
-                  {emailSuggestion && (
-                    <Button
-                      type="button"
-                      variant="link"
-                      size="sm"
-                      onClick={applySuggestion}
-                      className="p-0 h-auto text-blue-600"
-                    >
-                      Maksud Anda: <strong>{emailSuggestion}</strong>? Klik untuk gunakan
-                    </Button>
-                  )}
-                  <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Shield className="w-3 h-3" />
-                    Invoice pembayaran akan dikirim ke email ini (TEST MODE)
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.8 }}
-                  className="space-y-2"
-                >
-                  <Label htmlFor="whatsapp" className="text-base font-semibold flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-purple-600" />
-                    Nomor WhatsApp *
-                  </Label>
-                  <Input
-                    id="whatsapp"
-                    type="tel"
-                    placeholder="08123456789"
-                    value={formData.whatsapp}
-                    onChange={handleWhatsAppChange}
-                    required
-                    disabled={loading}
-                    inputMode="numeric"
-                    className={`h-12 border-2 transition-colors ${
-                      whatsappError 
-                        ? 'border-red-500 focus:border-red-500' 
-                        : 'border-purple-200 focus:border-purple-500 dark:border-purple-800 dark:focus:border-purple-600'
-                    }`}
-                  />
-                  {whatsappError && (
-                    <p className="text-xs text-red-600 flex items-center gap-1">
-                      ⚠️ {whatsappError}
-                    </p>
-                  )}
-                  <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Shield className="w-3 h-3" />
-                    Untuk konfirmasi pembayaran (TEST MODE)
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.9 }}
-                >
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className={`w-full h-14 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:from-purple-600 hover:via-blue-600 hover:to-cyan-600 text-white font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] relative overflow-hidden ${
-                      loading ? 'cursor-wait' : ''
-                    }`}
-                    disabled={loading}
-                  >
-                    {/* Skeleton Shimmer Effect When Loading */}
-                    {loading && (
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                        animate={{
-                          x: ['-100%', '200%'],
-                        }}
-                        transition={{
-                          duration: 1.5,
-                          repeat: Infinity,
-                          ease: 'linear',
-                        }}
-                      />
-                    )}
-                    
-                    {/* Button Content */}
-                    <span className="relative z-10 flex items-center justify-center">
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-6 h-6 mr-2 animate-spin" />
-                          Menghubungkan ke Pakasir.com...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-6 h-6 mr-2" />
-                          TEST Pembayaran Pakasir.com
-                          <Zap className="w-5 h-5 ml-2" />
-                        </>
-                      )}
-                    </span>
-                  </Button>
-                </motion.div>
-              </motion.form>
-
-              {/* Security Badge */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.1 }}
-                className="flex flex-col items-center gap-3 pt-6"
-              >
-                <div className="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30 px-6 py-3 rounded-full border border-yellow-300 dark:border-yellow-700">
-                  <Shield className="w-5 h-5 text-yellow-600" />
-                  <span>🧪 TEST MODE - Pakasir.com Payment Gateway</span>
+                  </div>
+                  <div className="text-right hidden sm:block">
+                    <p className="text-sm font-medium text-slate-500 mb-1">Paket</p>
+                    <p className="font-semibold text-slate-900 dark:text-white capitalize">{currentPlan.duration}</p>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground text-center">
-                  🔐 Ini adalah halaman test payment untuk development
-                </p>
+
+                {/* Warning Banner */}
+                <div className="mb-8 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20 flex gap-3">
+                  <Sparkles className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-amber-800 dark:text-amber-200">
+                    <strong>Test Mode:</strong> Tidak ada pembayaran asli yang diproses. Gunakan data dummy untuk mencoba alur pembayaran.
+                  </div>
+                </div>
+
+                {error && (
+                  <Alert variant="destructive" className="mb-6 animate-shake">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-5">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Nama Lengkap</Label>
+                      <PremiumInput
+                        icon={User}
+                        placeholder="Contoh: Budi Santoso"
+                        value={formData.fullName}
+                        onChange={(e: any) => setFormData({ ...formData, fullName: e.target.value })}
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Alamat Email</Label>
+                      <PremiumInput
+                        icon={Mail}
+                        type="email"
+                        placeholder="budi@example.com"
+                        value={formData.email}
+                        onChange={handleEmailChange}
+                        required
+                        disabled={loading}
+                        className={emailError ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}
+                      />
+                      {emailError && <p className="text-xs font-medium text-red-500 ml-1">{emailError}</p>}
+                      {emailSuggestion && (
+                        <div className="ml-1 text-xs">
+                          <span className="text-slate-500">Maksud anda </span>
+                          <button type="button" onClick={applySuggestion} className="font-bold text-blue-600 hover:underline">{emailSuggestion}</button>
+                          <span className="text-slate-500">?</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Nomor WhatsApp</Label>
+                      <PremiumInput
+                        icon={Phone}
+                        type="tel"
+                        placeholder="0812xxxx"
+                        value={formData.whatsapp}
+                        onChange={handleWhatsAppChange}
+                        required
+                        disabled={loading}
+                        className={whatsappError ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}
+                      />
+                      {whatsappError && <p className="text-xs font-medium text-red-500 ml-1">{whatsappError}</p>}
+                    </div>
+                  </div>
+
+                  <div className="pt-4">
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className={`w-full h-14 rounded-xl text-base font-bold shadow-lg shadow-purple-500/20 transition-all duration-300 ${loading ? 'opacity-80 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-[0.98]'
+                        } bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100`}
+                      disabled={loading}
+                      onMouseEnter={() => setIsHovered(true)}
+                      onMouseLeave={() => setIsHovered(false)}
+                    >
+                      {loading ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <span>Memproses...</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between w-full px-2">
+                          <span>Lanjut ke Pembayaran</span>
+                          <div className={`w-8 h-8 rounded-full bg-white/20 dark:bg-black/10 flex items-center justify-center transition-transform duration-300 ${isHovered ? 'translate-x-1' : ''}`}>
+                            <ArrowLeft className="w-4 h-4 rotate-180" />
+                          </div>
+                        </div>
+                      )}
+                    </Button>
+                    <p className="text-center text-xs text-slate-400 mt-4">
+                      Dengan melanjutkan, Anda menyetujui Syarat & Ketentuan kami.
+                    </p>
+                  </div>
+                </form>
               </motion.div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
       </div>
     </div>
@@ -505,8 +411,8 @@ function TestPaymentFormContent() {
 export default function TestPaymentPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] dark:bg-[#0B0F19]">
+        <Loader2 className="w-10 h-10 animate-spin text-purple-600" />
       </div>
     }>
       <TestPaymentFormContent />

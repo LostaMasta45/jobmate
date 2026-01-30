@@ -8,7 +8,7 @@ import { SecuritySection } from "@/components/settings/SecuritySection";
 
 export default async function SettingsPage() {
   const userProfile = await getUserProfile();
-  
+
   let profile;
   try {
     profile = await getProfile();
@@ -49,26 +49,30 @@ export default async function SettingsPage() {
   const isAdmin = userProfile?.role === 'admin';
 
   return (
-    <AppShell isAdmin={isAdmin}>
-      <PageHeader
-        title="Pengaturan"
-        description="Kelola profil, keamanan, dan preferensi akun Anda"
-      />
+    <AppShell isAdmin={isAdmin} isFullScreen>
+      <div className="h-full w-full overflow-y-auto bg-background dark:bg-[#050505] p-4 sm:p-6 lg:p-8">
+        <div className="max-w-4xl mx-auto space-y-8 pb-20">
+          <PageHeader
+            title="Pengaturan"
+            description="Kelola profil, keamanan, dan preferensi akun Anda"
+          />
 
-      <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-          <TabsTrigger value="profile">Profil</TabsTrigger>
-          <TabsTrigger value="security">Keamanan</TabsTrigger>
-        </TabsList>
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 lg:w-[400px] bg-muted/50 dark:bg-white/5 p-1">
+              <TabsTrigger value="profile">Profil</TabsTrigger>
+              <TabsTrigger value="security">Keamanan</TabsTrigger>
+            </TabsList>
 
-        <TabsContent value="profile" className="space-y-6">
-          <ProfileSection profile={profile} />
-        </TabsContent>
+            <TabsContent value="profile" className="space-y-6">
+              <ProfileSection profile={profile} />
+            </TabsContent>
 
-        <TabsContent value="security" className="space-y-6">
-          <SecuritySection />
-        </TabsContent>
-      </Tabs>
+            <TabsContent value="security" className="space-y-6">
+              <SecuritySection />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
     </AppShell>
   );
 }

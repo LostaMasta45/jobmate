@@ -16,9 +16,9 @@ export default function CoverLetterDocsPage() {
             <FileText className="h-8 w-8 text-primary" />
           </div>
           <div>
-            <h1 className="text-4xl font-bold">Cover Letter Generator</h1>
+            <h1 className="text-4xl font-bold">Surat Lamaran Generator</h1>
             <p className="text-muted-foreground text-lg">
-              Generate English cover letter yang professional dan compelling!
+              Buat surat lamaran formal Indonesia yang professional dengan wizard!
             </p>
           </div>
         </div>
@@ -26,33 +26,33 @@ export default function CoverLetterDocsPage() {
 
       <Separator />
 
-      {/* What is Cover Letter */}
+      {/* What is Surat Lamaran */}
       <Card>
         <CardHeader>
-          <CardTitle>Apa Bedanya Cover Letter dengan Surat Lamaran?</CardTitle>
+          <CardTitle>Apa itu Surat Lamaran?</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert>
             <Sparkles className="h-4 w-4" />
             <AlertDescription>
-              <strong>Cover Letter</strong> = English version, often more concise dan direct.<br/>
-              <strong>Surat Lamaran</strong> = Bahasa Indonesia version, lebih formal structure.
+              <strong>Surat Lamaran</strong> adalah surat formal untuk melamar pekerjaan di Indonesia.<br />
+              Tool ini membantu Anda membuat surat lamaran yang professional dan lengkap.
             </AlertDescription>
           </Alert>
 
           <p className="text-muted-foreground">
-            Cover letter digunakan untuk melamar ke perusahaan <strong>multinational</strong>, 
-            <strong>startup tech</strong>, atau posisi yang require <strong>English communication</strong>.
+            Surat lamaran berbeda dengan <strong>Cover Letter</strong> (versi Inggris).
+            Surat lamaran mengikuti format formal Indonesia dengan data diri lengkap.
           </p>
 
           <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-            <h3 className="font-semibold text-blue-600 mb-2">Kapan Pakai Cover Letter?</h3>
+            <h3 className="font-semibold text-blue-600 mb-2">Kapan Pakai Surat Lamaran?</h3>
             <ul className="space-y-1 text-sm text-muted-foreground">
-              <li>✅ Job posting dalam bahasa Inggris</li>
-              <li>✅ Perusahaan multinational (Google, Microsoft, dll)</li>
-              <li>✅ Startup dengan international team</li>
-              <li>✅ Posisi yang require English proficiency</li>
-              <li>✅ Apply ke perusahaan luar negeri</li>
+              <li>✅ Melamar ke perusahaan lokal Indonesia</li>
+              <li>✅ Job posting dalam bahasa Indonesia</li>
+              <li>✅ Perusahaan yang require format formal</li>
+              <li>✅ BUMN dan instansi pemerintah</li>
+              <li>✅ Perusahaan dengan kultur tradisional</li>
             </ul>
           </div>
         </CardContent>
@@ -61,117 +61,27 @@ export default function CoverLetterDocsPage() {
       {/* Step by Step */}
       <Card>
         <CardHeader>
-          <CardTitle>Cara Menggunakan Cover Letter Generator</CardTitle>
-          <CardDescription>AI akan craft compelling cover letter dalam bahasa Inggris</CardDescription>
+          <CardTitle>Cara Menggunakan Surat Lamaran Generator</CardTitle>
+          <CardDescription>7-step wizard untuk membuat surat lamaran formal Indonesia</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <StepByStep
             step={1}
-            title="Input Your Information"
+            title="Data Perusahaan"
             description={
               <div className="space-y-2">
-                <p>Fill in the form with your details:</p>
+                <p>Isi informasi perusahaan yang Anda lamar:</p>
                 <ul className="space-y-2 ml-4">
-                  <li>• <strong>Full Name</strong></li>
-                  <li>• <strong>Position</strong> you're applying for</li>
-                  <li>• <strong>Company Name</strong></li>
-                  <li>• <strong>Key Skills</strong> (relevant to the role)</li>
-                  <li>• <strong>Experience</strong> highlights (brief summary)</li>
-                  <li>• <strong>Reason</strong> why you're interested in the role/company</li>
-                  <li>• <strong>Tone</strong>: Formal, Professional, atau Friendly</li>
+                  <li>• <strong>Nama Perusahaan</strong></li>
+                  <li>• <strong>Alamat Perusahaan</strong></li>
+                  <li>• <strong>Nama HRD</strong> (jika diketahui)</li>
+                  <li>• <strong>Posisi yang Dilamar</strong></li>
+                  <li>• <strong>Sumber Lowongan</strong> (LinkedIn, JobStreet, dll)</li>
                 </ul>
-                <div className="mt-4 p-4 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground italic">[SCREENSHOT: Input form]</p>
-                </div>
-              </div>
-            }
-          />
-
-          <StepByStep
-            step={2}
-            title="Select Tone"
-            description={
-              <div className="space-y-2">
-                <p>Choose the right tone for your cover letter:</p>
-                <div className="space-y-3 mt-3">
-                  <div className="p-3 bg-muted/50 rounded">
-                    <strong>Formal</strong>
-                    <p className="text-sm text-muted-foreground">
-                      For corporate, banking, legal, government positions. Very professional language.
-                    </p>
-                  </div>
-                  <div className="p-3 bg-muted/50 rounded">
-                    <strong>Professional</strong> (Default)
-                    <p className="text-sm text-muted-foreground">
-                      For most applications. Professional but not overly stiff. Works for tech, consulting, etc.
-                    </p>
-                  </div>
-                  <div className="p-3 bg-muted/50 rounded">
-                    <strong>Friendly</strong>
-                    <p className="text-sm text-muted-foreground">
-                      For startups, creative agencies, casual work environments. More conversational tone.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            }
-          />
-
-          <StepByStep
-            step={3}
-            title="Generate with AI"
-            description={
-              <div className="space-y-2">
-                <ol className="space-y-2 ml-4">
-                  <li>1. Click <strong>"Generate Cover Letter"</strong></li>
-                  <li>2. AI will create a cover letter that:
-                    <ul className="ml-4 mt-1 space-y-1">
-                      <li>✅ Opens with a strong hook</li>
-                      <li>✅ Highlights your relevant qualifications</li>
-                      <li>✅ Shows enthusiasm for the role</li>
-                      <li>✅ Closes with a clear call-to-action</li>
-                    </ul>
-                  </li>
-                  <li>3. Wait 10-15 seconds for processing</li>
-                </ol>
-                <div className="mt-4 p-4 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground italic">[SCREENSHOT: Generated cover letter]</p>
-                </div>
-              </div>
-            }
-          />
-
-          <StepByStep
-            step={4}
-            title="Customize & Personalize"
-            description={
-              <div className="space-y-2">
-                <p>Make it uniquely yours:</p>
-                <ol className="space-y-2 ml-4">
-                  <li>1. <strong>Add specific details</strong> about the company
-                    <ul className="ml-4 mt-1 space-y-1 text-sm text-muted-foreground">
-                      <li>• Recent news, products, or initiatives</li>
-                      <li>• Why their mission resonates with you</li>
-                    </ul>
-                  </li>
-                  <li>2. <strong>Quantify achievements</strong>
-                    <ul className="ml-4 mt-1 space-y-1 text-sm text-muted-foreground">
-                      <li>• "Increased sales by 35%"</li>
-                      <li>• "Led team of 8 developers"</li>
-                    </ul>
-                  </li>
-                  <li>3. <strong>Show genuine passion</strong>
-                    <ul className="ml-4 mt-1 space-y-1 text-sm text-muted-foreground">
-                      <li>• What excites you about the role?</li>
-                      <li>• How do you see yourself contributing?</li>
-                    </ul>
-                  </li>
-                </ol>
                 <Alert className="mt-3">
                   <Lightbulb className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>Pro Tip:</strong> The best cover letters tell a <strong>story</strong>. 
-                    Don't just list qualifications—show how your experience connects to their needs.
+                    <strong>Tips:</strong> Paste job description untuk AI parsing otomatis!
                   </AlertDescription>
                 </Alert>
               </div>
@@ -179,16 +89,120 @@ export default function CoverLetterDocsPage() {
           />
 
           <StepByStep
-            step={5}
-            title="Download & Submit"
+            step={2}
+            title="Data Diri"
             description={
               <div className="space-y-2">
-                <p>Download in your preferred format:</p>
+                <p>Isi informasi pribadi Anda:</p>
                 <ul className="space-y-2 ml-4">
-                  <li>• <strong>PDF</strong> (recommended) - Professional and universal</li>
-                  <li>• <strong>DOCX</strong> (Word) - If required by employer</li>
-                  <li>• <strong>Copy Text</strong> - For pasting in email or online forms</li>
+                  <li>• <strong>Nama Lengkap</strong></li>
+                  <li>• <strong>Tempat & Tanggal Lahir</strong></li>
+                  <li>• <strong>Alamat</strong></li>
+                  <li>• <strong>No. KTP</strong></li>
+                  <li>• <strong>No. Telepon</strong></li>
+                  <li>• <strong>Email</strong></li>
+                  <li>• <strong>Status</strong> (Lajang/Menikah)</li>
                 </ul>
+              </div>
+            }
+          />
+
+          <StepByStep
+            step={3}
+            title="Pendidikan"
+            description={
+              <div className="space-y-2">
+                <p>Tambahkan riwayat pendidikan:</p>
+                <ul className="space-y-1 ml-4">
+                  <li>• <strong>Jenjang</strong> (S1, S2, Diploma)</li>
+                  <li>• <strong>Jurusan</strong></li>
+                  <li>• <strong>Universitas/Sekolah</strong></li>
+                  <li>• <strong>IPK</strong> (optional)</li>
+                  <li>• <strong>Tahun Lulus</strong></li>
+                  <li>• <strong>Kegiatan/Organisasi</strong></li>
+                </ul>
+              </div>
+            }
+          />
+
+          <StepByStep
+            step={4}
+            title="Pengalaman"
+            description={
+              <div className="space-y-2">
+                <p>Pilih tipe pengalaman Anda:</p>
+                <div className="space-y-2 mt-3">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded">
+                    <strong className="text-blue-600">Fresh Graduate</strong>
+                    <p className="text-sm text-muted-foreground">Ceritakan pengalaman magang, proyek, atau kegiatan kampus</p>
+                  </div>
+                  <div className="p-3 bg-green-50 dark:bg-green-950 rounded">
+                    <strong className="text-green-600">Berpengalaman</strong>
+                    <p className="text-sm text-muted-foreground">Tambahkan riwayat kerja sebelumnya</p>
+                  </div>
+                </div>
+              </div>
+            }
+          />
+
+          <StepByStep
+            step={5}
+            title="Motivasi"
+            description={
+              <div className="space-y-2">
+                <p>AI akan generate paragraf motivasi berdasarkan:</p>
+                <ul className="space-y-1 ml-4">
+                  <li>• Mengapa tertarik dengan posisi ini?</li>
+                  <li>• Mengapa tertarik dengan perusahaan ini?</li>
+                  <li>• Apa value yang bisa Anda berikan?</li>
+                  <li>• Bagaimana Anda cocok untuk peran ini?</li>
+                </ul>
+                <Alert className="mt-3">
+                  <Sparkles className="h-4 w-4" />
+                  <AlertDescription>
+                    AI akan generate motivasi yang compelling - Anda bisa edit sesuai keinginan!
+                  </AlertDescription>
+                </Alert>
+              </div>
+            }
+          />
+
+          <StepByStep
+            step={6}
+            title="Lampiran"
+            description={
+              <div className="space-y-2">
+                <p>Pilih dokumen yang akan dilampirkan:</p>
+                <ul className="space-y-1 ml-4">
+                  <li>• Curriculum Vitae (CV)</li>
+                  <li>• Foto terbaru</li>
+                  <li>• Ijazah & Transkrip</li>
+                  <li>• Sertifikat</li>
+                  <li>• Portfolio (jika relevant)</li>
+                </ul>
+                <p className="mt-3 text-sm">Optional statements:</p>
+                <ul className="space-y-1 ml-4 text-sm text-muted-foreground">
+                  <li>• Pernyataan kesediaan bekerja</li>
+                  <li>• Pernyataan siap ditempatkan</li>
+                  <li>• Pernyataan siap lembur</li>
+                </ul>
+              </div>
+            }
+          />
+
+          <StepByStep
+            step={7}
+            title="Preview & Simpan"
+            description={
+              <div className="space-y-2">
+                <p>Review surat lamaran Anda:</p>
+                <ol className="space-y-2 ml-4">
+                  <li>1. <strong>Pilih Template</strong> (T0-T5 tersedia)</li>
+                  <li>2. <strong>Preview</strong> hasil generate</li>
+                  <li>3. <strong>Edit</strong> jika perlu penyesuaian</li>
+                  <li>4. <strong>Simpan</strong> ke akun Anda</li>
+                  <li>5. <strong>Download</strong> dalam format PDF atau DOCX</li>
+                </ol>
               </div>
             }
           />
@@ -205,8 +219,8 @@ export default function CoverLetterDocsPage() {
             <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded">
               <strong>Opening Paragraph</strong>
               <p className="text-muted-foreground mt-1">
-                • Hook that grabs attention<br/>
-                • Position you're applying for<br/>
+                • Hook that grabs attention<br />
+                • Position you're applying for<br />
                 • Where you found the job posting
               </p>
             </div>
@@ -214,8 +228,8 @@ export default function CoverLetterDocsPage() {
             <div className="p-3 bg-green-50 dark:bg-green-950 rounded">
               <strong>Body Paragraph 1 - Your Qualifications</strong>
               <p className="text-muted-foreground mt-1">
-                • Relevant experience and skills<br/>
-                • Specific achievements with metrics<br/>
+                • Relevant experience and skills<br />
+                • Specific achievements with metrics<br />
                 • How you meet the requirements
               </p>
             </div>
@@ -223,8 +237,8 @@ export default function CoverLetterDocsPage() {
             <div className="p-3 bg-purple-50 dark:bg-purple-950 rounded">
               <strong>Body Paragraph 2 - Why This Company</strong>
               <p className="text-muted-foreground mt-1">
-                • What attracts you to the company<br/>
-                • Alignment with company values/mission<br/>
+                • What attracts you to the company<br />
+                • Alignment with company values/mission<br />
                 • How you'll contribute to their goals
               </p>
             </div>
@@ -232,8 +246,8 @@ export default function CoverLetterDocsPage() {
             <div className="p-3 bg-orange-50 dark:bg-orange-950 rounded">
               <strong>Closing Paragraph</strong>
               <p className="text-muted-foreground mt-1">
-                • Reiterate interest and enthusiasm<br/>
-                • Call-to-action (looking forward to discussing)<br/>
+                • Reiterate interest and enthusiasm<br />
+                • Call-to-action (looking forward to discussing)<br />
                 • Thank them for consideration
               </p>
             </div>
@@ -242,7 +256,7 @@ export default function CoverLetterDocsPage() {
           <Alert className="mt-4">
             <CheckCircle className="h-4 w-4" />
             <AlertDescription>
-              <strong>Length:</strong> Keep it to <strong>3-4 paragraphs</strong> or <strong>250-400 words</strong>. 
+              <strong>Length:</strong> Keep it to <strong>3-4 paragraphs</strong> or <strong>250-400 words</strong>.
               Hiring managers don't have time for novels!
             </AlertDescription>
           </Alert>
@@ -293,7 +307,7 @@ export default function CoverLetterDocsPage() {
           <div>
             <h3 className="font-semibold mb-2">Q: Do I really need a cover letter?</h3>
             <p className="text-muted-foreground">
-              A: <strong>Yes!</strong> Even if "optional", submitting one shows initiative and can set you apart 
+              A: <strong>Yes!</strong> Even if "optional", submitting one shows initiative and can set you apart
               from 80% of applicants who don't bother.
             </p>
           </div>
@@ -303,7 +317,7 @@ export default function CoverLetterDocsPage() {
           <div>
             <h3 className="font-semibold mb-2">Q: Should I use the same cover letter for multiple applications?</h3>
             <p className="text-muted-foreground">
-              A: <strong>NO.</strong> Customize each one. Hiring managers can tell when you're using a template. 
+              A: <strong>NO.</strong> Customize each one. Hiring managers can tell when you're using a template.
               Personalization shows genuine interest.
             </p>
           </div>
@@ -313,7 +327,7 @@ export default function CoverLetterDocsPage() {
           <div>
             <h3 className="font-semibold mb-2">Q: How do I address if I don't know the hiring manager's name?</h3>
             <p className="text-muted-foreground">
-              A: Try LinkedIn or company website first. If impossible to find, use "Dear Hiring Manager" 
+              A: Try LinkedIn or company website first. If impossible to find, use "Dear Hiring Manager"
               or "Dear [Department] Team" instead of "To Whom It May Concern".
             </p>
           </div>
@@ -324,10 +338,10 @@ export default function CoverLetterDocsPage() {
       <Alert>
         <Download className="h-4 w-4" />
         <AlertDescription>
-          <strong>Ready to Create Your Cover Letter?</strong>
+          <strong>Siap Buat Surat Lamaran?</strong>
           <br />
-          <a href="/tools/cover-letter" className="text-primary underline">
-            Open Cover Letter Generator →
+          <a href="/surat-lamaran" className="text-primary underline">
+            Buka Surat Lamaran Generator →
           </a>
         </AlertDescription>
       </Alert>

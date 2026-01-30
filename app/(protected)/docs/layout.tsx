@@ -8,7 +8,7 @@ export default async function DocsLayout({
 }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  
+
   let userData = null;
   let isAdmin = false;
 
@@ -29,8 +29,10 @@ export default async function DocsLayout({
   }
 
   return (
-    <AppShell user={userData || undefined} isAdmin={isAdmin}>
-      {children}
+    <AppShell user={userData || undefined} isAdmin={isAdmin} isFullScreen>
+      <div className="h-full w-full overflow-y-auto bg-background dark:bg-[#050505] p-4 pt-20 sm:p-6 sm:pt-24 lg:p-8">
+        {children}
+      </div>
     </AppShell>
   );
 }

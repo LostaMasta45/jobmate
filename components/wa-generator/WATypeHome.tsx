@@ -169,10 +169,7 @@ export function WATypeHome({ userName, onSelectType }: WATypeHomeProps) {
                     animate={{ opacity: 1, y: 0 }}
                     className="flex flex-col items-center justify-center text-center mb-12 md:mb-16 relative"
                 >
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700 backdrop-blur-md mb-6 shadow-sm">
-                        <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                        <span className="text-xs font-semibold tracking-wide uppercase text-slate-500 dark:text-slate-400">WhatsApp Generator V2.0</span>
-                    </div>
+
 
                     <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 leading-tight">
                         Chat Lebih <span className="text-green-600 dark:text-green-500 relative inline-block">
@@ -336,12 +333,7 @@ export function WATypeHome({ userName, onSelectType }: WATypeHomeProps) {
                     ))}
                 </motion.div>
 
-                <div className="flex justify-center pb-8">
-                    <p className="flex items-center gap-2 text-xs font-medium text-slate-400 bg-white/50 dark:bg-zinc-900/50 px-4 py-2 rounded-full border border-slate-200 dark:border-zinc-800 backdrop-blur-sm">
-                        <Zap className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                        <span>Powered by JobMate AI Engine</span>
-                    </p>
-                </div>
+
 
             </div>
         </div>

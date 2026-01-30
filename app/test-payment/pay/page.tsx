@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -11,13 +10,15 @@ import {
   Loader2,
   CheckCircle2,
   Clock,
-  Smartphone,
   Shield,
   ArrowLeft,
   RefreshCw,
   Copy,
-  CheckCheck,
-  Zap
+  Zap,
+  Smartphone,
+  ChevronRight,
+  Wifi,
+  Battery
 } from "lucide-react";
 import QRCode from "react-qr-code";
 
@@ -113,7 +114,6 @@ function PaymentDisplayContent() {
         const data = await response.json();
 
         if (data.success && data.status === 'completed') {
-          // Payment completed! Redirect to success page
           router.push(`/test-payment/success?order_id=${orderId}`);
         }
       } catch (err) {
@@ -121,12 +121,8 @@ function PaymentDisplayContent() {
       }
     };
 
-    // Check immediately
     checkStatus();
-
-    // Then check every 5 seconds
     const interval = setInterval(checkStatus, 5000);
-
     return () => clearInterval(interval);
   }, [orderId, paymentData, router]);
 
@@ -143,7 +139,6 @@ function PaymentDisplayContent() {
         if (data.status === 'completed') {
           router.push(`/test-payment/success?order_id=${orderId}`);
         } else {
-          // Show status
           alert(`Status: ${data.status}\nBelum dibayar. Silakan selesaikan pembayaran.`);
         }
       } else {
@@ -178,7 +173,6 @@ function PaymentDisplayContent() {
         body: JSON.stringify({
           orderId: orderId,
           amount: paymentData.amount,
-          // Customer data for direct email sending
           customerEmail: customerData?.email,
           customerName: customerData?.fullName,
           planType: orderId?.includes('premium') ? 'premium' : 'basic',
@@ -188,14 +182,13 @@ function PaymentDisplayContent() {
       const data = await response.json();
 
       if (data.success) {
-        // Simulation successful, redirect to success page
         router.push(`/test-payment/success?order_id=${orderId}`);
       } else {
-        alert(`Simulasi gagal: ${data.error || 'Unknown error'}\n\nPastikan project di Pakasir.com dalam mode Sandbox.`);
+        alert(`Simulasi gagal: ${data.error || 'Unknown error'}`);
       }
     } catch (err: any) {
       console.error('Simulation error:', err);
-      alert(`Terjadi kesalahan: ${err.message}\n\nPastikan project di Pakasir.com dalam mode Sandbox.`);
+      alert(`Terjadi kesalahan: ${err.message}`);
     } finally {
       setSimulating(false);
     }
@@ -224,10 +217,15 @@ function PaymentDisplayContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-        <div className="text-center space-y-4">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto text-purple-600" />
-          <p className="text-muted-foreground">Memuat data pembayaran...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#0B0F19]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full border-4 border-slate-800 border-t-purple-600 animate-spin" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-slate-700" />
+            </div>
+          </div>
+          <p className="text-slate-400 text-sm font-medium tracking-wide">SECURE CHECKOUT</p>
         </div>
       </div>
     );
@@ -235,19 +233,19 @@ function PaymentDisplayContent() {
 
   if (error || !paymentData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 px-4">
-        <Card className="max-w-md w-full">
-          <CardHeader>
-            <CardTitle className="text-red-600">Error</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground">{error || 'Terjadi kesalahan'}</p>
-            <Button onClick={() => router.push('/test-payment')} className="w-full">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Kembali
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center bg-[#0B0F19] px-4">
+        <div className="max-w-md w-full bg-[#111625] border border-slate-800 rounded-2xl p-8 text-center space-y-6">
+          <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto">
+            <Shield className="w-8 h-8 text-red-500" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-xl font-bold text-white">Sesi Berakhir</h2>
+            <p className="text-slate-400">{error || 'Terjadi kesalahan'}</p>
+          </div>
+          <Button onClick={() => router.push('/test-payment')} variant="outline" className="w-full border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white">
+            Kembali
+          </Button>
+        </div>
       </div>
     );
   }
@@ -255,302 +253,153 @@ function PaymentDisplayContent() {
   const isExpired = timeLeft <= 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-8 px-4">
-      {/* TEST MODE Banner */}
-      <div className="fixed top-0 left-0 right-0 bg-yellow-500 text-black text-center py-2 font-bold z-50">
-        🧪 TEST MODE - PAKASIR.COM CUSTOM PAYMENT
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 font-sans p-4 lg:p-8 flex flex-col items-center">
+
+      {/* Navbar Minimalist */}
+      <div className="w-full max-w-5xl mx-auto flex items-center justify-between mb-8">
+        <Button
+          variant="ghost"
+          onClick={() => router.push('/test-payment')}
+          className="text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-transparent pl-0"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          <span className="font-medium">Cancel</span>
+        </Button>
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-200 dark:bg-slate-900 rounded-full">
+          <Shield className="w-3 h-3 text-emerald-500" />
+          <span className="text-xs font-bold text-slate-600 dark:text-slate-400">SECURE PAYMENT</span>
+        </div>
       </div>
 
-      <div className="container max-w-4xl mx-auto mt-12 space-y-6">
-        {/* Back Button */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <Button
-            variant="ghost"
-            onClick={() => router.push('/test-payment')}
-            className="mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Kembali
-          </Button>
-        </motion.div>
+      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-        {/* Timer Alert */}
-        <AnimatePresence>
-          {!isExpired && timeLeft < 300 && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <Alert className="bg-amber-50 border-amber-300 dark:bg-amber-950/30">
-                <Clock className="h-4 w-4 text-amber-600" />
-                <AlertDescription className="text-amber-800 dark:text-amber-400">
-                  <strong>Segera selesaikan pembayaran!</strong> Waktu tersisa: {formatTime(timeLeft)}
-                </AlertDescription>
-              </Alert>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Expired Alert */}
-        {isExpired && (
-          <Alert variant="destructive">
-            <AlertDescription>
-              <strong>Pembayaran telah kadaluarsa.</strong> Silakan buat pembayaran baru.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* QR Code Section */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card className="shadow-xl border-2 border-purple-200/50 dark:border-purple-900/50">
-              <CardHeader className="text-center pb-4">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl">Scan QR Code</CardTitle>
-                  <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-                    QRIS
-                  </Badge>
+        {/* LEFT: Payment Details (Ticket Style) */}
+        <div className="lg:col-span-4 order-2 lg:order-1">
+          <div className="bg-white dark:bg-[#111625] rounded-3xl p-6 lg:p-8 shadow-xl shadow-slate-200/50 dark:shadow-black/50 border border-slate-100 dark:border-slate-800">
+            <div className="space-y-6">
+              <div>
+                <p className="text-xs font-semibold text-purple-600 dark:text-purple-400 tracking-wider mb-2">AMOUNT TO PAY</p>
+                <div className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
+                  {formatCurrency(paymentData.total_payment)}
                 </div>
-                <CardDescription>Gunakan aplikasi pembayaran Anda</CardDescription>
-              </CardHeader>
+              </div>
 
-              <CardContent className="space-y-6">
-                {/* QR Code */}
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="bg-white p-6 rounded-2xl shadow-lg"
-                >
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-orange-50 dark:bg-orange-900/10 border border-orange-100 dark:border-orange-900/20">
+                <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                <div>
+                  <p className="text-xs font-bold text-orange-800 dark:text-orange-300 uppercase">Payment Timer</p>
+                  <p className="text-sm font-mono font-medium text-orange-900 dark:text-orange-200">{formatTime(timeLeft)}</p>
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">Order ID</span>
+                  <span className="font-mono text-slate-700 dark:text-slate-300">{paymentData.order_id}</span>
+                </div>
+                {customerData && (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Customer</span>
+                      <span className="font-medium text-slate-900 dark:text-white text-right max-w-[150px] truncate">{customerData.fullName}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Email</span>
+                      <span className="text-slate-700 dark:text-slate-300 text-right max-w-[150px] truncate">{customerData.email}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <div className="pt-4 mt-4 border-t border-dashed border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-2 mb-2">
+                  <Smartphone className="w-4 h-4 text-slate-400" />
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">How to pay</span>
+                </div>
+                <ul className="text-xs space-y-2 text-slate-500 pl-6 list-disc">
+                  <li>Open your preferred mobile banking or e-wallet app (BCA, GoPay, OVO, etc).</li>
+                  <li>Select "Scan QRIS".</li>
+                  <li>Point your camera at the QR code on the right.</li>
+                  <li>Confirm payment details and enter your PIN.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT: QR Code (Focus) */}
+        <div className="lg:col-span-8 order-1 lg:order-2 flex flex-col items-center">
+          <div className="bg-white dark:bg-[#111625] rounded-[40px] p-8 lg:p-12 shadow-2xl shadow-purple-500/10 dark:shadow-purple-900/20 border border-slate-200 dark:border-slate-800 relative w-full max-w-xl mx-auto text-center overflow-hidden">
+            {/* Decorative Gradient Blob */}
+            <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-gradient-to-b from-purple-500/5 via-transparent to-transparent animate-spin-slow pointer-events-none" style={{ animationDuration: '20s' }} />
+
+            <div className="relative z-10">
+              <h2 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">Scan to Pay</h2>
+              <p className="text-slate-500 dark:text-slate-400 mb-8">QRIS supported by major Indonesian banks and e-wallets.</p>
+
+              <div className="relative mx-auto w-fit group">
+                {/* Dynamic Corner Borders */}
+                <div className="absolute -top-3 -left-3 w-8 h-8 border-t-4 border-l-4 border-slate-900 dark:border-white rounded-tl-xl" />
+                <div className="absolute -top-3 -right-3 w-8 h-8 border-t-4 border-r-4 border-slate-900 dark:border-white rounded-tr-xl" />
+                <div className="absolute -bottom-3 -left-3 w-8 h-8 border-b-4 border-l-4 border-slate-900 dark:border-white rounded-bl-xl" />
+                <div className="absolute -bottom-3 -right-3 w-8 h-8 border-b-4 border-r-4 border-slate-900 dark:border-white rounded-br-xl" />
+
+                <div className="bg-white p-4 rounded-xl shadow-lg relative overflow-hidden">
                   <QRCode
                     value={paymentData.payment_number}
-                    size={256}
+                    size={280}
                     style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                     viewBox={`0 0 256 256`}
                   />
-                </motion.div>
 
-                {/* Copy Button */}
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleCopy}
-                  disabled={copied}
-                >
-                  {copied ? (
-                    <>
-                      <CheckCheck className="w-4 h-4 mr-2" />
-                      Tersalin!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4 mr-2" />
-                      Salin Kode QR
-                    </>
+                  {/* Scanning Animation */}
+                  {!isExpired && (
+                    <motion.div
+                      className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_20px_rgba(239,68,68,0.5)] z-20"
+                      animate={{ top: ['0%', '100%', '0%'] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    />
                   )}
-                </Button>
 
-                {/* Instructions */}
-                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 rounded-xl p-4 space-y-3 border border-blue-200 dark:border-blue-800">
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                      1
+                  {isExpired && (
+                    <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center">
+                      <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-2">
+                        <Clock className="w-6 h-6 text-red-600" />
+                      </div>
+                      <p className="font-bold text-slate-900">Expired</p>
                     </div>
-                    <p className="text-sm">Buka aplikasi pembayaran (GoPay, OVO, Dana, dll)</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                      2
-                    </div>
-                    <p className="text-sm">Pilih menu <strong>Bayar</strong> atau <strong>Scan QR</strong></p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                      3
-                    </div>
-                    <p className="text-sm">Scan QR code di atas</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                      4
-                    </div>
-                    <p className="text-sm">Konfirmasi pembayaran di aplikasi</p>
-                  </div>
+                  )}
                 </div>
+              </div>
 
-                {/* Check Status Button */}
+              <div className="mt-8 flex items-center justify-center gap-4">
+                {/* Manual Check */}
                 <Button
                   onClick={handleCheckStatus}
                   disabled={checkingStatus || isExpired}
-                  className="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700"
-                  size="lg"
+                  className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 rounded-full h-10 px-6 font-medium"
                 >
-                  {checkingStatus ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Mengecek Status...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                      Cek Status Pembayaran
-                    </>
-                  )}
+                  {checkingStatus ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                  {checkingStatus ? 'Checking...' : 'Check Status'}
                 </Button>
 
-                {/* Sandbox Simulation Button */}
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-yellow-400/50"></div>
-                  </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="px-3 bg-white dark:bg-slate-900 text-yellow-600 font-bold">
-                      🧪 SANDBOX MODE
-                    </span>
-                  </div>
-                </div>
-
+                {/* Sandbox Simulator */}
                 <Button
                   onClick={handleSimulatePayment}
                   disabled={simulating || isExpired}
-                  variant="outline"
-                  className="w-full border-2 border-yellow-400 text-yellow-700 hover:bg-yellow-50 dark:hover:bg-yellow-950/30"
-                  size="lg"
+                  className="bg-amber-100 text-amber-800 hover:bg-amber-200 rounded-full h-10 px-6 font-medium border-0"
                 >
-                  {simulating ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Simulasi Pembayaran...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-4 h-4 mr-2" />
-                      Simulasi Pembayaran Berhasil
-                    </>
-                  )}
+                  {simulating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Zap className="w-4 h-4 mr-2 text-amber-600 fill-amber-600" />}
+                  Simulate Success
                 </Button>
-                <p className="text-xs text-center text-yellow-600">
-                  Klik tombol di atas untuk mensimulasikan pembayaran berhasil (hanya untuk testing)
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+              </div>
 
-          {/* Payment Details Section */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="space-y-6"
-          >
-            {/* Timer Card */}
-            <Card className="shadow-lg border-2 border-purple-200/50 dark:border-purple-900/50">
-              <CardContent className="pt-6">
-                <div className="text-center space-y-2">
-                  <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                    <Clock className="w-5 h-5" />
-                    <span className="text-sm">Waktu Pembayaran</span>
-                  </div>
-                  <div className={`text-5xl font-black font-mono ${isExpired
-                    ? 'text-red-600'
-                    : timeLeft < 300
-                      ? 'text-amber-600'
-                      : 'text-purple-600'
-                    }`}>
-                    {isExpired ? '00:00' : formatTime(timeLeft)}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {isExpired ? 'Kadaluarsa' : 'Selesaikan sebelum waktu habis'}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Payment Info Card */}
-            <Card className="shadow-lg border-2 border-purple-200/50 dark:border-purple-900/50">
-              <CardHeader>
-                <CardTitle className="text-lg">Detail Pembayaran</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Customer Info */}
-                {customerData && (
-                  <div className="space-y-2 pb-4 border-b">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Nama</span>
-                      <span className="font-semibold">{customerData.fullName}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Email</span>
-                      <span className="font-semibold text-xs">{customerData.email}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Paket</span>
-                      <span className="font-semibold">{customerData.plan}</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Order Info */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Order ID</span>
-                    <span className="font-mono text-xs">{paymentData.order_id}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Metode</span>
-                    <span className="font-semibold uppercase">{paymentData.payment_method}</span>
-                  </div>
-                </div>
-
-                {/* Amount Info */}
-                <div className="space-y-2 pt-4 border-t">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span>{formatCurrency(paymentData.amount)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Biaya Admin</span>
-                    <span>{formatCurrency(paymentData.fee)}</span>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t-2 border-dashed">
-                    <span className="font-bold">Total Pembayaran</span>
-                    <span className="text-2xl font-black text-purple-600">
-                      {formatCurrency(paymentData.total_payment)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Auto Check Info */}
-                <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 rounded-lg p-3 border border-emerald-200 dark:border-emerald-800">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
-                        Auto-Check Aktif
-                      </p>
-                      <p className="text-xs text-emerald-700 dark:text-emerald-300">
-                        Status pembayaran dicek otomatis setiap 5 detik. Anda akan otomatis diarahkan ke halaman sukses setelah pembayaran berhasil.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Security Badge */}
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground bg-white/50 dark:bg-slate-900/50 rounded-lg p-3">
-              <Shield className="w-4 h-4 text-emerald-600" />
-              <span>Pembayaran aman melalui Pakasir.com</span>
+              <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800/50 flex items-center justify-center gap-6 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                <img src="/icons/bca.png" alt="BCA" className="h-4 w-auto object-contain hidden" /> {/* Placeholder for logos if available */}
+                <span className="text-xs font-bold text-slate-300 dark:text-slate-600 tracking-widest">SUPPORTED PAYMENTS</span>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>
@@ -560,8 +409,8 @@ function PaymentDisplayContent() {
 export default function TestPaymentDisplayPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-[#0B0F19]">
+        <Loader2 className="w-10 h-10 animate-spin text-purple-600" />
       </div>
     }>
       <PaymentDisplayContent />

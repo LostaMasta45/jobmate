@@ -79,26 +79,20 @@ export default function CVCreativePage() {
         );
       case 'history':
         return (
-          <CVATSToolLayout
-            title="Portfolio CV"
-            description="Koleksi CV kreatif yang telah Anda buat."
-            icon={Palette}
-            theme="purple"
-            color="text-pink-500"
-            onBack={handleHomeView}
-          >
-            <div className="flex justify-end mb-6">
-              <Button onClick={handleCreateNew} size="sm" className="bg-pink-600 hover:bg-pink-700 text-white shadow-lg shadow-pink-500/20">
-                <Plus className="w-4 h-4 mr-2" />
-                Buat Baru
-              </Button>
+          <div className="h-full w-full bg-slate-50 dark:bg-[#050505] overflow-y-auto relative">
+            <div className="fixed inset-0 pointer-events-none">
+              <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-pink-600/10 dark:bg-pink-600/10 rounded-full blur-[120px] mix-blend-multiply dark:mix-blend-screen opacity-50 dark:opacity-100" />
             </div>
-            <CVCreativeHistory
-              cvs={cvs}
-              onEdit={handleEdit}
-              onRefresh={loadCVs}
-            />
-          </CVATSToolLayout>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+              <CVCreativeHistory
+                cvs={cvs}
+                onEdit={handleEdit}
+                onRefresh={loadCVs}
+                onBack={handleHomeView}
+              />
+            </div>
+          </div>
         );
       default:
         return null;

@@ -5,32 +5,32 @@ import {
     History,
     ArrowRight,
     Sparkles,
-    Palette,
-    Crown,
+    Briefcase,
+    Target,
     Zap,
-    LayoutTemplate,
-    Brush,
-    Image as ImageIcon
+    FileText,
+    CheckCircle2,
+    Users
 } from "lucide-react";
 import { MagicCard } from "@/components/ui/magic-card";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
 import { Button } from "@/components/ui/button";
 import { HistoryCard } from "@/components/tools/HistoryCard";
 
-interface CVCreativeHomeProps {
+interface InterviewPrepHomeProps {
     onSelectView: (view: 'wizard' | 'history') => void;
-    totalCVs?: number;
+    totalSessions?: number;
 }
 
-export function CVCreativeHome({ onSelectView, totalCVs = 0 }: CVCreativeHomeProps) {
+export function InterviewPrepHome({ onSelectView, totalSessions = 0 }: InterviewPrepHomeProps) {
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
     };
 
     return (
-        <div className="h-full w-full overflow-y-auto bg-slate-50/50 dark:bg-black/95 text-slate-900 dark:text-slate-100 font-sans selection:bg-pink-500/30">
-            <BackgroundPattern theme="red" />
+        <div className="h-full w-full overflow-y-auto bg-slate-50/50 dark:bg-black/95 text-slate-900 dark:text-slate-100 font-sans selection:bg-blue-500/30">
+            <BackgroundPattern theme="blue" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
@@ -43,16 +43,16 @@ export function CVCreativeHome({ onSelectView, totalCVs = 0 }: CVCreativeHomePro
 
 
                     <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 leading-tight">
-                        Design Your <span className="text-pink-600 dark:text-pink-500 relative inline-block">
-                            Legacy
-                            <svg className="absolute w-full h-3 -bottom-1 left-0 text-pink-400 opacity-40" viewBox="0 0 100 10" preserveAspectRatio="none">
+                        Master Your <span className="text-blue-600 dark:text-blue-500 relative inline-block">
+                            Interview
+                            <svg className="absolute w-full h-3 -bottom-1 left-0 text-blue-400 opacity-40" viewBox="0 0 100 10" preserveAspectRatio="none">
                                 <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
                             </svg>
                         </span>
                     </h1>
 
                     <p className="text-base md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed px-4">
-                        Buat CV <span className="font-bold text-slate-900 dark:text-white">Visual & Kreatif</span> yang memukau. Ekspresikan dirimu dengan 12+ template premium.
+                        Dapatkan <span className="font-bold text-slate-900 dark:text-white">pertanyaan prediksi</span> yang dipersonalisasi berdasarkan CV dan Job Description. Latihan jawaban metode STAR.
                     </p>
                 </motion.div>
 
@@ -68,25 +68,25 @@ export function CVCreativeHome({ onSelectView, totalCVs = 0 }: CVCreativeHomePro
                         <MagicCard
                             className="h-full bg-gradient-to-br from-slate-900 to-slate-800 dark:from-zinc-900 dark:to-black text-white border-none overflow-hidden relative"
                             onClick={() => onSelectView('wizard')}
-                            gradientFrom="pink-600/20"
-                            gradientTo="pink-900/20"
+                            gradientFrom="blue-600/20"
+                            gradientTo="blue-900/20"
                         >
-                            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-pink-500/30 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none" />
+                            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-500/30 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none" />
 
                             <div className="p-6 md:p-8 xl:p-10 flex flex-col xl:flex-row items-center h-full gap-6 xl:gap-8 relative z-10">
                                 <div className="flex-1 space-y-6 w-full text-center xl:text-left">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-pink-500/10 dark:bg-pink-500/20 text-pink-600 dark:text-pink-300 text-[10px] md:text-xs font-bold uppercase tracking-wider border border-pink-500/20 backdrop-blur-sm mx-auto xl:mx-0">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300 text-[10px] md:text-xs font-bold uppercase tracking-wider border border-blue-500/20 backdrop-blur-sm mx-auto xl:mx-0">
                                         <Sparkles className="h-3 w-3 animate-pulse" />
-                                        Most Popular • Visual Editor
+                                        Personalized • Gap Analysis
                                     </div>
                                     <h2 className="text-3xl md:text-4xl xl:text-5xl font-bold leading-tight tracking-tight">
-                                        Buat CV Creative <br /> <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-rose-600">Stand Out Now.</span>
+                                        Mulai Simulasi <br /> <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-600">Interview Baru.</span>
                                     </h2>
                                     <p className="text-slate-400 text-base md:text-lg max-w-md mx-auto xl:mx-0 leading-relaxed">
-                                        Visual editor canggih. Ganti warna, foto, dan layout secara real-time. <span className="text-pink-400 font-semibold">Tampil beda</span> dari yang lain.
+                                        Upload CV & Job Poster. AI akan berikan <span className="text-blue-400 font-semibold">30-40 pertanyaan</span> spesifik untuk posisi tersebut.
                                     </p>
-                                    <Button className="w-full md:w-auto rounded-xl bg-white text-slate-900 dark:bg-pink-600 dark:text-white hover:bg-slate-50 dark:hover:bg-pink-700 border-none px-8 py-6 text-base md:text-lg font-bold shadow-xl shadow-pink-900/10 dark:shadow-pink-900/20 group hover:scale-[1.02] transition-all duration-300">
-                                        Mulai Desain
+                                    <Button className="w-full md:w-auto rounded-xl bg-white text-slate-900 dark:bg-blue-600 dark:text-white hover:bg-slate-50 dark:hover:bg-blue-700 border-none px-8 py-6 text-base md:text-lg font-bold shadow-xl shadow-blue-900/10 dark:shadow-blue-900/20 group hover:scale-[1.02] transition-all duration-300">
+                                        Mulai Sekarang
                                         <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                                     </Button>
                                 </div>
@@ -98,12 +98,12 @@ export function CVCreativeHome({ onSelectView, totalCVs = 0 }: CVCreativeHomePro
                                         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
                                         className="w-full h-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 shadow-2xl flex flex-col gap-3 transform-style-3d items-center justify-center relative"
                                     >
-                                        <div className="absolute inset-0 bg-pink-500/20 blur-[40px] rounded-full animate-pulse" />
-                                        <div className="relative z-10 p-6 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 shadow-xl mb-4 group-hover:-rotate-6 transition-transform duration-500">
-                                            <Palette className="h-16 w-16 text-white" strokeWidth={1.5} />
+                                        <div className="absolute inset-0 bg-blue-500/20 blur-[40px] rounded-full animate-pulse" />
+                                        <div className="relative z-10 p-6 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 shadow-xl mb-4 group-hover:rotate-6 transition-transform duration-500">
+                                            <Target className="h-16 w-16 text-white" strokeWidth={1.5} />
                                         </div>
-                                        <div className="absolute -bottom-4 -left-4 bg-white dark:bg-zinc-800 p-2 rounded-xl shadow-lg border border-slate-200 dark:border-white/10 animate-bounce delay-1000">
-                                            <Brush className="h-5 w-5 text-indigo-500" />
+                                        <div className="absolute -top-4 -right-4 bg-white dark:bg-zinc-800 p-2 rounded-xl shadow-lg border border-slate-200 dark:border-white/10 animate-bounce delay-700">
+                                            <CheckCircle2 className="h-5 w-5 text-emerald-500" />
                                         </div>
                                     </motion.div>
                                 </div>
@@ -115,15 +115,15 @@ export function CVCreativeHome({ onSelectView, totalCVs = 0 }: CVCreativeHomePro
                     <div className="md:col-span-4 lg:col-span-4">
                         <MagicCard
                             className="h-full bg-white dark:bg-zinc-900 p-6 flex flex-col justify-between group"
-                            gradientFrom="pink-500/5"
-                            gradientTo="pink-900/5"
+                            gradientFrom="blue-500/5"
+                            gradientTo="blue-900/5"
                         >
                             <div>
                                 <div className="flex items-center justify-between mb-6">
                                     <div className="p-2 rounded-xl bg-slate-100 dark:bg-zinc-800">
-                                        <Palette className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                                        <Users className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                                     </div>
-                                    <span className="text-xs font-bold uppercase text-slate-400 tracking-wider">Gallery</span>
+                                    <span className="text-xs font-bold uppercase text-slate-400 tracking-wider">Practice</span>
                                 </div>
 
                                 <div className="text-center py-8">
@@ -133,29 +133,29 @@ export function CVCreativeHome({ onSelectView, totalCVs = 0 }: CVCreativeHomePro
                                         className="relative inline-block"
                                     >
                                         <span className="text-6xl font-black text-slate-900 dark:text-white tracking-tighter">
-                                            {totalCVs}
+                                            {totalSessions}
                                         </span>
-                                        <span className="absolute -top-2 -right-6 px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/10 dark:bg-pink-500/20 text-pink-600 dark:text-pink-400 border border-pink-500/20 backdrop-blur-sm">
-                                            SAVED
+                                        <span className="absolute -top-2 -right-6 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 backdrop-blur-sm">
+                                            SESSIONS
                                         </span>
                                     </motion.div>
-                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2">Portfolios Created</p>
+                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2">Completed Sessions</p>
                                 </div>
                             </div>
 
                             <div className="mt-auto">
                                 <div className="grid grid-cols-2 gap-2 mb-4">
                                     <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-800/30 border border-slate-100 dark:border-zinc-700/50 text-center">
-                                        <div className="text-lg font-bold text-slate-900 dark:text-white">12+</div>
-                                        <div className="text-[10px] text-slate-400 uppercase font-semibold tracking-wide">Templates</div>
+                                        <div className="text-lg font-bold text-slate-900 dark:text-white">STAR</div>
+                                        <div className="text-[10px] text-slate-400 uppercase font-semibold tracking-wide">Method</div>
                                     </div>
                                     <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-800/30 border border-slate-100 dark:border-zinc-700/50 text-center">
-                                        <div className="text-lg font-bold text-slate-900 dark:text-white">HD</div>
-                                        <div className="text-[10px] text-slate-400 uppercase font-semibold tracking-wide">Ready</div>
+                                        <div className="text-lg font-bold text-slate-900 dark:text-white">AI</div>
+                                        <div className="text-[10px] text-slate-400 uppercase font-semibold tracking-wide">Analysis</div>
                                     </div>
                                 </div>
-                                <Button variant="outline" className="w-full rounded-xl border-slate-200 dark:border-zinc-700 hover:border-pink-500/30 dark:hover:border-pink-500/30 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-slate-300 transition-colors" disabled>
-                                    View Analytics
+                                <Button variant="outline" className="w-full rounded-xl border-slate-200 dark:border-zinc-700 hover:border-blue-500/30 dark:hover:border-blue-500/30 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-slate-300 transition-colors" disabled>
+                                    Lihat Progress
                                 </Button>
                             </div>
                         </MagicCard>
@@ -164,13 +164,13 @@ export function CVCreativeHome({ onSelectView, totalCVs = 0 }: CVCreativeHomePro
                     {/* History / Secondary Card */}
                     <div className="md:col-span-12">
                         <HistoryCard
-                            title="My Portfolio Gallery"
-                            description="Lihat dan kelola koleksi desain CV kreatif Anda."
+                            title="Riwayat Interview"
+                            description="Lihat kembali pertanyaan dan latihan jawaban Anda sebelumnya."
                             icon={History}
                             onClick={() => onSelectView('history')}
-                            buttonText="Open Gallery"
-                            gradientFrom="#ec4899" // pink-500
-                            gradientTo="#be185d"   // pink-700
+                            buttonText="Buka Riwayat"
+                            gradientFrom="#3b82f6" // blue-500
+                            gradientTo="#1d4ed8"   // blue-700
                         />
                     </div>
                 </motion.div>

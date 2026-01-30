@@ -255,7 +255,7 @@ export function Sidebar({ isAdmin = false, membership: membershipProp = 'free', 
 
   // Desktop Sidebar Content
   const DesktopSidebarContent = () => (
-    <div className="flex flex-col h-full bg-background/60 backdrop-blur-xl border-r border-border/40 transition-all duration-300 shadow-[1px_0_20px_rgba(0,0,0,0.02)]">
+    <div className="flex flex-col h-full bg-background/60 dark:bg-black/90 backdrop-blur-xl border-r border-border/40 transition-all duration-300 shadow-[1px_0_20px_rgba(0,0,0,0.02)]">
       <div className="flex h-16 items-center justify-center border-b border-border/40 px-4">
         {!collapsed ? (
           <Link href="/dashboard" className="flex items-center justify-center hover:scale-105 transition-transform duration-200 group">

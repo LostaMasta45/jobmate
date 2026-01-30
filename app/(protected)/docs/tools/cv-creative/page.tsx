@@ -67,7 +67,7 @@ export default function CVCreativeDocsPage() {
           <Alert>
             <Lightbulb className="h-4 w-4" />
             <AlertDescription>
-              <strong>Pro Strategy:</strong> Punya BOTH! Use CV ATS untuk apply online, 
+              <strong>Pro Strategy:</strong> Punya BOTH! Use CV ATS untuk apply online,
               CV Creative untuk bring to interview atau email directly ke hiring manager.
             </AlertDescription>
           </Alert>
@@ -78,159 +78,87 @@ export default function CVCreativeDocsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Cara Menggunakan CV Creative Generator</CardTitle>
-          <CardDescription>Create stunning visual CV dengan wizard intuitif</CardDescription>
+          <CardDescription>Create stunning visual CV dengan 8-step wizard</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <StepByStep
             step={1}
-            title="Pilih Template"
+            title="Data Pribadi"
             description={
               <div className="space-y-2">
-                <p>Browse dan pilih dari <strong>12+ template profesional</strong>:</p>
-                <div className="grid grid-cols-2 gap-3 mt-3">
-                  <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded">
-                    <strong className="text-blue-600">Modern Minimal</strong>
-                    <p className="text-xs text-muted-foreground">Clean, professional, tech-friendly</p>
-                  </div>
-                  <div className="p-3 bg-purple-50 dark:bg-purple-950 rounded">
-                    <strong className="text-purple-600">Creative Bold</strong>
-                    <p className="text-xs text-muted-foreground">Eye-catching, design-focused</p>
-                  </div>
-                  <div className="p-3 bg-green-50 dark:bg-green-950 rounded">
-                    <strong className="text-green-600">Professional</strong>
-                    <p className="text-xs text-muted-foreground">Classic, corporate-ready</p>
-                  </div>
-                  <div className="p-3 bg-orange-50 dark:bg-orange-950 rounded">
-                    <strong className="text-orange-600">Two-Column</strong>
-                    <p className="text-xs text-muted-foreground">Space-efficient, content-rich</p>
-                  </div>
-                </div>
-                <div className="mt-4 p-4 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground italic">[SCREENSHOT: Template gallery dengan preview]</p>
-                </div>
+                <p>Isi informasi dasar Anda:</p>
+                <ul className="space-y-1 ml-4">
+                  <li>• <strong>Nama Lengkap</strong></li>
+                  <li>• <strong>Email</strong> (gunakan email profesional)</li>
+                  <li>• <strong>Nomor Telepon</strong></li>
+                  <li>• <strong>Lokasi</strong> (kota cukup)</li>
+                  <li>• <strong>LinkedIn</strong> & Portfolio URL (optional)</li>
+                </ul>
               </div>
             }
           />
 
           <StepByStep
             step={2}
-            title="Choose Color Scheme"
+            title="Professional Summary"
             description={
               <div className="space-y-2">
-                <p>Pilih color scheme yang match dengan personality dan industry:</p>
-                <div className="grid grid-cols-3 gap-2 mt-3">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded text-center">
-                    <div className="h-8 bg-blue-500 rounded mb-1"></div>
-                    <p className="text-xs">Professional Blue</p>
-                  </div>
-                  <div className="p-2 bg-green-100 dark:bg-green-900 rounded text-center">
-                    <div className="h-8 bg-green-500 rounded mb-1"></div>
-                    <p className="text-xs">Growth Green</p>
-                  </div>
-                  <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded text-center">
-                    <div className="h-8 bg-purple-500 rounded mb-1"></div>
-                    <p className="text-xs">Creative Purple</p>
-                  </div>
+                <p>Tulis ringkasan profesional Anda (2-3 kalimat):</p>
+                <div className="p-3 bg-muted/50 rounded text-sm">
+                  <p className="italic text-muted-foreground">
+                    "Frontend Developer dengan 3+ tahun pengalaman building responsive web apps.
+                    Passionate about clean code dan modern UI/UX best practices."
+                  </p>
                 </div>
-                <Alert className="mt-3">
-                  <Lightbulb className="h-4 w-4" />
-                  <AlertDescription>
-                    <strong>Color Psychology:</strong><br/>
-                    • Blue: Trust, professional (Corporate, Tech)<br/>
-                    • Green: Growth, sustainability (Environment, Health)<br/>
-                    • Purple: Creative, innovative (Design, Marketing)<br/>
-                    • Orange: Energetic, friendly (Sales, Hospitality)
-                  </AlertDescription>
-                </Alert>
               </div>
             }
           />
 
           <StepByStep
             step={3}
-            title="Upload Professional Photo"
+            title="Work Experience"
             description={
               <div className="space-y-2">
-                <p>Upload foto profesional untuk CV Anda:</p>
-                <div className="grid md:grid-cols-2 gap-4 mt-3">
-                  <div className="p-4 bg-green-50 dark:bg-green-950 rounded">
-                    <h4 className="font-semibold text-green-600 mb-2">✅ Good Photo:</h4>
-                    <ul className="space-y-1 text-sm">
-                      <li>• Professional attire (kemeja, blazer)</li>
-                      <li>• Plain background (polos)</li>
-                      <li>• Good lighting (terang)</li>
-                      <li>• Smile & eye contact</li>
-                      <li>• Close-up (head & shoulders)</li>
-                      <li>• High resolution</li>
-                    </ul>
-                  </div>
-                  <div className="p-4 bg-red-50 dark:bg-red-950 rounded">
-                    <h4 className="font-semibold text-red-600 mb-2">❌ Bad Photo:</h4>
-                    <ul className="space-y-1 text-sm">
-                      <li>• Selfie dengan tongsis</li>
-                      <li>• Group photo (crop sendiri)</li>
-                      <li>• Beach/vacation background</li>
-                      <li>• Sunglasses atau hat</li>
-                      <li>• Low quality, blurry</li>
-                      <li>• Filter/effect berlebihan</li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <p className="text-sm mb-2"><strong>Photo Options:</strong></p>
-                  <ul className="space-y-1 ml-4 text-sm">
-                    <li>• <strong>Circle</strong> - Modern, friendly</li>
-                    <li>• <strong>Square</strong> - Professional, classic</li>
-                    <li>• <strong>No Photo</strong> - If industry norms prefer (international companies)</li>
-                  </ul>
-                </div>
-                <div className="mt-4 p-4 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground italic">[SCREENSHOT: Photo upload & options]</p>
-                </div>
+                <p>Tambahkan pengalaman kerja (mulai dari yang terbaru):</p>
+                <ul className="space-y-1 ml-4">
+                  <li>• <strong>Job Title</strong> - Posisi Anda</li>
+                  <li>• <strong>Company Name</strong></li>
+                  <li>• <strong>Duration</strong> (Jan 2023 - Present)</li>
+                  <li>• <strong>Achievements</strong> dengan metrics</li>
+                </ul>
               </div>
             }
           />
 
           <StepByStep
             step={4}
-            title="Fill in Content"
+            title="Education"
             description={
               <div className="space-y-2">
-                <p>Isi informasi CV Anda (sama seperti CV ATS):</p>
+                <p>Tambahkan riwayat pendidikan:</p>
                 <ul className="space-y-1 ml-4">
-                  <li>• Data Pribadi</li>
-                  <li>• Professional Summary</li>
-                  <li>• Work Experience</li>
-                  <li>• Education</li>
-                  <li>• Skills (with visual skill bars!)</li>
-                  <li>• Languages (optional)</li>
-                  <li>• Certifications (optional)</li>
+                  <li>• <strong>Degree</strong> (S1, S2, Diploma, dll)</li>
+                  <li>• <strong>Major/Jurusan</strong></li>
+                  <li>• <strong>University/School</strong></li>
+                  <li>• <strong>Graduation Year</strong></li>
                 </ul>
-                <Alert className="mt-3">
-                  <Lightbulb className="h-4 w-4" />
-                  <AlertDescription>
-                    <strong>Space Management:</strong> Creative CV has limited space. 
-                    Keep it to 1 page! Prioritize most relevant info.
-                  </AlertDescription>
-                </Alert>
               </div>
             }
           />
 
           <StepByStep
             step={5}
-            title="Preview & Customize"
+            title="Skills"
             description={
               <div className="space-y-2">
-                <p>Real-time preview CV Anda:</p>
-                <ul className="space-y-2 ml-4">
-                  <li>1. <strong>Live Preview</strong> - Lihat changes real-time</li>
-                  <li>2. <strong>Adjust Layout</strong> - Rearrange sections</li>
-                  <li>3. <strong>Fine-tune</strong> - Font size, spacing, colors</li>
-                  <li>4. <strong>Check ATS Score</strong> - Even for creative, good score is bonus!</li>
-                </ul>
-                <div className="mt-4 p-4 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground italic">[SCREENSHOT: Preview dengan customization panel]</p>
+                <p>List skills Anda - akan ditampilkan dengan visual skill bars:</p>
+                <div className="space-y-2 mt-3">
+                  <div className="p-3 bg-muted/50 rounded text-sm">
+                    Technical: React, TypeScript, Node.js, Python
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded text-sm">
+                    Soft Skills: Leadership, Communication, Problem Solving
+                  </div>
                 </div>
               </div>
             }
@@ -238,20 +166,96 @@ export default function CVCreativeDocsPage() {
 
           <StepByStep
             step={6}
-            title="Download & Use"
+            title="Upload Photo"
             description={
               <div className="space-y-2">
-                <p>Download dalam berbagai format:</p>
-                <ul className="space-y-2 ml-4">
-                  <li>• <strong>PDF</strong> (print-ready, high quality)</li>
-                  <li>• <strong>PNG</strong> (untuk web, LinkedIn)</li>
-                  <li>• <strong>DOCX</strong> (editable jika perlu minor changes)</li>
-                </ul>
+                <p>Upload foto profesional untuk CV Anda:</p>
+                <div className="grid md:grid-cols-2 gap-4 mt-3">
+                  <div className="p-4 bg-green-50 dark:bg-green-950 rounded">
+                    <h4 className="font-semibold text-green-600 mb-2">✅ Good Photo:</h4>
+                    <ul className="space-y-1 text-sm">
+                      <li>• Professional attire</li>
+                      <li>• Plain background</li>
+                      <li>• Good lighting</li>
+                      <li>• High resolution</li>
+                    </ul>
+                  </div>
+                  <div className="p-4 bg-red-50 dark:bg-red-950 rounded">
+                    <h4 className="font-semibold text-red-600 mb-2">❌ Bad Photo:</h4>
+                    <ul className="space-y-1 text-sm">
+                      <li>• Selfie</li>
+                      <li>• Group photo (cropped)</li>
+                      <li>• Vacation background</li>
+                      <li>• Low quality</li>
+                    </ul>
+                  </div>
+                </div>
+                <Alert className="mt-3">
+                  <Lightbulb className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Optional:</strong> Anda bisa skip foto jika melamar ke perusahaan international.
+                  </AlertDescription>
+                </Alert>
+              </div>
+            }
+          />
+
+          <StepByStep
+            step={7}
+            title="Template & Color"
+            description={
+              <div className="space-y-2">
+                <p>Pilih template dan color scheme:</p>
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded">
+                    <strong className="text-blue-600">Modern Minimal</strong>
+                    <p className="text-xs text-muted-foreground">Clean, tech-friendly</p>
+                  </div>
+                  <div className="p-3 bg-purple-50 dark:bg-purple-950 rounded">
+                    <strong className="text-purple-600">Creative Bold</strong>
+                    <p className="text-xs text-muted-foreground">Eye-catching, design</p>
+                  </div>
+                  <div className="p-3 bg-green-50 dark:bg-green-950 rounded">
+                    <strong className="text-green-600">Professional</strong>
+                    <p className="text-xs text-muted-foreground">Corporate-ready</p>
+                  </div>
+                  <div className="p-3 bg-orange-50 dark:bg-orange-950 rounded">
+                    <strong className="text-orange-600">Two-Column</strong>
+                    <p className="text-xs text-muted-foreground">Space-efficient</p>
+                  </div>
+                </div>
+                <Alert className="mt-3">
+                  <Lightbulb className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Color Psychology:</strong><br />
+                    Blue: Trust • Green: Growth • Purple: Creative • Orange: Energetic
+                  </AlertDescription>
+                </Alert>
+              </div>
+            }
+          />
+
+          <StepByStep
+            step={8}
+            title="Review & Save"
+            description={
+              <div className="space-y-2">
+                <p>Final review dan download:</p>
+                <ol className="space-y-2 ml-4">
+                  <li>1. <strong>Preview</strong> CV dengan template yang dipilih</li>
+                  <li>2. <strong>Edit</strong> jika perlu adjustment</li>
+                  <li>3. <strong>Save</strong> ke akun untuk akses nanti</li>
+                  <li>4. <strong>Download</strong> dalam format:
+                    <ul className="ml-4 mt-1 space-y-1">
+                      <li>• <strong>PDF</strong> (print-ready)</li>
+                      <li>• <strong>PNG</strong> (untuk web/LinkedIn)</li>
+                    </ul>
+                  </li>
+                </ol>
                 <p className="mt-3"><strong>Use Cases:</strong></p>
                 <ul className="space-y-1 ml-4 text-sm text-muted-foreground">
                   <li>• Print untuk job fair atau walk-in interview</li>
                   <li>• Attach di email ke hiring manager directly</li>
-                  <li>• LinkedIn profile picture (crop dari CV)</li>
                   <li>• Portfolio website</li>
                 </ul>
               </div>
@@ -334,7 +338,7 @@ export default function CVCreativeDocsPage() {
           <div>
             <h3 className="font-semibold mb-2">Q: Apakah creative CV bisa lolos ATS?</h3>
             <p className="text-muted-foreground">
-              A: <strong>Tidak optimal</strong> untuk ATS. Creative CV best untuk direct submission, 
+              A: <strong>Tidak optimal</strong> untuk ATS. Creative CV best untuk direct submission,
               print, atau LinkedIn. Untuk apply online, use CV ATS.
             </p>
           </div>
@@ -344,8 +348,8 @@ export default function CVCreativeDocsPage() {
           <div>
             <h3 className="font-semibold mb-2">Q: Industry mana yang appreciate creative CV?</h3>
             <p className="text-muted-foreground">
-              A: <strong>Design</strong>, <strong>Marketing</strong>, <strong>Creative Agency</strong>, 
-              <strong>Startup</strong>, <strong>Media</strong>, <strong>Fashion</strong>. 
+              A: <strong>Design</strong>, <strong>Marketing</strong>, <strong>Creative Agency</strong>,
+              <strong>Startup</strong>, <strong>Media</strong>, <strong>Fashion</strong>.
               Avoid untuk Banking, Legal, Government.
             </p>
           </div>
@@ -355,7 +359,7 @@ export default function CVCreativeDocsPage() {
           <div>
             <h3 className="font-semibold mb-2">Q: Haruskah include foto di CV?</h3>
             <p className="text-muted-foreground">
-              A: Depends on country/industry. <strong>Indonesia</strong>: Yes, common practice. 
+              A: Depends on country/industry. <strong>Indonesia</strong>: Yes, common practice.
               <strong>US/UK</strong>: Often no (avoid bias). Check company culture!
             </p>
           </div>
@@ -365,7 +369,7 @@ export default function CVCreativeDocsPage() {
           <div>
             <h3 className="font-semibold mb-2">Q: Bisa edit setelah download?</h3>
             <p className="text-muted-foreground">
-              A: <strong>DOCX</strong> format bisa di-edit di Word. PDF/PNG tidak bisa edit. 
+              A: <strong>DOCX</strong> format bisa di-edit di Word. PDF/PNG tidak bisa edit.
               Save CV Anda di platform, bisa re-generate kapan saja!
             </p>
           </div>

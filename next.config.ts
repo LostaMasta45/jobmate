@@ -101,11 +101,13 @@ const nextConfig: NextConfig = {
     loader: 'default',
   },
 
+  // External packages for server components (moved from experimental in Next.js 15)
+  serverExternalPackages: ['pdf-parse'],
+
   experimental: {
     serverActions: {
       bodySizeLimit: "10mb", // Increased from default 1mb for CV with photos
     },
-    serverComponentsExternalPackages: ['pdf-parse'],
     // Optimize package imports
     optimizePackageImports: [
       'lucide-react',

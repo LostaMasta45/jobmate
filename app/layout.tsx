@@ -4,6 +4,7 @@ import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { ActivityTrackingProvider } from "@/components/providers/ActivityTrackingProvider";
 import { DelayedScripts } from "@/components/OptimizedScripts";
+import { QueryProvider } from "@/providers/query-provider";
 
 
 const inter = Inter({
@@ -90,10 +91,12 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ThemeProvider defaultTheme="system" storageKey="jobmate_theme">
-          <ActivityTrackingProvider>
-            {children}
-            <DelayedScripts />
-          </ActivityTrackingProvider>
+          <QueryProvider>
+            <ActivityTrackingProvider>
+              {children}
+              <DelayedScripts />
+            </ActivityTrackingProvider>
+          </QueryProvider>
         </ThemeProvider>
         <div id="dnd-portal" />
       </body>

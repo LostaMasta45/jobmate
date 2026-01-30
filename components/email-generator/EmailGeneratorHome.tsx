@@ -16,7 +16,8 @@ import {
     Trash2,
     Eye,
     Copy,
-    MoreHorizontal
+    MoreHorizontal,
+    Loader2
 } from "lucide-react";
 import { MagicCard } from "@/components/ui/magic-card";
 import { BackgroundPattern } from "@/components/ui/background-pattern";
@@ -31,6 +32,45 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
+
+// UI Data Configuration
+const EMAIL_TYPES: {
+    id: EmailType;
+    title: string;
+    description: string;
+    icon: React.ElementType;
+    color: string;
+}[] = [
+        {
+            id: 'application',
+            title: 'Job Application',
+            description: 'Buat Body Email & Cover Letter lengkap untuk melamar kerja.',
+            icon: Briefcase,
+            color: 'text-red-500',
+        },
+        {
+            id: 'follow_up',
+            title: 'Follow Up',
+            description: 'Tanya status lamaran dengan sopan & profesional.',
+            icon: RefreshCw,
+            color: 'text-blue-500',
+        },
+        {
+            id: 'thank_you',
+            title: 'Thank You',
+            description: 'Ucapkan terima kasih setelah interview.',
+            icon: Heart,
+            color: 'text-emerald-500',
+        },
+        {
+            id: 'inquiry',
+            title: 'Cold Inquiry',
+            description: 'Tanya lowongan ke perusahaan incaranmu.',
+            icon: Search,
+            color: 'text-purple-500',
+        },
+    ];
 
 interface EmailGeneratorHomeProps {
     onSelectType: (type: EmailType) => void;
@@ -87,13 +127,9 @@ export function EmailGeneratorHome({ onSelectType, totalEmails = 0 }: EmailGener
     };
 
     const getEmailIcon = (type: string) => {
-        switch (type) {
-            case 'application': return <Briefcase className="h-4 w-4" />;
-            case 'follow_up': return <RefreshCw className="h-4 w-4" />;
-            case 'thank_you': return <Heart className="h-4 w-4" />;
-            case 'inquiry': return <Search className="h-4 w-4" />;
-            default: return <Mail className="h-4 w-4" />;
-        }
+        const found = EMAIL_TYPES.find(t => t.id === type);
+        const Icon = found?.icon || Mail;
+        return <Icon className="h-4 w-4" />;
     };
 
     const getEmailColor = (type: string) => {
@@ -107,314 +143,280 @@ export function EmailGeneratorHome({ onSelectType, totalEmails = 0 }: EmailGener
     };
 
     return (
-        <div className="h-full w-full bg-slate-50 dark:bg-[#050505] text-slate-900 dark:text-white font-sans selection:bg-red-500/30 relative transition-colors duration-500 flex flex-col overflow-y-auto lg:overflow-x-hidden">
-            {/* Ambient Background Effects */}
-            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-red-600/10 dark:bg-red-600/10 rounded-full blur-[120px] pointer-events-none mix-blend-multiply dark:mix-blend-screen opacity-50 dark:opacity-100 fixed" />
-            <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-orange-600/10 dark:bg-orange-600/10 rounded-full blur-[100px] pointer-events-none mix-blend-multiply dark:mix-blend-screen opacity-50 dark:opacity-100 fixed" />
+        <div className="h-full w-full overflow-y-auto bg-slate-50/50 dark:bg-black/95 text-slate-900 dark:text-slate-100 font-sans selection:bg-red-500/30">
             <BackgroundPattern theme="red" />
 
-            <div className="flex-1 w-full px-4 md:px-8 lg:px-12 py-6 md:py-10 flex flex-col justify-start relative z-10 min-h-full">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-                {/* Main Grid Wrapper */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 w-full max-w-[1600px] mx-auto items-start mb-20">
+                {/* Header Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col items-center justify-center text-center mb-12 md:mb-16 relative"
+                >
 
-                    {/* Left Side: Hero Section */}
-                    <div className="lg:col-span-5 flex flex-col justify-center text-center lg:text-left mb-8 lg:mb-0 pt-12 lg:pt-20">
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
+
+                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 leading-tight">
+                        Write Like a <span className="text-red-600 dark:text-red-500 relative inline-block">
+                            Pro
+                            <svg className="absolute w-full h-3 -bottom-1 left-0 text-red-400 opacity-40" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
+                            </svg>
+                        </span>
+                    </h1>
+
+                    <p className="text-base md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed px-4">
+                        Buat Surat Lamaran & Email profesional dalam hitungan detik dengan bantuan AI.
+                    </p>
+                </motion.div>
+
+                {/* Main Grid Layout */}
+                <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 mb-20"
+                >
+                    {/* Featured Card (Application) */}
+                    <div className="md:col-span-8 lg:col-span-8">
+                        <MagicCard
+                            className="h-full bg-gradient-to-br from-slate-900 to-slate-800 dark:from-zinc-900 dark:to-black text-white border-none overflow-hidden relative"
+                            onClick={() => onSelectType('application')}
+                            gradientFrom="red-600/20"
+                            gradientTo="red-900/20"
                         >
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/50 dark:bg-zinc-900/50 border border-slate-200 dark:border-white/10 backdrop-blur-xl mb-8 shadow-sm dark:shadow-2xl hover:bg-white/60 dark:hover:bg-zinc-800/50 transition-all cursor-default mx-auto lg:mx-0 group w-fit">
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
-                                </span>
-                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">Smart Email AI</span>
+                            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-red-500/30 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none" />
+
+                            <div className="p-6 md:p-8 xl:p-10 flex flex-col xl:flex-row items-center h-full gap-6 xl:gap-8 relative z-10">
+                                <div className="flex-1 space-y-6 w-full text-center xl:text-left">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-300 text-[10px] md:text-xs font-bold uppercase tracking-wider border border-red-500/20 backdrop-blur-sm mx-auto xl:mx-0">
+                                        <Sparkles className="h-3 w-3 animate-pulse" />
+                                        Most Popular • Job Application
+                                    </div>
+                                    <h2 className="text-3xl md:text-4xl xl:text-5xl font-bold leading-tight tracking-tight">
+                                        Siap Lamar <br /> <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-orange-600">Kerja Impian?</span>
+                                    </h2>
+                                    <p className="text-slate-400 text-base md:text-lg max-w-md mx-auto xl:mx-0 leading-relaxed">
+                                        Buat <strong>Cover Letter</strong> & Body Email lengkap yang memikat HRD dalam 30 detik.
+                                    </p>
+                                    <Button className="w-full md:w-auto rounded-xl bg-white text-slate-900 dark:bg-red-600 dark:text-white hover:bg-slate-50 dark:hover:bg-red-700 border-none px-8 py-6 text-base md:text-lg font-bold shadow-xl shadow-red-900/10 dark:shadow-red-900/20 group hover:scale-[1.02] transition-all duration-300">
+                                        Tulis Sekarang
+                                        <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                                    </Button>
+                                </div>
+
+                                {/* Featured Visual */}
+                                <div className="relative w-full max-w-[280px] md:max-w-[320px] xl:max-w-none xl:w-64 h-64 md:h-72 xl:h-64 flex-shrink-0 perspective-1000 block mt-4 xl:mt-0">
+                                    <motion.div
+                                        animate={{ rotateY: [-10, 10, -10], rotateX: [5, -5, 5] }}
+                                        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                                        className="w-full h-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 shadow-2xl flex flex-col gap-3 transform-style-3d items-center justify-center relative"
+                                    >
+                                        <div className="absolute inset-0 bg-red-500/20 blur-[40px] rounded-full animate-pulse" />
+                                        <div className="relative z-10 p-6 rounded-full bg-gradient-to-br from-red-500 to-orange-600 shadow-xl mb-4 group-hover:scale-110 transition-transform">
+                                            <Mail className="h-16 w-16 text-white" strokeWidth={1.5} />
+                                        </div>
+                                        <div className="text-center">
+                                            <div className="w-32 h-2 bg-white/20 rounded-full mx-auto mb-2" />
+                                            <div className="w-20 h-2 bg-white/10 rounded-full mx-auto" />
+                                        </div>
+                                    </motion.div>
+                                </div>
                             </div>
-
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tighter mb-6 leading-[1.05] md:leading-[0.95] drop-shadow-sm dark:drop-shadow-2xl text-slate-900 dark:text-white">
-                                Write Like a <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-600 dark:from-red-400 dark:via-white dark:to-orange-400 relative">
-                                    Pro.
-                                </span>
-                            </h1>
-
-                            <p className="text-sm md:text-lg text-slate-600 dark:text-zinc-400 max-w-lg mx-auto lg:mx-0 leading-relaxed font-light mb-8">
-                                Buat <span className="text-slate-900 dark:text-white font-medium">Surat Lamaran & Email</span> profesional dalam hitungan detik. Pilih template di samping untuk memulai.
-                            </p>
-
-                            <div className="flex flex-wrap items-center gap-3 md:gap-4 text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-zinc-600 cursor-default justify-center lg:justify-start mt-8 lg:mt-0">
-                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100/50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
-                                    <Briefcase className="h-3 w-3 text-red-500" />
-                                    Job Application
-                                </div>
-                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100/50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
-                                    <Zap className="h-3 w-3 text-orange-500" />
-                                    Instant Tone
-                                </div>
-                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100/50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
-                                    <Send className="h-3 w-3 text-blue-500" />
-                                    Ready to Send
-                                </div>
-                            </div>
-                        </motion.div>
+                        </MagicCard>
                     </div>
 
-                    {/* Right Side: Bento Grid Tools */}
-                    <motion.div
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="visible"
-                        className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 w-full"
-                    >
-                        {/* 1. APPLICATION TOOL - Primary - Spans 2 cols */}
-                        <div className="md:col-span-2 group min-h-[260px]">
-                            <MagicCard
-                                onClick={() => onSelectType('application')}
-                                className="h-full relative overflow-hidden bg-white/60 dark:bg-zinc-900/40 border-slate-200/60 dark:border-white/10 hover:border-red-500/50 dark:hover:border-red-400/50 backdrop-blur-md transition-all duration-500 shadow-xl shadow-slate-200/40 dark:shadow-none dark:hover:shadow-[0_0_50px_-12px_rgba(239,68,68,0.3)]"
-                                gradientFrom="red-500/20"
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                                <div className="flex flex-col md:flex-row h-full p-6 md:p-10 relative z-10 items-center gap-8">
-                                    <div className="flex-1 text-center md:text-left space-y-4">
-                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 text-red-600 dark:text-red-300 text-[10px] font-bold uppercase tracking-wider mb-2">
-                                            <Sparkles className="h-3 w-3" />
-                                            Most Popular
-                                        </div>
-                                        <h3 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-300 transition-colors tracking-tight">
-                                            Job Application
-                                        </h3>
-                                        <p className="text-slate-600 dark:text-zinc-400 text-sm md:text-base leading-relaxed max-w-sm mx-auto md:mx-0">
-                                            Buat Body Email & Cover Letter lengkap untuk melamar kerja.
-                                        </p>
-
-                                        <div className="pt-4 flex justify-center md:justify-start">
-                                            <button className="flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-black px-6 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg hover:shadow-red-500/25">
-                                                Tulis Sekarang <ArrowRight className="h-4 w-4" />
-                                            </button>
-                                        </div>
+                    {/* Stats Widget */}
+                    <div className="md:col-span-4 lg:col-span-4">
+                        <MagicCard
+                            className="h-full bg-white dark:bg-zinc-900 p-6 flex flex-col justify-between group"
+                            gradientFrom="red-500/5"
+                            gradientTo="red-900/5"
+                        >
+                            <div>
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-zinc-800">
+                                        <History className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                                     </div>
+                                    <span className="text-xs font-bold uppercase text-slate-400 tracking-wider">Activity</span>
+                                </div>
 
-                                    {/* Visual Decoration */}
-                                    <div className="relative w-32 h-32 md:w-40 md:h-40 flex-shrink-0">
-                                        <div className="absolute inset-0 bg-red-500/20 blur-[40px] rounded-full animate-pulse" />
-                                        <div className="relative h-full w-full bg-gradient-to-br from-red-500 to-orange-600 rounded-[2rem] flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-700 shadow-2xl border border-white/20">
-                                            <Mail className="h-16 w-16 text-white/90" strokeWidth={1.5} />
-                                        </div>
+                                <div className="text-center py-8">
+                                    <motion.div
+                                        initial={{ scale: 0.5, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        className="relative inline-block"
+                                    >
+                                        <span className="text-6xl font-black text-slate-900 dark:text-white tracking-tighter">
+                                            {totalEmails}
+                                        </span>
+                                        <span className="absolute -top-2 -right-6 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 backdrop-blur-sm">
+                                            +NEW
+                                        </span>
+                                    </motion.div>
+                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2">Email Digenerate</p>
+                                </div>
+                            </div>
+
+                            <div className="mt-auto">
+                                <div className="w-full bg-slate-100 dark:bg-zinc-800/50 rounded-xl p-4 border border-slate-200 dark:border-zinc-700/50 mb-4">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-xs font-medium text-slate-500">Drafts Saved</span>
+                                        <span className="text-xs font-bold text-slate-900 dark:text-white">{drafts.length}</span>
+                                    </div>
+                                    <div className="h-1.5 w-full bg-slate-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                                        <div className="h-full bg-red-500 w-[60%] rounded-full" />
                                     </div>
                                 </div>
-                            </MagicCard>
-                        </div>
+                                <Button variant="outline" className="w-full rounded-xl border-slate-200 dark:border-zinc-700 hover:border-red-500/30 dark:hover:border-red-500/30 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-slate-300 transition-colors" disabled>
+                                    View Analytics
+                                </Button>
+                            </div>
+                        </MagicCard>
+                    </div>
 
-                        {/* 2. FOLLOW UP TOOL */}
-                        <div className="h-[200px] group col-span-1">
+                    {/* Grid Items for other types */}
+                    {EMAIL_TYPES.slice(1).map((type) => (
+                        <div key={type.id} className="md:col-span-6 lg:col-span-4">
                             <MagicCard
-                                onClick={() => onSelectType('follow_up')}
-                                className="h-full relative overflow-hidden bg-white/60 dark:bg-zinc-900/40 border-slate-200/60 dark:border-white/10 hover:border-blue-500/50 dark:hover:border-blue-400/50 backdrop-blur-md transition-all duration-500 shadow-lg"
-                                gradientFrom="blue-500/20"
+                                onClick={() => onSelectType(type.id)}
+                                className="h-full p-6"
+                                gradientFrom="red-500/5"
+                                gradientTo="red-900/5"
                             >
-                                <div className="flex flex-col h-full p-6 relative z-10 justify-between">
-                                    <div>
-                                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-3 group-hover:scale-110 transition-transform">
-                                            <RefreshCw className="h-5 w-5" strokeWidth={2} />
+                                <div className="flex flex-col h-full">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className={`p-3.5 rounded-2xl border backdrop-blur-md bg-slate-100 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-slate-400 group-hover:text-red-500 group-hover:border-red-500/20 transition-colors`}>
+                                            <type.icon className={`h-6 w-6 ${type.id === 'follow_up' ? 'text-blue-500' : type.id === 'thank_you' ? 'text-emerald-500' : 'text-purple-500'}`} />
                                         </div>
-                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                                            Follow Up
-                                        </h3>
-                                        <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 line-clamp-2">
-                                            Tanya status lamaran dengan sopan & profesional.
-                                        </p>
+                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="p-1.5 rounded-full bg-slate-100 dark:bg-zinc-800">
+                                                <ArrowRight className="h-4 w-4 text-slate-900 dark:text-white -rotate-45 group-hover:rotate-0 transition-transform" />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center text-[10px] font-bold text-slate-400 group-hover:text-blue-600 uppercase tracking-widest">
-                                        Create <ArrowRight className="ml-auto h-3 w-3" />
-                                    </div>
-                                </div>
-                            </MagicCard>
-                        </div>
 
-                        {/* 3. THANK YOU TOOL */}
-                        <div className="h-[200px] group col-span-1">
-                            <MagicCard
-                                onClick={() => onSelectType('thank_you')}
-                                className="h-full relative overflow-hidden bg-white/60 dark:bg-zinc-900/40 border-slate-200/60 dark:border-white/10 hover:border-emerald-500/50 dark:hover:border-emerald-400/50 backdrop-blur-md transition-all duration-500 shadow-lg"
-                                gradientFrom="emerald-500/20"
-                            >
-                                <div className="flex flex-col h-full p-6 relative z-10 justify-between">
-                                    <div>
-                                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-3 group-hover:scale-110 transition-transform">
-                                            <Heart className="h-5 w-5" strokeWidth={2} />
-                                        </div>
-                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                                            Thank You
+                                    <div className="mt-auto space-y-2">
+                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                                            {type.title}
                                         </h3>
-                                        <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 line-clamp-2">
-                                            Ucapkan terima kasih setelah interview.
+                                        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                                            {type.description}
                                         </p>
                                     </div>
-                                    <div className="flex items-center text-[10px] font-bold text-slate-400 group-hover:text-emerald-600 uppercase tracking-widest">
-                                        Create <ArrowRight className="ml-auto h-3 w-3" />
-                                    </div>
                                 </div>
                             </MagicCard>
                         </div>
-
-                        {/* 4. COLD INQUIRY TOOL */}
-                        <div className="h-[200px] group col-span-1">
-                            <MagicCard
-                                onClick={() => onSelectType('inquiry')}
-                                className="h-full relative overflow-hidden bg-white/60 dark:bg-zinc-900/40 border-slate-200/60 dark:border-white/10 hover:border-purple-500/50 dark:hover:border-purple-400/50 backdrop-blur-md transition-all duration-500 shadow-lg"
-                                gradientFrom="purple-500/20"
-                            >
-                                <div className="flex flex-col h-full p-6 relative z-10 justify-between">
-                                    <div>
-                                        <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-3 group-hover:scale-110 transition-transform">
-                                            <Search className="h-5 w-5" strokeWidth={2} />
-                                        </div>
-                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                                            Cold Inquiry
-                                        </h3>
-                                        <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 line-clamp-2">
-                                            Tanya lowongan ke perusahaan incaranmu.
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center text-[10px] font-bold text-slate-400 group-hover:text-purple-600 uppercase tracking-widest">
-                                        Create <ArrowRight className="ml-auto h-3 w-3" />
-                                    </div>
-                                </div>
-                            </MagicCard>
-                        </div>
-
-                        {/* 5. STATS WIDGET */}
-                        <div className="h-[200px] group col-span-1">
-                            <MagicCard className="h-full relative overflow-hidden bg-white/60 dark:bg-zinc-900/40 border-slate-200/60 dark:border-white/10 backdrop-blur-md hover:border-red-500/50 dark:hover:border-red-500/50 transition-all duration-500 shadow-lg group-hover:scale-[1.02]">
-                                {/* Animated Grid Background */}
-                                <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                                <div className="flex flex-col h-full p-6 relative z-10 justify-between">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <span className="relative flex h-2 w-2">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                                            </span>
-                                            <span className="text-[10px] font-bold uppercase text-red-600 dark:text-red-400 tracking-widest">
-                                                Stats
-                                            </span>
-                                        </div>
-                                        <div className="text-red-500 opacity-50">
-                                            <History className="h-4 w-4" />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div className="flex items-end gap-2 mb-2">
-                                            <motion.span
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter leading-none"
-                                            >
-                                                {totalEmails}
-                                            </motion.span>
-                                            <span className="text-xs font-bold text-slate-400 mb-1 uppercase">
-                                                Generated
-                                            </span>
-                                        </div>
-
-                                        <div className="h-1 w-full bg-slate-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                                            <motion.div
-                                                initial={{ width: 0 }}
-                                                animate={{ width: "85%" }}
-                                                transition={{ duration: 1.5, ease: "circOut", delay: 0.4 }}
-                                                className="h-full bg-gradient-to-r from-red-500 to-orange-400 relative overflow-hidden"
-                                            >
-                                                <div className="absolute inset-0 bg-white/30 w-full -translate-x-full animate-[shimmer_2s_infinite]" />
-                                            </motion.div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </MagicCard>
-                        </div>
-                    </motion.div>
-                </div>
+                    ))}
+                </motion.div>
 
                 {/* History Section */}
-                <div className="w-full max-w-[1600px] mx-auto pb-20">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-slate-100 dark:bg-zinc-900 rounded-lg">
-                            <History className="h-5 w-5 text-slate-500 dark:text-zinc-400" />
+                <div className="mb-20">
+                    <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 p-6 md:p-8 mb-8">
+                        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-red-500/10 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none" />
+
+                        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div className="flex items-center gap-5">
+                                <div className="p-4 rounded-2xl bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400">
+                                    <History className="h-8 w-8" />
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">My Email History</h2>
+                                    <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base">
+                                        Draft dan email yang sudah Anda generate sebelumnya.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
+                                <div className="relative w-full md:w-64">
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="Cari surat..."
+                                        className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-red-500/50 text-sm transition-all"
+                                    />
+                                </div>
+                                <div className="relative w-full md:w-auto">
+                                    <select className="w-full appearance-none pl-4 pr-10 py-3 rounded-xl bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all cursor-pointer">
+                                        <option>Semua</option>
+                                        <option>Job App</option>
+                                        <option>Follow Up</option>
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                        <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Riwayat Email Terakhir</h2>
                     </div>
 
                     {loading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {[1, 2, 3].map((i) => (
-                                <div key={i} className="h-40 rounded-2xl bg-slate-200 dark:bg-zinc-900 animate-pulse" />
+                                <div key={i} className="h-48 rounded-3xl bg-slate-200 dark:bg-zinc-900 animate-pulse" />
                             ))}
                         </div>
                     ) : drafts.length === 0 ? (
-                        <div className="text-center py-12 rounded-2xl border border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50">
-                            <Mail className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-                            <p className="text-slate-500">Belum ada riwayat email.</p>
+                        <div className="text-center py-16 rounded-3xl border border-dashed border-slate-300 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50">
+                            <Mail className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                            <p className="text-slate-500 font-medium">Belum ada riwayat email.</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {drafts.map((draft, idx) => (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {drafts.map((draft) => (
                                 <MagicCard
                                     key={draft.id}
-                                    className="group relative overflow-hidden bg-white/60 dark:bg-zinc-900/40 border-slate-200/60 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20 transition-all p-4"
+                                    className="group relative flex flex-col justify-between overflow-hidden bg-slate-900 dark:bg-black border-slate-800 dark:border-zinc-800 hover:border-red-500/50 transition-all duration-300 h-full p-6"
+                                    gradientFrom="red-600/20"
+                                    gradientTo="red-900/20"
                                 >
-                                    <div className="flex justify-between items-start mb-3">
-                                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md border ${getEmailColor(draft.type)}`}>
-                                            <span className="flex items-center gap-1.5">
-                                                {getEmailIcon(draft.type)}
-                                                {draft.type.replace('_', ' ')}
-                                            </span>
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div className="p-3 rounded-2xl bg-zinc-800/50 border border-zinc-700/50 group-hover:bg-red-500/20 group-hover:border-red-500/30 transition-colors">
+                                            {getEmailIcon(draft.type)}
+                                        </div>
+                                        <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wider border border-emerald-500/20">
+                                            Final
                                         </span>
-
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-slate-600 dark:hover:text-white">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onClick={(e) => handleDelete(draft.id, e)} className="text-red-600 focus:text-red-600">
-                                                    <Trash2 className="h-4 w-4 mr-2" />
-                                                    Hapus
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
                                     </div>
 
-                                    <h4 className="font-bold text-slate-900 dark:text-white mb-1 line-clamp-1">
-                                        {draft.subject}
-                                    </h4>
-                                    <p className="text-xs text-slate-500 dark:text-zinc-500 line-clamp-2 mb-4 h-8">
-                                        {draft.content.replace(/<[^>]*>?/gm, "")}
-                                    </p>
-
-                                    <div className="flex justify-between items-center pt-3 border-t border-slate-100 dark:border-white/5">
-                                        <span className="text-[10px] text-slate-400 font-medium">
+                                    <div className="mb-6">
+                                        <h3 className="text-lg font-bold text-white mb-1 line-clamp-1 group-hover:text-red-400 transition-colors">
+                                            {draft.subject || "No Subject"}
+                                        </h3>
+                                        <p className="text-sm text-zinc-500 font-medium">
+                                            {(draft.type || "").replace('_', ' ').toUpperCase()}
+                                        </p>
+                                        <div className="flex items-center gap-2 mt-4 text-xs text-zinc-500 font-medium bg-zinc-900/50 py-2 px-3 rounded-lg w-fit">
+                                            <History className="h-3 w-3" />
                                             {new Date(draft.created_at).toLocaleDateString()}
-                                        </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 pt-4 border-t border-zinc-800/50">
                                         <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            className="h-7 text-xs gap-1.5 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                                            className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 hover:border-zinc-600 rounded-xl h-10 text-xs font-semibold"
                                             onClick={(e) => handleCopy(draft.content, e)}
                                         >
-                                            <Copy className="h-3 w-3" />
-                                            Salin
+                                            <Eye className="h-3.5 w-3.5 mr-2" />
+                                            Lihat
                                         </Button>
+                                        <button
+                                            onClick={(e) => handleDelete(draft.id, e)}
+                                            className="flex items-center gap-2 px-4 h-10 rounded-xl text-red-500 hover:bg-red-500/10 transition-colors text-xs font-bold"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                            Hapus
+                                        </button>
                                     </div>
                                 </MagicCard>
                             ))}
                         </div>
                     )}
                 </div>
+
 
             </div>
         </div>

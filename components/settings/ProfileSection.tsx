@@ -102,7 +102,7 @@ export function ProfileSection({ profile }: { profile: any }) {
   const isDirty = form.formState.isDirty;
 
   return (
-    <Card>
+    <Card className="border-0 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10">
       <CardHeader>
         <CardTitle>Informasi Profil</CardTitle>
         <CardDescription>

@@ -62,13 +62,7 @@ export function PDFHome({ onSelectTool }: PDFHomeProps) {
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.8, ease: "easeOut" }}
                         >
-                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-xl mb-8 shadow-sm dark:shadow-2xl hover:bg-white/60 dark:hover:bg-white/10 transition-colors cursor-default mx-auto xl:mx-0">
-                                <span className="relative flex h-2.5 w-2.5">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
-                                </span>
-                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">PDF Tools Pro</span>
-                            </div>
+
 
                             <h1 className="text-5xl md:text-6xl xl:text-7xl font-black tracking-tighter mb-6 leading-[0.9] drop-shadow-sm dark:drop-shadow-2xl text-slate-900 dark:text-white">
                                 Dokumen <br />
@@ -81,10 +75,7 @@ export function PDFHome({ onSelectTool }: PDFHomeProps) {
                                 Optimalkan proses lamaran kerjamu. Gabung, kompres, dan konversi dokumen dalam satu dashboard yang <span className="text-slate-900 dark:text-zinc-200 font-medium">cepat dan aman</span>.
                             </p>
 
-                            <div className="hidden xl:flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-zinc-600 cursor-default">
-                                <Zap className="h-3 w-3 fill-slate-300 dark:fill-white/10" />
-                                JobMate PDF Engine v2.1
-                            </div>
+
                         </motion.div>
                     </div>
 

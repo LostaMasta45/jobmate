@@ -13,34 +13,75 @@ interface WelcomeHeroProps {
   totalApplications: number;
 }
 
-const greetings = [
-  { icon: Sparkles, text: "Semangat hari ini!" },
-  { icon: Target, text: "Raih impianmu!" },
-  { icon: TrendingUp, text: "Keep going!" },
-  { icon: Zap, text: "You got this!" },
+const typewriterTexts = [
+  "Mulai karir impianmu hari ini! 🚀",
+  "Satu langkah lebih dekat menuju sukses. ✨",
+  "Kamu luar biasa, jangan menyerah! 💪",
+  "Rezeki gak bakal ketuker, gas terus! 🔥",
+  "Hari ini penuh peluang, ambil semuanya! 🌟",
+  "Percaya pada proses, hasilnya akan manis. 🍬",
+  "Fokus, konsisten, dan berdoa. 🙏"
 ];
 
+function TypewriterText({ texts }: { texts: string[] }) {
+  const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
+  const [reverse, setReverse] = useState(false);
+  const [blink, setBlink] = useState(true);
+
+  // Blinking cursor effect
+  useEffect(() => {
+    const timeout2 = setTimeout(() => {
+      setBlink((prev) => !prev);
+    }, 500);
+    return () => clearTimeout(timeout2);
+  }, [blink]);
+
+  // Typewriter effect
+  useEffect(() => {
+    if (subIndex === texts[index].length + 1 && !reverse) {
+      setTimeout(() => setReverse(true), 1500); // Wait before deleting
+      return;
+    }
+
+    if (subIndex === 0 && reverse) {
+      setReverse(false);
+      setIndex((prev) => (prev + 1) % texts.length); // Next quote
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, reverse ? 30 : 50); // Typing speed vs Deleting speed
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse, texts]);
+
+  return (
+    <span className="inline-flex items-center">
+      {texts[index].substring(0, subIndex)}
+      <span className={`ml-1 w-[2px] h-4 bg-primary ${blink ? "opacity-100" : "opacity-0"}`} />
+    </span>
+  );
+}
+
 export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications }: WelcomeHeroProps) {
-  const [greeting, setGreeting] = useState(greetings[0]);
   const [showWelcome, setShowWelcome] = useState(true);
-  // Fix hydration: time greeting generated on client only
-  const [timeGreeting, setTimeGreeting] = useState("Selamat Siang"); // Default fallback
+  const [timeGreeting, setTimeGreeting] = useState("Selamat Siang");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     // Generate time-based greeting on client only
     const hour = new Date().getHours();
     let greeting = "Selamat Siang";
-    if (hour < 12) greeting = "Selamat Pagi";
+    if (hour < 4) greeting = "Selamat Malam";
+    else if (hour < 11) greeting = "Selamat Pagi";
     else if (hour < 15) greeting = "Selamat Siang";
     else if (hour < 18) greeting = "Selamat Sore";
     else greeting = "Selamat Malam";
+
     setTimeGreeting(greeting);
     setMounted(true);
-    
-    // Random greeting
-    const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
-    setGreeting(randomGreeting);
 
     // Check if welcome was shown in this session
     const welcomed = sessionStorage.getItem("welcomed");
@@ -60,8 +101,6 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
       .slice(0, 2);
   };
 
-  const GreetingIcon = greeting.icon;
-
   return (
     <>
       {/* Welcome Popup - Shows once per session */}
@@ -78,11 +117,11 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
             <motion.div
               initial={{ y: 50 }}
               animate={{ y: 0 }}
-              className="relative"
+              className="relative px-4 w-full flex justify-center"
               onClick={(e) => e.stopPropagation()}
             >
-              <Card className="relative overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-background via-background to-primary/5 p-8 shadow-2xl max-w-md">
-                {/* Decorative elements - Purple/Cyan */}
+              <Card className="relative w-full max-w-md overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-background via-background to-primary/5 p-8 shadow-2xl">
+                {/* Decorative elements */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#8e68fd]/20 rounded-full -mr-16 -mt-16 blur-3xl" />
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#00d1dc]/20 rounded-full -ml-16 -mb-16 blur-3xl" />
 
@@ -113,18 +152,10 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
                       {timeGreeting}! 👋
                     </h2>
                     <p className="text-2xl font-semibold">{userName}</p>
-                    <p className="text-muted-foreground text-sm">{userEmail}</p>
-                  </motion.div>
-
-                  {/* Stats */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="flex items-center justify-center gap-2 text-sm"
-                  >
-                    <GreetingIcon className="h-4 w-4 text-primary" />
-                    <span className="font-medium">{greeting.text}</span>
+                    {/* Dynamic Typewriter Text in Popup */}
+                    <div className="h-6 flex items-center justify-center text-sm font-medium text-primary/80">
+                      <TypewriterText texts={typewriterTexts} />
+                    </div>
                   </motion.div>
 
                   {totalApplications > 0 && (
@@ -187,9 +218,9 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
                   👋
                 </motion.span>
               </div>
-              <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5">
-                <GreetingIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary flex-shrink-0" />
-                <span className="truncate">{greeting.text}</span>
+              <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5 h-5">
+                <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary flex-shrink-0" />
+                <TypewriterText texts={typewriterTexts} />
               </p>
             </div>
           </div>
@@ -206,7 +237,7 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
                 <span className="text-xl sm:text-2xl font-bold text-primary">{totalApplications}</span>
                 <p className="text-[10px] sm:text-xs text-muted-foreground">Lamaran</p>
               </div>
-              <GreetingIcon className="h-5 w-5 text-primary" />
+              <Sparkles className="h-5 w-5 text-primary" />
             </motion.div>
           )}
         </div>

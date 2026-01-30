@@ -99,7 +99,7 @@ export default function QuickStartPage() {
                 <div className="flex-1">
                   <h3 className="text-xl font-bold mb-3">Explore Dashboard 📊</h3>
                   <p className="mb-4">Kenali dashboard JobMate:</p>
-                  
+
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-semibold mb-2">Dashboard utama menampilkan:</h4>
@@ -151,7 +151,7 @@ export default function QuickStartPage() {
                 <div className="flex-1">
                   <h3 className="text-xl font-bold mb-3">Jelajah Lowongan Kerja 💼</h3>
                   <p className="mb-4">Temukan pekerjaan impian Anda:</p>
-                  
+
                   <ol className="space-y-3 mb-4">
                     <li>1. Klik menu <strong>Lowongan Kerja</strong> di sidebar</li>
                     <li>2. Lihat lowongan terbaru (update setiap hari!)</li>
@@ -212,39 +212,39 @@ export default function QuickStartPage() {
           <div className="mt-12">
             <h2 className="text-2xl font-bold mb-6">❓ FAQ Quick Start</h2>
             <div className="space-y-4">
-              <div className="p-4 bg-muted rounded-lg">
+              <div className="p-5 bg-white/50 dark:bg-zinc-900/50 rounded-xl border-0 shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10">
                 <h4 className="font-semibold mb-2">Q: Apakah saya harus isi profil lengkap?</h4>
-                <p className="text-sm">A: Sangat disarankan! Profil lengkap membantu AI memberikan rekomendasi dan hasil generation yang lebih akurat dan personal.</p>
+                <p className="text-sm text-muted-foreground">A: Sangat disarankan! Profil lengkap membantu AI memberikan rekomendasi dan hasil generation yang lebih akurat dan personal.</p>
               </div>
-              <div className="p-4 bg-muted rounded-lg">
+              <div className="p-5 bg-white/50 dark:bg-zinc-900/50 rounded-xl border-0 shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10">
                 <h4 className="font-semibold mb-2">Q: Berapa lama waktu yang dibutuhkan untuk setup?</h4>
-                <p className="text-sm">A: Sekitar 5-10 menit untuk setup awal, termasuk isi profil dan explore fitur dasar.</p>
+                <p className="text-sm text-muted-foreground">A: Sekitar 5-10 menit untuk setup awal, termasuk isi profil dan explore fitur dasar.</p>
               </div>
-              <div className="p-4 bg-muted rounded-lg">
+              <div className="p-5 bg-white/50 dark:bg-zinc-900/50 rounded-xl border-0 shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10">
                 <h4 className="font-semibold mb-2">Q: Apakah data saya aman?</h4>
-                <p className="text-sm">A: Ya! Semua data Anda terenkripsi dan hanya Anda yang bisa akses. Kami tidak share data ke pihak ketiga.</p>
+                <p className="text-sm text-muted-foreground">A: Ya! Semua data Anda terenkripsi dan hanya Anda yang bisa akses. Kami tidak share data ke pihak ketiga.</p>
               </div>
             </div>
           </div>
 
           {/* Help CTA */}
-          <section className="mt-12 p-6 bg-primary/5 border-2 border-primary/20 rounded-lg not-prose">
-            <h3 className="text-xl font-bold mb-2">💬 Butuh Bantuan?</h3>
-            <p className="text-muted-foreground mb-4">
-              Tim support kami siap membantu Anda 24/7!
+          <section className="mt-12 p-8 bg-gradient-to-br from-primary/10 to-purple-500/10 dark:from-primary/20 dark:to-purple-500/20 rounded-2xl border-0 shadow-sm ring-1 ring-primary/20 not-prose text-center">
+            <h3 className="text-xl sm:text-2xl font-bold mb-3">💬 Butuh Bantuan?</h3>
+            <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
+              Tim support kami siap membantu Anda 24/7! Jangan ragu untuk menghubungi kami.
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="https://t.me/jobmate_support"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold"
+                className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all font-semibold shadow-lg shadow-primary/25"
               >
                 Chat dengan Admin
               </Link>
               <Link
                 href="/docs/faq"
-                className="inline-flex items-center px-4 py-2 border-2 border-primary rounded-lg hover:bg-primary/10 transition-colors font-semibold"
+                className="inline-flex items-center justify-center px-6 py-3 bg-white/5 dark:bg-white/10 border border-primary/20 rounded-xl hover:bg-primary/5 transition-all font-semibold backdrop-blur-sm"
               >
                 Lihat FAQ
               </Link>

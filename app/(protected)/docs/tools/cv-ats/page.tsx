@@ -20,7 +20,7 @@ export default function CVATSDocsPage() {
       />
 
       {/* What is ATS */}
-      <Card>
+      <Card className="border-0 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10">
         <CardHeader>
           <CardTitle>Apa itu ATS (Applicant Tracking System)?</CardTitle>
         </CardHeader>
@@ -28,13 +28,13 @@ export default function CVATSDocsPage() {
           <Alert>
             <Zap className="h-4 w-4" />
             <AlertDescription>
-              <strong>Fun Fact:</strong> 75% perusahaan besar menggunakan ATS untuk screening CV!<br/>
+              <strong>Fun Fact:</strong> 75% perusahaan besar menggunakan ATS untuk screening CV!<br />
               CV Anda mungkin ditolak oleh <strong>robot</strong> sebelum dilihat HRD 🤖
             </AlertDescription>
           </Alert>
 
           <p className="text-muted-foreground">
-            <strong>ATS</strong> adalah software yang scan dan filter CV secara otomatis berdasarkan keywords, 
+            <strong>ATS</strong> adalah software yang scan dan filter CV secara otomatis berdasarkan keywords,
             format, dan struktur. Jika CV Anda tidak ATS-friendly, akan langsung ditolak tanpa pernah sampai ke HRD.
           </p>
 
@@ -62,7 +62,7 @@ export default function CVATSDocsPage() {
       </Card>
 
       {/* Step by Step */}
-      <Card>
+      <Card className="border-0 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10">
         <CardHeader>
           <CardTitle>Cara Menggunakan CV ATS Generator</CardTitle>
           <CardDescription>Wizard akan guide Anda step-by-step untuk membuat CV ATS-friendly</CardDescription>
@@ -84,7 +84,7 @@ export default function CVATSDocsPage() {
                 <Alert className="mt-3">
                   <Lightbulb className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>Pro Tip:</strong> Gunakan email format nama.lengkap@gmail.com, 
+                    <strong>Pro Tip:</strong> Gunakan email format nama.lengkap@gmail.com,
                     bukan email alay seperti cute_girl123@yahoo.com
                   </AlertDescription>
                 </Alert>
@@ -104,15 +104,15 @@ export default function CVATSDocsPage() {
                 <div className="p-4 bg-muted/50 rounded text-sm space-y-2">
                   <p className="font-semibold">Contoh Good Summary:</p>
                   <p className="text-muted-foreground">
-                    "Frontend Developer dengan 3+ tahun pengalaman building responsive web applications 
-                    menggunakan React dan TypeScript. Proven track record dalam improve website performance 
+                    "Frontend Developer dengan 3+ tahun pengalaman building responsive web applications
+                    menggunakan React dan TypeScript. Proven track record dalam improve website performance
                     by 40% dan increase user engagement. Passionate about clean code dan modern UI/UX best practices."
                   </p>
                 </div>
                 <Alert className="mt-3">
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>Avoid:</strong> Summary yang terlalu generik seperti "Hard worker, fast learner, team player". 
+                    <strong>Avoid:</strong> Summary yang terlalu generik seperti "Hard worker, fast learner, team player".
                     Fokus pada <strong>achievements dan skills specific</strong>!
                   </AlertDescription>
                 </Alert>
@@ -135,19 +135,19 @@ export default function CVATSDocsPage() {
                 <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded text-sm space-y-2 mt-3">
                   <p className="font-semibold text-blue-600">Gunakan Format STAR + Metrics:</p>
                   <p className="text-muted-foreground">
-                    ❌ Bad: "Responsible for website development"<br/>
-                    ✅ Good: "<strong>Developed</strong> 15+ responsive web pages using React, 
+                    ❌ Bad: "Responsible for website development"<br />
+                    ✅ Good: "<strong>Developed</strong> 15+ responsive web pages using React,
                     <strong>resulting in</strong> 40% increase in mobile user retention"
                   </p>
                   <p className="text-muted-foreground">
-                    ✅ "Led team of 4 developers to <strong>migrate</strong> legacy system to modern tech stack, 
+                    ✅ "Led team of 4 developers to <strong>migrate</strong> legacy system to modern tech stack,
                     <strong>reducing</strong> load time by 60%"
                   </p>
                 </div>
                 <Alert className="mt-3">
                   <Lightbulb className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>Pro Tip:</strong> Selalu include <strong>numbers/metrics</strong>! 
+                    <strong>Pro Tip:</strong> Selalu include <strong>numbers/metrics</strong>!
                     ATS dan HRD love quantifiable achievements.
                   </AlertDescription>
                 </Alert>
@@ -185,7 +185,7 @@ export default function CVATSDocsPage() {
                 <Alert className="mt-3">
                   <Zap className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>PENTING:</strong> Copy-paste keywords dari <strong>job description</strong>!<br/>
+                    <strong>PENTING:</strong> Copy-paste keywords dari <strong>job description</strong>!<br />
                     ATS akan scan dan match skills Anda dengan requirement di JD.
                   </AlertDescription>
                 </Alert>
@@ -218,13 +218,52 @@ export default function CVATSDocsPage() {
 
           <StepByStep
             step={6}
-            title="Preview & Download"
+            title="Pilih Template"
+            description={
+              <div className="space-y-2">
+                <p>Pilih template CV yang sesuai dengan style Anda:</p>
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded">
+                    <strong className="text-blue-600">Classic</strong>
+                    <p className="text-xs text-muted-foreground">Clean, traditional format</p>
+                  </div>
+                  <div className="p-3 bg-green-50 dark:bg-green-950 rounded">
+                    <strong className="text-green-600">Modern</strong>
+                    <p className="text-xs text-muted-foreground">Contemporary, minimal</p>
+                  </div>
+                  <div className="p-3 bg-purple-50 dark:bg-purple-950 rounded">
+                    <strong className="text-purple-600">Professional</strong>
+                    <p className="text-xs text-muted-foreground">Corporate-ready style</p>
+                  </div>
+                  <div className="p-3 bg-orange-50 dark:bg-orange-950 rounded">
+                    <strong className="text-orange-600">Compact</strong>
+                    <p className="text-xs text-muted-foreground">Space-efficient layout</p>
+                  </div>
+                </div>
+                <Alert className="mt-3">
+                  <Lightbulb className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Tips:</strong> Semua template sudah ATS-friendly. Pilih yang paling sesuai dengan industry Anda!
+                  </AlertDescription>
+                </Alert>
+                <div className="mt-4 p-4 bg-muted rounded-lg">
+                  <p className="text-sm text-muted-foreground italic">[SCREENSHOT: Template selection]</p>
+                </div>
+              </div>
+            }
+          />
+
+          <StepByStep
+            step={7}
+            title="Review & Save"
             description={
               <div className="space-y-2">
                 <ol className="space-y-2 ml-4">
                   <li>1. <strong>Preview</strong> CV Anda dalam format ATS-friendly</li>
                   <li>2. Check <strong>ATS Score</strong> - Aim for 80%+!</li>
-                  <li>3. <strong>Download</strong> dalam format:
+                  <li>3. <strong>Edit</strong> jika ada yang perlu diperbaiki</li>
+                  <li>4. <strong>Save</strong> ke akun Anda untuk akses kapan saja</li>
+                  <li>5. <strong>Download</strong> dalam format:
                     <ul className="ml-4 mt-1 space-y-1">
                       <li>• <strong>PDF</strong> (recommended) - Universal format</li>
                       <li>• <strong>DOCX</strong> (Word) - Jika diminta by recruiter</li>
@@ -241,7 +280,7 @@ export default function CVATSDocsPage() {
       </Card>
 
       {/* ATS Optimization Tips */}
-      <Card>
+      <Card className="border-0 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Award className="h-5 w-5" />
@@ -282,7 +321,7 @@ export default function CVATSDocsPage() {
       </Card>
 
       {/* FAQ */}
-      <Card>
+      <Card className="border-0 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10">
         <CardHeader>
           <CardTitle>FAQ CV ATS Generator</CardTitle>
         </CardHeader>
@@ -308,7 +347,7 @@ export default function CVATSDocsPage() {
           <div>
             <h3 className="font-semibold mb-2">Q: Bagaimana cara dapat keywords yang tepat?</h3>
             <p className="text-muted-foreground">
-              A: Baca <strong>job description</strong> dengan teliti. Copy-paste keywords yang relevant dari "Requirements" 
+              A: Baca <strong>job description</strong> dengan teliti. Copy-paste keywords yang relevant dari "Requirements"
               dan "Qualifications" section.
             </p>
           </div>
@@ -327,7 +366,7 @@ export default function CVATSDocsPage() {
           <div>
             <h3 className="font-semibold mb-2">Q: Apakah perlu customize CV untuk setiap aplikasi?</h3>
             <p className="text-muted-foreground">
-              A: <strong>YES!</strong> Setiap job description berbeda. Customize keywords dan highlights yang relevant 
+              A: <strong>YES!</strong> Setiap job description berbeda. Customize keywords dan highlights yang relevant
               untuk setiap posisi. Quality over quantity!
             </p>
           </div>
@@ -335,16 +374,16 @@ export default function CVATSDocsPage() {
       </Card>
 
       {/* Call to Action */}
-      <Alert>
-        <FileText className="h-4 w-4" />
-        <AlertDescription>
-          <strong>Siap Buat CV ATS-Friendly?</strong>
-          <br />
-          <a href="/tools/cv-ats" className="text-primary underline">
-            Buka CV ATS Generator →
-          </a>
-        </AlertDescription>
-      </Alert>
+      <div className="mt-8 p-8 bg-gradient-to-br from-primary/10 to-purple-500/10 dark:from-primary/20 dark:to-purple-500/20 rounded-2xl border-0 shadow-sm ring-1 ring-primary/20 text-center">
+        <h3 className="text-xl font-bold mb-3">Siap Buat CV ATS-Friendly?</h3>
+        <p className="text-muted-foreground mb-6">
+          Mulai buat CV Anda sekarang dan lolos screening otomatis!
+        </p>
+        <a href="/tools/cv-ats" className="inline-flex items-center justify-center px-8 py-3 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all font-bold shadow-lg shadow-primary/25">
+          <FileText className="w-4 h-4 mr-2" />
+          Buka CV ATS Generator →
+        </a>
+      </div>
     </div>
   );
 }

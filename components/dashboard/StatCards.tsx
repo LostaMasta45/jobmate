@@ -25,7 +25,7 @@ function AnimatedCounter({ value, duration = 1000 }: { value: number; duration?:
     const animate = (currentTime: number) => {
       if (!startTime) startTime = currentTime;
       const progress = Math.min((currentTime - startTime) / duration, 1);
-      
+
       setCount(Math.floor(progress * value));
 
       if (progress < 1) {
@@ -96,22 +96,22 @@ export function StatCards({ data }: StatCardsProps) {
           key={item.label}
           initial={{ opacity: 0, y: 20, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ 
-            duration: 0.4, 
+          transition={{
+            duration: 0.4,
             delay: index * 0.1,
             type: "spring",
             stiffness: 100
           }}
         >
           <motion.div
-            whileHover={{ 
-              scale: 1.05, 
+            whileHover={{
+              scale: 1.05,
               y: -5,
               transition: { duration: 0.2 }
             }}
             whileTap={{ scale: 0.98 }}
           >
-            <Card 
+            <Card
               className={`
                 relative overflow-hidden border-0 
                 bg-gradient-to-br ${item.gradient}
@@ -122,7 +122,7 @@ export function StatCards({ data }: StatCardsProps) {
             >
               {/* Glassmorphism overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent dark:from-white/5" />
-              
+
               {/* Animated background pattern */}
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-0 -left-4 w-24 h-24 bg-white rounded-full mix-blend-overlay filter blur-xl animate-pulse" />
@@ -132,7 +132,7 @@ export function StatCards({ data }: StatCardsProps) {
               <CardContent className="relative p-5 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <motion.p 
+                    <motion.p
                       className="text-xs sm:text-sm font-semibold text-white/90 truncate mb-2"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -140,11 +140,11 @@ export function StatCards({ data }: StatCardsProps) {
                     >
                       {item.label}
                     </motion.p>
-                    <motion.p 
+                    <motion.p
                       className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg"
                       initial={{ opacity: 0, scale: 0.5 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ 
+                      transition={{
                         delay: index * 0.1 + 0.3,
                         type: "spring",
                         stiffness: 200
@@ -153,9 +153,9 @@ export function StatCards({ data }: StatCardsProps) {
                       <AnimatedCounter value={item.value} duration={1200} />
                     </motion.p>
                   </div>
-                  
+
                   {/* Icon with glassmorphism */}
-                  <motion.div 
+                  <motion.div
                     className={`
                       ${item.iconBg}
                       p-3 sm:p-3.5 rounded-2xl
@@ -166,7 +166,7 @@ export function StatCards({ data }: StatCardsProps) {
                     `}
                     initial={{ rotate: -180, opacity: 0 }}
                     animate={{ rotate: 0, opacity: 1 }}
-                    transition={{ 
+                    transition={{
                       delay: index * 0.1 + 0.4,
                       type: "spring",
                       stiffness: 200
@@ -177,11 +177,11 @@ export function StatCards({ data }: StatCardsProps) {
                 </div>
 
                 {/* Bottom accent line */}
-                <motion.div 
+                <motion.div
                   className="absolute bottom-0 left-0 h-1 bg-white/30"
                   initial={{ width: "0%" }}
                   animate={{ width: "100%" }}
-                  transition={{ 
+                  transition={{
                     delay: index * 0.1 + 0.5,
                     duration: 0.6,
                     ease: "easeOut"

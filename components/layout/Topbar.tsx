@@ -200,7 +200,7 @@ export function Topbar({ user }: TopbarProps) {
   };
 
   return (
-    <header className="hidden lg:flex sticky top-0 z-30 h-16 items-center gap-4 border-b border-border/40 bg-background/60 backdrop-blur-xl px-4 md:px-6 transition-all duration-300">
+    <header className="hidden lg:flex sticky top-0 z-30 h-16 items-center gap-4 border-b border-border/40 bg-background/60 dark:bg-black/90 backdrop-blur-xl px-4 md:px-6 transition-all duration-300">
       <div className="flex flex-1 items-center gap-4">
         {/* Search Bar - Glassy Pill Design */}
         <div className="relative max-w-md flex-1" ref={searchRef}>

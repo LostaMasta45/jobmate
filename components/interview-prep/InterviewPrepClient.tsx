@@ -1,54 +1,46 @@
 "use client";
 
 import { useState } from "react";
-import { Resume } from "@/lib/schemas/cv-ats";
-import { CVATSHome } from "./CVATSHome";
-import { CVWizard } from "./CVWizard";
-import { CVHistoryList } from "./CVHistoryList";
-import { CVATSToolLayout } from "./CVATSToolLayout";
+import { InterviewPrepSession } from "@/types/interview-prep";
+import { InterviewPrepHome } from "./InterviewPrepHome";
+import { InterviewHistoryList } from "./InterviewHistoryList";
+import { UploadFormNew } from "./UploadFormNew";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
-import { FileText, Plus, History as HistoryIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
-interface CVATSClientProps {
-    initialResumes: any[];
-    onRefresh: () => Promise<void>;
+interface InterviewPrepClientProps {
+    initialSessions: InterviewPrepSession[];
 }
 
 type ViewType = 'home' | 'wizard' | 'history';
 
-export function CVATSClient({ initialResumes, onRefresh }: CVATSClientProps) {
-    // Local state for UI navigation, data is passed from parent page or refreshed via onRefresh
+export function InterviewPrepClient({ initialSessions }: InterviewPrepClientProps) {
     const [activeView, setActiveView] = useState<ViewType>('home');
-    const [editingResume, setEditingResume] = useState<Resume | null>(null);
-
-    const handleCreateNew = () => {
-        setEditingResume(null);
-        setActiveView('wizard');
-    };
-
-    const handleEditResume = (resume: Resume) => {
-        setEditingResume(resume);
-        setActiveView('wizard');
-    };
-
-    const handleCloseWizard = () => {
-        setEditingResume(null);
-        setActiveView('home');
-        onRefresh(); // Refresh data on close
-    };
 
     // Helper render function
     const renderContent = () => {
         switch (activeView) {
             case 'wizard':
-                // CVWizard handles its own layout/fullscreen nature
                 return (
-                    <CVWizard
-                        initialResume={editingResume}
-                        onClose={handleCloseWizard}
-                    />
+                    <div className="max-w-4xl mx-auto px-4 py-8">
+                        <div className="mb-6">
+                            <Button
+                                variant="ghost"
+                                className="mb-4 pl-0 hover:pl-2 transition-all"
+                                onClick={() => setActiveView('home')}
+                            >
+                                <ArrowLeft className="mr-2 h-4 w-4" />
+                                Kembali ke Dashboard
+                            </Button>
+                            <h2 className="text-2xl font-bold mb-2">Mulai Sesi Interview Baru</h2>
+                            <p className="text-muted-foreground">
+                                Upload gambar CV & job poster atau paste text untuk generate persiapan interview yang dipersonalisasi
+                            </p>
+                        </div>
+                        <UploadFormNew />
+                    </div>
                 );
             case 'history':
                 return (
@@ -59,10 +51,8 @@ export function CVATSClient({ initialResumes, onRefresh }: CVATSClientProps) {
                         </div>
 
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-                            <CVHistoryList
-                                resumes={initialResumes}
-                                onEdit={handleEditResume}
-                                onRefresh={onRefresh}
+                            <InterviewHistoryList
+                                sessions={initialSessions}
                                 onBack={() => setActiveView('home')}
                             />
                         </div>
@@ -78,8 +68,8 @@ export function CVATSClient({ initialResumes, onRefresh }: CVATSClientProps) {
             {/* Mobile Header only on Home */}
             {activeView === 'home' && (
                 <MobileToolHeader
-                    title="CV Generator"
-                    description="Professional Resume Builder"
+                    title="Interview Prep"
+                    description="AI Interview Simulator"
                 />
             )}
 
@@ -92,22 +82,18 @@ export function CVATSClient({ initialResumes, onRefresh }: CVATSClientProps) {
                         exit={{ opacity: 0, x: -20 }}
                         className="h-full w-full overflow-y-auto"
                     >
-                        <CVATSHome
-                            onSelectView={(view) => {
-                                if (view === 'wizard') handleCreateNew();
-                                else setActiveView(view);
-                            }}
-                            totalResumes={initialResumes.length}
+                        <InterviewPrepHome
+                            onSelectView={(view) => setActiveView(view)}
+                            totalSessions={initialSessions.length}
                         />
                     </motion.div>
                 ) : (
                     <motion.div
-                        // Key ensures re-mount animation if switching types, though here we mostly go home <-> tool
                         key="tool-view"
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 20 }}
-                        className="h-full w-full bg-slate-50 dark:bg-[#050505] overflow-hidden"
+                        className="h-full w-full bg-slate-50 dark:bg-[#050505] overflow-y-auto"
                     >
                         {renderContent()}
                     </motion.div>

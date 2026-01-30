@@ -16,9 +16,10 @@ import {
   Upload,
   FolderOpen,
   Menu,
-  ChevronRight,
   MoreVertical,
   Wallet,
+  ClipboardList,
+  ChevronRight,
 } from "lucide-react";
 import { AdminThemeToggle } from "@/components/admin/AdminThemeToggle";
 import { signOut } from "@/actions/auth";
@@ -96,6 +97,14 @@ const menuItems: MenuItem[] = [
     title: "Applications",
     href: "/admin/applications",
     icon: Users,
+    section: "Users",
+  },
+  {
+    title: "Job Tracker",
+    href: "/admin/job-tracker",
+    icon: ClipboardList,
+    badge: "NEW",
+    badgeColor: "bg-blue-500",
     section: "Users",
   },
   {
