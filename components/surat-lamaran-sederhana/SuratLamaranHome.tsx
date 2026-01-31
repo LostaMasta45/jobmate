@@ -26,6 +26,7 @@ interface Stats {
     total: number;
     draft: number;
     final: number;
+    mostUsedTemplate?: string;
 }
 
 export function SuratLamaranHome({ onSelectView }: SuratLamaranHomeProps) {
@@ -36,7 +37,7 @@ export function SuratLamaranHome({ onSelectView }: SuratLamaranHomeProps) {
         const fetchStats = async () => {
             try {
                 const result = await getSuratLamaranStats();
-                if (!result.error) {
+                if (!result.error && result.data) {
                     setStats(result.data);
                 }
             } catch (error) {

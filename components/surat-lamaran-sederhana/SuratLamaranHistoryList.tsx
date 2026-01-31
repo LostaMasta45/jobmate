@@ -164,16 +164,16 @@ export function SuratLamaranHistoryList({ onBack }: SuratLamaranHistoryListProps
                         >
                             <HistoryCard
                                 title={surat.nama_perusahaan}
-                                description={surat.posisi_lowongan || "Posisi tidak tertera"}
-                                icon={FileText}
-                                date={new Date(surat.created_at).toLocaleDateString("id-ID", {
+                                description={`${surat.posisi_lowongan || "Posisi tidak tertera"} • ${new Date(surat.created_at).toLocaleDateString("id-ID", {
                                     day: "numeric",
                                     month: "short",
                                     year: "numeric"
-                                })}
-                                gradientColors="group-hover:text-emerald-500 text-emerald-500/20"
+                                })}`}
+                                icon={FileText}
+                                gradientFrom="#10b981"
+                                gradientTo="#059669"
+                                buttonText="Lihat Detail"
                                 onClick={() => window.location.href = `/surat-lamaran-sederhana/view?id=${surat.id}`}
-                                onDelete={(e) => handleDelete(surat.id, e)}
                             />
                         </motion.div>
                     ))}
