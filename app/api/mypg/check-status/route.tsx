@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { resend, FROM_EMAIL } from '@/lib/resend';
+import { PaymentSuccessEmail, PaymentSuccessEmailText } from '@/emails/PaymentSuccessEmail';
+import { render } from '@react-email/render';
 
 // MY PG Configuration - from environment variables
 const MYPG_API_KEY = process.env.MYPG_API_KEY || 'WGyyEYlAiGwbHeiwHbcuJlyDlx9xCOsxJ2kPAI1X';
@@ -56,22 +59,65 @@ export async function GET(request: NextRequest) {
             status: data.data?.status,
         });
 
-        // Also check database status
+        // Get current database status
         const { data: dbTransaction } = await supabase
             .from('mypg_transactions')
             .select('*')
             .eq('order_id', orderId)
             .single();
 
+        // Check if this is a newly detected PAID status (was not PAID before in our DB)
+        const apiStatus = data.data?.status;
+        const isPaidNow = apiStatus === 'PAID' || apiStatus === 'SUCCESS';
+        const wasPaidBefore = dbTransaction?.status === 'PAID';
+        const isNewlyPaid = isPaidNow && !wasPaidBefore;
+
         // Sync status from API to database if different
-        if (data.data?.status && dbTransaction && data.data.status !== dbTransaction.status) {
+        if (apiStatus && dbTransaction && apiStatus !== dbTransaction.status) {
+            const normalizedStatus = apiStatus === 'SUCCESS' ? 'PAID' : apiStatus;
             await supabase
                 .from('mypg_transactions')
                 .update({
-                    status: data.data.status,
-                    paid_at: data.data.status === 'SUCCESS' ? data.data.paid_at : null,
+                    status: normalizedStatus,
+                    paid_at: isPaidNow ? new Date().toISOString() : null,
                 })
                 .eq('order_id', orderId);
+
+            console.log('[MY PG Check Status] DB status updated to:', normalizedStatus);
+        }
+
+        // Send success email if newly detected as PAID
+        if (isNewlyPaid && dbTransaction?.email) {
+            console.log('[MY PG Check Status] Payment newly detected as PAID, sending email...');
+            try {
+                const emailProps = {
+                    userName: dbTransaction.full_name || 'User',
+                    amount: parseInt(dbTransaction.amount) || data.data?.amount_paid || 0,
+                    transactionDate: new Date().toISOString(),
+                    planType: dbTransaction.plan_type || 'basic',
+                    dashboardUrl: 'https://jobmate.web.id/ajukan-akun',
+                };
+
+                const emailHtml = await render(<PaymentSuccessEmail { ...emailProps } />);
+                const emailText = PaymentSuccessEmailText(emailProps);
+
+                await resend.emails.send({
+                    from: FROM_EMAIL,
+                    to: dbTransaction.email,
+                    subject: `✅ Pembayaran ${dbTransaction.plan_type === 'premium' ? 'VIP Premium' : dbTransaction.plan_type === 'basic' ? 'VIP Basic' : 'Test'} Berhasil - JOBMATE`,
+                    html: emailHtml,
+                    text: emailText,
+                    tags: [
+                        { name: 'category', value: 'payment-confirmation' },
+                        { name: 'plan', value: dbTransaction.plan_type || 'unknown' },
+                        { name: 'gateway', value: 'mypg-klikqris' },
+                    ],
+                });
+
+                console.log('[MY PG Check Status] ✅ Success email sent to:', dbTransaction.email);
+            } catch (emailError) {
+                console.error('[MY PG Check Status] Failed to send email:', emailError);
+            }
         }
 
         return NextResponse.json({
@@ -79,6 +125,7 @@ export async function GET(request: NextRequest) {
             status: data.data?.status || 'UNKNOWN',
             transaction: data.data,
             dbRecord: dbTransaction,
+            emailSent: isNewlyPaid && !!dbTransaction?.email,
         });
 
     } catch (error: any) {

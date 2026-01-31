@@ -60,7 +60,7 @@ export interface IncomeByMethod {
     percentage: number;
 }
 
-// Get Revenue Overview
+// Get Revenue Overview (includes both payments and mypg_transactions)
 export async function getRevenueOverview(): Promise<RevenueOverview> {
     const supabase = createAdminClient();
 
@@ -81,12 +81,27 @@ export async function getRevenueOverview(): Promise<RevenueOverview> {
         monthStart.setDate(1);
         monthStart.setHours(0, 0, 0, 0);
 
-        // Get all payments
-        const { data: payments, count: totalTransactions } = await supabase
+        // Get all payments from "payments" table
+        const { data: payments, count: paymentsCount } = await supabase
             .from("payments")
             .select("*", { count: "exact" });
 
-        if (!payments) {
+        // Get all payments from "mypg_transactions" table
+        const { data: mypgPayments, count: mypgCount } = await supabase
+            .from("mypg_transactions")
+            .select("*", { count: "exact" });
+
+        // Normalize mypg_transactions to match format
+        const normalizedMypg = (mypgPayments || []).map((tx: any) => ({
+            status: (tx.status || 'PENDING').toLowerCase(),
+            amount: parseInt(tx.amount) || 0,
+            paid_at: tx.paid_at,
+        }));
+
+        // Combine all payments
+        const allPayments = [...(payments || []), ...normalizedMypg];
+
+        if (allPayments.length === 0) {
             return {
                 totalRevenue: 0,
                 thisMonthRevenue: 0,
@@ -102,10 +117,10 @@ export async function getRevenueOverview(): Promise<RevenueOverview> {
         }
 
         // Calculate totals
-        const paidPayments = payments.filter(p => p.status === 'paid');
-        const pendingPayments = payments.filter(p => p.status === 'pending');
-        const expiredPayments = payments.filter(p => p.status === 'expired');
-        const failedPayments = payments.filter(p => p.status === 'failed');
+        const paidPayments = allPayments.filter(p => p.status === 'paid');
+        const pendingPayments = allPayments.filter(p => p.status === 'pending');
+        const expiredPayments = allPayments.filter(p => p.status === 'expired');
+        const failedPayments = allPayments.filter(p => p.status === 'failed');
 
         const totalRevenue = paidPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
         const pendingAmount = pendingPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
@@ -133,7 +148,7 @@ export async function getRevenueOverview(): Promise<RevenueOverview> {
             thisMonthRevenue,
             thisWeekRevenue,
             todayRevenue,
-            totalTransactions: totalTransactions || 0,
+            totalTransactions: (paymentsCount || 0) + (mypgCount || 0),
             paidCount: paidPayments.length,
             pendingCount: pendingPayments.length,
             expiredCount: expiredPayments.length,
@@ -180,7 +195,7 @@ export async function getRecentPayments(limit = 10): Promise<PaymentRecord[]> {
     }
 }
 
-// Get Invoices with Filters
+// Get Invoices with Filters (includes both payments and mypg_transactions)
 export async function getInvoices(filters: InvoiceFilters = {}) {
     const supabase = createAdminClient();
     const {
@@ -194,51 +209,72 @@ export async function getInvoices(filters: InvoiceFilters = {}) {
     } = filters;
 
     try {
-        let query = supabase
+        // Query 1: Regular payments table
+        let paymentsQuery = supabase
             .from("payments")
             .select("*", { count: "exact" });
 
-        // Apply status filter
+        if (status !== 'all') paymentsQuery = paymentsQuery.eq("status", status);
+        if (planType !== 'all') paymentsQuery = paymentsQuery.eq("plan_type", planType);
+        if (search) paymentsQuery = paymentsQuery.or(`user_email.ilike.%${search}%,user_name.ilike.%${search}%,external_id.ilike.%${search}%`);
+        if (startDate) paymentsQuery = paymentsQuery.gte("created_at", startDate);
+        if (endDate) paymentsQuery = paymentsQuery.lte("created_at", endDate);
+
+        const { data: paymentsData, count: paymentsCount } = await paymentsQuery.order("created_at", { ascending: false });
+
+        // Query 2: MY PG transactions table
+        let mypgQuery = supabase
+            .from("mypg_transactions")
+            .select("*", { count: "exact" });
+
+        // Map status for mypg (uses PAID/PENDING/EXPIRED instead of paid/pending/expired)
         if (status !== 'all') {
-            query = query.eq("status", status);
+            const mypgStatus = status.toUpperCase();
+            mypgQuery = mypgQuery.eq("status", mypgStatus);
         }
+        if (planType !== 'all') mypgQuery = mypgQuery.eq("plan_type", planType);
+        if (search) mypgQuery = mypgQuery.or(`email.ilike.%${search}%,full_name.ilike.%${search}%,order_id.ilike.%${search}%`);
+        if (startDate) mypgQuery = mypgQuery.gte("created_at", startDate);
+        if (endDate) mypgQuery = mypgQuery.lte("created_at", endDate);
 
-        // Apply plan type filter
-        if (planType !== 'all') {
-            query = query.eq("plan_type", planType);
-        }
+        const { data: mypgData, count: mypgCount } = await mypgQuery.order("created_at", { ascending: false });
 
-        // Apply search filter
-        if (search) {
-            query = query.or(`user_email.ilike.%${search}%,user_name.ilike.%${search}%,external_id.ilike.%${search}%`);
-        }
+        // Normalize mypg_transactions to match PaymentRecord format
+        const normalizedMypg: PaymentRecord[] = (mypgData || []).map((tx: any) => ({
+            id: tx.id,
+            external_id: tx.order_id,
+            invoice_id: null,
+            user_email: tx.email || '',
+            user_name: tx.full_name || '',
+            user_whatsapp: tx.whatsapp || null,
+            plan_type: tx.plan_type || 'basic',
+            amount: parseInt(tx.amount) || 0,
+            status: (tx.status || 'PENDING').toLowerCase() as any,
+            payment_method: 'QRIS (MY PG)',
+            payment_gateway: 'mypg-klikqris',
+            invoice_url: tx.qris_url || null,
+            paid_at: tx.paid_at || null,
+            expired_at: tx.expired_at || null,
+            created_at: tx.created_at,
+            updated_at: tx.updated_at || null,
+        }));
 
-        // Apply date range
-        if (startDate) {
-            query = query.gte("created_at", startDate);
-        }
-        if (endDate) {
-            query = query.lte("created_at", endDate);
-        }
+        // Merge and sort by created_at descending
+        const allData = [...(paymentsData || []), ...normalizedMypg]
+            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-        // Apply pagination
+        const totalCount = (paymentsCount || 0) + (mypgCount || 0);
+
+        // Apply pagination to merged results
         const from = (page - 1) * limit;
-        const to = from + limit - 1;
-        query = query.range(from, to).order("created_at", { ascending: false });
-
-        const { data, count, error } = await query;
-
-        if (error) {
-            console.error("Error fetching invoices:", error);
-            return { data: [], total: 0, page, limit };
-        }
+        const paginatedData = allData.slice(from, from + limit);
 
         return {
-            data: data || [],
-            total: count || 0,
+            data: paginatedData,
+            total: totalCount,
             page,
             limit,
-            totalPages: Math.ceil((count || 0) / limit),
+            totalPages: Math.ceil(totalCount / limit),
         };
     } catch (error) {
         console.error("Error fetching invoices:", error);

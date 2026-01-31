@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
     Loader2,
@@ -11,9 +11,14 @@ import {
     Shield,
     ArrowLeft,
     RefreshCw,
-    Zap,
     Smartphone,
+    Download,
+    Share2,
+    MoreHorizontal,
+    QrCode
 } from "lucide-react";
+import { toast } from "sonner";
+import confetti from "canvas-confetti";
 
 interface PaymentData {
     orderId: string;
@@ -35,16 +40,18 @@ function MYPGPaymentDisplayContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const orderId = searchParams.get('order_id');
-    const amount = searchParams.get('amount');
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
     const [timeLeft, setTimeLeft] = useState<number>(0);
-    const [checkingStatus, setCheckingStatus] = useState(false);
     const [isPaid, setIsPaid] = useState(false);
 
-    // Load payment data from sessionStorage
+    // Polling state
+    const [lastChecked, setLastChecked] = useState<Date>(new Date());
+    const [isPolling, setIsPolling] = useState(false);
+
+    // Initial load
     useEffect(() => {
         if (!orderId) {
             setError('Order ID tidak ditemukan');
@@ -69,15 +76,50 @@ function MYPGPaymentDisplayContent() {
                     setTimeLeft(30 * 60); // 30 minutes default
                 }
             } else {
-                setError('Data pembayaran tidak ditemukan. Silakan buat pembayaran baru.');
-                setLoading(false);
+                // If not found in session, try to fetch status to see if it exists
+                fetch(`/api/mypg/check-status?order_id=${orderId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && data.transaction) {
+                            // Reconstruct partial payment data from transaction
+                            const newData: PaymentData = {
+                                orderId: data.transaction.order_id,
+                                amount: parseInt(data.transaction.amount),
+                                totalAmount: data.transaction.amount,
+                                qrisImage: data.transaction.qris_image || '', // Might be missing if not stored
+                                qrisUrl: data.transaction.qris_url || '',
+                                directUrl: '',
+                                expiredAt: data.transaction.expired_at || new Date(Date.now() + 30 * 60000).toISOString(),
+                                customerData: {
+                                    email: data.transaction.email || 'Unknown',
+                                    fullName: 'Customer',
+                                    whatsapp: '',
+                                    plan: 'Unknown'
+                                }
+                            };
+                            setPaymentData(newData);
+                            setLoading(false);
+
+                            if (data.status === 'SUCCESS' || data.status === 'PAID') {
+                                setIsPaid(true);
+                                setTimeout(() => router.push(`/test-mypg/success?order_id=${orderId}`), 1500);
+                            }
+                        } else {
+                            setError('Data pembayaran tidak ditemukan. Silakan buat pembayaran baru.');
+                            setLoading(false);
+                        }
+                    })
+                    .catch(err => {
+                        setError('Gagal memuat data pembayaran');
+                        setLoading(false);
+                    });
             }
         } catch (err) {
             console.error('Error loading payment data:', err);
             setError('Gagal memuat data pembayaran');
             setLoading(false);
         }
-    }, [orderId]);
+    }, [orderId, router]);
 
     // Countdown timer
     useEffect(() => {
@@ -96,63 +138,53 @@ function MYPGPaymentDisplayContent() {
         return () => clearInterval(timer);
     }, [timeLeft]);
 
-    // Auto check payment status every 5 seconds
-    useEffect(() => {
+    // Auto check function
+    const checkPaymentStatus = async (isManual = false) => {
         if (!orderId || isPaid) return;
 
-        const checkStatus = async () => {
-            try {
-                const response = await fetch(`/api/mypg/check-status?order_id=${orderId}`);
-                const data = await response.json();
+        if (isManual) setIsPolling(true);
 
-                if (data.success && (data.status === 'SUCCESS' || data.status === 'PAID')) {
-                    setIsPaid(true);
-                    router.push(`/test-mypg/success?order_id=${orderId}`);
-                }
-            } catch (err) {
-                console.error('Error checking payment status:', err);
-            }
-        };
-
-        checkStatus();
-        const interval = setInterval(checkStatus, 5000);
-        return () => clearInterval(interval);
-    }, [orderId, isPaid, router]);
-
-    // Manual check status
-    const handleCheckStatus = async () => {
-        if (!orderId) return;
-
-        setCheckingStatus(true);
         try {
             const response = await fetch(`/api/mypg/check-status?order_id=${orderId}`);
             const data = await response.json();
 
-            if (data.success) {
-                if (data.status === 'SUCCESS' || data.status === 'PAID') {
-                    router.push(`/test-mypg/success?order_id=${orderId}`);
-                } else {
-                    alert(`Status: ${data.status}\nBelum dibayar. Silakan selesaikan pembayaran.`);
-                }
-            } else {
-                alert('Gagal mengecek status pembayaran');
+            setLastChecked(new Date());
+
+            if (data.success && (data.status === 'SUCCESS' || data.status === 'PAID')) {
+                setIsPaid(true);
+                if (isManual) toast.success("Pembayaran Berhasil!");
+
+                // Navigate to success
+                router.push(`/test-mypg/success?order_id=${orderId}`);
+            } else if (isManual) {
+                toast.info("Pembayaran belum terdeteksi. Silakan coba sesaat lagi.");
             }
         } catch (err) {
-            console.error('Error checking status:', err);
-            alert('Terjadi kesalahan saat mengecek status');
+            console.error('Error checking payment status:', err);
+            if (isManual) toast.error("Gagal mengecek status");
         } finally {
-            setCheckingStatus(false);
+            if (isManual) setIsPolling(false);
         }
     };
 
-    // Format time
+    // Polling interval (Every 5 seconds)
+    useEffect(() => {
+        if (!orderId || isPaid) return; // FIXED: Removed timeLeft check to prevent re-creation loop
+
+        const interval = setInterval(() => {
+            checkPaymentStatus(false);
+        }, 5000); // 5 detik
+
+        return () => clearInterval(interval);
+    }, [orderId, isPaid]); // FIXED: Removed timeLeft dependency
+
+    // Format helpers
     const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${minutes}:${secs.toString().padStart(2, '0')}`;
     };
 
-    // Format currency
     const formatCurrency = (amount: number | string) => {
         const num = typeof amount === 'string' ? parseFloat(amount) : amount;
         return new Intl.NumberFormat('id-ID', {
@@ -166,13 +198,8 @@ function MYPGPaymentDisplayContent() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[#0B0F19]">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="relative">
-                        <div className="w-12 h-12 rounded-full border-4 border-slate-800 border-t-orange-600 animate-spin" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <Shield className="w-5 h-5 text-slate-700" />
-                        </div>
-                    </div>
-                    <p className="text-slate-400 text-sm font-medium tracking-wide">MY PG CHECKOUT</p>
+                    <Loader2 className="w-12 h-12 text-orange-500 animate-spin" />
+                    <p className="text-slate-400 font-medium animate-pulse">Memuat Data Pembayaran...</p>
                 </div>
             </div>
         );
@@ -180,17 +207,17 @@ function MYPGPaymentDisplayContent() {
 
     if (error || !paymentData) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#0B0F19] px-4">
-                <div className="max-w-md w-full bg-[#111625] border border-slate-800 rounded-2xl p-8 text-center space-y-6">
-                    <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto">
+            <div className="min-h-screen flex items-center justify-center bg-[#0B0F19] p-4">
+                <div className="max-w-md w-full bg-[#151b2d] border border-red-900/50 rounded-2xl p-8 text-center space-y-6 shadow-2xl">
+                    <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto ring-4 ring-red-500/5">
                         <Shield className="w-8 h-8 text-red-500" />
                     </div>
-                    <div className="space-y-2">
-                        <h2 className="text-xl font-bold text-white">Sesi Berakhir</h2>
-                        <p className="text-slate-400">{error || 'Terjadi kesalahan'}</p>
+                    <div>
+                        <h2 className="text-xl font-bold text-white mb-2">Sesi Tidak Valid</h2>
+                        <p className="text-slate-400 text-sm leading-relaxed">{error || 'Data pembayaran tidak ditemukan.'}</p>
                     </div>
-                    <Button onClick={() => router.push('/test-mypg')} variant="outline" className="w-full border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white">
-                        Kembali
+                    <Button onClick={() => router.push('/test-mypg')} className="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium">
+                        Kembali ke Halaman Utama
                     </Button>
                 </div>
             </div>
@@ -201,174 +228,220 @@ function MYPGPaymentDisplayContent() {
     const displayAmount = paymentData.totalAmount || paymentData.amount;
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 font-sans">
-            {/* MY PG Test Banner */}
-            <div className="fixed top-0 left-0 right-0 bg-gradient-to-r from-orange-600 to-amber-600 text-white text-center py-2 font-bold z-50">
-                🧪 MY PG - klikqris.com | Order: {orderId}
-            </div>
-
-            <div className="p-4 lg:p-8 pt-16 flex flex-col items-center">
-                {/* Navbar */}
-                <div className="w-full max-w-5xl mx-auto flex items-center justify-between mb-8">
-                    <Button
-                        variant="ghost"
-                        onClick={() => router.push('/test-mypg')}
-                        className="text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-transparent pl-0"
-                    >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        <span className="font-medium">Cancel</span>
-                    </Button>
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-100 dark:bg-orange-900/30 rounded-full">
-                        <Shield className="w-3 h-3 text-orange-500" />
-                        <span className="text-xs font-bold text-orange-600 dark:text-orange-400">MY PG QRIS</span>
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 font-sans selection:bg-orange-500/30">
+            {/* Header / Navbar */}
+            <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#0B0F19]/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+                <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+                    <div className="flex items-center gap-2" onClick={() => router.push('/test-mypg')}>
+                        <div className="w-8 h-8 rounded-lg bg-orange-600 flex items-center justify-center">
+                            <span className="font-black text-white text-xs">MY</span>
+                        </div>
+                        <span className="font-bold text-lg hidden sm:block">Payment Gateway</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="text-right hidden sm:block">
+                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Order ID</p>
+                            <p className="text-xs font-mono font-medium">{orderId}</p>
+                        </div>
+                        <Button variant="ghost" size="icon" className="rounded-full" onClick={() => router.push('/test-mypg')}>
+                            <ArrowLeft className="w-5 h-5" />
+                        </Button>
                     </div>
                 </div>
+            </div>
 
-                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* LEFT: Payment Details */}
-                    <div className="lg:col-span-4 order-2 lg:order-1">
-                        <div className="bg-white dark:bg-[#111625] rounded-3xl p-6 lg:p-8 shadow-xl border border-slate-100 dark:border-slate-800">
-                            <div className="space-y-6">
-                                <div>
-                                    <p className="text-xs font-semibold text-orange-600 dark:text-orange-400 tracking-wider mb-2">AMOUNT TO PAY</p>
-                                    <div className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
-                                        {formatCurrency(displayAmount)}
-                                    </div>
-                                    <p className="text-xs text-slate-500 mt-1">*Termasuk kode unik untuk verifikasi</p>
+            <div className="pt-24 pb-12 px-4">
+                <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+
+                    {/* LEFT COLUMN: Payment Instructions & Details */}
+                    <div className="lg:col-span-5 space-y-6 order-2 lg:order-1">
+
+                        {/* Timer Card */}
+                        <div className="bg-white dark:bg-[#151b2d] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex items-center justify-between relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-orange-500" />
+                            <div>
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Sisa Waktu</p>
+                                <div className="text-3xl font-mono font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <Clock className="w-6 h-6 text-orange-500 animate-pulse" />
+                                    {formatTime(timeLeft)}
                                 </div>
+                            </div>
+                            <div className="h-12 w-12 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center">
+                                <span className="text-xl">⏳</span>
+                            </div>
+                        </div>
 
-                                <div className="flex items-center gap-3 p-3 rounded-xl bg-orange-50 dark:bg-orange-900/10 border border-orange-100 dark:border-orange-900/20">
-                                    <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                                    <div>
-                                        <p className="text-xs font-bold text-orange-800 dark:text-orange-300 uppercase">Payment Timer</p>
-                                        <p className="text-sm font-mono font-medium text-orange-900 dark:text-orange-200">{formatTime(timeLeft)}</p>
-                                    </div>
+                        {/* Amount Card */}
+                        <div className="bg-white dark:bg-[#151b2d] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+                            <div>
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Total Pembayaran</p>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-sm font-bold text-slate-500">Rp</span>
+                                    <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+                                        {new Intl.NumberFormat('id-ID').format(typeof displayAmount === 'string' ? parseFloat(displayAmount) : displayAmount)}
+                                    </span>
                                 </div>
-
-                                <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500">Order ID</span>
-                                        <span className="font-mono text-xs text-slate-700 dark:text-slate-300 max-w-[180px] truncate">{paymentData.orderId}</span>
-                                    </div>
-                                    {paymentData.customerData && (
-                                        <>
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-slate-500">Customer</span>
-                                                <span className="font-medium text-slate-900 dark:text-white text-right max-w-[150px] truncate">{paymentData.customerData.fullName}</span>
-                                            </div>
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-slate-500">Email</span>
-                                                <span className="text-slate-700 dark:text-slate-300 text-right max-w-[150px] truncate">{paymentData.customerData.email}</span>
-                                            </div>
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-slate-500">Plan</span>
-                                                <span className="font-medium text-orange-600 dark:text-orange-400">{paymentData.customerData.plan}</span>
-                                            </div>
-                                        </>
-                                    )}
+                                <div className="mt-2 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/10 px-3 py-1.5 rounded-lg border border-amber-100 dark:border-amber-900/20 inline-block">
+                                    ⚠ Mohon transfer Sesuai nominal persis (termasuk 3 digit terakhir)
                                 </div>
+                            </div>
 
-                                <div className="pt-4 mt-4 border-t border-dashed border-slate-200 dark:border-slate-800">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Smartphone className="w-4 h-4 text-slate-400" />
-                                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Cara Bayar</span>
-                                    </div>
-                                    <ul className="text-xs space-y-2 text-slate-500 pl-6 list-disc">
-                                        <li>Buka aplikasi e-wallet/m-banking (GoPay, OVO, DANA, BCA, dll)</li>
-                                        <li>Pilih menu "Scan QRIS"</li>
-                                        <li>Scan QR code di sebelah kanan</li>
-                                        <li>Pastikan nominal sesuai (termasuk kode unik)</li>
-                                        <li>Konfirmasi dan masukkan PIN</li>
-                                    </ul>
+                            <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800/50">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">Merchant</span>
+                                    <span className="font-semibold text-slate-900 dark:text-white">infolokerjombang</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">Item</span>
+                                    <span className="font-semibold text-slate-900 dark:text-white">{paymentData.customerData.plan}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">Customer</span>
+                                    <span className="font-semibold text-slate-900 dark:text-white">{paymentData.customerData.fullName}</span>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Payment Method Steps */}
+                        <div className="bg-white dark:bg-[#151b2d] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                <Smartphone className="w-4 h-4 text-slate-500" />
+                                Cara Pembayaran
+                            </h3>
+                            <div className="space-y-4 relative">
+                                <div className="absolute left-[11px] top-2 bottom-2 w-[1px] bg-slate-200 dark:bg-slate-700" />
+
+                                {[
+                                    { text: "Buka aplikasi e-wallet (Gopay, OVO, Dana, LinkAja, ShopeePay) atau Mobile Banking (BCA, Mandiri, dll)" },
+                                    { text: "Pilih menu 'Scan QRIS' atau 'Bayar'" },
+                                    { text: "Arahkan kamera ke QR Code di samping kanan" },
+                                    { text: "Periksa nama merchant 'KlikQRIS' atau 'JOBMATE' dan nominal" },
+                                    { text: "Masukkan PIN anda dan pembaayaran selesai" }
+                                ].map((step, idx) => (
+                                    <div key={idx} className="flex gap-4 relative">
+                                        <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-400 flex-shrink-0 z-10">
+                                            {idx + 1}
+                                        </div>
+                                        <p className="text-sm text-slate-600 dark:text-slate-300 leading-snug pt-0.5">{step.text}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
                     </div>
 
-                    {/* RIGHT: QR Code */}
-                    <div className="lg:col-span-8 order-1 lg:order-2 flex flex-col items-center">
-                        <div className="bg-white dark:bg-[#111625] rounded-[40px] p-8 lg:p-12 shadow-2xl border border-slate-200 dark:border-slate-800 relative w-full max-w-xl mx-auto text-center overflow-hidden">
-                            <div className="relative z-10">
-                                <h2 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">Scan QRIS</h2>
-                                <p className="text-slate-500 dark:text-slate-400 mb-8">Powered by MY PG (klikqris.com)</p>
+                    {/* RIGHT COLUMN: The Authentic QRIS */}
+                    <div className="lg:col-span-7 flex flex-col items-center order-1 lg:order-2">
 
-                                <div className="relative mx-auto w-fit">
-                                    {/* Corner Borders */}
-                                    <div className="absolute -top-3 -left-3 w-8 h-8 border-t-4 border-l-4 border-orange-500 rounded-tl-xl" />
-                                    <div className="absolute -top-3 -right-3 w-8 h-8 border-t-4 border-r-4 border-orange-500 rounded-tr-xl" />
-                                    <div className="absolute -bottom-3 -left-3 w-8 h-8 border-b-4 border-l-4 border-orange-500 rounded-bl-xl" />
-                                    <div className="absolute -bottom-3 -right-3 w-8 h-8 border-b-4 border-r-4 border-orange-500 rounded-br-xl" />
+                        {/* AUTHENTIC QRIS CARD */}
+                        <div className="bg-white rounded-[20px] shadow-2xl overflow-hidden w-full max-w-[380px] border-2 border-slate-200 relative transform transition-transform hover:scale-[1.01] duration-300">
 
-                                    <div className="bg-white p-4 rounded-xl shadow-lg relative overflow-hidden">
-                                        {/* QR Code Image from MY PG */}
-                                        {paymentData.qrisImage ? (
-                                            <img
-                                                src={paymentData.qrisImage}
-                                                alt="QRIS Code"
-                                                className="w-[280px] h-[280px] object-contain"
-                                            />
-                                        ) : paymentData.qrisUrl ? (
-                                            <img
-                                                src={paymentData.qrisUrl}
-                                                alt="QRIS Code"
-                                                className="w-[280px] h-[280px] object-contain"
-                                            />
-                                        ) : (
-                                            <div className="w-[280px] h-[280px] bg-slate-100 flex items-center justify-center">
-                                                <p className="text-slate-500">QR Code unavailable</p>
-                                            </div>
-                                        )}
-
-                                        {/* Scanning Animation */}
-                                        {!isExpired && (
-                                            <motion.div
-                                                className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-orange-500 to-transparent shadow-[0_0_20px_rgba(249,115,22,0.5)] z-20"
-                                                animate={{ top: ['0%', '100%', '0%'] }}
-                                                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                                            />
-                                        )}
-
-                                        {isExpired && (
-                                            <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center">
-                                                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-2">
-                                                    <Clock className="w-6 h-6 text-red-600" />
-                                                </div>
-                                                <p className="font-bold text-slate-900">Expired</p>
-                                            </div>
-                                        )}
+                            {/* QRIS Header Standar Nasional */}
+                            <div className="bg-white p-6 pb-2 relative">
+                                <div className="flex justify-between items-start mb-6">
+                                    <div className="relative w-24 h-12">
+                                        {/* QRIS Logo Vector Replacement */}
+                                        <svg viewBox="0 0 200 65" className="w-full h-full text-slate-900" fill="currentColor">
+                                            <path d="M22.5,41.2c-5.8,0-10.8-3.4-13-8.3c-0.2-0.5-0.4-1-0.5-1.5c-1-2.9-1.5-6-1.5-9.3c0-3.3,0.5-6.5,1.5-9.4 c0.2-0.5,0.4-1,0.5-1.5c2.2-4.9,7.2-8.3,13-8.3c5.8,0,10.8,3.4,13,8.3c0.2,0.5,0.4,1,0.5,1.5c1,2.9,1.5,6,1.5,9.4 c0,3.3-0.5,6.5-1.5,9.3c-0.2,0.5-0.4,1-0.6,1.5C33.3,37.8,28.3,41.2,22.5,41.2z M22.5,9.9c-2.9,0-5.5,1.3-7.2,3.4 c-0.6,0.7-1.1,1.5-1.5,2.4C13.2,17.4,13,19.7,13,22.1c0,2.4,0.3,4.7,0.8,6.4c0.4,0.9,0.9,1.7,1.5,2.4c1.7,2.1,4.4,3.4,7.2,3.4 s5.5-1.3,7.2-3.4c0.6-0.7,1.1-1.5,1.5-2.4c0.5-1.7,0.8-4,0.8-6.4c0-2.4-0.3-4.7-0.8-6.4c-0.4-0.9-0.9-1.7-1.5-2.4 C28,11.2,25.4,9.9,22.5,9.9z" fill="#ED1C24" />
+                                            <path d="M51,40h-6V4h6V40z M60,4h17v6H66v5h11v6H66v7h11v6H60V4z M83,4h6v36h-6V4z M100,26.5L100,26.5 c4.8-1,7-4.1,7-9.5c0-7.2-4.1-13-13-13h-12v36h6v-11h5.8l6.8,11h7.4L100,26.5z M94,22h-6v-12h6c5.2,0,7,2,7,6S99.2,22,94,22z" />
+                                        </svg>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="font-bold text-slate-800 text-lg">QRIS</div>
+                                        <div className="text-[10px] text-slate-500 font-medium">LinkAja, Gopay, OVO, Dana, ShopeePay</div>
                                     </div>
                                 </div>
-
-                                <div className="mt-8 flex items-center justify-center gap-4">
-                                    <Button
-                                        onClick={handleCheckStatus}
-                                        disabled={checkingStatus || isExpired}
-                                        className="bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:from-orange-700 hover:to-amber-700 rounded-full h-10 px-6 font-medium"
-                                    >
-                                        {checkingStatus ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
-                                        {checkingStatus ? 'Checking...' : 'Check Status'}
-                                    </Button>
+                                <div className="text-center border-b border-dashed border-slate-300 pb-4">
+                                    <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tight">{paymentData.customerData.plan}</h2>
+                                    <p className="text-sm text-slate-500 font-medium">NMID: {paymentData.orderId.substring(0, 15)}</p>
                                 </div>
+                            </div>
 
-                                {/* Direct URL */}
-                                {paymentData.directUrl && (
-                                    <div className="mt-6 text-center">
-                                        <a
-                                            href={paymentData.directUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-sm text-orange-600 hover:underline"
-                                        >
-                                            Buka di Browser →
-                                        </a>
+                            {/* QR Pattern Sides */}
+                            <div className="absolute top-[108px] left-0 right-0 h-4 bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Qris_logo.svg/1200px-Qris_logo.svg.png')] bg-repeat-x opacity-10 hidden" />
+
+                            {/* QR Code Area */}
+                            <div className="p-8 bg-white flex flex-col items-center justify-center relative">
+
+                                {/* Scanning Line Animation */}
+                                {!isExpired && !isPaid && (
+                                    <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden rounded-b-[20px]">
+                                        <motion.div
+                                            className="w-full h-[2px] bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.8)]"
+                                            animate={{ top: ["10%", "90%", "10%"] }}
+                                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                        />
                                     </div>
                                 )}
 
-                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800/50">
-                                    <p className="text-xs text-slate-400">Auto-checking payment status setiap 5 detik...</p>
+                                {paymentData.qrisImage ? (
+                                    <div className="relative group">
+                                        <img
+                                            src={paymentData.qrisImage}
+                                            alt="QRIS"
+                                            className={`w-64 h-64 object-contain mix-blend-multiply ${isExpired ? 'opacity-20 grayscale' : ''}`}
+                                        />
+                                        {/* Center Logo */}
+                                        {!isExpired && (
+                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-lg p-1 shadow-sm">
+                                                <div className="w-full h-full bg-orange-600 rounded flex items-center justify-center text-white font-bold text-xs">
+                                                    MY
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="w-64 h-64 bg-slate-100 flex items-center justify-center rounded-xl border-2 border-dashed border-slate-300">
+                                        <QrCode className="w-12 h-12 text-slate-300" />
+                                    </div>
+                                )}
+
+                                {isExpired && (
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 z-20">
+                                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-3">
+                                            <Shield className="w-8 h-8 text-red-500" />
+                                        </div>
+                                        <p className="font-bold text-slate-900">QR Code Expired</p>
+                                        <p className="text-xs text-slate-500">Silakan request ulang</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Footer */}
+                            <div className="bg-slate-50 px-6 py-4 flex flex-col gap-3 border-t border-slate-100">
+                                <div className="flex justify-between items-center text-xs text-slate-500 font-medium">
+                                    <span>Dicetak oleh: KlikQRIS</span>
+                                    <span>v2.0</span>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Status Check & Polling Indicator */}
+                        <div className="mt-8 text-center space-y-4">
+                            <div className="flex items-center justify-center gap-2 text-xs font-medium text-slate-400">
+                                <span className={`w-2 h-2 rounded-full ${isPolling ? 'bg-orange-500 animate-ping' : 'bg-slate-300'}`} />
+                                {isPolling ? (
+                                    <span>Mengecek pembayaran manual...</span>
+                                ) : (
+                                    <span>Auto-check aktif (tiap 5 detik)</span>
+                                )}
+                            </div>
+
+                            <Button
+                                variant="outline"
+                                onClick={() => checkPaymentStatus(true)}
+                                disabled={isPolling || isExpired}
+                                className="rounded-full px-8 border-slate-200 dark:border-slate-700 bg-white dark:bg-[#151b2d] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all font-medium"
+                            >
+                                <RefreshCw className={`w-4 h-4 mr-2 ${isPolling ? 'animate-spin' : ''}`} />
+                                Cek Status Manual
+                            </Button>
+
+                            <p className="text-[10px] text-slate-400">
+                                Terakhir dicek: {lastChecked.toLocaleTimeString()}
+                            </p>
+                        </div>
+
                     </div>
                 </div>
             </div>
