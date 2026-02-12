@@ -15,7 +15,7 @@ export function FloatingActionMenu() {
   ]
 
   return (
-    <div className="fixed bottom-8 right-8 z-50">
+    <div className="fixed bottom-8 right-6 z-50">
       {/* Action Items */}
       {isOpen && (
         <div className="absolute bottom-20 right-0 space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -45,11 +45,10 @@ export function FloatingActionMenu() {
       <Button
         size="icon"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-16 h-16 rounded-2xl shadow-2xl transition-all duration-300 ${
-          isOpen
+        className={`w-16 h-16 rounded-2xl shadow-2xl transition-all duration-300 ${isOpen
             ? 'bg-gradient-to-br from-red-500 to-rose-500 rotate-45'
             : 'bg-gradient-to-br from-cyan-500 to-teal-500 hover:scale-110'
-        }`}
+          }`}
       >
         {isOpen ? (
           <X className="w-6 h-6 text-white" />

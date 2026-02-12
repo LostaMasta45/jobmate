@@ -53,21 +53,60 @@ export function VIPHeader({ onMenuToggle, user }: VIPHeaderProps) {
 
     // Only fetch if user prop wasn't valid or incomplete
     if (!user) {
+      let channel: any = null
+      const supabase = createClient()
+
       const loadProfile = async () => {
-        const supabase = createClient()
-        const { data: { user: authUser } } = await supabase.auth.getUser()
+        try {
+          // 1. Get Auth User
+          const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
 
-        if (authUser) {
-          const { data } = await supabase
-            .from('profiles')
-            .select('id, email, full_name, avatar_url, role, membership_tier, membership_status')
-            .eq('id', authUser.id)
-            .single()
+          if (authError || !authUser) {
+            console.error("VIPHeader: Auth check failed", authError)
+            return
+          }
 
-          setProfile(data)
+          // 2. Setup Realtime Subscription immediately (so we don't miss updates while fetching)
+          channel = supabase
+            .channel('vip_header_profile_updates')
+            .on(
+              'postgres_changes',
+              {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'profiles',
+                filter: `id=eq.${authUser.id}`,
+              },
+              (payload) => {
+                console.log("VIPHeader: Realtime update received", payload)
+                const newData = payload.new as Partial<MemberProfile>
+                setProfile((prev) => ({ ...prev, ...newData }))
+              }
+            )
+            .subscribe()
+
+          // 3. Fetch Profile using Server Action (Robust: Creates if missing)
+          // Dynamic import to avoid server action issues in client component if direct import fails
+          const { getProfile } = await import('@/actions/settings')
+          const profileData = await getProfile()
+
+          if (profileData) {
+            console.log("VIPHeader: Profile loaded successfully via Server Action", profileData)
+            setProfile(profileData)
+          } else {
+            console.warn("VIPHeader: getProfile returned null?")
+          }
+
+        } catch (err) {
+          console.error("VIPHeader: Error loading profile", err)
         }
       }
+
       loadProfile()
+
+      return () => {
+        if (channel) supabase.removeChannel(channel)
+      }
     }
   }, [user])
 
@@ -214,8 +253,12 @@ export function VIPHeader({ onMenuToggle, user }: VIPHeaderProps) {
                     variant="ghost"
                     className="gap-1 sm:gap-2 lg:gap-3 rounded-xl sm:rounded-2xl h-8 sm:h-9 lg:h-10 px-1.5 sm:px-2 lg:px-3 hover:bg-gradient-to-br hover:from-[#5547d0]/10 hover:to-[#00acc7]/10 transition-all duration-200 border border-transparent hover:border-[#5547d0]/20"
                   >
-                    <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-9 lg:h-9 rounded-full bg-gradient-to-br from-[#5547d0] to-[#00acc7] flex items-center justify-center text-white font-bold text-[10px] sm:text-xs lg:text-sm shadow-lg">
-                      {profile?.full_name?.charAt(0).toUpperCase() || 'U'}
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-9 lg:h-9 rounded-full bg-gradient-to-br from-[#5547d0] to-[#00acc7] flex items-center justify-center text-white font-bold text-[10px] sm:text-xs lg:text-sm shadow-lg overflow-hidden">
+                      {profile?.avatar_url ? (
+                        <img src={profile.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+                      ) : (
+                        profile?.full_name?.charAt(0).toUpperCase() || 'U'
+                      )}
                     </div>
                     <span className="hidden md:inline font-semibold text-sm lg:text-base text-gray-700 dark:text-gray-200">
                       {profile?.full_name || 'User'}
@@ -231,7 +274,7 @@ export function VIPHeader({ onMenuToggle, user }: VIPHeaderProps) {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/settings" className="cursor-pointer py-2.5 px-3 rounded-lg hover:bg-gradient-to-br hover:from-[#5547d0]/10 hover:to-[#00acc7]/10">
+                    <Link href="/vip/profile" className="cursor-pointer py-2.5 px-3 rounded-lg hover:bg-gradient-to-br hover:from-[#5547d0]/10 hover:to-[#00acc7]/10">
                       <User className="w-4 h-4 mr-3 text-[#5547d0]" />
                       <span className="font-medium">Profil Saya</span>
                     </Link>

@@ -8,6 +8,13 @@ import { SecuritySection } from "@/components/settings/SecuritySection";
 
 export default async function SettingsPage() {
   const userProfile = await getUserProfile();
+  const userName = userProfile?.full_name || userProfile?.name || "User";
+  const userEmail = userProfile?.email || "";
+  const userForShell = {
+    name: userName,
+    email: userEmail,
+    avatar: userProfile?.avatar_url
+  };
 
   let profile;
   try {
@@ -16,7 +23,7 @@ export default async function SettingsPage() {
     console.error("Failed to get profile in settings page:", error);
     // Return error page with helpful message
     return (
-      <AppShell isAdmin={userProfile?.role === 'admin'}>
+      <AppShell isAdmin={userProfile?.role === 'admin'} user={userForShell}>
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center space-y-4 max-w-md">
             <h2 className="text-2xl font-bold text-red-600">Error Loading Profile</h2>
@@ -49,7 +56,7 @@ export default async function SettingsPage() {
   const isAdmin = userProfile?.role === 'admin';
 
   return (
-    <AppShell isAdmin={isAdmin} isFullScreen>
+    <AppShell isAdmin={isAdmin} user={userForShell} isFullScreen>
       <div className="h-full w-full overflow-y-auto bg-background dark:bg-[#050505] p-4 sm:p-6 lg:p-8">
         <div className="max-w-4xl mx-auto space-y-8 pb-20">
           <PageHeader

@@ -581,7 +581,7 @@ export function ModernLokerList({ initialLoker, totalResults, user }: ModernLoke
       {newJobsCount > 0 && <NewJobsBanner count={newJobsCount} />}
 
       {/* Desktop Filter Navigation - Sticky */}
-      <div className="hidden lg:block sticky top-20 z-40 bg-gray-50 dark:bg-gray-950 py-4 -mx-4 px-4 lg:-mx-8 lg:px-8 shadow-sm">
+      <div className="hidden lg:block sticky top-16 z-40 bg-gray-50 dark:bg-slate-950 pt-2 pb-4 -mx-4 px-4 lg:-mx-8 lg:px-8 border-b border-gray-200 dark:border-slate-800">
         <TabFilterNavigation onFilterChange={(desktopFilters) => {
           updateFilters({
             search: desktopFilters.search || null,
@@ -593,7 +593,7 @@ export function ModernLokerList({ initialLoker, totalResults, user }: ModernLoke
       </div>
 
       {/* 1. Quick Filter Chips - Mobile Only - REDUCED SPACING */}
-      <div className="mt-2">
+      <div className="mt-2 lg:hidden">
         <QuickFilterChipsAdvanced
           onFilterSelect={handleQuickFilter}
           activeFilters={quickFilters}
@@ -603,7 +603,7 @@ export function ModernLokerList({ initialLoker, totalResults, user }: ModernLoke
       </div>
 
       {/* 2. Job Statistics - Mobile Only - REDUCED SPACING */}
-      <div className="mt-3">
+      <div className="mt-3 lg:hidden">
         <JobStatistics
           newJobsCount={newJobsCount}
           totalCompanies={companies.length}
@@ -627,7 +627,7 @@ export function ModernLokerList({ initialLoker, totalResults, user }: ModernLoke
       {/* 2. STORIES PERUSAHAAN (Moved Up) */}
       {
         companies.length > 0 && (
-          <div className="mt-3">
+          <div className="mt-3 lg:hidden">
             <PerusahaanHiring companies={companies} />
           </div>
         )
@@ -809,7 +809,7 @@ export function ModernLokerList({ initialLoker, totalResults, user }: ModernLoke
             </div>
 
             {/* Desktop: Grid layout */}
-            <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-6 pb-12">
               {filteredLoker.map((loker) => (
                 <DesktopCard2Overlay key={loker.id} loker={loker} />
               ))}

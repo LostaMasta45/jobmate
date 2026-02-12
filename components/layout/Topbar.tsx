@@ -15,6 +15,7 @@ interface TopbarProps {
   user?: {
     name: string;
     email: string;
+    avatar?: string | null;
   };
 }
 
@@ -29,6 +30,36 @@ export function Topbar({ user }: TopbarProps) {
   const debouncedSearch = useDebounce(searchQuery, 300);
   const searchRef = React.useRef<HTMLDivElement>(null);
   const userMenuRef = React.useRef<HTMLDivElement>(null);
+
+  // Profile state — use passed prop or fetch from Supabase
+  const [profile, setProfile] = React.useState<{
+    name: string;
+    email: string;
+    avatar?: string | null;
+  } | null>(user || null);
+
+  // Fetch profile from Supabase if no user prop was provided
+  React.useEffect(() => {
+    if (!user) {
+      const loadProfile = async () => {
+        const supabase = createClient();
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (authUser) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("full_name, avatar_url")
+            .eq("id", authUser.id)
+            .single();
+          setProfile({
+            name: data?.full_name || authUser.email?.split("@")[0] || "User",
+            email: authUser.email || "",
+            avatar: data?.avatar_url || null,
+          });
+        }
+      };
+      loadProfile();
+    }
+  }, [user]);
 
   // Close search results when clicking outside
   React.useEffect(() => {
@@ -288,11 +319,15 @@ export function Topbar({ user }: TopbarProps) {
             className="flex items-center gap-2 rounded-full pl-2 pr-3 py-1 hover:bg-muted/50 transition-all border border-transparent hover:border-border/40"
             onClick={() => setShowUserMenu(!showUserMenu)}
           >
-            <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-primary/20 to-secondary/20 flex items-center justify-center border border-primary/10 shadow-inner">
-              <User className="h-4 w-4 text-primary" />
+            <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-primary/20 to-secondary/20 flex items-center justify-center border border-primary/10 shadow-inner overflow-hidden">
+              {profile?.avatar ? (
+                <img src={profile.avatar} alt="" className="h-full w-full rounded-full object-cover" />
+              ) : (
+                <User className="h-4 w-4 text-primary" />
+              )}
             </div>
             <span className="text-sm font-medium hidden md:block max-w-[100px] truncate">
-              {user?.name?.split(' ')[0] || "User"}
+              {profile?.name?.split(' ')[0] || "User"}
             </span>
             <ChevronDown className="h-3 w-3 text-muted-foreground" />
           </Button>
@@ -300,8 +335,8 @@ export function Topbar({ user }: TopbarProps) {
           {showUserMenu && (
             <div className="absolute right-0 mt-2 w-60 rounded-xl border border-border/50 bg-background/95 backdrop-blur-xl p-2 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200 ring-1 ring-black/5">
               <div className="px-3 py-3 border-b border-border/50 mb-1">
-                <p className="text-sm font-semibold truncate">{user?.name || "User"}</p>
-                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                <p className="text-sm font-semibold truncate">{profile?.name || "User"}</p>
+                <p className="text-xs text-muted-foreground truncate">{profile?.email}</p>
               </div>
               <div className="space-y-1">
                 <Button

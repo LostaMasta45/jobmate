@@ -42,7 +42,7 @@ export async function getProfile() {
 
     const { data: newProfile, error: createError } = await supabase
       .from("profiles")
-      .insert(newProfileData)
+      .upsert(newProfileData, { onConflict: "id", ignoreDuplicates: true })
       .select()
       .single();
 

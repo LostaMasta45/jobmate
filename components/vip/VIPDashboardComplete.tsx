@@ -1,6 +1,7 @@
 'use client'
 
 import { OptimizedPosterImage } from '@/components/vip/OptimizedPosterImage'
+import { CompleteProfileBanner } from '@/components/vip/CompleteProfileBanner'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
@@ -271,11 +272,14 @@ export function VIPDashboardComplete({
         )}
       </section>
 
+      {/* NEW: Profile Completion Banner - Full Width */}
+      <CompleteProfileBanner completionPercentage={userSkills?.length > 0 ? 85 : 45} />
+
       {/* SPLIT GRID LAYOUT */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className={`grid grid-cols-1 gap-8 ${recentlyViewedWithScores.length > 0 ? 'lg:grid-cols-4' : 'lg:grid-cols-1'}`}>
 
         {/* LEFT COLUMN: Main Feed (3 Cols) */}
-        <div className="lg:col-span-3 space-y-10">
+        <div className={`space-y-10 ${recentlyViewedWithScores.length > 0 ? 'lg:col-span-3' : 'lg:col-span-1'}`}>
 
           {/* Recommended Section (Smart Match) */}
           {recommendedLoker.length > 0 && (
@@ -349,11 +353,11 @@ export function VIPDashboardComplete({
         </div>
 
         {/* RIGHT COLUMN: Sidebar (1 Col - Sticky) */}
-        <aside className="lg:col-span-1 space-y-6">
-          <div className="sticky top-24 space-y-6">
+        {recentlyViewedWithScores.length > 0 && (
+          <aside className="lg:col-span-1 space-y-6">
+            <div className="sticky top-24 space-y-6">
 
-            {/* Recently Viewed Widget */}
-            {recentlyViewedWithScores.length > 0 && (
+              {/* Recently Viewed Widget */}
               <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
                 <div className="flex items-center gap-2 mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                   <Clock className="w-4 h-4 text-gray-500" />
@@ -365,27 +369,17 @@ export function VIPDashboardComplete({
                   ))}
                 </div>
               </div>
-            )}
 
-            {/* Info Box */}
-            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
-              <h3 className="font-bold text-lg mb-2 relative z-10">Lengkapi Profil!</h3>
-              <p className="text-xs text-white/90 mb-4 relative z-10 leading-relaxed">
-                Lengkapi skill dan pengalaman untuk mendapatkan Match Score yang akurat.
-              </p>
-              <Button asChild size="sm" variant="secondary" className="w-full text-xs font-bold shadow-md bg-white text-blue-600 hover:bg-blue-50">
-                <Link href="/vip/profile/edit">Edit Profil</Link>
-              </Button>
             </div>
-
-          </div>
-        </aside>
+          </aside>
+        )}
 
       </div>
     </div>
   )
 }
+
+
 
 // Compact Loker Card for Recommendations
 function LokerCardCompact({ loker, priority = false, matchScore }: { loker: Loker; priority?: boolean; matchScore?: number }) {

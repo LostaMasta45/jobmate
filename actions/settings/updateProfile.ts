@@ -46,14 +46,24 @@ export async function updateProfile(payload: ProfilePayload) {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      // Handle unique constraint violation (e.g. duplicate username)
+      if (error.code === "23505") {
+        throw new Error("Username sudah dipakai oleh pengguna lain. Silakan pilih username yang berbeda.");
+      }
+      throw error;
+    }
 
     revalidatePath("/settings");
     revalidatePath("/dashboard");
 
     return { success: true, data };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating profile:", error);
-    throw error;
+    // Re-throw with user-friendly message if not already formatted
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Gagal memperbarui profil. Silakan coba lagi.");
   }
 }
