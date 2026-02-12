@@ -73,7 +73,7 @@ export default function MobileQRPage() {
                 scale: 2,
                 useCORS: true,
                 logging: false,
-            });
+            } as any);
 
             const link = document.createElement("a");
             link.download = `JobMate-QR-${mockPaymentData.orderId}.png`;
