@@ -109,13 +109,42 @@ export default async function LokerDetailPage({
 
   const allLokers = recentLokers || [] as Loker[]
 
-  // Helper: Match Score Logic
-  const calculateMatchScore = (lokerSkills: string[] = []) => {
-    if (!userSkills.length || !lokerSkills.length) return 0
-    const matches = lokerSkills.filter(skill =>
-      userSkills.some(us => us.toLowerCase() === skill.toLowerCase())
-    )
-    return Math.round((matches.length / lokerSkills.length) * 100)
+  // Helper: Enhanced Match Score Logic - matches title, kategori, kualifikasi, deskripsi
+  const calculateMatchScore = (loker: any) => {
+    if (!userSkills.length) return 0
+    const userSkillsLower = userSkills.map(s => s.toLowerCase().trim())
+
+    // 1. If loker has skills, use direct matching
+    if (loker.skills && loker.skills.length > 0) {
+      const matches = loker.skills.filter((skill: string) =>
+        userSkillsLower.some(us => us === skill.toLowerCase())
+      )
+      return Math.round((matches.length / loker.skills.length) * 100)
+    }
+
+    // 2. Fallback: fuzzy match against other fields
+    let score = 0
+    let maxScore = 0
+
+    const titleLower = (loker.title || '').toLowerCase()
+    if (userSkillsLower.some(skill => titleLower.includes(skill) || skill.includes(titleLower.split(' ')[0]))) score += 40
+    maxScore += 40
+
+    const kategoriLower = (loker.kategori || []).map((k: string) => k.toLowerCase())
+    if (userSkillsLower.some(skill => kategoriLower.some((k: string) => k.includes(skill) || skill.includes(k)))) score += 30
+    maxScore += 30
+
+    const kualifikasiText = (loker.kualifikasi || []).join(' ').toLowerCase()
+    const kualifikasiMatches = userSkillsLower.filter(skill => kualifikasiText.includes(skill)).length
+    if (kualifikasiMatches > 0) score += Math.min(20, kualifikasiMatches * 10)
+    maxScore += 20
+
+    const deskripsiLower = (loker.deskripsi || '').toLowerCase()
+    const deskripsiMatches = userSkillsLower.filter(skill => deskripsiLower.includes(skill)).length
+    if (deskripsiMatches > 0) score += Math.min(10, deskripsiMatches * 5)
+    maxScore += 10
+
+    return maxScore > 0 ? Math.round((score / maxScore) * 100) : 0
   }
 
   // 3. Process "Lowongan Hari Ini" (Last 24 Hours)
@@ -129,27 +158,18 @@ export default async function LokerDetailPage({
       const postDate = new Date(dateStr)
       return postDate > oneDayAgo
     })
-    .map(l => ({ ...l, matchScore: calculateMatchScore(l.skills) }))
+    .map(l => ({ ...l, matchScore: calculateMatchScore(l) }))
     .sort((a, b) => b.matchScore - a.matchScore)
 
   // 4. Process "Rekomendasi Match"
-  // Filter out those already in todayLoker to avoid duplication if desired, or keep them.
-  // For now we keep them but ensure diverse results.
   const recommendedLoker = allLokers
-    .filter(l => !todayLoker.find(t => t.id === l.id)) // Optional: Exclude 'Today's items from Recommendation to show variety
-    .map(l => ({ ...l, matchScore: calculateMatchScore(l.skills) }))
+    .filter(l => !todayLoker.find(t => t.id === l.id))
+    .map(l => ({ ...l, matchScore: calculateMatchScore(l) }))
     .sort((a, b) => {
-      // Priority 1: High Match (>60%)
       if (a.matchScore >= 60 && b.matchScore < 60) return -1
       if (b.matchScore >= 60 && a.matchScore < 60) return 1
-
-      // Priority 2: Match Score desc
       if (a.matchScore !== b.matchScore) return b.matchScore - a.matchScore
-
-      // Priority 3: Featured
       if (a.is_featured !== b.is_featured) return a.is_featured ? -1 : 1
-
-      // Priority 4: Views
       return (b.view_count || 0) - (a.view_count || 0)
     })
     .slice(0, 6)

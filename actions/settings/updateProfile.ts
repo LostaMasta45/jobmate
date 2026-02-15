@@ -28,7 +28,7 @@ export async function updateProfile(payload: ProfilePayload) {
     const user = await getUser();
 
     if (!user) {
-      throw new Error("Unauthorized");
+      return { success: false, error: "Unauthorized" };
     }
 
     // Username ke lowercase & trim
@@ -36,10 +36,25 @@ export async function updateProfile(payload: ProfilePayload) {
       payload.username = payload.username.trim().toLowerCase();
     }
 
+    // Only include fields that exist in the profiles table
+    const validFields: (keyof ProfilePayload)[] = [
+      'full_name', 'username', 'phone', 'whatsapp', 'website', 'linkedin',
+      'locale', 'timezone', 'notify_email', 'notify_telegram',
+      'telegram_chat_id', 'avatar_url', 'skills',
+      'headline', 'bio', 'portfolio',
+    ];
+
+    const cleanPayload: Record<string, any> = {};
+    for (const key of validFields) {
+      if (key in payload && payload[key] !== undefined) {
+        cleanPayload[key] = payload[key];
+      }
+    }
+
     const { data, error } = await supabase
       .from("profiles")
       .update({
-        ...payload,
+        ...cleanPayload,
         updated_at: new Date().toISOString(),
       })
       .eq("id", user.id)
@@ -47,23 +62,22 @@ export async function updateProfile(payload: ProfilePayload) {
       .single();
 
     if (error) {
+      console.error("Supabase update error:", error);
       // Handle unique constraint violation (e.g. duplicate username)
       if (error.code === "23505") {
-        throw new Error("Username sudah dipakai oleh pengguna lain. Silakan pilih username yang berbeda.");
+        return { success: false, error: "Username sudah dipakai oleh pengguna lain. Silakan pilih username yang berbeda." };
       }
-      throw error;
+      return { success: false, error: error.message || "Gagal memperbarui profil." };
     }
 
     revalidatePath("/settings");
     revalidatePath("/dashboard");
+    revalidatePath("/vip");
+    revalidatePath("/vip/profile");
 
     return { success: true, data };
   } catch (error: any) {
     console.error("Error updating profile:", error);
-    // Re-throw with user-friendly message if not already formatted
-    if (error instanceof Error) {
-      throw error;
-    }
-    throw new Error("Gagal memperbarui profil. Silakan coba lagi.");
+    return { success: false, error: error?.message || "Gagal memperbarui profil. Silakan coba lagi." };
   }
 }

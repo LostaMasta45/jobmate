@@ -40,7 +40,7 @@ export default async function LokerListPage({
   const timeFilter = (params.timeFilter as string) || 'all'
   const sort = (params.sort as string) || 'terbaru'
   const page = parseInt((params.page as string) || '1')
-  const limit = 12
+  const limit = params.limit ? parseInt(params.limit as string) : 12
 
   // Helper function to get date for time filter
   const getTimeFilterDate = (filter: string): string | null => {

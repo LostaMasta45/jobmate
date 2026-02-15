@@ -159,6 +159,42 @@
     --radius: 1.5rem;
   }
 
+  /* Theme Overrides - Works in both light and dark mode */
+  .theme-emerald,
+  .dark .theme-emerald {
+    --primary: 158 64% 52%;    /* Emerald 500 */
+    --primary-foreground: 0 0% 100%;
+    --ring: 158 64% 52%;
+  }
+
+  .theme-green,
+  .dark .theme-green {
+    --primary: 142 76% 36%;    /* Green 600 */
+    --primary-foreground: 0 0% 100%;
+    --ring: 142 76% 36%;
+  }
+
+  .theme-purple,
+  .dark .theme-purple {
+    --primary: 262 83% 58%;    /* Purple 600 */
+    --primary-foreground: 0 0% 100%;
+    --ring: 262 83% 58%;
+  }
+
+  .theme-slate,
+  .dark .theme-slate {
+    --primary: 215 16% 47%;    /* Slate 500 */
+    --primary-foreground: 0 0% 100%;
+    --ring: 215 16% 47%;
+  }
+
+  .theme-pink,
+  .dark .theme-pink {
+    --primary: 330 81% 60%;    /* Pink 500 */
+    --primary-foreground: 0 0% 100%;
+    --ring: 330 81% 60%;
+  }
+
   .dark {
     /* Dark Mode Colors - Match JobMate Dashboard */
     --color-primary: 217 91% 60%;       /* Blue */

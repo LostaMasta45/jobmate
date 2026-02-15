@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Sparkles, TrendingUp, Target, Zap } from "lucide-react";
+import Image from "next/image";
 
 interface WelcomeHeroProps {
   userName: string;
@@ -69,6 +69,7 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
   const [showWelcome, setShowWelcome] = useState(true);
   const [timeGreeting, setTimeGreeting] = useState("Selamat Siang");
   const [mounted, setMounted] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     // Generate time-based greeting on client only
@@ -133,12 +134,22 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
                     transition={{ delay: 0.2, type: "spring" }}
                     className="flex justify-center"
                   >
-                    <Avatar className="h-20 w-20 ring-4 ring-[#8e68fd]/30">
-                      <AvatarImage src={avatarUrl || undefined} alt={userName} />
-                      <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-[#8e68fd] to-[#5547d0] text-white">
-                        {getInitials(userName)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="h-20 w-20 rounded-full ring-4 ring-[#8e68fd]/30 shadow-lg relative overflow-hidden bg-muted">
+                      {avatarUrl && !imageError ? (
+                        <Image
+                          src={avatarUrl}
+                          alt={userName}
+                          fill
+                          priority
+                          className="object-cover"
+                          onError={() => setImageError(true)}
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-[#8e68fd] to-[#5547d0] text-white text-2xl font-bold">
+                          {getInitials(userName)}
+                        </div>
+                      )}
+                    </div>
                   </motion.div>
 
                   {/* Greeting */}
@@ -196,13 +207,23 @@ export function WelcomeHero({ userName, userEmail, avatarUrl, totalApplications 
       >
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            {/* Avatar */}
-            <Avatar className="h-12 w-12 ring-2 ring-[#8e68fd]/30 shadow-md flex-shrink-0">
-              <AvatarImage src={avatarUrl || undefined} alt={userName} />
-              <AvatarFallback className="text-base font-bold bg-gradient-to-br from-[#8e68fd] to-[#5547d0] text-white">
-                {getInitials(userName)}
-              </AvatarFallback>
-            </Avatar>
+            {/* Avatar - Optimized */}
+            <div className="w-12 h-12 rounded-full ring-2 ring-[#8e68fd]/30 shadow-md relative overflow-hidden flex-shrink-0 bg-muted">
+              {avatarUrl && !imageError ? (
+                <Image
+                  src={avatarUrl}
+                  alt={userName}
+                  fill
+                  priority
+                  className="object-cover"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-[#8e68fd] to-[#5547d0] text-white text-base font-bold">
+                  {getInitials(userName)}
+                </div>
+              )}
+            </div>
 
             {/* Text content */}
             <div className="flex-1 min-w-0">

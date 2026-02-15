@@ -634,7 +634,7 @@ export function WAWizardV2({ userName = '', onBack }: WAWizardV2Props) {
     };
 
     return (
-        <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-background">
+        <div className="theme-green h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-background">
             {/* Loading Overlay */}
             <WALoadingOverlay isLoading={isGenerating} messageType="application" />
 

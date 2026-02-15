@@ -63,13 +63,58 @@ export function VIPDashboardComplete({
   recentlyViewedLoker = [],
   userSkills = [],
 }: VIPDashboardCompleteProps) {
-  // Helper to calculate match score
-  const calculateMatchScore = (lokerSkills: string[] = []) => {
-    if (!userSkills.length || !lokerSkills.length) return 0
-    const matches = lokerSkills.filter(skill =>
-      userSkills.some(us => us.toLowerCase() === skill.toLowerCase())
+  // Helper to calculate match score - enhanced to use title, kategori, kualifikasi, deskripsi
+  const calculateMatchScore = (loker: Loker) => {
+    if (!userSkills.length) return 0
+
+    const userSkillsLower = userSkills.map(s => s.toLowerCase().trim())
+
+    // 1. If loker has skills, use direct matching (best case)
+    if (loker.skills && loker.skills.length > 0) {
+      const matches = loker.skills.filter(skill =>
+        userSkillsLower.some(us => us === skill.toLowerCase())
+      )
+      return Math.round((matches.length / loker.skills.length) * 100)
+    }
+
+    // 2. Fallback: match against title, kategori, kualifikasi, deskripsi
+    let score = 0
+    let maxScore = 0
+
+    // Check title (high weight: 40)
+    const titleLower = (loker.title || '').toLowerCase()
+    const titleMatches = userSkillsLower.some(skill =>
+      titleLower.includes(skill) || skill.includes(titleLower.split(' ')[0])
     )
-    return Math.round((matches.length / lokerSkills.length) * 100)
+    if (titleMatches) score += 40
+    maxScore += 40
+
+    // Check kategori (high weight: 30)
+    const kategoriArr = loker.kategori || []
+    const kategoriLower = kategoriArr.map(k => k.toLowerCase())
+    const kategoriMatches = userSkillsLower.filter(skill =>
+      kategoriLower.some(k => k.includes(skill) || skill.includes(k))
+    ).length
+    if (kategoriMatches > 0) score += 30
+    maxScore += 30
+
+    // Check kualifikasi (medium weight: 20)
+    const kualifikasiText = (loker.kualifikasi || []).join(' ').toLowerCase()
+    const kualifikasiMatches = userSkillsLower.filter(skill =>
+      kualifikasiText.includes(skill)
+    ).length
+    if (kualifikasiMatches > 0) score += Math.min(20, kualifikasiMatches * 10)
+    maxScore += 20
+
+    // Check deskripsi (low weight: 10)
+    const deskripsiLower = (loker.deskripsi || '').toLowerCase()
+    const deskripsiMatches = userSkillsLower.filter(skill =>
+      deskripsiLower.includes(skill)
+    ).length
+    if (deskripsiMatches > 0) score += Math.min(10, deskripsiMatches * 5)
+    maxScore += 10
+
+    return maxScore > 0 ? Math.round((score / maxScore) * 100) : 0
   }
   const [selectedCategory, setSelectedCategory] = useState('Semua')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid') // Mobile: list, Desktop: grid
@@ -102,7 +147,7 @@ export function VIPDashboardComplete({
   // 1. Calculate scores for all loker first
   const lokerWithScores = lokerList.map(l => ({
     ...l,
-    matchScore: calculateMatchScore(l.skills)
+    matchScore: calculateMatchScore(l)
   }))
 
   // 2. Filter loker by category
@@ -151,7 +196,7 @@ export function VIPDashboardComplete({
   // 6. Recently Viewed with Scores
   const recentlyViewedWithScores = recentlyViewedLoker.map(l => ({
     ...l,
-    matchScore: calculateMatchScore(l.skills)
+    matchScore: calculateMatchScore(l)
   }))
 
   return (

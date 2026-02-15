@@ -263,7 +263,7 @@ export function EmailWizardV2({ userName = '', onBack }: EmailWizardV2Props) {
     }
 
     return (
-        <div className="flex flex-col h-full bg-gradient-to-br from-gmail-red-50/50 via-background to-gmail-blue-50/30 dark:from-red-950/20 dark:via-background dark:to-blue-950/20 overflow-hidden relative">
+        <div className="theme-purple flex flex-col h-full bg-gradient-to-br from-gmail-red-50/50 via-background to-gmail-blue-50/30 dark:from-red-950/20 dark:via-background dark:to-blue-950/20 overflow-hidden relative">
 
             <AnimatePresence>
                 {isGenerating && <LoadingOverlay isVisible={isGenerating} type="application" />}

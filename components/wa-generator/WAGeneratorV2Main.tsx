@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
+import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
 
 import type { WAMessageType } from "./types";
 
@@ -64,8 +65,15 @@ export function WAGeneratorV2Main({ userName }: WAGeneratorV2MainProps) {
 
     // Show homepage with message type selection
     return (
-        <div className="min-h-screen bg-background">
-            <WATypeHome userName={userName} onSelectType={handleSelectType} />
-        </div>
+        <>
+            <MobileToolHeader
+                title="WA Generator"
+                description="Buat pesan WhatsApp profesional"
+                fullScreen
+            />
+            <div className="h-full w-full overflow-y-auto">
+                <WATypeHome userName={userName} onSelectType={handleSelectType} />
+            </div>
+        </>
     );
 }

@@ -791,7 +791,7 @@ export function ModernLokerList({ initialLoker, totalResults, user }: ModernLoke
       {
         filteredLoker.length > 0 ? (
           <>
-            <div className="lg:hidden space-y-4 px-4 pb-24">
+            <div className="lg:hidden space-y-4 px-4 pb-24 mt-6">
               {filteredLoker.map((loker) => (
                 <JobCardStacked
                   key={loker.id}
@@ -800,20 +800,52 @@ export function ModernLokerList({ initialLoker, totalResults, user }: ModernLoke
                 />
               ))}
 
-              <div className="pt-4">
-                <Link href="/vip/loker/semua" className="flex items-center justify-center w-full py-3.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-bold text-gray-900 dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
-                  Lihat Semuanya
-                  <ArrowUpRight className="w-4 h-4 ml-2 text-gray-400" />
-                </Link>
-              </div>
+              {/* Load More / See All Button */}
+              {filteredLoker.length < totalResults && (
+                <div className="pt-4 pb-8 flex justify-center">
+                  <Button
+                    onClick={() => {
+                      const params = new URLSearchParams(searchParams.toString())
+                      params.set('limit', totalResults.toString())
+                      router.push(`/vip/loker?${params.toString()}`, { scroll: false })
+                    }}
+                    variant="outline"
+                    className="rounded-full px-8 border-cyan-500/30 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/30"
+                  >
+                    Lihat Semuanya ({totalResults - filteredLoker.length} lagi)
+                    <ArrowUpRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </div>
+              )}
             </div>
 
+
             {/* Desktop: Grid layout */}
-            <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-6 pb-12">
+            {/* Desktop: Grid layout */}
+            <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-6 pb-12 mt-32">
               {filteredLoker.map((loker) => (
                 <DesktopCard2Overlay key={loker.id} loker={loker} />
               ))}
             </div>
+
+            {/* Desktop Load More / See All Button */}
+            {filteredLoker.length < totalResults && (
+              <div className="hidden lg:flex justify-center pt-2 pb-12">
+                <Button
+                  onClick={() => {
+                    const params = new URLSearchParams(searchParams.toString())
+                    params.set('limit', totalResults.toString())
+                    router.push(`/vip/loker?${params.toString()}`, { scroll: false })
+                  }}
+                  variant="outline"
+                  size="lg"
+                  className="rounded-full px-10 h-12 border-cyan-500/30 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 font-semibold"
+                >
+                  Lihat Semuanya ({totalResults - filteredLoker.length} lagi)
+                  <ArrowUpRight className="ml-2 w-5 h-5" />
+                </Button>
+              </div>
+            )}
           </>
         ) : (
           /* Empty State */

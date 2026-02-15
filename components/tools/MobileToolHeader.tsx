@@ -10,6 +10,7 @@ interface MobileToolHeaderProps {
   description?: string;
   showHomeButton?: boolean;
   onBack?: () => void;
+  fullScreen?: boolean;
   className?: string;
 }
 
@@ -18,6 +19,7 @@ export function MobileToolHeader({
   description,
   showHomeButton = false,
   onBack,
+  fullScreen = false,
   className
 }: MobileToolHeaderProps) {
   const router = useRouter();
@@ -43,8 +45,10 @@ export function MobileToolHeader({
       {/* Mobile Header - Only visible on mobile */}
       <div className={cn(
         "lg:hidden sticky top-0 z-40",
-        // Negative margins to counteract AppShell padding
-        "-mx-3 sm:-mx-4 mb-4",
+        // Negative margins only needed to counteract AppShell padding (non-fullscreen)
+        !fullScreen && "-mx-3 sm:-mx-4 mb-4",
+        // In fullscreen mode, push below the fixed VIPHeader
+        fullScreen && "mt-12 sm:mt-14",
         "bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg",
         "border-b border-gray-200 dark:border-gray-800",
         "shadow-sm",

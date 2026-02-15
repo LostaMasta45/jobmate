@@ -80,6 +80,7 @@ export function CVATSClient({ initialResumes, onRefresh }: CVATSClientProps) {
                 <MobileToolHeader
                     title="CV Generator"
                     description="Professional Resume Builder"
+                    fullScreen
                 />
             )}
 

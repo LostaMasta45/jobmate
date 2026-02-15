@@ -5,6 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { MobileToolHeader } from "@/components/tools/MobileToolHeader";
 
 // Types from separate file
 import type { EmailType, FollowUpFormData, ThankYouFormData, InquiryFormData } from "./types";
@@ -230,9 +231,16 @@ export function EmailGeneratorV2Main({ userName }: EmailGeneratorV2MainProps) {
 
     // Show home page with email type selection
     return (
-        <div className="h-full w-full">
-            <EmailGeneratorHome onSelectType={handleSelectType} />
-        </div>
+        <>
+            <MobileToolHeader
+                title="Email Generator"
+                description="Buat email profesional dengan AI"
+                fullScreen
+            />
+            <div className="h-full w-full overflow-y-auto">
+                <EmailGeneratorHome onSelectType={handleSelectType} />
+            </div>
+        </>
     );
 }
 

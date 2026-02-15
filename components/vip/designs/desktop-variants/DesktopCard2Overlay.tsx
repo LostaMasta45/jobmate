@@ -6,15 +6,22 @@ import { MapPin, Briefcase, Calendar, ChevronRight } from 'lucide-react'
 import type { Loker } from '@/types/vip'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
+import { useState, useEffect } from 'react'
 
 interface DesktopCardProps {
     loker: Loker
 }
 
 export function DesktopCard2Overlay({ loker }: DesktopCardProps) {
-    const formattedDate = loker.published_at
-        ? format(new Date(loker.published_at), 'd MMMM yyyy', { locale: id })
-        : '-';
+    const [formattedDate, setFormattedDate] = useState<string>('')
+
+    useEffect(() => {
+        if (loker.published_at) {
+            setFormattedDate(format(new Date(loker.published_at), 'd MMMM yyyy', { locale: id }))
+        } else {
+            setFormattedDate('-')
+        }
+    }, [loker.published_at])
 
     return (
         <Link href={`/vip/loker/${loker.id}`} className="group block h-full">

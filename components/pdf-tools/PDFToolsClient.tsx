@@ -32,11 +32,12 @@ export function PDFToolsClient() {
   };
 
   return (
-    <>
+    <div className="theme-slate h-full w-full">
       {activeTool === 'home' && (
         <MobileToolHeader
           title="PDF Tools"
           description="Kelola dokumen PDF"
+          fullScreen
         />
       )}
 
@@ -64,6 +65,6 @@ export function PDFToolsClient() {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 }

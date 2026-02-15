@@ -71,7 +71,7 @@ export default function VIPLayout({
         </aside>
 
         {/* Main Content Area - Proper spacing + bottom padding for mobile nav + overflow handling */}
-        <main className={`flex-1 w-full lg:ml-72 bg-gray-50 dark:bg-slate-950 min-h-screen overflow-y-auto ${isFullWidth ? 'pt-16 pb-0' : 'pt-20 sm:pt-24 pb-24 lg:pb-8'
+        <main className={`flex-1 w-full lg:ml-72 bg-gray-50 dark:bg-slate-950 min-h-screen overflow-y-auto ${isFullWidth ? 'pt-16 pb-24 lg:pb-0' : 'pt-20 sm:pt-24 pb-24 lg:pb-8'
           }`}>
           <div className={isFullWidth ? "w-full lg:px-8 lg:pb-8" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6"}>
             {children}

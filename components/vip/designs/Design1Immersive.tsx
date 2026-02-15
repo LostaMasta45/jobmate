@@ -84,13 +84,15 @@ export default function Design1Immersive({ loker, similar, todayLoker = [], reco
 
             {/* 1. FULL SCREEN DYNAMIC BACKGROUND */}
             <div className="fixed inset-0 z-0">
-                <Image
-                    src={loker.poster_url || ''}
-                    alt="Background"
-                    fill
-                    className="object-cover opacity-20 dark:opacity-40 blur-3xl scale-110"
-                    priority
-                />
+                {loker.poster_url && (
+                    <Image
+                        src={loker.poster_url}
+                        alt="Background"
+                        fill
+                        className="object-cover opacity-20 dark:opacity-40 blur-3xl scale-110"
+                        priority
+                    />
+                )}
                 <div className="absolute inset-0 bg-white/60 dark:bg-slate-950/80" /> {/* Theme Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-gray-50/50 dark:from-slate-950 dark:via-transparent dark:to-slate-950/50" />
             </div>
@@ -111,12 +113,18 @@ export default function Design1Immersive({ loker, similar, todayLoker = [], reco
 
                             {/* Poster Card */}
                             <div className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-white/10 mb-6 group-hover:scale-[1.02] transition-transform duration-500">
-                                <Image
-                                    src={loker.poster_url || ''}
-                                    alt={loker.title}
-                                    fill
-                                    className="object-cover"
-                                />
+                                {loker.poster_url ? (
+                                    <Image
+                                        src={loker.poster_url}
+                                        alt={loker.title}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center">
+                                        <Briefcase className="w-16 h-16 text-slate-400 dark:text-slate-500" />
+                                    </div>
+                                )}
                                 {/* Hover Overlay */}
                                 <Dialog>
                                     <DialogTrigger asChild>

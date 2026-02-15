@@ -129,13 +129,20 @@ export default function VIPProfileEditPage() {
     const onSubmit = async (data: ProfileFormData) => {
         setIsSaving(true)
         try {
-            await updateProfile({
+            const result = await updateProfile({
                 ...data,
                 avatar_url: currentAvatar
             })
-            toast.success('Profil berhasil disimpan')
-        } catch (error) {
-            toast.error('Gagal menyimpan profil')
+            if (result.success) {
+                toast.success('Profil berhasil disimpan')
+                router.refresh()
+            } else {
+                console.error('Profile save error:', result.error)
+                toast.error(result.error || 'Gagal menyimpan profil')
+            }
+        } catch (error: any) {
+            console.error('Unexpected save error:', error)
+            toast.error('Terjadi kesalahan sistem. Silakan coba lagi.')
         } finally {
             setIsSaving(false)
         }

@@ -109,7 +109,7 @@ export default function BuatSuratLamaranPage() {
   return (
     <AppShell>
       <Toaster />
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="theme-emerald container mx-auto px-4 py-8 max-w-7xl">
         {/* Breadcrumb Navigation */}
         <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
           <Link href="/dashboard" className="hover:text-foreground flex items-center gap-1">
@@ -216,7 +216,7 @@ export default function BuatSuratLamaranPage() {
                   Biarkan AI membuat surat lamaran profesional untuk Anda. Cukup klik tombol di bawah untuk mendapatkan 3 variasi yang berbeda.
                 </p>
               )}
-              
+
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <AIGeneratorDialog
                   posisi={formData.perusahaan.posisiLowongan}

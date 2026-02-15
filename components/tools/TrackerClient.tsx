@@ -139,7 +139,7 @@ export function TrackerClient({ applications, userId }: { applications: Applicat
         notes: "",
         poster_path: undefined,
       });
-      
+
       router.refresh(); // Refresh instead of reload
     } catch (error) {
       alert("Gagal: " + (error as Error).message);
@@ -149,7 +149,7 @@ export function TrackerClient({ applications, userId }: { applications: Applicat
   };
 
   return (
-    <div className="space-y-6">
+    <div className="theme-emerald space-y-6">
       <TrackerStats applications={filteredApplications} />
 
       {/* Toolbar */}
@@ -213,7 +213,7 @@ export function TrackerClient({ applications, userId }: { applications: Applicat
       </div>
 
       {/* Follow-up Reminders Panel */}
-      <FollowUpTrackerPanel 
+      <FollowUpTrackerPanel
         onFilterChange={setShowOnlyWithFollowUps}
       />
 
