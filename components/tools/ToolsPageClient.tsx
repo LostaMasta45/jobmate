@@ -209,13 +209,13 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
   const popularTools = tools.filter(t => t.popular);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 -mx-3 sm:-mx-4 lg:mx-0">
       {/* ============================================ */}
       {/* MOBILE VERSION - Native App Style */}
       {/* ============================================ */}
       <div className="lg:hidden space-y-4 sm:space-y-5 pb-24">
         {/* Hero Section - Gradient Purple/Cyan - Fully Responsive */}
-        <div className="bg-gradient-to-br from-[#8e68fd] via-[#5547d0] to-[#3977d3] dark:from-[#5547d0] dark:via-[#3977d3] dark:to-[#00acc7] -mx-4 sm:-mx-6 px-4 sm:px-6 pt-6 sm:pt-8 pb-5 sm:pb-6 shadow-lg">
+        <div className="bg-gradient-to-br from-[#8e68fd] via-[#5547d0] to-[#3977d3] dark:from-[#5547d0] dark:via-[#3977d3] dark:to-[#00acc7] px-4 sm:px-5 pt-6 sm:pt-8 pb-5 sm:pb-6 shadow-lg">
           <div className="space-y-3 sm:space-y-4 max-w-md mx-auto">
             {/* Greeting */}
             <div>
@@ -228,7 +228,7 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
             </div>
 
             {/* Quick Stats - Pills - Responsive */}
-            <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
+            <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 scrollbar-hide">
               <div className="flex items-center gap-1.5 sm:gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 flex-shrink-0 border border-white/30">
                 <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white flex-shrink-0" />
                 <span className="text-xs sm:text-sm font-bold text-white whitespace-nowrap">{tools.length} Tools</span>
@@ -246,8 +246,8 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
         </div>
 
         {/* Category Carousel - Responsive */}
-        <div className="px-4 sm:px-6">
-          <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
+        <div className="px-3 sm:px-4">
+          <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {categories.map((category) => {
               const Icon = category.icon;
               const isActive = selectedCategory === category.id;
@@ -279,7 +279,7 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
         {/* Popular Tools - Horizontal Scroll - Responsive */}
         {selectedCategory === "all" && (
           <div className="space-y-2.5 sm:space-y-3">
-            <div className="flex items-center justify-between px-4 sm:px-6">
+            <div className="flex items-center justify-between px-3 sm:px-4">
               <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-1.5 sm:gap-2">
                 <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 fill-yellow-500 flex-shrink-0" />
                 <span>Populer</span>
@@ -289,7 +289,7 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
               </Badge>
             </div>
 
-            <div className="flex gap-2.5 sm:gap-3 overflow-x-auto pb-2 px-4 sm:px-6 scrollbar-hide">
+            <div className="flex gap-2.5 sm:gap-3 overflow-x-auto pb-2 px-3 sm:px-4 scrollbar-hide">
               {popularTools.map((tool) => {
                 const Icon = tool.icon;
 
@@ -330,7 +330,7 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
         )}
 
         {/* All Tools Grid - Mobile Optimized & Responsive */}
-        <div className="px-4 sm:px-6 space-y-2.5 sm:space-y-3">
+        <div className="px-3 sm:px-4 space-y-2.5 sm:space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate mr-2">
               {selectedCategory === "all" ? "Semua Tools" : categories.find(c => c.id === selectedCategory)?.name}
@@ -383,7 +383,7 @@ export function ToolsPageClient({ userName }: ToolsPageClientProps) {
         </div>
 
         {/* Tips Card - Mobile - Responsive */}
-        <div className="px-4 sm:px-6">
+        <div className="px-3 sm:px-4">
           <Card className="border-0 bg-gradient-to-br from-amber-400 via-yellow-400 to-orange-400 dark:from-amber-600 dark:via-yellow-600 dark:to-orange-600 p-4 sm:p-5 shadow-lg">
             <div className="flex items-start gap-3 sm:gap-4">
               <div className="w-11 h-11 sm:w-12 sm:h-12 bg-white/30 backdrop-blur-sm rounded-2xl flex items-center justify-center flex-shrink-0">
