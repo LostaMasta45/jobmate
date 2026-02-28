@@ -6,7 +6,7 @@
 
 1. **404 Not Found** - API `/api/payment/check-status` tidak ditemukan
 2. **Minified React Error #310** - Unhandled promise rejection
-3. **Domain vercel.app** - Bukan jobmate.web.id
+3. **Domain vercel.app** - Bukan infolokerjombang.id
 
 ---
 
@@ -143,7 +143,7 @@ console.log('[Check Status] Payment found:', payment.external_id, 'Status:', pay
 
 ---
 
-## 🌐 Domain Issue: vercel.app vs jobmate.web.id
+## 🌐 Domain Issue: vercel.app vs infolokerjombang.id
 
 ### ❓ Kenapa URL masih vercel.app?
 
@@ -160,12 +160,12 @@ https://jobmate-ivory.vercel.app/payment/success?external_id=...
 - Ini NORMAL untuk testing
 
 #### Scenario 2: Production Domain Not Set
-- Custom domain `jobmate.web.id` belum di-assign ke production
+- Custom domain `infolokerjombang.id` belum di-assign ke production
 - User akses via vercel URL
 
 ---
 
-### ✅ Cara Memastikan Domain jobmate.web.id
+### ✅ Cara Memastikan Domain infolokerjombang.id
 
 #### Option A: Access Production URL
 
@@ -176,7 +176,7 @@ https://jobmate-ivory.vercel.app/payment/success?external_id=...
 
 **Akses production URL:**
 ```
-✅ https://jobmate.web.id
+✅ https://infolokerjombang.id
 ```
 
 #### Option B: Set Custom Domain di Vercel
@@ -190,7 +190,7 @@ https://jobmate-ivory.vercel.app/payment/success?external_id=...
 2. **Go to Settings → Domains**
 
 3. **Add Custom Domain**
-   - Input: `jobmate.web.id`
+   - Input: `infolokerjombang.id`
    - Click "Add"
 
 4. **Configure DNS** (di registrar domain Anda)
@@ -203,7 +203,7 @@ https://jobmate-ivory.vercel.app/payment/success?external_id=...
 5. **Wait for DNS Propagation** (~5-30 minutes)
 
 6. **Verify**
-   - Go to: https://jobmate.web.id
+   - Go to: https://infolokerjombang.id
    - Should load your site ✅
 
 ---
@@ -215,20 +215,20 @@ https://jobmate-ivory.vercel.app/payment/success?external_id=...
 1. Go to: https://vercel.com
 2. Select project: jobmate
 3. Go to: Settings → Domains
-4. Check if `jobmate.web.id` is listed
+4. Check if `infolokerjombang.id` is listed
 
 **Expected:**
 ```
-✅ jobmate.web.id (Production)
-✅ www.jobmate.web.id
+✅ infolokerjombang.id (Production)
+✅ www.infolokerjombang.id
    jobmate-ivory.vercel.app (Preview)
 ```
 
 #### Check 2: Browser
 
-1. Open: https://jobmate.web.id
+1. Open: https://infolokerjombang.id
 2. Check address bar
-3. Should stay as `jobmate.web.id` (not redirect to vercel.app)
+3. Should stay as `infolokerjombang.id` (not redirect to vercel.app)
 
 ---
 
@@ -236,7 +236,7 @@ https://jobmate-ivory.vercel.app/payment/success?external_id=...
 
 ### Test 1: Create New Payment
 
-1. Go to: **https://jobmate.web.id/payment** (gunakan production URL!)
+1. Go to: **https://infolokerjombang.id/payment** (gunakan production URL!)
 2. Fill form:
    ```
    Plan: VIP Basic
@@ -323,9 +323,9 @@ https://jobmate-ivory.vercel.app/payment/success?external_id=...
 
 **Solution:**
 1. Check Vercel Dashboard → Settings → Domains
-2. Verify `jobmate.web.id` is listed
+2. Verify `infolokerjombang.id` is listed
 3. Wait for DNS propagation (5-30 mins)
-4. Access via **https://jobmate.web.id** (not vercel.app)
+4. Access via **https://infolokerjombang.id** (not vercel.app)
 
 ### Problem 3: Payment Not Found (Tapi Sudah Bayar)
 
@@ -384,14 +384,14 @@ Total: +69 lines
 ⚠️ **Domain vercel.app is expected for preview deployments**
 
 To use production domain:
-1. ✅ Access via: **https://jobmate.web.id**
+1. ✅ Access via: **https://infolokerjombang.id**
 2. ✅ NOT via: `https://jobmate-ivory.vercel.app`
 3. ✅ Set custom domain in Vercel Dashboard
 4. ✅ Configure DNS at domain registrar
 
 ### Testing:
 
-1. ✅ Create payment via **jobmate.web.id/payment**
+1. ✅ Create payment via **infolokerjombang.id/payment**
 2. ✅ Simulate payment in Xendit dashboard
 3. ✅ Check success page for payment details
 4. ✅ Check console logs for debugging
@@ -401,7 +401,7 @@ To use production domain:
 ✅ **Code deployed to production**  
 ✅ **Error handling improved**  
 ✅ **User experience enhanced**  
-⚠️ **Access via jobmate.web.id for production domain**
+⚠️ **Access via infolokerjombang.id for production domain**
 
 ---
 

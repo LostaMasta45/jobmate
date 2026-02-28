@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
                 },
                 // Callback URLs
                 callbacks: {
-                    finish: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://jobmate.web.id'}/payment-midtrans/success?order_id=${orderId}`,
+                    finish: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://infolokerjombang.id'}/payment-midtrans/success?order_id=${orderId}`,
                 },
             }),
         });

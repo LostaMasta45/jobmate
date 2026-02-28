@@ -98,7 +98,7 @@ https://raw.githubusercontent.com/yourusername/jobmate/main/public/Logo/logopanj
 ```
 
 **Untuk production**, ganti dengan:
-1. URL dari domain Jobmate: `https://jobmate.web.id/Logo/logopanjang.png`
+1. URL dari domain Jobmate: `https://infolokerjombang.id/Logo/logopanjang.png`
 2. Atau upload ke CDN (Cloudinary, ImgIX, dll)
 3. Atau gunakan base64 encoded image (file jadi lebih besar tapi reliable)
 

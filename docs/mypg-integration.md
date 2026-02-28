@@ -12,10 +12,10 @@ Integrasi payment gateway MY PG (klikqris.com) untuk JOBMATE.
 
 | Endpoint | URL | Deskripsi |
 |----------|-----|-----------|
-| **Payment Page** | `https://jobmate.web.id/test-mypg` | Halaman form pembayaran |
-| **Test Payment** | `https://jobmate.web.id/test-mypg?plan=test` | Test pembayaran Rp 1.000 |
-| **Admin Dashboard** | `https://jobmate.web.id/test-mypg/admin` | Lihat semua transaksi |
-| **Webhook URL** | `https://jobmate.web.id/api/mypg/webhook` | ⚠️ SET DI APK KLIKQRIS |
+| **Payment Page** | `https://infolokerjombang.id/test-mypg` | Halaman form pembayaran |
+| **Test Payment** | `https://infolokerjombang.id/test-mypg?plan=test` | Test pembayaran Rp 1.000 |
+| **Admin Dashboard** | `https://infolokerjombang.id/test-mypg/admin` | Lihat semua transaksi |
+| **Webhook URL** | `https://infolokerjombang.id/api/mypg/webhook` | ⚠️ SET DI APK KLIKQRIS |
 
 ### API Endpoints
 
@@ -36,7 +36,7 @@ Buka app **KlikQRIS** di Android:
 2. Cari menu **Webhook** atau **Notifikasi URL**
 3. Masukkan URL:
    ```
-   https://jobmate.web.id/api/mypg/webhook
+   https://infolokerjombang.id/api/mypg/webhook
    ```
 4. Simpan
 

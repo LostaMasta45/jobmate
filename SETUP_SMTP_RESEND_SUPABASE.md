@@ -1,11 +1,11 @@
 # Setup SMTP Resend.com untuk Supabase
 
-Guide lengkap untuk menggunakan email custom `@jobmate.web.id` di Supabase menggunakan Resend.com sebagai SMTP provider.
+Guide lengkap untuk menggunakan email custom `@infolokerjombang.id` di Supabase menggunakan Resend.com sebagai SMTP provider.
 
 ## 📋 Prerequisites
 
 - ✅ Akun Resend.com (gratis: 100 email/hari, 3,000 email/bulan)
-- ✅ Domain `jobmate.web.id` sudah diverifikasi di Resend
+- ✅ Domain `infolokerjombang.id` sudah diverifikasi di Resend
 - ✅ Akses ke Supabase Dashboard (Project Settings)
 
 ---
@@ -32,12 +32,12 @@ Guide lengkap untuk menggunakan email custom `@jobmate.web.id` di Supabase mengg
 ### 1.3 Verify Domain (jika belum)
 1. Klik **Domains** di sidebar
 2. Klik **Add Domain**
-3. Masukkan: `jobmate.web.id`
+3. Masukkan: `infolokerjombang.id`
 4. Copy DNS Records yang diberikan
 5. Tambahkan ke DNS provider Anda:
    ```
    Type: TXT
-   Name: @ atau jobmate.web.id
+   Name: @ atau infolokerjombang.id
    Value: v=DKIM1; k=rsa; p=MIGfMA0GCS...
    
    Type: TXT
@@ -68,10 +68,10 @@ SMTP Port:           587
 SMTP Username:       resend
 SMTP Password:       re_xxxxxxxxxxxxxxxxxxxxxxxxxx (dari Step 1.2)
 
-Sender Email:        noreply@jobmate.web.id
+Sender Email:        noreply@infolokerjombang.id
 Sender Name:         JobMate
 
-SMTP Admin Email:    admin@jobmate.web.id (optional, untuk notif admin)
+SMTP Admin Email:    admin@infolokerjombang.id (optional, untuk notif admin)
 ```
 
 ### 2.3 Test Connection
@@ -130,7 +130,7 @@ Di **Authentication** → **Email Templates**, customize:
 
 ### 4.2 Verifikasi Email Terkirim
 1. Cek inbox email (atau spam folder)
-2. Email harus dari: `noreply@jobmate.web.id`
+2. Email harus dari: `noreply@infolokerjombang.id`
 3. Subject: "Reset Your Password" (sesuai template)
 4. Klik link reset password di email
 
@@ -173,7 +173,7 @@ Di **Authentication** → **Email Templates**, customize:
 **Cause:** DNS records belum propagasi
 **Solution:**
 - Tunggu 24 jam untuk DNS propagasi
-- Cek DNS dengan: `nslookup -type=TXT jobmate.web.id`
+- Cek DNS dengan: `nslookup -type=TXT infolokerjombang.id`
 - Re-verify domain di Resend Dashboard
 
 #### ❌ **Email masuk SPAM**
@@ -314,7 +314,7 @@ Sebelum production, test semua email flows:
   - New user signup → admin receives notification
 - [ ] **Spam Check** - All emails NOT in spam folder
 - [ ] **Mobile Responsive** - Email templates look good on mobile
-- [ ] **From Address** - Shows `JobMate <noreply@jobmate.web.id>`
+- [ ] **From Address** - Shows `JobMate <noreply@infolokerjombang.id>`
 - [ ] **Reply-To** (optional) - Set to support email if needed
 
 ---
@@ -322,7 +322,7 @@ Sebelum production, test semua email flows:
 ## 🎉 Setup Complete!
 
 Your reset password flow is now fully functional with:
-- ✅ Custom email domain `@jobmate.web.id`
+- ✅ Custom email domain `@infolokerjombang.id`
 - ✅ Professional email templates
 - ✅ Reliable delivery via Resend SMTP
 - ✅ Secure token-based authentication

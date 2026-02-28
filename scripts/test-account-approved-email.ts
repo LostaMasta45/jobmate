@@ -23,7 +23,7 @@ envContent.split('\n').forEach(line => {
 });
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const fromEmail = 'Jobmate x Infolokerjombang <admin@jobmate.web.id>';
+const fromEmail = 'InfoLokerJombang <admin@infolokerjombang.id>';
 
 async function testAccountApprovedEmail(toEmail: string) {
   console.log('\n✨ Testing Account Approved Email - MODERN UI VERSION\n');
@@ -41,7 +41,7 @@ async function testAccountApprovedEmail(toEmail: string) {
     const now = new Date();
     const loginUrl = process.env.NEXT_PUBLIC_SITE_URL 
       ? `${process.env.NEXT_PUBLIC_SITE_URL}/sign-in`
-      : 'https://jobmate.web.id/sign-in';
+      : 'https://infolokerjombang.id/sign-in';
     
     const emailHtml = await render(
       React.createElement(AccountApprovedEmail, {

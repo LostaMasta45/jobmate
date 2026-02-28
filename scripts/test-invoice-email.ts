@@ -23,7 +23,7 @@ envContent.split('\n').forEach(line => {
 });
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const fromEmail = 'Jobmate x Infolokerjombang <admin@jobmate.web.id>';
+const fromEmail = 'InfoLokerJombang <admin@infolokerjombang.id>';
 
 async function testInvoiceEmail(toEmail: string) {
   console.log('\n🧪 Testing Invoice Email (Redesigned)\n');
@@ -60,7 +60,7 @@ async function testInvoiceEmail(toEmail: string) {
     const { data, error } = await resend.emails.send({
       from: fromEmail,
       to: toEmail,
-      subject: 'Invoice Pembayaran VIP Basic - 1 Bulan - Jobmate X infolokerjombang',
+      subject: 'Invoice Pembayaran VIP Basic - 1 Bulan - InfoLokerJombang',
       html: String(emailHtml),
       text: emailText,
     });

@@ -23,7 +23,7 @@ envContent.split('\n').forEach(line => {
 });
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const fromEmail = 'Jobmate x Infolokerjombang <admin@jobmate.web.id>';
+const fromEmail = 'InfoLokerJombang <admin@infolokerjombang.id>';
 
 async function testAccountPendingEmail(toEmail: string) {
   console.log('\n✨ Testing Account Pending Email - MODERN UI WITH BRAND COLORS\n');

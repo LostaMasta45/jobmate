@@ -117,11 +117,11 @@
                 Platform pencarian kerja terpercaya di Indonesia
               </p>
               <div style="margin-top: 16px;">
-                <a href="https://jobmate.web.id" style="color: #667eea; text-decoration: none; font-size: 12px; margin: 0 8px;">Website</a>
+                <a href="https://infolokerjombang.id" style="color: #667eea; text-decoration: none; font-size: 12px; margin: 0 8px;">Website</a>
                 <span style="color: #ccc;">•</span>
-                <a href="https://jobmate.web.id/help" style="color: #667eea; text-decoration: none; font-size: 12px; margin: 0 8px;">Bantuan</a>
+                <a href="https://infolokerjombang.id/help" style="color: #667eea; text-decoration: none; font-size: 12px; margin: 0 8px;">Bantuan</a>
                 <span style="color: #ccc;">•</span>
-                <a href="https://jobmate.web.id/privacy" style="color: #667eea; text-decoration: none; font-size: 12px; margin: 0 8px;">Privacy</a>
+                <a href="https://infolokerjombang.id/privacy" style="color: #667eea; text-decoration: none; font-size: 12px; margin: 0 8px;">Privacy</a>
               </div>
             </td>
           </tr>
@@ -320,11 +320,11 @@
               <p style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: #1a1a1a;">JobMate Indonesia</p>
               <p style="margin: 0 0 16px 0; font-size: 12px; color: #999;">Platform Pencarian Kerja Terpercaya</p>
               <div>
-                <a href="https://jobmate.web.id" style="display: inline-block; margin: 0 8px; color: #667eea; text-decoration: none; font-size: 12px; font-weight: 600;">Website</a>
+                <a href="https://infolokerjombang.id" style="display: inline-block; margin: 0 8px; color: #667eea; text-decoration: none; font-size: 12px; font-weight: 600;">Website</a>
                 <span style="color: #ddd;">|</span>
-                <a href="mailto:support@jobmate.web.id" style="display: inline-block; margin: 0 8px; color: #667eea; text-decoration: none; font-size: 12px; font-weight: 600;">Support</a>
+                <a href="mailto:support@infolokerjombang.id" style="display: inline-block; margin: 0 8px; color: #667eea; text-decoration: none; font-size: 12px; font-weight: 600;">Support</a>
                 <span style="color: #ddd;">|</span>
-                <a href="https://jobmate.web.id/privacy" style="display: inline-block; margin: 0 8px; color: #667eea; text-decoration: none; font-size: 12px; font-weight: 600;">Privacy</a>
+                <a href="https://infolokerjombang.id/privacy" style="display: inline-block; margin: 0 8px; color: #667eea; text-decoration: none; font-size: 12px; font-weight: 600;">Privacy</a>
               </div>
               <p style="margin: 16px 0 0 0; font-size: 11px; color: #bbb;">
                 © 2024 JobMate. All rights reserved.

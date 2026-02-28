@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
                             amount: body.data.amount_paid || transaction.total_amount || transaction.amount,
                             transactionDate: body.data.payment_date || new Date().toISOString(),
                             planType: transaction.plan_type || 'basic',
-                            dashboardUrl: 'https://jobmate.web.id/ajukan-akun',
+                            dashboardUrl: 'https://infolokerjombang.id/ajukan-akun',
                         };
 
                         const emailHtml = await render(<PaymentSuccessEmail {...emailProps} />);

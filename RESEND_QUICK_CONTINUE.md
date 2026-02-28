@@ -15,7 +15,7 @@
 
 ⏳ **Yang Perlu Dilakukan** (Bagian 7-8):
 - Test integrasi end-to-end di localhost
-- Test di production (jobmate.web.id)
+- Test di production (infolokerjombang.id)
 - (Optional) Verify domain untuk production
 
 ---
@@ -127,7 +127,7 @@ git push origin main
 #### Step 8.4: Test Production API
 ```bash
 # Test create invoice di production
-curl -X POST https://jobmate.web.id/api/payment/create-invoice \
+curl -X POST https://infolokerjombang.id/api/payment/create-invoice \
   -H "Content-Type: application/json" \
   -d "{\"plan\":\"basic\",\"email\":\"reza.nur.h45@gmail.com\",\"fullName\":\"Test User\",\"whatsapp\":\"08123456789\"}"
 ```
@@ -174,7 +174,7 @@ Reason: Development mode (unverified domain)
 
 **Option 2: Verify Domain (Production - Recommended)**
 Follow tutorial di `resend.md` bagian "Step 1.4: Verifikasi Domain"
-- Verify: `noreply@jobmate.web.id`
+- Verify: `noreply@infolokerjombang.id`
 - Add DNS records di Cloudflare
 - Update `RESEND_FROM_EMAIL` di Vercel
 - No more restrictions! 🎉
@@ -248,7 +248,7 @@ PRODUCTION
 
 OPTIONAL (LATER)
 [ ] 11. Invite more testing emails ke Resend team
-[ ] 12. Verify domain noreply@jobmate.web.id untuk production
+[ ] 12. Verify domain noreply@infolokerjombang.id untuk production
 [ ] 13. Update RESEND_FROM_EMAIL to custom domain
 [ ] 14. Add email analytics tracking
 [ ] 15. Enhance email templates dengan branding
@@ -268,7 +268,7 @@ OPTIONAL (LATER)
 
 ### Apa yang Perlu Dilakukan
 - ⏳ Test end-to-end flow di localhost
-- ⏳ Test di production (jobmate.web.id)
+- ⏳ Test di production (infolokerjombang.id)
 - ⏳ Monitor logs & deliverability
 
 ### Optional Enhancement (Later)

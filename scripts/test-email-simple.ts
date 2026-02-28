@@ -30,8 +30,8 @@ async function testEmail(toEmail: string) {
   console.log('\n---\n');
 
   try {
-    // Display name: "Jobmate x Infolokerjombang"
-    const fromEmail = 'Jobmate x Infolokerjombang <admin@jobmate.web.id>';
+    // Display name: "InfoLokerJombang"
+    const fromEmail = 'InfoLokerJombang <admin@infolokerjombang.id>';
     
     console.log('Attempting to send from:', fromEmail);
     console.log('\n');
@@ -48,8 +48,8 @@ async function testEmail(toEmail: string) {
           </div>
           <div style="padding: 30px; background: #f9fafb; margin: 20px 0; border-radius: 10px;">
             <h2>✅ Email Berhasil Terkirim!</h2>
-            <p>Ini adalah test email dari <strong>admin@jobmate.web.id</strong></p>
-            <p>Domain <strong>jobmate.web.id</strong> sudah verified dan siap digunakan!</p>
+            <p>Ini adalah test email dari <strong>admin@infolokerjombang.id</strong></p>
+            <p>Domain <strong>infolokerjombang.id</strong> sudah verified dan siap digunakan!</p>
           </div>
           <div style="text-align: center; color: #666; font-size: 14px;">
             <p>JOBMATE - Platform Karir Terpercaya</p>
@@ -60,8 +60,8 @@ async function testEmail(toEmail: string) {
       text: `
 JOBMATE - Email System Test
 
-Email berhasil terkirim dari: admin@jobmate.web.id
-Domain: jobmate.web.id (Verified)
+Email berhasil terkirim dari: admin@infolokerjombang.id
+Domain: infolokerjombang.id (Verified)
 
 JOBMATE - Platform Karir Terpercaya
 © ${new Date().getFullYear()} JOBMATE
@@ -71,7 +71,7 @@ JOBMATE - Platform Karir Terpercaya
     if (error) {
       console.error('❌ Error:', error);
       console.log('\nPossible issues:');
-      console.log('1. Domain "jobmate.web.id" belum verified di Resend');
+      console.log('1. Domain "infolokerjombang.id" belum verified di Resend');
       console.log('2. API key tidak valid');
       console.log('3. Email format tidak sesuai');
       console.log('\nCheck: https://resend.com/domains\n');

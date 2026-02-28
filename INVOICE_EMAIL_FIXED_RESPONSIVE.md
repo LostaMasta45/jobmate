@@ -228,7 +228,7 @@ Borders: #475569 (Slate 600)
 ### Functionality:
 - [ ] Link "Bayar Sekarang" bisa diklik
 - [ ] Link "Lihat Detail Invoice" bisa diklik
-- [ ] Email contact link (admin@jobmate.web.id) bisa diklik
+- [ ] Email contact link (admin@infolokerjombang.id) bisa diklik
 - [ ] Amount display benar: Rp 50.000
 - [ ] Invoice ID generated
 - [ ] Countdown timer muncul

@@ -614,7 +614,7 @@ export default function InvoiceAnimatedPreview() {
           }}
         >
           <div style={{ fontWeight: 600, color: theme.text, marginBottom: '4px', fontSize: '14px' }}>
-            Jobmate x Infolokerjombang
+            InfoLokerJombang
           </div>
           <div style={{ color: theme.textSecondary, fontSize: '13px', marginBottom: '4px' }}>
             Platform Karir Terpercaya
@@ -622,10 +622,10 @@ export default function InvoiceAnimatedPreview() {
           <div style={{ color: theme.textSecondary, fontSize: '13px', marginBottom: '12px' }}>
             Butuh bantuan? Hubungi{' '}
             <a
-              href="mailto:admin@jobmate.web.id"
+              href="mailto:admin@infolokerjombang.id"
               style={{ color: colors.primary.mariner, textDecoration: 'none' }}
             >
-              admin@jobmate.web.id
+              admin@infolokerjombang.id
             </a>
           </div>
           <div style={{ color: theme.textSecondary, fontSize: '12px', marginTop: '12px' }}>

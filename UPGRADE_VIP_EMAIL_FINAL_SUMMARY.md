@@ -12,13 +12,13 @@ Upgrade VIP Email berhasil disesuaikan dengan 3 email template lainnya!
 
 #### **Email 1 - VIP Basic** ⭐
 - **Email ID**: `4d8012d4-4495-4089-9109-72b884bdc389`
-- **From**: **Jobmate x Infolokerjombang** <admin@jobmate.web.id>
+- **From**: **Jobmate x Infolokerjombang** <admin@infolokerjombang.id>
 - **Subject**: `⭐ Selamat! Upgrade VIP Basic Berhasil - JOBMATE`
 - **Status**: ✅ Delivered
 
 #### **Email 2 - VIP Premium** 👑
 - **Email ID**: `e8bf52f6-9377-4ae6-8a56-29b1119d6edb`
-- **From**: **Jobmate x Infolokerjombang** <admin@jobmate.web.id>
+- **From**: **Jobmate x Infolokerjombang** <admin@infolokerjombang.id>
 - **Subject**: `👑 Selamat! Upgrade VIP Premium Berhasil - JOBMATE`
 - **Status**: ✅ Delivered
 
@@ -28,8 +28,8 @@ Upgrade VIP Email berhasil disesuaikan dengan 3 email template lainnya!
 
 ### 1. **Sender Name** ✅
 ```
-❌ Before: admin@jobmate.web.id (plain email)
-✅ After: Jobmate x Infolokerjombang <admin@jobmate.web.id>
+❌ Before: admin@infolokerjombang.id (plain email)
+✅ After: Jobmate x Infolokerjombang <admin@infolokerjombang.id>
 ```
 
 **Konsisten dengan:**
@@ -108,7 +108,7 @@ premiumGoldDark: '#d97706'
 
 ### **1. Gmail Warning "Dangerous Message"** 
 **Kenapa muncul?**
-- Domain `admin@jobmate.web.id` masih baru
+- Domain `admin@infolokerjombang.id` masih baru
 - Gmail perlu build **sender reputation**
 - Machine learning Gmail mendeteksi pattern baru
 
@@ -124,7 +124,7 @@ premiumGoldDark: '#d97706'
 
 3. **User Action**
    - Klik "Looks safe" di Gmail
-   - Add admin@jobmate.web.id ke Contacts
+   - Add admin@infolokerjombang.id ke Contacts
 
 **Note**: Email lama (yang sudah lama dipakai) TIDAK ada warning karena reputasi sudah terbangun.
 
@@ -146,7 +146,7 @@ premiumGoldDark: '#d97706'
 
 #### **Option 2 - Add to Safe Senders**
 ```
-1. Add admin@jobmate.web.id ke Gmail Contacts
+1. Add admin@infolokerjombang.id ke Gmail Contacts
 2. Gmail auto-trust images dari contacts
 ```
 
@@ -173,7 +173,7 @@ Hanya Gmail yang default block external images
 ### **Jika Tidak Ketemu:**
 1. **Cek Spam/Junk folder** (paling sering)
 2. **Cek tab Promotions** (Gmail auto-categorize)
-3. **Search**: `from:admin@jobmate.web.id`
+3. **Search**: `from:admin@infolokerjombang.id`
 4. **Filter by**: "Today"
 
 ---
@@ -231,7 +231,7 @@ Hanya Gmail yang default block external images
 ### **1. lib/email-notifications.ts**
 ```typescript
 // Changed FROM_EMAIL to sender name format
-from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>'
+from: 'Jobmate x Infolokerjombang <admin@infolokerjombang.id>'
 
 // Updated subject lines
 subject: isPremium 
@@ -242,7 +242,7 @@ subject: isPremium
 ### **2. lib/send-invoice-email.tsx**
 ```typescript
 // Updated sender name
-from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>'
+from: 'Jobmate x Infolokerjombang <admin@infolokerjombang.id>'
 ```
 
 ### **3. emails/UpgradeVIPEmail.tsx**
@@ -253,7 +253,7 @@ from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>'
 
 ### **4. .env.local**
 ```env
-RESEND_FROM_EMAIL=admin@jobmate.web.id
+RESEND_FROM_EMAIL=admin@infolokerjombang.id
 ```
 
 ---
@@ -269,7 +269,7 @@ RESEND_FROM_EMAIL=admin@jobmate.web.id
 ### **User Action Required:**
 1. **Enable Images di Gmail**
    - Klik "Display images" di email
-   - Atau add admin@jobmate.web.id ke Contacts
+   - Atau add admin@infolokerjombang.id ke Contacts
 
 2. **Mark as Safe**
    - Klik "Looks safe" button

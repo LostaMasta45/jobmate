@@ -226,7 +226,7 @@ export async function approveApplication(applicationId: string) {
   // Send email notification to user
   try {
     const userName = getUserDisplayName(application.full_name, application.email);
-    const loginUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://jobmate.web.id'}/sign-in`;
+    const loginUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://infolokerjombang.id'}/sign-in`;
     
     await sendAccountApprovedEmail({
       userName,
@@ -245,7 +245,7 @@ export async function approveApplication(applicationId: string) {
   if (application.telegram_chat_id) {
     await sendTelegramMessage(
       application.telegram_chat_id,
-      `✅ Pengajuan akun Anda telah disetujui!\n\nSilakan login di: ${process.env.NEXT_PUBLIC_BASE_URL || 'https://jobmate.web.id'}/sign-in\n\nEmail: ${application.email}`
+      `✅ Pengajuan akun Anda telah disetujui!\n\nSilakan login di: ${process.env.NEXT_PUBLIC_BASE_URL || 'https://infolokerjombang.id'}/sign-in\n\nEmail: ${application.email}`
     );
   }
 

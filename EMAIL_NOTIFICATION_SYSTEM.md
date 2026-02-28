@@ -101,7 +101,7 @@ await sendAccountApprovedEmail({
   userName: "John Doe",
   email: "user@example.com",
   approvedAt: new Date().toISOString(),
-  loginUrl: "https://jobmate.web.id/sign-in",
+  loginUrl: "https://infolokerjombang.id/sign-in",
 });
 
 // Send VIP upgrade email
@@ -110,7 +110,7 @@ await sendUpgradeVIPEmail({
   email: "user@example.com",
   membershipType: "vip_premium", // or "vip_basic"
   upgradedAt: new Date().toISOString(),
-  dashboardUrl: "https://jobmate.web.id/dashboard",
+  dashboardUrl: "https://infolokerjombang.id/dashboard",
 });
 ```
 
@@ -337,7 +337,7 @@ RESEND_FROM_EMAIL=JobMate <hello@yourdomain.com>
 3. **Scheduled emails** - Reminder emails otomatis
 4. **Email preferences** - User bisa opt-out notifikasi tertentu
 5. **Multi-language** - Email dalam bahasa Inggris juga
-6. **Custom domain** - `hello@jobmate.web.id` instead of `onboarding@resend.dev`
+6. **Custom domain** - `hello@infolokerjombang.id` instead of `onboarding@resend.dev`
 
 ### Priority:
 1. 🔥 **Setup custom domain** - Tingkatkan deliverability

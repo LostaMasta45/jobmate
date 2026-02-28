@@ -175,7 +175,7 @@ Jika ingin design lebih menarik, edit file:
 ```tsx
 // Tambahkan logo
 <div className="header">
-  <img src="https://jobmate.web.id/logo.png" alt="JOBMATE" style="height: 40px" />
+  <img src="https://infolokerjombang.id/logo.png" alt="JOBMATE" style="height: 40px" />
   <h1>Invoice Pembayaran</h1>
 </div>
 
@@ -279,7 +279,7 @@ Auto-deploy setelah push, atau manual di dashboard.
 
 **4. Test Production**
 ```bash
-curl -X POST https://jobmate.web.id/api/payment/create-invoice ^
+curl -X POST https://infolokerjombang.id/api/payment/create-invoice ^
   -H "Content-Type: application/json" ^
   -d "{\"plan\":\"basic\",\"email\":\"reza.nur.h45@gmail.com\",\"fullName\":\"Production Test\",\"whatsapp\":\"08123456789\"}"
 ```
@@ -295,19 +295,19 @@ curl -X POST https://jobmate.web.id/api/payment/create-invoice ^
 
 ### Production Mode (After Domain Verification)
 - ✅ Email ke siapa saja
-- ✅ Sender: `noreply@jobmate.web.id` (custom domain)
+- ✅ Sender: `noreply@infolokerjombang.id` (custom domain)
 - ✅ Rate limit: 3,000 emails/month (free tier)
 
 ### Verify Custom Domain (Optional)
 1. Dashboard Resend → **Domains** → **Add Domain**
-2. Domain: `noreply.jobmate.web.id`
+2. Domain: `noreply.infolokerjombang.id`
 3. Add DNS records di Cloudflare:
    ```
    Type: TXT | Name: _resend.noreply | Value: [given-by-resend]
    Type: MX  | Name: noreply         | Value: feedback-smtp.us-east-1.amazonses.com
    ```
 4. Wait 5-30 menit
-5. Update `.env.local`: `RESEND_FROM_EMAIL=noreply@jobmate.web.id`
+5. Update `.env.local`: `RESEND_FROM_EMAIL=noreply@infolokerjombang.id`
 
 ---
 

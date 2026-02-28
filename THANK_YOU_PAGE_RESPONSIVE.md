@@ -97,10 +97,10 @@ After:  "Terima Kasih, Budi! 🙏
 Domain routing sudah benar di `create-invoice`:
 
 ```typescript
-success_redirect_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://jobmate.web.id'}/payment/success?external_id=${externalId}`
+success_redirect_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://infolokerjombang.id'}/payment/success?external_id=${externalId}`
 ```
 
-**Result:** User redirected to **jobmate.web.id/payment/success** (bukan vercel domain) ✅
+**Result:** User redirected to **infolokerjombang.id/payment/success** (bukan vercel domain) ✅
 
 ---
 
@@ -480,7 +480,7 @@ className="p-4 sm:p-6 lg:p-10"
 ✅ **Deployed to Production**  
 ✅ **Fully Responsive**  
 ✅ **Personalized**  
-✅ **Domain: jobmate.web.id**
+✅ **Domain: infolokerjombang.id**
 
 ---
 

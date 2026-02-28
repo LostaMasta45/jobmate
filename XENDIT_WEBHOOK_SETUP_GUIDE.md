@@ -68,7 +68,7 @@ Di row **"Invoices paid"**, ada 3 kolom:
 
 **Isi Webhook URL dengan:**
 ```
-https://jobmate.web.id/api/webhooks/xendit
+https://infolokerjombang.id/api/webhooks/xendit
 ```
 
 ⚠️ **IMPORTANT:**
@@ -178,7 +178,7 @@ Setelah webhook configured dan deployed, test full flow:
 
 ### Step 1: Create Invoice
 
-1. Buka website: https://jobmate.web.id
+1. Buka website: https://infolokerjombang.id
 2. Scroll ke **Pricing Section**
 3. Klik **"Ambil Premium Sekarang!"** atau **"Mulai dengan Basic"**
 4. Isi form payment:
@@ -290,7 +290,7 @@ Checklist yang harus sukses:
 2. **Check webhook route exists:**
    ```bash
    # Test dengan curl
-   curl -X POST https://jobmate.web.id/api/webhooks/xendit \
+   curl -X POST https://infolokerjombang.id/api/webhooks/xendit \
      -H "Content-Type: application/json" \
      -d '{"test":"data"}'
    
@@ -300,9 +300,9 @@ Checklist yang harus sukses:
 
 3. **Check URL correct:**
    ```
-   ✅ https://jobmate.web.id/api/webhooks/xendit
-   ❌ https://jobmate.web.id/api/webhooks/xendit/ (trailing slash)
-   ❌ http://jobmate.web.id/api/webhooks/xendit (http instead of https)
+   ✅ https://infolokerjombang.id/api/webhooks/xendit
+   ❌ https://infolokerjombang.id/api/webhooks/xendit/ (trailing slash)
+   ❌ http://infolokerjombang.id/api/webhooks/xendit (http instead of https)
    ```
 
 ---
@@ -520,7 +520,7 @@ Setelah setup selesai, pastikan semua ini ✅:
 **Yang WAJIB disetup:**
 
 1. ✅ **Payment Links** → **Invoices paid**
-   - URL: `https://jobmate.web.id/api/webhooks/xendit`
+   - URL: `https://infolokerjombang.id/api/webhooks/xendit`
    - ✅ Notify on expired
    - ✅ Notify on late payment (optional)
 

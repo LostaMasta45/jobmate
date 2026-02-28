@@ -47,7 +47,7 @@ Upload: Sembarang gambar
 ```bash
 # 1. Login sebagai admin
 http://localhost:3000/sign-in
-Email: admin@jobmate.web.id
+Email: admin@infolokerjombang.id
 Password: (password admin)
 
 # 2. Go to Applications

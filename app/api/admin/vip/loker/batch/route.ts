@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
 
         const adminName = adminProfile?.full_name || adminProfile?.email || 'Admin';
         const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/vip`;
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jobmate.web.id';
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://infolokerjombang.id';
 
         // Prepare top jobs list
         const topJobs = results.success.map(job => ({

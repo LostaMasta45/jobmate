@@ -14,7 +14,7 @@ async function testToAnotherEmail() {
     email: testEmail,
     membershipType: 'vip_basic',
     upgradedAt: new Date().toISOString(),
-    dashboardUrl: 'https://jobmate.web.id/dashboard',
+    dashboardUrl: 'https://infolokerjombang.id/dashboard',
   });
   
   if (result.success) {

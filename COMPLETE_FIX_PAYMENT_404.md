@@ -110,7 +110,7 @@ Should return 1 row! ✅
 
 #### Step 4: Test Success Page
 
-Go to: `https://jobmate.web.id/payment/success?external_id=jobmate-premium-1761113144725`
+Go to: `https://infolokerjombang.id/payment/success?external_id=jobmate-premium-1761113144725`
 
 Should now show:
 - ✅ Confetti animation
@@ -191,7 +191,7 @@ This enables UPSERT to work properly!
 
 1. **Create payment:**
    ```
-   https://jobmate.web.id/payment
+   https://infolokerjombang.id/payment
    Email: test-premium@example.com
    Plan: VIP Premium
    ```
@@ -214,7 +214,7 @@ This enables UPSERT to work properly!
 
 5. **Success page:**
    ```
-   https://jobmate.web.id/payment/success?external_id=...
+   https://infolokerjombang.id/payment/success?external_id=...
    Should work! ✅
    ```
 

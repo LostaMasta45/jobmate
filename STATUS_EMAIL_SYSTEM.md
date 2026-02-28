@@ -4,7 +4,7 @@
 
 Semua kode sudah diupdate dan siap digunakan:
 
-- ✅ Sender email: `JOBMATE <admin@jobmate.web.id>`
+- ✅ Sender email: `JOBMATE <admin@infolokerjombang.id>`
 - ✅ Email templates professional & responsive
 - ✅ Test script ready
 - ✅ Email types: Account Approval, Invoice, VIP Upgrade
@@ -22,7 +22,7 @@ Message: Internal server error from Resend API
 ```
 
 **Root Cause:**
-Domain `jobmate.web.id` **belum sepenuhnya verified** di Resend.
+Domain `infolokerjombang.id` **belum sepenuhnya verified** di Resend.
 
 ---
 
@@ -31,7 +31,7 @@ Domain `jobmate.web.id` **belum sepenuhnya verified** di Resend.
 ### ⚠️ KAMU PERLU SETUP DNS RECORDS
 
 1. **Login ke Resend**: https://resend.com/domains
-2. **Check domain**: `jobmate.web.id`
+2. **Check domain**: `infolokerjombang.id`
 3. **Add DNS records** (SPF, DKIM, DMARC)
 4. **Verify domain** 
 5. **Wait** 15-30 menit untuk DNS propagation
@@ -76,7 +76,7 @@ npm run test-email-simple updatesumobito@gmail.com
 - `SETUP_RESEND_DOMAIN.md` - DNS setup guide
 
 ### 3. **Environment** ✅
-- `.env` updated with `admin@jobmate.web.id`
+- `.env` updated with `admin@infolokerjombang.id`
 - NPM script: `test-email-simple` ready
 
 ---
@@ -91,7 +91,7 @@ npm run test-email-simple updatesumobito@gmail.com
 Key tasks:
 1. Login ke Resend dashboard
 2. Go to Domains section  
-3. Check/add jobmate.web.id
+3. Check/add infolokerjombang.id
 4. Get DNS records from Resend
 5. Add records ke DNS provider
 6. Verify domain di Resend
@@ -132,7 +132,7 @@ Once verified, email system ready untuk:
 
 ✅ **Professional**
 - Sender: JOBMATE (bukan "onboarding")
-- Email: admin@jobmate.web.id (bukan resend.dev)
+- Email: admin@infolokerjombang.id (bukan resend.dev)
 
 ✅ **Deliverability**
 - SPF & DKIM configured

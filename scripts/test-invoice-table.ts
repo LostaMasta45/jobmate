@@ -24,7 +24,7 @@ envContent.split('\n').forEach(line => {
 });
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const fromEmail = 'Jobmate x Infolokerjombang <admin@jobmate.web.id>';
+const fromEmail = 'InfoLokerJombang <admin@infolokerjombang.id>';
 
 async function testInvoiceEmail(toEmail: string) {
   console.log('\n✨ Testing Invoice Email - TABLE LAYOUT (Gmail Compatible)\n');

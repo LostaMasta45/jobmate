@@ -4,9 +4,9 @@
 
 **Current Setup:**
 ```
-From: admin@jobmate.web.id (SAME as invoice)
+From: admin@infolokerjombang.id (SAME as invoice)
 SMTP: smtp.resend.com (SAME as invoice)
-Domain: jobmate.web.id (verified)
+Domain: infolokerjombang.id (verified)
 
 Invoice emails: ✅ Inbox
 Reset emails: ❌ Spam
@@ -65,7 +65,7 @@ Reset Your Password
 
 Invoice may have:
 ```
-List-Unsubscribe: <mailto:unsubscribe@jobmate.web.id>
+List-Unsubscribe: <mailto:unsubscribe@infolokerjombang.id>
 X-Mailer: Resend (consistent)
 Message-ID: <consistent format>
 ```
@@ -281,8 +281,8 @@ Impact: Low
 
 **Invoice Headers (working):**
 ```
-From: admin@jobmate.web.id
-Return-Path: re@jobmate.web.id
+From: admin@infolokerjombang.id
+Return-Path: re@infolokerjombang.id
 Authentication-Results: PASS
 X-Mailer: ?
 Message-ID: ?
@@ -290,8 +290,8 @@ Message-ID: ?
 
 **Reset Headers (spam):**
 ```
-From: admin@jobmate.web.id
-Return-Path: re@jobmate.web.id (should match)
+From: admin@infolokerjombang.id
+Return-Path: re@infolokerjombang.id (should match)
 Authentication-Results: PASS (should match)
 X-Mailer: ? (check if different!)
 Message-ID: ? (check if different!)

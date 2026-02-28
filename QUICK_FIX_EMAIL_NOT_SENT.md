@@ -1,6 +1,6 @@
 # ⚡ QUICK FIX: Email Tidak Terkirim di Production
 
-> **Problem**: Payment di jobmate.web.id tidak kirim email
+> **Problem**: Payment di infolokerjombang.id tidak kirim email
 > **Quick Solution**: 3 langkah cepat
 
 ## 🚀 Quick Fix (5 Menit)
@@ -53,7 +53,7 @@ Environments: ✅ Production ✅ Preview ✅ Development
 
 ### Quick Test (Via Curl)
 ```bash
-curl -X POST https://jobmate.web.id/api/payment/create-invoice ^
+curl -X POST https://infolokerjombang.id/api/payment/create-invoice ^
   -H "Content-Type: application/json" ^
   -d "{\"plan\":\"basic\",\"email\":\"reza.nur.h45@gmail.com\",\"fullName\":\"Quick Test\",\"whatsapp\":\"081234567890\"}"
 ```

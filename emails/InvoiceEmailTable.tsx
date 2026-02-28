@@ -3,8 +3,8 @@ import React from 'react';
 
 // Use Imgur CDN for reliable email logo display
 // Logo dari production URL - pastikan file ada di public/Logo/x.png
-const LOGO_PANJANG_URL = 'https://jobmate.web.id/Logo/x.png';
-const LOGO_KECIL_URL = 'https://jobmate.web.id/Logo/x.png';
+const LOGO_PANJANG_URL = 'https://infolokerjombang.id/Logo/x.png';
+const LOGO_KECIL_URL = 'https://infolokerjombang.id/Logo/x.png';
 
 interface InvoiceEmailProps {
   userName: string;
@@ -85,7 +85,7 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                               }}>
                                 <img 
                                   src={LOGO_PANJANG_URL}
-                                  alt="JOBMATE x Infolokerjombang"
+                                  alt="InfoLokerJombang"
                                   width="280"
                                   height="70"
                                   style={{
@@ -430,7 +430,7 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                       fontSize: '15px',
                       letterSpacing: '0.5px',
                     }}>
-                      JOBMATE x Infolokerjombang
+                      InfoLokerJombang
                     </p>
                     <p style={{
                       margin: '0 0 16px',
@@ -458,13 +458,13 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                           }}>
                             💬 Butuh bantuan?
                           </p>
-                          <a href="mailto:admin@jobmate.web.id" style={{
+                          <a href="mailto:admin@infolokerjombang.id" style={{
                             color: '#3977d3',
                             textDecoration: 'none',
                             fontWeight: '600',
                             fontSize: '13px',
                           }}>
-                            admin@jobmate.web.id
+                            admin@infolokerjombang.id
                           </a>
                         </td>
                       </tr>
@@ -519,9 +519,9 @@ Transfer Bank, Kartu Kredit, E-Wallet, Alfamart, Indomaret
 ⚡ PENTING: Link pembayaran ini akan kedaluwarsa pada ${new Date(expiryDate).toLocaleString('id-ID')}.
 
 ---
-Jobmate x Infolokerjombang
+InfoLokerJombang
 Platform Karir Terpercaya
 
-Butuh bantuan? admin@jobmate.web.id
+Butuh bantuan? admin@infolokerjombang.id
 © 2025 JOBMATE. All rights reserved.
 `;

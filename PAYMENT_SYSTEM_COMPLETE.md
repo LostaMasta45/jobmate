@@ -131,7 +131,7 @@ XENDIT_SECRET_KEY=xnd_test_YOUR_KEY_HERE
 XENDIT_WEBHOOK_VERIFICATION_TOKEN=YOUR_WEBHOOK_TOKEN_HERE
 
 # Required for redirects
-NEXT_PUBLIC_BASE_URL=https://jobmate.web.id
+NEXT_PUBLIC_BASE_URL=https://infolokerjombang.id
 ```
 
 **How to get:**
@@ -143,7 +143,7 @@ NEXT_PUBLIC_BASE_URL=https://jobmate.web.id
 ## ✅ Testing Checklist
 
 ### 1. Test Payment Form (Public Access)
-- [ ] Go to https://jobmate.web.id
+- [ ] Go to https://infolokerjombang.id
 - [ ] Scroll to pricing section
 - [ ] Click "Mulai dengan Basic" → Should open /payment?plan=basic (NO LOGIN!)
 - [ ] Click "Ambil Premium Sekarang" → Should open /payment?plan=premium (NO LOGIN!)

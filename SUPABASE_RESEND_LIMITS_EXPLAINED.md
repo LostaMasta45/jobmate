@@ -14,7 +14,7 @@ Workflow:
 1. Edit template → Supabase Dashboard (Auth → Email Templates)
 2. User requests reset → Supabase generates HTML from template
 3. Send email → Goes through Resend SMTP
-4. Delivered → From admin@jobmate.web.id via Resend
+4. Delivered → From admin@infolokerjombang.id via Resend
 ```
 
 ---
@@ -57,7 +57,7 @@ Cost: $0 (Free forever)
 ```
 Template: Supabase Dashboard ← STILL HERE!
 Sending: Resend SMTP infrastructure
-From: @jobmate.web.id
+From: @infolokerjombang.id
 
 Limits:
 ⚠️ Monthly emails: 3,000 (Resend Free)
@@ -110,14 +110,14 @@ Cost: $0 (Free tier Resend)
 │ 5. Resend delivers email               │
 │    - Checks monthly limit (3,000) ✅   │
 │    - Checks daily limit (100) ✅       │
-│    - Sends from: admin@jobmate.web.id  │
+│    - Sends from: admin@infolokerjombang.id  │
 │    - Uses your verified domain         │
 └──────────────┬─────────────────────────┘
                │
                ▼
 ┌────────────────────────────────────────┐
 │ 6. User receives email ✅              │
-│    From: admin@jobmate.web.id          │
+│    From: admin@infolokerjombang.id          │
 │    Via: Resend infrastructure          │
 └────────────────────────────────────────┘
 ```
@@ -131,7 +131,7 @@ Cost: $0 (Free tier Resend)
 | **Template Editing** | Supabase Dashboard | Supabase Dashboard ✅ (SAME!) |
 | **Email Generation** | Supabase | Supabase ✅ (SAME!) |
 | **SMTP Delivery** | Supabase servers | Resend servers |
-| **From Address** | @mail.app.supabase.io | @jobmate.web.id ✅ |
+| **From Address** | @mail.app.supabase.io | @infolokerjombang.id ✅ |
 | **Monthly Limit** | Unlimited ✅ | 3,000 (free) ⚠️ |
 | **Daily Limit** | None ✅ | 100 (free) ⚠️ |
 | **Rate Limit** | 4/hour per email | 4/hour per email (SAME!) |
@@ -256,7 +256,7 @@ Status: NO ISSUES! All limits are safe! 🎉
    Resend: Checks daily/monthly limits
    Resend: Sends email via SMTP
    Resend: Tracks delivery status
-   User: Receives email from @jobmate.web.id
+   User: Receives email from @infolokerjombang.id
    ```
 
 **You never edit anything in Resend!**
@@ -332,7 +332,7 @@ NO! You now have Resend limits:
 Before (Supabase default): Unlimited
 After (Resend SMTP): 3,000/month limit
 
-BUT you get custom domain @jobmate.web.id!
+BUT you get custom domain @infolokerjombang.id!
 ```
 
 ---
@@ -364,7 +364,7 @@ Cons:
 Cost: $0/month
 Monthly emails: 3,000
 Daily emails: 100
-From: @jobmate.web.id
+From: @infolokerjombang.id
 Rate limit: 4/hour per user
 
 Pros:
@@ -385,7 +385,7 @@ Cons:
 Cost: $20/month
 Monthly emails: 50,000
 Daily emails: Unlimited
-From: @jobmate.web.id
+From: @infolokerjombang.id
 Rate limit: 4/hour per user
 
 Pros:
@@ -462,7 +462,7 @@ A: BOTH! ✅
 3. **Email delivery:** Goes through Resend SMTP
 4. **Rate limits:** Supabase controls (4/hour per email)
 5. **Volume limits:** Resend controls (3,000/month, 100/day)
-6. **From address:** Your domain (@jobmate.web.id)
+6. **From address:** Your domain (@infolokerjombang.id)
 7. **Cost:** $0 for free tier (enough for most cases)
 
 ---

@@ -526,7 +526,7 @@ export default function InvoicePreviewV2() {
             marginBottom: '8px',
             fontSize: '15px'
           }}>
-            Jobmate x Infolokerjombang
+            InfoLokerJombang
           </div>
           <div style={{
             color: theme.textSecondary,
@@ -542,14 +542,14 @@ export default function InvoicePreviewV2() {
           }}>
             Butuh bantuan?{' '}
             <a 
-              href="mailto:admin@jobmate.web.id" 
+              href="mailto:admin@infolokerjombang.id" 
               style={{ 
                 color: colors.primary.mariner, 
                 textDecoration: 'none',
                 fontWeight: 600
               }}
             >
-              admin@jobmate.web.id
+              admin@infolokerjombang.id
             </a>
           </div>
           <div style={{

@@ -57,14 +57,14 @@ Pastikan variabel berikut sudah diset:
 ```env
 # Resend
 RESEND_API_KEY=re_xxxxxxxxxxxxx
-RESEND_FROM_EMAIL=admin@jobmate.web.id
+RESEND_FROM_EMAIL=admin@infolokerjombang.id
 
 # Supabase (untuk Admin API)
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJxxxx...
 
 # Base URL
-NEXT_PUBLIC_BASE_URL=https://jobmate.web.id
+NEXT_PUBLIC_BASE_URL=https://infolokerjombang.id
 ```
 
 ## File Structure

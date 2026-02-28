@@ -17,7 +17,7 @@ async function testAllEmails(toEmail: string) {
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
   
   console.log('📨 Target Email:', toEmail);
-  console.log('📤 Sender: JOBMATE <admin@jobmate.web.id>\n');
+  console.log('📤 Sender: InfoLokerJombang <admin@infolokerjombang.id>\n');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
   const testUser = {
@@ -39,7 +39,7 @@ async function testAllEmails(toEmail: string) {
     
     if (result1.success) {
       console.log('   ✅ Account Pending Email sent!');
-      console.log(`   📧 Subject: ⏳ Jobmate X infolokerjombang - Pengajuan Akun Sedang Diproses\n`);
+      console.log(`   📧 Subject: ⏳ InfoLokerJombang - Pengajuan Akun Sedang Diproses\n`);
       successCount++;
     } else {
       console.log('   ❌ Failed:', result1.error);
@@ -60,12 +60,12 @@ async function testAllEmails(toEmail: string) {
       userName: testUser.name,
       email: testUser.email,
       approvedAt: new Date().toISOString(),
-      loginUrl: 'https://jobmate.web.id/sign-in',
+      loginUrl: 'https://infolokerjombang.id/sign-in',
     });
     
     if (result2.success) {
       console.log('   ✅ Account Approved Email sent!');
-      console.log(`   📧 Subject: 🎉 Jobmate X infolokerjombang - Akun Anda Disetujui!\n`);
+      console.log(`   📧 Subject: 🎉 InfoLokerJombang - Akun Anda Disetujui!\n`);
       successCount++;
     } else {
       console.log('   ❌ Failed:', result2.error);
@@ -86,12 +86,12 @@ async function testAllEmails(toEmail: string) {
       email: testUser.email,
       membershipType: 'vip_basic',
       upgradedAt: new Date().toISOString(),
-      dashboardUrl: 'https://jobmate.web.id/vip',
+      dashboardUrl: 'https://infolokerjombang.id/vip',
     });
     
     if (result3.success) {
       console.log('   ✅ VIP Basic Upgrade Email sent!');
-      console.log(`   📧 Subject: ⭐ Jobmate X infolokerjombang - Selamat Anda VIP Basic!\n`);
+      console.log(`   📧 Subject: ⭐ InfoLokerJombang - Selamat Anda VIP Basic!\n`);
       successCount++;
     } else {
       console.log('   ❌ Failed:', result3.error);
@@ -112,12 +112,12 @@ async function testAllEmails(toEmail: string) {
       email: testUser.email,
       membershipType: 'vip_premium',
       upgradedAt: new Date().toISOString(),
-      dashboardUrl: 'https://jobmate.web.id/vip',
+      dashboardUrl: 'https://infolokerjombang.id/vip',
     });
     
     if (result4.success) {
       console.log('   ✅ VIP Premium Upgrade Email sent!');
-      console.log(`   📧 Subject: 👑 Jobmate X infolokerjombang - Selamat Anda VIP Premium!\n`);
+      console.log(`   📧 Subject: 👑 InfoLokerJombang - Selamat Anda VIP Premium!\n`);
       successCount++;
     } else {
       console.log('   ❌ Failed:', result4.error);
@@ -148,7 +148,7 @@ async function testAllEmails(toEmail: string) {
     
     if (result5.success) {
       console.log('   ✅ Invoice Email sent!');
-      console.log(`   📧 Subject: 💰 Jobmate X infolokerjombang - Invoice VIP Basic - 1 Bulan\n`);
+      console.log(`   📧 Subject: 💰 InfoLokerJombang - Invoice VIP Basic - 1 Bulan\n`);
       successCount++;
     } else {
       console.log('   ❌ Failed:', result5.error);

@@ -10,7 +10,7 @@ interface UpgradeVIPEmailProps {
 }
 
 // Logo dari production URL - pastikan file ada di public/Logo/x.png
-const LOGO_URL = 'https://jobmate.web.id/Logo/x.png';
+const LOGO_URL = 'https://infolokerjombang.id/Logo/x.png';
 
 export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
   userName,
@@ -89,7 +89,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                               }}>
                                 <img 
                                   src={LOGO_URL}
-                                  alt="JOBMATE x Infolokerjombang"
+                                  alt="InfoLokerJombang"
                                   width="280"
                                   height="70"
                                   style={{
@@ -625,7 +625,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                       fontSize: '15px',
                       letterSpacing: '0.5px',
                     }}>
-                      JOBMATE x Infolokerjombang
+                      InfoLokerJombang
                     </p>
                     <p style={{
                       margin: '0 0 16px',

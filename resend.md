@@ -1,9 +1,9 @@
 # Tutorial Lengkap Integrasi Resend.com dengan Xendit di JOBMATE
 
-> 🎯 **Tujuan**: Kirim email invoice otomatis saat user membuat pembayaran & email konfirmasi saat pembayaran berhasil di **jobmate.web.id**
+> 🎯 **Tujuan**: Kirim email invoice otomatis saat user membuat pembayaran & email konfirmasi saat pembayaran berhasil di **infolokerjombang.id**
 
 ## Status Project
-- ✅ Xendit payment sudah jalan di jobmate.web.id
+- ✅ Xendit payment sudah jalan di infolokerjombang.id
 - ✅ Create invoice API sudah ada: `app/api/payment/create-invoice/route.ts`
 - ✅ Webhook Xendit sudah ada: `app/api/webhooks/xendit/route.ts`
 - ⏳ **Tinggal tambahkan Resend untuk email notification**
@@ -49,7 +49,7 @@
 4. Sekarang email Anda bisa terima test emails! ✅
 
 ### Step 1.4: Verifikasi Domain (Optional - Skip dulu untuk testing)
-> Untuk production, gunakan domain custom `noreply@jobmate.web.id`
+> Untuk production, gunakan domain custom `noreply@infolokerjombang.id`
 
 **Untuk sekarang, gunakan sender default:**
 ```bash
@@ -58,10 +58,10 @@ From: onboarding@resend.dev  # ← Sender untuk development/testing
 
 **Nanti untuk production (optional):**
 1. Dashboard Resend > **"Domains"** > **"Add Domain"**
-2. Domain: `noreply.jobmate.web.id` atau `mail.jobmate.web.id`
+2. Domain: `noreply.infolokerjombang.id` atau `mail.infolokerjombang.id`
 3. Add DNS records di Cloudflare (akan dikasih instruksi)
 4. Wait 5-30 menit untuk verification
-5. Ubah sender jadi: `noreply@jobmate.web.id`
+5. Ubah sender jadi: `noreply@infolokerjombang.id`
 
 **💡 Tip**: Mulai dengan `onboarding@resend.dev`, upgrade domain nanti setelah testing berhasil!
 
@@ -645,7 +645,7 @@ git push origin main
 ### Step 7.4: Test Production API
 ```bash
 # Test create invoice
-curl -X POST https://jobmate.web.id/api/payment/create-invoice \
+curl -X POST https://infolokerjombang.id/api/payment/create-invoice \
   -H "Content-Type: application/json" \
   -d '{
     "plan": "basic",
@@ -676,22 +676,22 @@ https://resend.com/emails
 > Untuk production professional, gunakan domain sendiri
 
 **Benefit:**
-- Email dari: `noreply@jobmate.web.id` (bukan onboarding@resend.dev)
+- Email dari: `noreply@infolokerjombang.id` (bukan onboarding@resend.dev)
 - Better deliverability & trust
 - No rate limits untuk verified domain
 
 **Steps:**
 1. Resend Dashboard > **"Domains"** > **"Add Domain"**
-2. Domain: `noreply.jobmate.web.id`
+2. Domain: `noreply.infolokerjombang.id`
 3. Add DNS Records di **Cloudflare** (or domain provider):
    ```
-   Type: TXT   | Name: _resend.noreply.jobmate.web.id | Value: [provided-by-resend]
-   Type: MX    | Name: noreply.jobmate.web.id         | Value: feedback-smtp.us-east-1.amazonses.com
-   Type: TXT   | Name: noreply.jobmate.web.id         | Value: [DKIM-key]
+   Type: TXT   | Name: _resend.noreply.infolokerjombang.id | Value: [provided-by-resend]
+   Type: MX    | Name: noreply.infolokerjombang.id         | Value: feedback-smtp.us-east-1.amazonses.com
+   Type: TXT   | Name: noreply.infolokerjombang.id         | Value: [DKIM-key]
    ```
 4. Wait 5-30 menit untuk DNS propagation
 5. Verify di Resend dashboard
-6. Update Vercel env: `RESEND_FROM_EMAIL=noreply@jobmate.web.id`
+6. Update Vercel env: `RESEND_FROM_EMAIL=noreply@infolokerjombang.id`
 7. Redeploy
 
 ---
@@ -755,7 +755,7 @@ npm run dev
 - Mark email as "Not Spam" di Gmail
 
 **Fix untuk Production:**
-1. Verifikasi domain custom (noreply@jobmate.web.id)
+1. Verifikasi domain custom (noreply@infolokerjombang.id)
 2. Setup SPF, DKIM, DMARC DNS records
 3. Warm up email sending (start kecil)
 4. Monitor bounce rate di: https://resend.com/emails
@@ -775,7 +775,7 @@ https://vercel.com/your-username/jobmate/logs
 # Pastikan ada kode send email di dalam if (status === 'PAID')
 
 # 3. Test webhook manually
-curl -X POST https://jobmate.web.id/api/webhooks/xendit \
+curl -X POST https://infolokerjombang.id/api/webhooks/xendit \
   -H "x-callback-token: YOUR_WEBHOOK_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"external_id":"test-123","status":"PAID","payer_email":"test@example.com"}'
@@ -871,7 +871,7 @@ DEPLOY PRODUCTION
 [ ] 25. Monitor logs: vercel.com & resend.com/emails
 
 OPTIONAL (Later)
-[ ] 26. Verify custom domain noreply@jobmate.web.id
+[ ] 26. Verify custom domain noreply@infolokerjombang.id
 [ ] 27. Update RESEND_FROM_EMAIL to custom domain
 [ ] 28. Redeploy & test
 ```
@@ -902,7 +902,7 @@ OPTIONAL (Later)
 
 ## Next Steps (Optional)
 
-1. **Custom Domain** - Verifikasi `noreply@jobmate.web.id`
+1. **Custom Domain** - Verifikasi `noreply@infolokerjombang.id`
 2. **Email Templates** - Design lebih menarik dengan React Email
 3. **Email Tracking** - Monitor open/click rates
 4. **Reminder Emails** - Kirim reminder sebelum invoice expire
@@ -956,7 +956,7 @@ OPTIONAL (Later)
    - Receipt PDF attachment
 
 3. **Verify Custom Domain**
-   - Setup `noreply@jobmate.web.id`
+   - Setup `noreply@infolokerjombang.id`
    - Better deliverability & professional appearance
    - No rate limits
 

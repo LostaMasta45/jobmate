@@ -39,7 +39,7 @@
 
 ---
 
-### 2. ✅ **Redirect ke vercel.app (bukan jobmate.web.id)**
+### 2. ✅ **Redirect ke vercel.app (bukan infolokerjombang.id)**
 
 **Problem:**
 User report URL masih:
@@ -52,7 +52,7 @@ https://jobmate-ivory.vercel.app/payment/success?external_id=...
 
 Code di `create-invoice/route.ts` sudah benar:
 ```typescript
-success_redirect_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://jobmate.web.id'}/payment/success?external_id=${externalId}`
+success_redirect_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://infolokerjombang.id'}/payment/success?external_id=${externalId}`
 ```
 
 Tapi karena env var undefined, fallback ke hardcoded URL tidak berfungsi di preview deployments.
@@ -61,19 +61,19 @@ Tapi karena env var undefined, fallback ke hardcoded URL tidak berfungsi di prev
 
 1. **Updated `.env.local`** (local development):
 ```bash
-NEXT_PUBLIC_BASE_URL=https://jobmate.web.id
+NEXT_PUBLIC_BASE_URL=https://infolokerjombang.id
 ```
 
 2. **Created `VERCEL_ENV_SETUP.md`** dengan instruksi lengkap:
    - Login ke Vercel Dashboard
    - Settings → Environment Variables
-   - Add: `NEXT_PUBLIC_BASE_URL` = `https://jobmate.web.id`
+   - Add: `NEXT_PUBLIC_BASE_URL` = `https://infolokerjombang.id`
    - Select **ALL** environments
    - Save & Redeploy
 
 3. **Testing:**
    - After setting env var, test payment
-   - Redirect URL should be: `https://jobmate.web.id/payment/success`
+   - Redirect URL should be: `https://infolokerjombang.id/payment/success`
    - NOT: `https://jobmate-ivory.vercel.app/payment/success`
 
 **Status:** ⚠️ **ACTION REQUIRED** - You must set this in Vercel Dashboard!
@@ -234,11 +234,11 @@ useEffect(() => {
 **⚠️ IMPORTANT: You must set env var first!**
 - [ ] Go to Vercel Dashboard
 - [ ] Settings → Environment Variables
-- [ ] Add `NEXT_PUBLIC_BASE_URL` = `https://jobmate.web.id`
+- [ ] Add `NEXT_PUBLIC_BASE_URL` = `https://infolokerjombang.id`
 - [ ] Select ALL environments
 - [ ] Save & Redeploy
 - [ ] Test payment and check URL
-- [ ] Should redirect to: `https://jobmate.web.id/payment/success`
+- [ ] Should redirect to: `https://infolokerjombang.id/payment/success`
 - [ ] NOT: `https://jobmate-ivory.vercel.app/payment/success`
 
 ### Test 3: User Name Display
@@ -294,7 +294,7 @@ useEffect(() => {
 4. Click "Add New"
 5. Add:
    - **Key:** `NEXT_PUBLIC_BASE_URL`
-   - **Value:** `https://jobmate.web.id`
+   - **Value:** `https://infolokerjombang.id`
    - **Environment:** Select **ALL** (Production, Preview, Development)
 6. Click **Save**
 7. Go to Deployments tab
@@ -303,7 +303,7 @@ useEffect(() => {
 10. Wait ~2 minutes
 
 **After redeployment:**
-- All payment redirects will use jobmate.web.id ✅
+- All payment redirects will use infolokerjombang.id ✅
 - No more vercel.app URLs ✅
 
 ---

@@ -27,7 +27,7 @@ async function testEmail() {
               <p>This is a test email to verify that Resend integration is working correctly.</p>
               <div style="background: white; padding: 20px; border-radius: 6px; margin: 20px 0;">
                 <h2>✨ Integration Details</h2>
-                <p><strong>Project:</strong> JOBMATE (jobmate.web.id)</p>
+                <p><strong>Project:</strong> JOBMATE (infolokerjombang.id)</p>
                 <p><strong>Service:</strong> Resend Email API</p>
                 <p><strong>Status:</strong> <span style="color: #10B981; font-weight: bold;">Active ✓</span></p>
               </div>

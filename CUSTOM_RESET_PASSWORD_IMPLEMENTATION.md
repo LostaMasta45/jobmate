@@ -231,7 +231,7 @@ export async function POST(request: NextRequest) {
     );
     
     const { error: emailError } = await resend.emails.send({
-      from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>',
+      from: 'Jobmate x Infolokerjombang <admin@infolokerjombang.id>',
       to: email,
       subject: '🔐 Reset Password Akun JobMate Anda',
       html: emailHtml,

@@ -47,7 +47,7 @@ Ada 2 kemungkinan:
 3. **Go to:** Settings → Webhooks
 4. **Check webhook URL:**
    ```
-   Expected: https://jobmate.web.id/api/webhooks/xendit
+   Expected: https://infolokerjombang.id/api/webhooks/xendit
    Status: Should be ✅ Enabled
    ```
 
@@ -154,7 +154,7 @@ WHERE external_id = 'jobmate-basic-1761112019187';
    XENDIT_SECRET_KEY=xnd_test_xxxxxxxxxxxxx
    XENDIT_WEBHOOK_VERIFICATION_TOKEN=<your_token>
    SUPABASE_SERVICE_ROLE_KEY=<your_key>
-   NEXT_PUBLIC_BASE_URL=https://jobmate.web.id
+   NEXT_PUBLIC_BASE_URL=https://infolokerjombang.id
    ```
 
 3. **If missing, add them:**
@@ -169,7 +169,7 @@ WHERE external_id = 'jobmate-basic-1761112019187';
 **Force Xendit to resend webhook:**
 
 1. **Xendit Dashboard → Settings → Webhooks**
-2. **Find webhook:** `https://jobmate.web.id/api/webhooks/xendit`
+2. **Find webhook:** `https://infolokerjombang.id/api/webhooks/xendit`
 3. **Look for:** "Test" or "Send Test Event" button
 4. **Or resend failed delivery:**
    - Go to webhook logs
@@ -186,7 +186,7 @@ WHERE external_id = 'jobmate-basic-1761112019187';
 
 **Current URL should be:**
 ```
-https://jobmate.web.id/api/webhooks/xendit
+https://infolokerjombang.id/api/webhooks/xendit
 ```
 
 **NOT:**
@@ -231,7 +231,7 @@ https://jobmate.web.id/api/webhooks/xendit
 
 1. **Create new payment:**
    ```
-   https://jobmate.web.id/payment
+   https://infolokerjombang.id/payment
    Use different email (to avoid duplicate)
    ```
 
@@ -251,7 +251,7 @@ https://jobmate.web.id/api/webhooks/xendit
 
 5. **Go to success page:**
    ```
-   https://jobmate.web.id/payment/success?external_id=jobmate-basic-xxx
+   https://infolokerjombang.id/payment/success?external_id=jobmate-basic-xxx
    ```
 
 6. **Should work!** ✅

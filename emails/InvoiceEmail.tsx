@@ -709,10 +709,10 @@ export const InvoiceEmail: React.FC<InvoiceEmailProps> = ({
           
           {/* Footer */}
           <div className="footer">
-            <div className="footer-brand">Jobmate x Infolokerjombang</div>
+            <div className="footer-brand">InfoLokerJombang</div>
             <div className="footer-text">Platform Karir Terpercaya</div>
             <div className="footer-text">
-              Butuh bantuan? Hubungi <a href="mailto:admin@jobmate.web.id" className="footer-link">admin@jobmate.web.id</a>
+              Butuh bantuan? Hubungi <a href="mailto:admin@infolokerjombang.id" className="footer-link">admin@infolokerjombang.id</a>
             </div>
             <div className="footer-text" style={{ marginTop: 12 }}>
               © 2025 JOBMATE. All rights reserved.

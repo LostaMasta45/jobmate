@@ -2,7 +2,7 @@
  * Test Email Send Script
  * 
  * Script untuk test kirim email ke alamat email manapun
- * Menggunakan domain verified: jobmate.web.id
+ * Menggunakan domain verified: infolokerjombang.id
  * 
  * Usage:
  *   npm run test-email your-email@example.com
@@ -19,7 +19,7 @@ async function sendTestEmail(toEmail: string) {
   
   console.log('📧 From:', FROM_EMAIL);
   console.log('📨 To:', toEmail);
-  console.log('🌐 Domain: jobmate.web.id (Verified ✅)\n');
+  console.log('🌐 Domain: infolokerjombang.id (Verified ✅)\n');
   
   try {
     console.log('📤 Sending test email...\n');
@@ -73,7 +73,7 @@ async function sendTestEmail(toEmail: string) {
                       </h3>
                       
                       <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-                        Ini adalah email test untuk memverifikasi bahwa sistem email JOBMATE sudah berjalan dengan sempurna menggunakan <strong>domain verified jobmate.web.id</strong>.
+                        Ini adalah email test untuk memverifikasi bahwa sistem email JOBMATE sudah berjalan dengan sempurna menggunakan <strong>domain verified infolokerjombang.id</strong>.
                       </p>
                       
                       <!-- Info Box -->
@@ -88,7 +88,7 @@ async function sendTestEmail(toEmail: string) {
                           </tr>
                           <tr>
                             <td style="padding: 8px 0; color: #6b7280; font-size: 14px;"><strong>Email:</strong></td>
-                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; text-align: right;">admin@jobmate.web.id</td>
+                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; text-align: right;">admin@infolokerjombang.id</td>
                           </tr>
                           <tr>
                             <td style="padding: 8px 0; color: #6b7280; font-size: 14px;"><strong>Domain:</strong></td>
@@ -118,7 +118,7 @@ async function sendTestEmail(toEmail: string) {
                       
                       <!-- CTA Button -->
                       <div style="text-align: center; margin: 40px 0 20px 0;">
-                        <a href="https://jobmate.web.id" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; padding: 14px 36px; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <a href="https://infolokerjombang.id" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; padding: 14px 36px; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                           Kunjungi JOBMATE
                         </a>
                       </div>
@@ -137,7 +137,7 @@ async function sendTestEmail(toEmail: string) {
                         <strong>JOBMATE</strong> - Platform Karir Terpercaya Indonesia
                       </p>
                       <p style="margin: 0; color: #9ca3af; font-size: 12px;">
-                        Email dikirim dari: admin@jobmate.web.id
+                        Email dikirim dari: admin@infolokerjombang.id
                       </p>
                       <p style="margin: 10px 0 0 0; color: #9ca3af; font-size: 12px;">
                         © ${new Date().getFullYear()} JOBMATE. All rights reserved.
@@ -162,8 +162,8 @@ Ini adalah email test untuk memverifikasi bahwa sistem email JOBMATE sudah berja
 
 Detail Setup:
 - Sender: JOBMATE
-- Email: admin@jobmate.web.id
-- Domain: jobmate.web.id (Verified)
+- Email: admin@infolokerjombang.id
+- Domain: infolokerjombang.id (Verified)
 - Service: Resend
 
 Fitur Email System:
@@ -178,7 +178,7 @@ Jika kamu menerima email ini, berarti sistem email sudah berfungsi sempurna! �
 
 ---
 JOBMATE - Platform Karir Terpercaya Indonesia
-Email dikirim dari: admin@jobmate.web.id
+Email dikirim dari: admin@infolokerjombang.id
 © ${new Date().getFullYear()} JOBMATE. All rights reserved.
       `.trim(),
       tags: [

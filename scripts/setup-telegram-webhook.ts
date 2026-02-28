@@ -33,7 +33,7 @@ function loadEnv() {
 loadEnv();
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const APP_URL = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://jobmate.web.id';
+const APP_URL = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://infolokerjombang.id';
 const WEBHOOK_URL = `${APP_URL}/api/telegram-webhook`;
 
 async function setWebhook() {

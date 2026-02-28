@@ -10,21 +10,21 @@
 
 #### Test 1: SPF Record
 ```
-Domain: jobmate.web.id
+Domain: infolokerjombang.id
 Type: TXT
 Look for: v=spf1 include:_spf.resend.com ~all
 ```
 
 #### Test 2: DKIM Record
 ```
-Domain: resend._domainkey.jobmate.web.id
+Domain: resend._domainkey.infolokerjombang.id
 Type: TXT
 Look for: v=DKIM1; k=rsa; p=MIGfMA0...
 ```
 
 #### Test 3: DMARC Record
 ```
-Domain: _dmarc.jobmate.web.id
+Domain: _dmarc.infolokerjombang.id
 Type: TXT
 Look for: v=DMARC1; p=...
 ```
@@ -94,7 +94,7 @@ Current Value: v=DMARC1; p=none; ...
 ```
 Type: TXT
 Name: _dmarc
-New Value: v=DMARC1; p=quarantine; rua=mailto:postmaster@jobmate.web.id; pct=100; adkim=s; aspf=s
+New Value: v=DMARC1; p=quarantine; rua=mailto:postmaster@infolokerjombang.id; pct=100; adkim=s; aspf=s
 ```
 
 **Save**

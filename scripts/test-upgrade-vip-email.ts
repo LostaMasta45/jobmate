@@ -4,7 +4,7 @@ import { sendUpgradeVIPEmail } from '../lib/email-notifications';
 async function testUpgradeVIPEmail() {
   console.log('🧪 Testing Upgrade VIP Email...\n');
   
-  // Domain jobmate.web.id sudah verified, bisa kirim ke email mana saja!
+  // Domain infolokerjombang.id sudah verified, bisa kirim ke email mana saja!
   const testEmail = 'updatesumobito@gmail.com';
   const userName = 'Update Sumobito';
   
@@ -18,7 +18,7 @@ async function testUpgradeVIPEmail() {
     email: testEmail,
     membershipType: 'vip_basic',
     upgradedAt: new Date().toISOString(),
-    dashboardUrl: 'https://jobmate.web.id/dashboard',
+    dashboardUrl: 'https://infolokerjombang.id/dashboard',
   });
   
   if (resultBasic.success) {
@@ -40,7 +40,7 @@ async function testUpgradeVIPEmail() {
     email: testEmail,
     membershipType: 'vip_premium',
     upgradedAt: new Date().toISOString(),
-    dashboardUrl: 'https://jobmate.web.id/dashboard',
+    dashboardUrl: 'https://infolokerjombang.id/dashboard',
   });
   
   if (resultPremium.success) {

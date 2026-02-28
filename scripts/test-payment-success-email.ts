@@ -54,7 +54,7 @@ async function main() {
 
     try {
         const result = await resend.emails.send({
-            from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>',
+            from: 'InfoLokerJombang <admin@infolokerjombang.id>',
             to: email,
             subject: '✅ Pembayaran VIP Premium Berhasil - JOBMATE',
             html: emailHtml,

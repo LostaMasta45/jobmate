@@ -1,6 +1,6 @@
 # 🔍 Debug: Email Tidak Terkirim di Production
 
-> **Issue**: User sudah test payment di jobmate.web.id, tapi email tidak terkirim ke reza.nur.h45@gmail.com
+> **Issue**: User sudah test payment di infolokerjombang.id, tapi email tidak terkirim ke reza.nur.h45@gmail.com
 > **Date**: October 24, 2025
 
 ## ✅ Yang Sudah Dikonfirmasi
@@ -155,7 +155,7 @@ Environment: ✅ Production ✅ Preview ✅ Development
 ### Test 1: Direct API Call (Verify Backend)
 ```bash
 # From any terminal/command prompt
-curl -X POST https://jobmate.web.id/api/payment/create-invoice \
+curl -X POST https://infolokerjombang.id/api/payment/create-invoice \
   -H "Content-Type: application/json" \
   -d "{\"plan\":\"basic\",\"email\":\"reza.nur.h45@gmail.com\",\"fullName\":\"Debug Test\",\"whatsapp\":\"081234567890\"}"
 ```
@@ -175,7 +175,7 @@ curl -X POST https://jobmate.web.id/api/payment/create-invoice \
 - Error message in response will give clue
 
 ### Test 2: Via Browser (Full User Flow)
-1. Buka https://jobmate.web.id
+1. Buka https://infolokerjombang.id
 2. Scroll ke pricing section
 3. Click "Mulai dengan Basic"
 4. Fill form:

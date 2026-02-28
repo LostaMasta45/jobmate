@@ -208,7 +208,7 @@ https://i.ibb.co/[hash]/logo.png
 
 **Option 3: Domain Sendiri**
 ```
-https://jobmate.web.id/assets/logo.png
+https://infolokerjombang.id/assets/logo.png
 ```
 
 **Option 4: Base64 (Inline)**

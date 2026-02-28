@@ -20,11 +20,11 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams) {
     const emailHtml: string = await render(<InvoiceEmailTable {...params} />);
     const emailText: string = InvoiceEmailTableText(params);
 
-    // No attachments needed - logos loaded from production URL (jobmate.web.id)
+    // No attachments needed - logos loaded from production URL (infolokerjombang.id)
     const { data, error } = await resend.emails.send({
-      from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>',
+      from: 'InfoLokerJombang <admin@infolokerjombang.id>',
       to: params.toEmail,
-      subject: `💳 Invoice Pembayaran ${params.description} - Jobmate`,
+      subject: `💳 Invoice Pembayaran ${params.description} - InfoLokerJombang`,
       html: emailHtml,
       text: emailText,
       // Optional: tags untuk tracking

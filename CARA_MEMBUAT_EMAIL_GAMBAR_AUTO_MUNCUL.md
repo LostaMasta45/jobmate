@@ -51,7 +51,7 @@ Value: [provided by Resend]
 ```
 Type: TXT
 Name: _dmarc
-Value: v=DMARC1; p=none; rua=mailto:admin@jobmate.web.id
+Value: v=DMARC1; p=none; rua=mailto:admin@infolokerjombang.id
 ```
 
 ### Step 2: Warm Up Domain
@@ -102,7 +102,7 @@ const LOGO_URL = 'https://i.imgur.com/1KlCKWl.png';
 Your current setup actually works:
 ```tsx
 // If site deployed on Vercel
-const LOGO_URL = 'https://jobmate.web.id/Logo/logopanjang.png';
+const LOGO_URL = 'https://infolokerjombang.id/Logo/logopanjang.png';
 ```
 
 ### Step 4: Gmail Auto-Display Triggers
@@ -114,7 +114,7 @@ const LOGO_URL = 'https://jobmate.web.id/Logo/logopanjang.png';
 - Future emails will auto-display images
 
 **Option 2: User Clicks "Always Display"**
-- Gmail shows prompt: "Always display images from admin@jobmate.web.id"
+- Gmail shows prompt: "Always display images from admin@infolokerjombang.id"
 - Click once = all future emails auto-display
 
 **Option 3: Build Sender Reputation**
@@ -149,15 +149,15 @@ const LOGO_URL = 'https://jobmate.web.id/Logo/logopanjang.png';
 2. **Setup Email Authentication**
    ```bash
    # Check current DNS
-   nslookup -type=TXT jobmate.web.id
-   nslookup -type=TXT _spf.jobmate.web.id
+   nslookup -type=TXT infolokerjombang.id
+   nslookup -type=TXT _spf.infolokerjombang.id
    
    # Add SPF, DKIM, DMARC records
    ```
 
 3. **Verify Resend Domain**
    - Go to Resend dashboard
-   - Add custom domain: jobmate.web.id
+   - Add custom domain: infolokerjombang.id
    - Add DNS records they provide
    - Verify domain
 
@@ -186,7 +186,7 @@ const LOGO_URL = 'https://jobmate.web.id/Logo/logopanjang.png';
 **Gmail Desktop:**
 1. Open email from JOBMATE
 2. Click "Display images below" link
-3. Click "Always display images from admin@jobmate.web.id"
+3. Click "Always display images from admin@infolokerjombang.id"
 
 **Gmail Mobile:**
 1. Settings → General Settings

@@ -20,7 +20,7 @@ Kirim Email Ke:
 ✅ Email yang verified di Resend → BISA
 
 Example:
-✅ admin@jobmate.web.id (jika sudah add di Resend)
+✅ admin@infolokerjombang.id (jika sudah add di Resend)
 ✅ your-email@gmail.com (jika sudah add di Resend)
 ❌ random-user@gmail.com → REJECTED!
 ❌ customer@yahoo.com → REJECTED!
@@ -36,7 +36,7 @@ Example:
 ### 🟢 Production Mode - UNLIMITED ✅
 ```
 Status: Production Ready
-Domain: jobmate.web.id (VERIFIED)
+Domain: infolokerjombang.id (VERIFIED)
 
 Kirim Email Ke:
 ✅ SEMUA email di dunia! 🌍
@@ -71,7 +71,7 @@ Login dengan account kamu
 ```
 1. Klik "Domains" di sidebar
 2. Klik "Add Domain"
-3. Enter: jobmate.web.id
+3. Enter: infolokerjombang.id
 4. Klik "Add"
 ```
 
@@ -96,14 +96,14 @@ Resend akan show 3 DNS records:
 3. DMARC Record (TXT) - Optional tapi recommended
    Type: TXT
    Name: _dmarc
-   Value: v=DMARC1; p=none; rua=mailto:dmarc@jobmate.web.id
+   Value: v=DMARC1; p=none; rua=mailto:dmarc@infolokerjombang.id
 ```
 
 ---
 
 ### Step 4: Add DNS Records ke Domain Provider
 
-**Dimana jobmate.web.id didaftarkan?**
+**Dimana infolokerjombang.id didaftarkan?**
 - Niagahoster?
 - Cloudflare?
 - Namecheap?
@@ -113,7 +113,7 @@ Resend akan show 3 DNS records:
 
 ```
 1. Login ke Cloudflare
-2. Select domain: jobmate.web.id
+2. Select domain: infolokerjombang.id
 3. Klik "DNS"
 4. Klik "Add record"
 
@@ -134,7 +134,7 @@ Record 2 (DKIM):
 Record 3 (DMARC):
   Type: TXT
   Name: _dmarc
-  Content: v=DMARC1; p=none; rua=mailto:dmarc@jobmate.web.id
+  Content: v=DMARC1; p=none; rua=mailto:dmarc@infolokerjombang.id
   TTL: Auto
   [Save]
 ```
@@ -146,7 +146,7 @@ Record 3 (DMARC):
 ```
 1. Kembali ke Resend Dashboard
 2. Klik "Domains"
-3. Klik "Verify" di jobmate.web.id
+3. Klik "Verify" di infolokerjombang.id
 4. Resend akan check DNS records
 ```
 
@@ -174,17 +174,17 @@ RESEND_FROM_EMAIL=onboarding@resend.dev
 
 **After (Production):**
 ```
-RESEND_FROM_EMAIL=noreply@jobmate.web.id
+RESEND_FROM_EMAIL=noreply@infolokerjombang.id
 ```
 
 **Or custom:**
 ```
-RESEND_FROM_EMAIL=info@jobmate.web.id
-RESEND_FROM_EMAIL=support@jobmate.web.id
-RESEND_FROM_EMAIL=hello@jobmate.web.id
+RESEND_FROM_EMAIL=info@infolokerjombang.id
+RESEND_FROM_EMAIL=support@infolokerjombang.id
+RESEND_FROM_EMAIL=hello@infolokerjombang.id
 ```
 
-**Note:** Email name BEBAS, yang penting @jobmate.web.id
+**Note:** Email name BEBAS, yang penting @infolokerjombang.id
 
 ---
 
@@ -193,7 +193,7 @@ RESEND_FROM_EMAIL=hello@jobmate.web.id
 ### Check 1: Resend Dashboard
 ```
 1. Login: https://resend.com/domains
-2. Lihat status jobmate.web.id
+2. Lihat status infolokerjombang.id
    
 Status:
 ✅ Verified → Bisa kirim ke semua email!
@@ -212,17 +212,17 @@ Status:
 
 2. Check SPF:
    Type: TXT Lookup
-   Enter: jobmate.web.id
+   Enter: infolokerjombang.id
    Should show: v=spf1 include:_spf.resend.com ~all
 
 3. Check DKIM:
    Type: TXT Lookup
-   Enter: resend._domainkey.jobmate.web.id
+   Enter: resend._domainkey.infolokerjombang.id
    Should show: [DKIM string dari Resend]
 
 4. Check DMARC:
    Type: TXT Lookup
-   Enter: _dmarc.jobmate.web.id
+   Enter: _dmarc.infolokerjombang.id
    Should show: v=DMARC1; p=none...
 ```
 
@@ -251,7 +251,7 @@ await resend.emails.send({
 ```typescript
 // Bisa kirim ke SEMUA email!
 await resend.emails.send({
-  from: 'noreply@jobmate.web.id',  // Verified domain
+  from: 'noreply@infolokerjombang.id',  // Verified domain
   to: 'anyone@anywhere.com',       // ANY email!
   subject: 'Welcome to JobMate',
   html: '<p>Hello</p>'
@@ -270,7 +270,7 @@ await resend.emails.send({
 ### Kemungkinan 1: Domain Belum Ditambahkan
 ```
 Status di Resend:
-❌ jobmate.web.id NOT in domains list
+❌ infolokerjombang.id NOT in domains list
 
 Action Needed:
 1. Add domain di Resend
@@ -288,7 +288,7 @@ Result:
 ### Kemungkinan 2: Domain Sudah Ditambahkan Tapi Pending
 ```
 Status di Resend:
-⏳ jobmate.web.id PENDING verification
+⏳ infolokerjombang.id PENDING verification
 
 Action Needed:
 1. Check DNS records sudah benar?
@@ -304,7 +304,7 @@ Result:
 ### Kemungkinan 3: Domain Sudah Verified ✅
 ```
 Status di Resend:
-✅ jobmate.web.id VERIFIED
+✅ infolokerjombang.id VERIFIED
 
 Current Status:
 ✅ SUDAH bisa kirim ke semua email!
@@ -312,7 +312,7 @@ Current Status:
 ✅ Production ready
 
 Pastikan .env.local:
-RESEND_FROM_EMAIL=noreply@jobmate.web.id
+RESEND_FROM_EMAIL=noreply@infolokerjombang.id
 (bukan onboarding@resend.dev)
 ```
 
@@ -329,7 +329,7 @@ Cause:
 ❌ Masih pakai default Resend domain
 
 Solution:
-1. Add & verify domain jobmate.web.id
+1. Add & verify domain infolokerjombang.id
 2. Update RESEND_FROM_EMAIL
 3. Restart aplikasi
 ```
@@ -377,7 +377,7 @@ Solution:
 
 | Feature | Development Mode | Production Mode |
 |---------|------------------|-----------------|
-| **From Email** | onboarding@resend.dev | noreply@jobmate.web.id |
+| **From Email** | onboarding@resend.dev | noreply@infolokerjombang.id |
 | **Send To** | Verified emails only | ✅ ANY email! |
 | **Restrictions** | Max 100 emails/day | Based on plan |
 | **Domain** | Resend's domain | Your domain (verified) |
@@ -398,9 +398,9 @@ Solution:
 
 ### For Production (Live Users):
 ```
-✅ MUST verify domain: jobmate.web.id
+✅ MUST verify domain: infolokerjombang.id
 ✅ Setup: SPF, DKIM, DMARC
-✅ Use: noreply@jobmate.web.id
+✅ Use: noreply@infolokerjombang.id
 ✅ Can send to ANY email worldwide! 🌍
 ```
 
@@ -412,7 +412,7 @@ Solution:
 ```bash
 1. Login to Resend: https://resend.com/domains
 
-2. Add domain: jobmate.web.id
+2. Add domain: infolokerjombang.id
    (if not added yet)
 
 3. Copy DNS records:
@@ -437,7 +437,7 @@ Solution:
 ### Priority 2: Update Code
 ```bash
 1. Edit .env.local:
-   RESEND_FROM_EMAIL=noreply@jobmate.web.id
+   RESEND_FROM_EMAIL=noreply@infolokerjombang.id
 
 2. Restart development server:
    docker-dev-stop.bat
@@ -455,7 +455,7 @@ Solution:
 1. Vercel Dashboard → Settings → Environment Variables
 
 2. Update:
-   RESEND_FROM_EMAIL=noreply@jobmate.web.id
+   RESEND_FROM_EMAIL=noreply@infolokerjombang.id
 
 3. Redeploy (optional, next deploy will use it)
 
@@ -472,19 +472,19 @@ Solution:
 https://resend.com/domains
 
 # Look for:
-✅ jobmate.web.id - VERIFIED
+✅ infolokerjombang.id - VERIFIED
 ```
 
 ### Check DNS Records:
 ```bash
 # SPF Check
-nslookup -type=TXT jobmate.web.id
+nslookup -type=TXT infolokerjombang.id
 
 # DKIM Check
-nslookup -type=TXT resend._domainkey.jobmate.web.id
+nslookup -type=TXT resend._domainkey.infolokerjombang.id
 
 # DMARC Check
-nslookup -type=TXT _dmarc.jobmate.web.id
+nslookup -type=TXT _dmarc.infolokerjombang.id
 ```
 
 ### Test Send Email:
@@ -495,7 +495,7 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const { data, error } = await resend.emails.send({
-  from: 'noreply@jobmate.web.id',
+  from: 'noreply@infolokerjombang.id',
   to: 'your-email@gmail.com',  // Your personal email to test
   subject: 'Test Production Email',
   html: '<p>If you receive this, production mode works! ✅</p>'
@@ -509,7 +509,7 @@ console.log('Result:', data ? 'SUCCESS ✅' : `ERROR: ${error}`);
 ## ✅ Checklist: Ready for Production
 
 ### Domain Setup:
-- [ ] Domain jobmate.web.id added to Resend
+- [ ] Domain infolokerjombang.id added to Resend
 - [ ] SPF record added to DNS
 - [ ] DKIM record added to DNS
 - [ ] DMARC record added to DNS
@@ -517,7 +517,7 @@ console.log('Result:', data ? 'SUCCESS ✅' : `ERROR: ${error}`);
 - [ ] DNS propagation complete (check with mxtoolbox)
 
 ### Code Setup:
-- [ ] `.env.local` updated: RESEND_FROM_EMAIL=noreply@jobmate.web.id
+- [ ] `.env.local` updated: RESEND_FROM_EMAIL=noreply@infolokerjombang.id
 - [ ] Test send email successful
 - [ ] Email received (not in spam)
 
@@ -541,9 +541,9 @@ console.log('Result:', data ? 'SUCCESS ✅' : `ERROR: ${error}`);
 
 ### After Domain Verification:
 ```
-✅ Domain jobmate.web.id VERIFIED
+✅ Domain infolokerjombang.id VERIFIED
 ✅ Bisa kirim ke SEMUA email (Gmail, Yahoo, dll)
-✅ Pakai noreply@jobmate.web.id
+✅ Pakai noreply@infolokerjombang.id
 ✅ No restrictions!
 ✅ Production ready! 🚀
 ```
@@ -580,5 +580,5 @@ Total: ~2 hours (mostly waiting)
 
 **Created:** 2025-11-10  
 **For:** JobMate - Email Setup  
-**Domain:** jobmate.web.id  
+**Domain:** infolokerjombang.id  
 **Goal:** ✅ Send emails to ANY email address!

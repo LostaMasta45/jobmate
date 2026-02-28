@@ -12,7 +12,7 @@ interface SocialShareReferralProps {
 
 export function SocialShareReferral({ userName, userId }: SocialShareReferralProps) {
   const firstName = userName?.split(' ')[0] || 'Teman';
-  const shareLink = `https://jobmate.web.id`;
+  const shareLink = `https://infolokerjombang.id`;
   
   const shareText = `Saya baru saja join VIP InfoLokerJombang! 🚀\n\nAkses lowongan eksklusif + tools premium untuk boost karir.\n\nJoin sekarang: ${shareLink}`;
 

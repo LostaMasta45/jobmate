@@ -2,17 +2,17 @@
 import React from 'react';
 import { resend, FROM_EMAIL } from './resend';
 import { render } from '@react-email/render';
-import { 
-  AccountPendingEmail, 
-  AccountPendingEmailText 
+import {
+  AccountPendingEmail,
+  AccountPendingEmailText
 } from '@/emails/AccountPendingEmail';
-import { 
-  AccountApprovedEmail, 
-  AccountApprovedEmailText 
+import {
+  AccountApprovedEmail,
+  AccountApprovedEmailText
 } from '@/emails/AccountApprovedEmail';
-import { 
-  UpgradeVIPEmail, 
-  UpgradeVIPEmailText 
+import {
+  UpgradeVIPEmail,
+  UpgradeVIPEmailText
 } from '@/emails/UpgradeVIPEmail';
 
 /**
@@ -31,16 +31,16 @@ export async function sendAccountPendingEmail({
     const emailHtml = await render(
       React.createElement(AccountPendingEmail, { userName, email, submittedAt })
     );
-    
+
     const emailText = AccountPendingEmailText({ userName, email, submittedAt });
 
     console.log('[Email Debug] HTML type:', typeof emailHtml);
     console.log('[Email Debug] HTML length:', emailHtml?.length || 0);
 
-    const { data, error} = await resend.emails.send({
-      from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>',
+    const { data, error } = await resend.emails.send({
+      from: 'InfoLokerJombang <admin@infolokerjombang.id>',
       to: email,
-      subject: 'Status Pengajuan Akun Anda - Jobmate X infolokerjombang',
+      subject: 'Status Pengajuan Akun Anda - InfoLokerJombang',
       html: String(emailHtml),
       text: emailText,
       tags: [
@@ -79,13 +79,13 @@ export async function sendAccountApprovedEmail({
     const emailHtml = await render(
       React.createElement(AccountApprovedEmail, { userName, email, approvedAt, loginUrl })
     );
-    
+
     const emailText = AccountApprovedEmailText({ userName, email, approvedAt, loginUrl });
 
     const { data, error } = await resend.emails.send({
-      from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>',
+      from: 'InfoLokerJombang <admin@infolokerjombang.id>',
       to: email,
-      subject: 'Akun Anda Telah Disetujui - Jobmate X infolokerjombang',
+      subject: 'Akun Anda Telah Disetujui - InfoLokerJombang',
       html: String(emailHtml),
       text: emailText,
       tags: [
@@ -126,19 +126,19 @@ export async function sendUpgradeVIPEmail({
     const isPremium = membershipType === 'vip_premium';
     const membershipName = isPremium ? 'VIP Premium' : 'VIP Basic';
     const emoji = isPremium ? '👑' : '⭐';
-    
+
     const emailHtml = await render(
       React.createElement(UpgradeVIPEmail, { userName, email, membershipType, upgradedAt, dashboardUrl })
     );
-    
+
     const emailText = UpgradeVIPEmailText({ userName, email, membershipType, upgradedAt, dashboardUrl });
 
     const { data, error } = await resend.emails.send({
-      from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>',
+      from: 'InfoLokerJombang <admin@infolokerjombang.id>',
       to: email,
-      subject: isPremium 
-        ? '👑 Selamat! Upgrade VIP Premium Berhasil - JOBMATE'
-        : '⭐ Selamat! Upgrade VIP Basic Berhasil - JOBMATE',
+      subject: isPremium
+        ? '👑 Selamat! Upgrade VIP Premium Berhasil - InfoLokerJombang'
+        : '⭐ Selamat! Upgrade VIP Basic Berhasil - InfoLokerJombang',
       html: String(emailHtml),
       text: emailText,
       tags: [

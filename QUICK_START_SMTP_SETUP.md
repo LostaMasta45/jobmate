@@ -21,19 +21,19 @@
    SMTP Port:           587
    SMTP Username:       resend
    SMTP Password:       re_xxxxxxxxxxxxxxxxxxxxxxxxxx
-   Sender Email:        noreply@jobmate.web.id
+   Sender Email:        noreply@infolokerjombang.id
    Sender Name:         JobMate
    ```
 4. **Save**
 
 ### Step 3: Verify Domain di Resend (PENTING!)
 1. Resend Dashboard → **Domains** → **Add Domain**
-2. Masukkan: `jobmate.web.id`
+2. Masukkan: `infolokerjombang.id`
 3. Copy DNS records yang diberikan
 4. Tambahkan ke DNS provider Anda:
    ```
    Type: TXT
-   Name: @ (atau jobmate.web.id)
+   Name: @ (atau infolokerjombang.id)
    Value: v=DKIM1; k=rsa; p=MIGf... (copy dari Resend)
    ```
 5. Tunggu verifikasi (5 menit - 24 jam)
@@ -62,7 +62,7 @@
 ### Domain belum verified?
 ```bash
 # Cek DNS propagation:
-nslookup -type=TXT jobmate.web.id
+nslookup -type=TXT infolokerjombang.id
 
 # Atau gunakan online tool:
 https://dnschecker.org/
@@ -84,7 +84,7 @@ Value: v=spf1 include:_spf.resend.com ~all
 ✅ **Backend:** Supabase Auth `resetPasswordForEmail()` sudah implemented  
 ✅ **Verify Page:** Password update form sudah ada di `/auth/verify`  
 ⏳ **SMTP:** Perlu setup manual di Supabase Dashboard  
-⏳ **Domain:** Perlu verify `jobmate.web.id` di Resend  
+⏳ **Domain:** Perlu verify `infolokerjombang.id` di Resend  
 
 **File locations:**
 - Reset page: `app/(auth)/reset/page.tsx`

@@ -27,7 +27,7 @@ envContent.split('\n').forEach(line => {
 });
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const fromEmail = 'Jobmate x Infolokerjombang <admin@jobmate.web.id>';
+const fromEmail = 'InfoLokerJombang <admin@infolokerjombang.id>';
 
 async function testAllEmails(toEmail: string) {
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -67,7 +67,7 @@ async function testAllEmails(toEmail: string) {
     const { data, error } = await resend.emails.send({
       from: fromEmail,
       to: toEmail,
-      subject: 'Status Pengajuan Akun Anda - Jobmate X infolokerjombang',
+      subject: 'Status Pengajuan Akun Anda - InfoLokerJombang',
       html: String(emailHtml),
       text: emailText,
     });
@@ -94,7 +94,7 @@ async function testAllEmails(toEmail: string) {
         userName: testUser.name,
         email: testUser.email,
         approvedAt: new Date().toISOString(),
-        loginUrl: 'https://jobmate.web.id/sign-in',
+        loginUrl: 'https://infolokerjombang.id/sign-in',
       })
     );
     
@@ -102,13 +102,13 @@ async function testAllEmails(toEmail: string) {
       userName: testUser.name,
       email: testUser.email,
       approvedAt: new Date().toISOString(),
-      loginUrl: 'https://jobmate.web.id/sign-in',
+      loginUrl: 'https://infolokerjombang.id/sign-in',
     });
 
     const { data, error } = await resend.emails.send({
       from: fromEmail,
       to: toEmail,
-      subject: 'Akun Anda Telah Disetujui - Jobmate X infolokerjombang',
+      subject: 'Akun Anda Telah Disetujui - InfoLokerJombang',
       html: String(emailHtml),
       text: emailText,
     });
@@ -136,7 +136,7 @@ async function testAllEmails(toEmail: string) {
         email: testUser.email,
         membershipType: 'vip_basic',
         upgradedAt: new Date().toISOString(),
-        dashboardUrl: 'https://jobmate.web.id/vip',
+        dashboardUrl: 'https://infolokerjombang.id/vip',
       })
     );
     
@@ -145,13 +145,13 @@ async function testAllEmails(toEmail: string) {
       email: testUser.email,
       membershipType: 'vip_basic',
       upgradedAt: new Date().toISOString(),
-      dashboardUrl: 'https://jobmate.web.id/vip',
+      dashboardUrl: 'https://infolokerjombang.id/vip',
     });
 
     const { data, error } = await resend.emails.send({
       from: fromEmail,
       to: toEmail,
-      subject: 'Akun VIP Basic Anda Aktif - Jobmate X infolokerjombang',
+      subject: 'Akun VIP Basic Anda Aktif - InfoLokerJombang',
       html: String(emailHtml),
       text: emailText,
     });
@@ -179,7 +179,7 @@ async function testAllEmails(toEmail: string) {
         email: testUser.email,
         membershipType: 'vip_premium',
         upgradedAt: new Date().toISOString(),
-        dashboardUrl: 'https://jobmate.web.id/vip',
+        dashboardUrl: 'https://infolokerjombang.id/vip',
       })
     );
     
@@ -188,13 +188,13 @@ async function testAllEmails(toEmail: string) {
       email: testUser.email,
       membershipType: 'vip_premium',
       upgradedAt: new Date().toISOString(),
-      dashboardUrl: 'https://jobmate.web.id/vip',
+      dashboardUrl: 'https://infolokerjombang.id/vip',
     });
 
     const { data, error } = await resend.emails.send({
       from: fromEmail,
       to: toEmail,
-      subject: 'Akun VIP Premium Anda Aktif - Jobmate X infolokerjombang',
+      subject: 'Akun VIP Premium Anda Aktif - InfoLokerJombang',
       html: String(emailHtml),
       text: emailText,
     });
@@ -244,7 +244,7 @@ async function testAllEmails(toEmail: string) {
     const { data, error } = await resend.emails.send({
       from: fromEmail,
       to: toEmail,
-      subject: 'Invoice Pembayaran VIP Basic - 1 Bulan - Jobmate X infolokerjombang',
+      subject: 'Invoice Pembayaran VIP Basic - 1 Bulan - InfoLokerJombang',
       html: String(emailHtml),
       text: emailText,
     });

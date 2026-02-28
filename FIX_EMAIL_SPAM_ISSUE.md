@@ -15,7 +15,7 @@
 #### Step 1: Verify All DNS Records di Resend
 
 1. **Go to:** https://resend.com/domains
-2. **Find:** jobmate.web.id
+2. **Find:** infolokerjombang.id
 3. **Check status:** Harus semua ✅ (tidak ada yang pending)
 
 **Must have all 3:**
@@ -32,9 +32,9 @@
 https://dnschecker.org/
 
 Search for:
-1. jobmate.web.id (Type: TXT) → Check SPF
-2. resend._domainkey.jobmate.web.id (Type: TXT) → Check DKIM
-3. _dmarc.jobmate.web.id (Type: TXT) → Check DMARC
+1. infolokerjombang.id (Type: TXT) → Check SPF
+2. resend._domainkey.infolokerjombang.id (Type: TXT) → Check DKIM
+3. _dmarc.infolokerjombang.id (Type: TXT) → Check DMARC
 ```
 
 **Expected Results:**
@@ -48,7 +48,7 @@ Search for:
 
 **Run this command (if you have access):**
 ```bash
-nslookup -type=TXT jobmate.web.id
+nslookup -type=TXT infolokerjombang.id
 ```
 
 **Should return:**
@@ -61,7 +61,7 @@ v=spf1 include:_spf.resend.com ~all
 2. Add TXT record:
    ```
    Type: TXT
-   Name: @ (or jobmate.web.id)
+   Name: @ (or infolokerjombang.id)
    Value: v=spf1 include:_spf.resend.com ~all
    TTL: 3600
    ```
@@ -75,7 +75,7 @@ v=spf1 include:_spf.resend.com ~all
 #### In Resend Dashboard:
 
 1. **Go to:** https://resend.com/domains
-2. **Click:** jobmate.web.id
+2. **Click:** infolokerjombang.id
 3. **Find:** "Return-Path Record"
 4. **Add DNS record:**
    ```
@@ -167,7 +167,7 @@ Start with:
 **Setup monitoring:**
 
 1. **Go to:** https://postmaster.google.com/
-2. **Add domain:** jobmate.web.id
+2. **Add domain:** infolokerjombang.id
 3. **Verify ownership** (use DNS TXT record)
 4. **Monitor:**
    - Spam rate
@@ -194,14 +194,14 @@ v=DMARC1; p=none;
 
 **Better DMARC (after testing):**
 ```
-v=DMARC1; p=quarantine; rua=mailto:dmarc@jobmate.web.id; pct=100;
+v=DMARC1; p=quarantine; rua=mailto:dmarc@infolokerjombang.id; pct=100;
 ```
 
 **Update in DNS:**
 ```
 Type: TXT
 Name: _dmarc
-Value: v=DMARC1; p=quarantine; rua=mailto:dmarc@jobmate.web.id; pct=100; adkim=s; aspf=s
+Value: v=DMARC1; p=quarantine; rua=mailto:dmarc@infolokerjombang.id; pct=100; adkim=s; aspf=s
 ```
 
 **What this does:**
@@ -241,7 +241,7 @@ https://www.mail-tester.com/
 ```
 https://mxtoolbox.com/blacklists.aspx
 
-Enter: jobmate.web.id
+Enter: infolokerjombang.id
 Check: All blacklist databases
 ```
 
@@ -279,7 +279,7 @@ Check: All blacklist databases
 **In email template:**
 ```html
 <!-- Add to email headers or template -->
-Reply-To: support@jobmate.web.id
+Reply-To: support@infolokerjombang.id
 ```
 
 **Why:** Shows email expects replies (not spam)
@@ -289,7 +289,7 @@ Reply-To: support@jobmate.web.id
 **For transactional emails (optional):**
 ```html
 <!-- Add to headers -->
-List-Unsubscribe: <mailto:unsubscribe@jobmate.web.id>
+List-Unsubscribe: <mailto:unsubscribe@infolokerjombang.id>
 ```
 
 **Note:** Not required for password resets, but helps for other emails
@@ -298,14 +298,14 @@ List-Unsubscribe: <mailto:unsubscribe@jobmate.web.id>
 
 **Always use:**
 ```
-From: JobMate <noreply@jobmate.web.id>
+From: JobMate <noreply@infolokerjombang.id>
 ```
 
 **NOT random variations:**
 ```
-❌ From: jobmate <noreply@jobmate.web.id>
-❌ From: JOBMATE <noreply@jobmate.web.id>
-❌ From: Job Mate <noreply@jobmate.web.id>
+❌ From: jobmate <noreply@infolokerjombang.id>
+❌ From: JOBMATE <noreply@infolokerjombang.id>
+❌ From: Job Mate <noreply@infolokerjombang.id>
 ```
 
 ---

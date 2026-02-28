@@ -118,7 +118,7 @@ export async function updateMembership(
       try {
         const profile = data[0];
         const userName = getUserDisplayName(profile.full_name || profile.name, profile.email);
-        const dashboardUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://jobmate.web.id'}/dashboard`;
+        const dashboardUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://infolokerjombang.id'}/dashboard`;
         
         await sendUpgradeVIPEmail({
           userName,

@@ -138,7 +138,7 @@ Setelah bisnis approved:
 2. **Pastikan toggle "Live Mode" aktif**
 3. Add webhook URL:
    ```
-   https://jobmate.web.id/api/webhooks/xendit
+   https://infolokerjombang.id/api/webhooks/xendit
    ```
 4. Select events:
    - ✅ Invoices paid

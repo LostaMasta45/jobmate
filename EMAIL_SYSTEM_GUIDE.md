@@ -2,12 +2,12 @@
 
 ## ✨ Overview
 
-Sistem email profesional JOBMATE menggunakan **Resend** dengan domain verified **jobmate.web.id**.
+Sistem email profesional JOBMATE menggunakan **Resend** dengan domain verified **infolokerjombang.id**.
 
 ### Sender Configuration
-- **Email**: `admin@jobmate.web.id`
+- **Email**: `admin@infolokerjombang.id`
 - **Name**: `JOBMATE`
-- **Domain**: `jobmate.web.id` (✅ Verified)
+- **Domain**: `infolokerjombang.id` (✅ Verified)
 - **Service**: Resend API
 
 ---
@@ -60,7 +60,7 @@ await sendAccountApprovedEmail({
   userName: 'John Doe',
   email: 'john@example.com',
   approvedAt: new Date().toISOString(),
-  loginUrl: 'https://jobmate.web.id/sign-in',
+  loginUrl: 'https://infolokerjombang.id/sign-in',
 });
 ```
 
@@ -79,7 +79,7 @@ await sendUpgradeVIPEmail({
   email: 'john@example.com',
   membershipType: 'vip_premium', // or 'vip_basic'
   upgradedAt: new Date().toISOString(),
-  dashboardUrl: 'https://jobmate.web.id/dashboard',
+  dashboardUrl: 'https://infolokerjombang.id/dashboard',
 });
 ```
 
@@ -140,10 +140,10 @@ emails/
 RESEND_API_KEY=re_xxxxxxxxxxxxx
 
 # Optional (will use default if not set)
-RESEND_FROM_EMAIL="JOBMATE <admin@jobmate.web.id>"
+RESEND_FROM_EMAIL="JOBMATE <admin@infolokerjombang.id>"
 
 # Base URL for links in emails
-NEXT_PUBLIC_BASE_URL=https://jobmate.web.id
+NEXT_PUBLIC_BASE_URL=https://infolokerjombang.id
 ```
 
 ### Default Configuration
@@ -151,9 +151,9 @@ NEXT_PUBLIC_BASE_URL=https://jobmate.web.id
 File: `lib/resend.ts`
 
 ```typescript
-export const FROM_EMAIL = 'JOBMATE <admin@jobmate.web.id>';
+export const FROM_EMAIL = 'JOBMATE <admin@infolokerjombang.id>';
 export const FROM_NAME = 'JOBMATE';
-export const FROM_ADDRESS = 'admin@jobmate.web.id';
+export const FROM_ADDRESS = 'admin@infolokerjombang.id';
 ```
 
 ---
@@ -306,7 +306,7 @@ await sendUpgradeVIPEmail({
 
 2. Domain verified di Resend dashboard?
    - Login ke resend.com
-   - Check Domains > jobmate.web.id status
+   - Check Domains > infolokerjombang.id status
 
 3. Check logs:
    ```bash
@@ -339,7 +339,7 @@ await sendUpgradeVIPEmail({
 **API Docs**: https://resend.com/docs
 
 **Questions?**
-Contact: admin@jobmate.web.id
+Contact: admin@infolokerjombang.id
 
 ---
 
@@ -347,8 +347,8 @@ Contact: admin@jobmate.web.id
 
 ✅ **Setup Complete!**
 
-- Domain verified: `jobmate.web.id`
-- Sender email: `admin@jobmate.web.id`
+- Domain verified: `infolokerjombang.id`
+- Sender email: `admin@infolokerjombang.id`
 - Sender name: `JOBMATE`
 - Can send to any email address (tidak terbatas)
 - Professional templates ready

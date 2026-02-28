@@ -55,7 +55,7 @@ const LOGO_KECIL_URL = 'https://i.imgur.com/1KlCKWl.png';
 ║                                       ║
 ║   ┌─────────────────────────────┐     ║
 ║   │  💬 Butuh bantuan?          │     ║
-║   │  admin@jobmate.web.id       │     ║
+║   │  admin@infolokerjombang.id       │     ║
 ║   └─────────────────────────────┘     ║
 ║                                       ║
 ║   © 2025 JOBMATE                      ║

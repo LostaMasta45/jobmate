@@ -268,7 +268,7 @@ Before going live:
 
 Priority improvements:
 
-1. **Custom Domain** - `hello@jobmate.web.id` instead of `onboarding@resend.dev`
+1. **Custom Domain** - `hello@infolokerjombang.id` instead of `onboarding@resend.dev`
 2. **Email Tracking** - Track open & click rates
 3. **Reminder Emails** - Auto-remind users to complete profile
 4. **Email Preferences** - Let users opt-out of certain notifications

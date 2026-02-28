@@ -46,13 +46,13 @@ POST /api/test-payment/webhook
 2. Pilih proyek **Jobmate**
 3. Klik **Edit Proyek**
 4. Isi field **Webhook URL**:
-   - **Production:** `https://jobmate.web.id/api/test-payment/webhook`
+   - **Production:** `https://infolokerjombang.id/api/test-payment/webhook`
    - **Local (ngrok):** `https://xxxx.ngrok.io/api/test-payment/webhook`
 5. Klik **Simpan**
 
 ### Deploy ke Production (Sama seperti Midtrans):
 Webhook tidak akan berfungsi di `localhost`. Anda harus:
-1. Deploy kode ke production (`jobmate.web.id`), ATAU
+1. Deploy kode ke production (`infolokerjombang.id`), ATAU
 2. Gunakan [ngrok](https://ngrok.com) untuk testing lokal:
    ```bash
    ngrok http 3000

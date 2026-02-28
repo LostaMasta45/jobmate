@@ -69,8 +69,8 @@ export async function POST(request: NextRequest) {
         payer_email: email,
         description: `${selectedPlan.name} - InfoLokerJombang`,
         invoice_duration: 86400, // 24 hours
-        success_redirect_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://jobmate.web.id'}/payment/success?external_id=${externalId}`,
-        failure_redirect_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://jobmate.web.id'}/payment/failed?external_id=${externalId}`,
+        success_redirect_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://infolokerjombang.id'}/payment/success?external_id=${externalId}`,
+        failure_redirect_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://infolokerjombang.id'}/payment/failed?external_id=${externalId}`,
         currency: 'IDR',
         items: [
           {

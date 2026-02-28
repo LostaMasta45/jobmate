@@ -2,7 +2,7 @@
 
 ## ✅ Website Status: LIVE!
 
-**URL:** https://jobmate.web.id  
+**URL:** https://infolokerjombang.id  
 **Status:** 200 OK  
 **SSL:** ✅ Active (HTTPS)  
 **Custom Domain:** ✅ Configured  
@@ -18,7 +18,7 @@
 - [x] Vercel project created & imported
 - [x] Environment variables configured (9 variables)
 - [x] Initial deployment successful
-- [x] Custom domain `jobmate.web.id` configured
+- [x] Custom domain `infolokerjombang.id` configured
 - [x] DNS propagated & domain active
 - [x] SSL certificate issued
 - [x] Landing page functional
@@ -31,7 +31,7 @@
 ### 🔄 Next Steps to Test
 
 - [ ] **Test Payment Flow (Xendit)**
-  - [ ] Setup Xendit webhook URL: `https://jobmate.web.id/api/webhooks/xendit`
+  - [ ] Setup Xendit webhook URL: `https://infolokerjombang.id/api/webhooks/xendit`
   - [ ] Test create invoice
   - [ ] Test payment methods (QRIS, VA, E-wallet)
   - [ ] Verify webhook received
@@ -81,7 +81,7 @@
 #### Xendit Webhook
 Update webhook URL di Xendit Dashboard:
 ```
-https://jobmate.web.id/api/webhooks/xendit
+https://infolokerjombang.id/api/webhooks/xendit
 ```
 
 **Steps:**
@@ -95,7 +95,7 @@ https://jobmate.web.id/api/webhooks/xendit
 #### Telegram Notifications
 Update `NEXT_PUBLIC_APP_URL` di Vercel environment variables jika ada:
 ```
-NEXT_PUBLIC_APP_URL=https://jobmate.web.id
+NEXT_PUBLIC_APP_URL=https://infolokerjombang.id
 ```
 
 Redeploy setelah update.
@@ -153,7 +153,7 @@ Redeploy setelah update.
 
 ### DNS Configuration
 ```
-Domain: jobmate.web.id
+Domain: infolokerjombang.id
 Type: CNAME
 Target: cname.vercel-dns.com
 Status: ✅ Active
@@ -209,7 +209,7 @@ Website sudah live dan bisa diakses publik! 🎉
 🎉 JOBMATE OFFICIAL WEBSITE SUDAH LIVE! 🎉
 
 Sekarang kamu bisa akses semua tools Career VIP langsung dari website:
-🌐 https://jobmate.web.id
+🌐 https://infolokerjombang.id
 
 ✨ Fitur yang bisa kamu akses:
 ✅ CV ATS Generator
@@ -222,7 +222,7 @@ Sekarang kamu bisa akses semua tools Career VIP langsung dari website:
 💰 Investasi sekali, akses selamanya!
 Cuma Rp 39.000 untuk VIP Premium Lifetime
 
-Gabung sekarang: https://jobmate.web.id/#pricing
+Gabung sekarang: https://infolokerjombang.id/#pricing
 
 #JobMate #InfoLokerJombang #CareerVIP
 ```

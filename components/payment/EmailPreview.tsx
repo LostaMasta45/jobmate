@@ -65,7 +65,7 @@ export function EmailPreview({ email, userName }: EmailPreviewProps) {
                       JOBMATE - InfoLokerJombang
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      noreply@jobmate.web.id
+                      noreply@infolokerjombang.id
                     </p>
                   </div>
                 </div>
@@ -129,7 +129,7 @@ export function EmailPreview({ email, userName }: EmailPreviewProps) {
                 <p className="text-xs font-semibold mb-1">📌 Tips:</p>
                 <ul className="text-xs text-muted-foreground space-y-1">
                   <li>• Check folder <strong>Spam/Junk</strong> jika tidak ada di Inbox</li>
-                  <li>• Add <strong>noreply@jobmate.web.id</strong> ke contacts</li>
+                  <li>• Add <strong>noreply@infolokerjombang.id</strong> ke contacts</li>
                   <li>• Search "{userName}" atau "JOBMATE" di email Anda</li>
                 </ul>
               </div>

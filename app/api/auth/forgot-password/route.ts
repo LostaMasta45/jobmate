@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       .select('id, full_name, email')
       .ilike('email', normalizedEmail)
       .single();
-    
+
     if (profileError || !profile) {
       console.log('⚠️ Profile lookup failed:', profileError?.message);
       // Don't reveal if email exists or not for security
@@ -82,12 +82,12 @@ export async function POST(request: NextRequest) {
     const displayName = userName || normalizedEmail.split('@')[0];
 
     // Build reset URL
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://jobmate.web.id';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://infolokerjombang.id';
     const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`;
 
     // Send email via Resend
     console.log('📤 Sending email to:', normalizedEmail, 'with name:', displayName);
-    
+
     const emailHtml = await render(
       React.createElement(ResetPasswordEmail, {
         userName: displayName,
@@ -105,9 +105,9 @@ export async function POST(request: NextRequest) {
     });
 
     const { data: sendData, error: sendError } = await resend.emails.send({
-      from: 'JOBMATE <admin@jobmate.web.id>',
+      from: 'InfoLokerJombang <admin@infolokerjombang.id>',
       to: normalizedEmail,
-      subject: '🔐 Reset Password - JOBMATE',
+      subject: '🔐 Reset Password - InfoLokerJombang',
       html: String(emailHtml),
       text: emailText,
       tags: [

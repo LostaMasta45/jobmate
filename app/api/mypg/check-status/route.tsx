@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
                     amount: parseInt(dbTransaction.amount) || data.data?.amount_paid || 0,
                     transactionDate: new Date().toISOString(),
                     planType: dbTransaction.plan_type || 'basic',
-                    dashboardUrl: 'https://jobmate.web.id/ajukan-akun',
+                    dashboardUrl: 'https://infolokerjombang.id/ajukan-akun',
                 };
 
                 const emailHtml = await render(<PaymentSuccessEmail { ...emailProps } />);

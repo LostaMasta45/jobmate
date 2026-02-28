@@ -281,7 +281,7 @@
 
 Jika semua test pass, kamu bisa:
 1. Deploy ke production
-2. Test dengan payment real di jobmate.web.id
+2. Test dengan payment real di infolokerjombang.id
 3. Verify webhook Xendit berfungsi dengan baik
 
 **Done! 🎉**

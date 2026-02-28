@@ -2,8 +2,8 @@
 import React from 'react';
 
 // Logo dari production URL
-const LOGO_PANJANG_URL = 'https://jobmate.web.id/Logo/x.png';
-const LOGO_KECIL_URL = 'https://jobmate.web.id/Logo/x.png';
+const LOGO_PANJANG_URL = 'https://infolokerjombang.id/Logo/x.png';
+const LOGO_KECIL_URL = 'https://infolokerjombang.id/Logo/x.png';
 
 interface PaymentSuccessEmailProps {
     userName: string;
@@ -18,7 +18,7 @@ export const PaymentSuccessEmail: React.FC<PaymentSuccessEmailProps> = ({
     amount,
     transactionDate,
     planType,
-    dashboardUrl = 'https://jobmate.web.id/dashboard',
+    dashboardUrl = 'https://infolokerjombang.id/dashboard',
 }) => {
     const planName = planType === 'premium' ? 'VIP Premium' : 'VIP Basic';
 
@@ -76,7 +76,7 @@ export const PaymentSuccessEmail: React.FC<PaymentSuccessEmailProps> = ({
                                                             }}>
                                                                 <img
                                                                     src={LOGO_PANJANG_URL}
-                                                                    alt="JOBMATE x Infolokerjombang"
+                                                                    alt="InfoLokerJombang"
                                                                     width="280"
                                                                     height="70"
                                                                     style={{
@@ -302,7 +302,7 @@ export const PaymentSuccessEmail: React.FC<PaymentSuccessEmailProps> = ({
                                             fontSize: '15px',
                                             letterSpacing: '0.5px',
                                         }}>
-                                            JOBMATE x Infolokerjombang
+                                            InfoLokerJombang
                                         </p>
                                         <p style={{
                                             margin: '0 0 16px',
@@ -330,13 +330,13 @@ export const PaymentSuccessEmail: React.FC<PaymentSuccessEmailProps> = ({
                                                     }}>
                                                         💬 Butuh bantuan?
                                                     </p>
-                                                    <a href="mailto:admin@jobmate.web.id" style={{
+                                                    <a href="mailto:admin@infolokerjombang.id" style={{
                                                         color: '#3977d3',
                                                         textDecoration: 'none',
                                                         fontWeight: '600',
                                                         fontSize: '13px',
                                                     }}>
-                                                        admin@jobmate.web.id
+                                                        admin@infolokerjombang.id
                                                     </a>
                                                 </td>
                                             </tr>
@@ -367,7 +367,7 @@ export const PaymentSuccessEmailText = ({
     amount,
     transactionDate,
     planType,
-    dashboardUrl = 'https://jobmate.web.id/dashboard',
+    dashboardUrl = 'https://infolokerjombang.id/dashboard',
 }: PaymentSuccessEmailProps) => `
 JOBMATE - Pembayaran Berhasil
 
@@ -382,6 +382,6 @@ Detail Transaksi:
 
 📝 Ajukan Akun Sekarang: ${dashboardUrl}
 
-Butuh bantuan? admin@jobmate.web.id
+Butuh bantuan? admin@infolokerjombang.id
 © 2025 JOBMATE. All rights reserved.
 `;

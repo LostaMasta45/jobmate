@@ -56,7 +56,7 @@
 **Guide:** `QUICK_START_SMTP_SETUP.md`
 
 ### 2. Domain Verification di Resend (15 menit - 24 jam) 🔴 REQUIRED
-**Status:** Perlu verify `jobmate.web.id`
+**Status:** Perlu verify `infolokerjombang.id`
 
 **Steps:**
 1. Add domain di Resend
@@ -145,7 +145,7 @@ if (!passwordRegex.test(password)) {
 
 ### Backend Setup
 - [ ] SMTP credentials configured in Supabase
-- [ ] Domain `jobmate.web.id` verified in Resend
+- [ ] Domain `infolokerjombang.id` verified in Resend
 - [ ] SPF/DKIM/DMARC DNS records added
 - [ ] Test email delivery end-to-end
 
@@ -166,7 +166,7 @@ if (!passwordRegex.test(password)) {
 
 ### Email Deliverability
 - [ ] Emails NOT going to spam
-- [ ] From address shows: `JobMate <noreply@jobmate.web.id>`
+- [ ] From address shows: `JobMate <noreply@infolokerjombang.id>`
 - [ ] Email template is branded and professional
 - [ ] Mobile email rendering looks good
 - [ ] Links in email work correctly
@@ -205,10 +205,10 @@ https://mxtoolbox.com/diagnostic.aspx
 ### Test DNS Propagation
 ```bash
 # Check DKIM record
-nslookup -type=TXT default._domainkey.jobmate.web.id
+nslookup -type=TXT default._domainkey.infolokerjombang.id
 
 # Check SPF record
-nslookup -type=TXT jobmate.web.id
+nslookup -type=TXT infolokerjombang.id
 
 # Or use: https://dnschecker.org/
 ```
@@ -235,7 +235,7 @@ Production:  ░░░░░░░░░░░░░░░░░░░░   0%
 3. [ ] Test: Send reset email from `/reset` page
 
 ### This Week (if domain not verified yet)
-1. [ ] Add domain `jobmate.web.id` to Resend
+1. [ ] Add domain `infolokerjombang.id` to Resend
 2. [ ] Copy DNS records from Resend
 3. [ ] Add to DNS provider (Cloudflare/Niagahoster/etc)
 4. [ ] Wait for verification (usually < 24 hours)

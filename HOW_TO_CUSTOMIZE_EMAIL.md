@@ -242,7 +242,7 @@ const PaymentSuccessEmail = ({ userName, amount, transactionDate, planType }: an
           
           <!-- CTA Button -->
           <div style="text-align: center; margin: 32px 0;">
-            <a href="https://jobmate.web.id/dashboard" class="cta-button">
+            <a href="https://infolokerjombang.id/dashboard" class="cta-button">
               🚀 Mulai Gunakan Fitur VIP
             </a>
           </div>
@@ -265,8 +265,8 @@ const PaymentSuccessEmail = ({ userName, amount, transactionDate, planType }: an
           
           <div class="social-links">
             <a href="https://wa.me/6281234567890">📱 WhatsApp</a>
-            <a href="https://jobmate.web.id">🌐 Website</a>
-            <a href="mailto:support@jobmate.web.id">✉️ Email</a>
+            <a href="https://infolokerjombang.id">🌐 Website</a>
+            <a href="mailto:support@infolokerjombang.id">✉️ Email</a>
           </div>
           
           <p style="margin: 16px 0 0; font-size: 12px; color: #9CA3AF;">
@@ -314,7 +314,7 @@ Create new payment → complete payment → check inbox!
 
 ### 1. **Logo/Brand**
 ```html
-<img src="https://jobmate.web.id/logo.png" alt="JOBMATE" width="120" />
+<img src="https://infolokerjombang.id/logo.png" alt="JOBMATE" width="120" />
 ```
 
 ### 2. **Progress Bar** (untuk recurring payments)

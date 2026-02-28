@@ -9,7 +9,7 @@ Reset password feature **sudah selesai 100%** dan siap digunakan dengan **Supaba
 ## 🎉 What Changed
 
 ### ❌ CANCELLED: Custom SMTP Setup
-- **Original Plan:** Setup Resend.com SMTP untuk email custom `@jobmate.web.id`
+- **Original Plan:** Setup Resend.com SMTP untuk email custom `@infolokerjombang.id`
 - **Issue:** Resend.com requires paid upgrade
 - **Solution:** Use Supabase default email (FREE & WORKS OUT OF THE BOX)
 
@@ -194,7 +194,7 @@ Token Validity: 1 hour
 
 **Requirement:** Paid email service (Resend/SendGrid)  
 **Cost:** ~$20/month  
-**Benefit:** Email from `@jobmate.web.id`  
+**Benefit:** Email from `@infolokerjombang.id`  
 
 **Setup Time:** 30 minutes (follow `SETUP_SMTP_RESEND_SUPABASE.md`)
 

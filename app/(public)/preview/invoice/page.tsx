@@ -428,7 +428,7 @@ export default function InvoicePreviewPage() {
             marginBottom: '8px',
             fontSize: '14px'
           }}>
-            Jobmate x Infolokerjombang
+            InfoLokerJombang
           </div>
           <div style={{
             color: '#6b7280',
@@ -443,8 +443,8 @@ export default function InvoicePreviewPage() {
             margin: '4px 0'
           }}>
             Butuh bantuan? Hubungi{' '}
-            <a href="mailto:admin@jobmate.web.id" style={{ color: '#3977d3', textDecoration: 'none' }}>
-              admin@jobmate.web.id
+            <a href="mailto:admin@infolokerjombang.id" style={{ color: '#3977d3', textDecoration: 'none' }}>
+              admin@infolokerjombang.id
             </a>
           </div>
           <div style={{

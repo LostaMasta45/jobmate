@@ -460,7 +460,7 @@
       <ShareButton 
         platform="whatsapp" 
         text="Saya baru saja join VIP InfoLokerJombang! 🚀 Akses lowongan eksklusif + tools premium. Join sekarang!"
-        url="https://jobmate.web.id/?ref=USER_ID"
+        url="https://infolokerjombang.id/?ref=USER_ID"
       />
       <ShareButton platform="twitter" />
       <ShareButton platform="facebook" />
@@ -548,7 +548,7 @@
         <div className="w-8 h-8 bg-emerald-500 rounded-full" />
         <div>
           <p className="text-xs font-semibold">JOBMATE</p>
-          <p className="text-xs text-muted-foreground">noreply@jobmate.web.id</p>
+          <p className="text-xs text-muted-foreground">noreply@infolokerjombang.id</p>
         </div>
       </div>
       <p className="text-sm font-semibold">✓ Pembayaran VIP Berhasil!</p>
@@ -682,7 +682,7 @@
 │  🎁 Referral Program              ← NEW!   │
 │  ┌─────────────────────────────────┐        │
 │  │ Ajak teman, dapat Rp 5.000      │        │
-│  │ [Link: jobmate.web.id/ref/XXX]  │        │
+│  │ [Link: infolokerjombang.id/ref/XXX]  │        │
 │  │ [📱] [🐦] [📘] Share            │        │
 │  └─────────────────────────────────┘        │
 │                                              │

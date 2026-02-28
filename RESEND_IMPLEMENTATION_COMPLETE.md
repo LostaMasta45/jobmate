@@ -2,7 +2,7 @@
 
 > **Status**: Implemented & Tested  
 > **Date**: October 24, 2025  
-> **Project**: JOBMATE (jobmate.web.id)
+> **Project**: JOBMATE (infolokerjombang.id)
 
 ## 📋 Implementation Summary
 
@@ -159,7 +159,7 @@ To send emails to other recipients, please verify a domain.
    - Accept invitation di inbox
    
 2. **Production**: Verify domain (recommended)
-   - Gunakan domain custom: `noreply@jobmate.web.id`
+   - Gunakan domain custom: `noreply@infolokerjombang.id`
    - Lihat tutorial bagian "Production Setup" di bawah
 
 ### 2. Rate Limits (Free Tier)
@@ -179,7 +179,7 @@ To send emails to other recipients, please verify a domain.
 ### Verify Custom Domain
 
 **Benefits:**
-- Email from: `noreply@jobmate.web.id` (professional!)
+- Email from: `noreply@infolokerjombang.id` (professional!)
 - No rate limits untuk verified domain
 - Better deliverability (tidak masuk spam)
 - Bisa kirim ke email manapun
@@ -189,7 +189,7 @@ To send emails to other recipients, please verify a domain.
 #### 1. Add Domain di Resend
 1. Login https://resend.com
 2. Klik **"Domains"** > **"Add Domain"**
-3. Domain: `noreply.jobmate.web.id` atau `mail.jobmate.web.id`
+3. Domain: `noreply.infolokerjombang.id` atau `mail.infolokerjombang.id`
 4. Click **"Add"**
 
 #### 2. Add DNS Records di Cloudflare
@@ -197,25 +197,25 @@ Resend akan kasih 3 DNS records untuk ditambahkan:
 
 ```
 Type: TXT
-Name: _resend.noreply.jobmate.web.id
+Name: _resend.noreply.infolokerjombang.id
 Value: re=abcdefghijklmnop (dari Resend dashboard)
 TTL: Auto
 
 Type: MX
-Name: noreply.jobmate.web.id
+Name: noreply.infolokerjombang.id
 Value: feedback-smtp.us-east-1.amazonses.com
 Priority: 10
 TTL: Auto
 
 Type: TXT (DKIM)
-Name: resend._domainkey.noreply.jobmate.web.id
+Name: resend._domainkey.noreply.infolokerjombang.id
 Value: v=DKIM1; k=rsa; p=MIGfMA0GCS... (long key dari Resend)
 TTL: Auto
 ```
 
 **Add di Cloudflare:**
 1. Login https://dash.cloudflare.com
-2. Pilih domain **jobmate.web.id**
+2. Pilih domain **infolokerjombang.id**
 3. Klik **DNS** > **Records**
 4. Click **"Add record"** untuk masing-masing record di atas
 5. Save
@@ -228,11 +228,11 @@ TTL: Auto
 #### 4. Update Environment Variables
 ```bash
 # .env.local
-RESEND_FROM_EMAIL=noreply@jobmate.web.id
+RESEND_FROM_EMAIL=noreply@infolokerjombang.id
 
 # Vercel
 Settings > Environment Variables
-RESEND_FROM_EMAIL = noreply@jobmate.web.id
+RESEND_FROM_EMAIL = noreply@infolokerjombang.id
 ```
 
 #### 5. Redeploy
@@ -339,7 +339,7 @@ npx tsx scripts/test-resend.ts
 - Mark as "Not Spam" di Gmail/Outlook
 
 **Production:**
-1. Verify domain custom (noreply@jobmate.web.id)
+1. Verify domain custom (noreply@infolokerjombang.id)
 2. Setup SPF, DKIM, DMARC (auto via Resend)
 3. Warm up sending (start dengan volume kecil)
 4. Monitor bounce rate di resend.com/emails
@@ -369,7 +369,7 @@ validation_error: You can only send testing emails to your own email address
 **Option 2: Verify Domain (Production)**
 ```
 Follow "Production Setup" section above
-Verify noreply@jobmate.web.id
+Verify noreply@infolokerjombang.id
 Update RESEND_FROM_EMAIL
 ```
 
@@ -391,7 +391,7 @@ Update RESEND_FROM_EMAIL
 # Lihat apakah ada error
 
 # 3. Test webhook manually
-curl -X POST https://jobmate.web.id/api/webhooks/xendit \
+curl -X POST https://infolokerjombang.id/api/webhooks/xendit \
   -H "x-callback-token: YOUR_WEBHOOK_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -435,7 +435,7 @@ export const InvoiceEmailV2 = (props: InvoiceEmailProps) => (
     <Body style={main}>
       <Container style={container}>
         <Img
-          src="https://jobmate.web.id/logo.png"
+          src="https://infolokerjombang.id/logo.png"
           width="120"
           height="40"
           alt="JOBMATE"
@@ -466,10 +466,10 @@ export const InvoiceEmailV2 = (props: InvoiceEmailProps) => (
 **Implementation:**
 ```typescript
 // Add tracking to email template
-<img src="https://api.jobmate.web.id/track/open?id={emailId}" width="1" height="1" />
+<img src="https://api.infolokerjombang.id/track/open?id={emailId}" width="1" height="1" />
 
 // Add UTM to links
-<a href="https://jobmate.web.id/invoice?utm_source=email&utm_campaign=invoice&id={invoiceId}">
+<a href="https://infolokerjombang.id/invoice?utm_source=email&utm_campaign=invoice&id={invoiceId}">
   Bayar Sekarang
 </a>
 ```
@@ -556,7 +556,7 @@ export async function scheduleReminderEmail(
 - Sender: `onboarding@resend.dev`
 
 **For Production (Recommended):**
-1. Verify domain: `noreply@jobmate.web.id`
+1. Verify domain: `noreply@infolokerjombang.id`
 2. Remove email restrictions
 3. Better deliverability & branding
 4. No rate limits (paid tier)

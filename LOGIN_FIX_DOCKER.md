@@ -382,7 +382,7 @@ Expected: Redirect to /dashboard (with VIP features)
 
 ### Test 3: Admin Login
 ```bash
-Email: admin@jobmate.web.id
+Email: admin@infolokerjombang.id
 Password: adminpassword
 Expected: Redirect to /admin/dashboard
 ```

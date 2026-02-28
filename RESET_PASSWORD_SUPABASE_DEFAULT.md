@@ -266,7 +266,7 @@ Delivery: Supabase email infrastructure
 
 ### 1. Custom Email Domain (Requires Paid Resend/SendGrid)
 **When to consider:**
-- Want professional `@jobmate.web.id` sender
+- Want professional `@infolokerjombang.id` sender
 - Need custom email templates
 - Higher email volume (>3,000/month)
 

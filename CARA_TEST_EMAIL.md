@@ -3,8 +3,8 @@
 ## ✨ Setup Selesai!
 
 Email system JOBMATE sudah dikonfigurasi dengan:
-- ✅ Sender: **JOBMATE** `<admin@jobmate.web.id>`
-- ✅ Domain: **jobmate.web.id** (Verified)
+- ✅ Sender: **JOBMATE** `<admin@infolokerjombang.id>`
+- ✅ Domain: **infolokerjombang.id** (Verified)
 - ✅ Service: **Resend**
 - ✅ **Bisa kirim ke email manapun** (tidak terbatas)
 
@@ -70,7 +70,7 @@ Email test professional dengan:
 
 1. **Check Inbox** - Email masuk dalam 5-10 detik
 2. **Check Spam/Junk** - Jika tidak ada di inbox
-3. **Verify Sender** - Harus dari `JOBMATE <admin@jobmate.web.id>`
+3. **Verify Sender** - Harus dari `JOBMATE <admin@infolokerjombang.id>`
 4. **Check Design** - Buka di mobile & desktop
 5. **Test Links** - Klik tombol "Kunjungi JOBMATE"
 
@@ -109,7 +109,7 @@ Memastikan email diterima di semua email provider.
 ### Email tidak masuk?
 
 1. **Check spam folder**
-   - Cari "JOBMATE" atau "admin@jobmate.web.id"
+   - Cari "JOBMATE" atau "admin@infolokerjombang.id"
    - Mark as "Not Spam" jika ada
 
 2. **Tunggu 1-2 menit**
@@ -202,7 +202,7 @@ npm run dev
 ---
 
 **Questions?**
-Contact: admin@jobmate.web.id
+Contact: admin@infolokerjombang.id
 
 **Resend Dashboard**: https://resend.com/emails
 

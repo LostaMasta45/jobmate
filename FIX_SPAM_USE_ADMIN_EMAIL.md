@@ -1,26 +1,26 @@
-# Fix Spam: Use admin@jobmate.web.id (Working Email)
+# Fix Spam: Use admin@infolokerjombang.id (Working Email)
 
 ## 🔍 Root Cause Found!
 
 ### ❌ Supabase Currently Using:
 ```
-From: JobMate <noreply@jobmate.web.id>
+From: JobMate <noreply@infolokerjombang.id>
 Result: Goes to spam ❌
 ```
 
 ### ✅ Invoice & Ajukan Akun Using:
 ```
-From: Jobmate x Infolokerjombang <admin@jobmate.web.id>
+From: Jobmate x Infolokerjombang <admin@infolokerjombang.id>
 Result: Goes to inbox ✅
 ```
 
 **Perbedaan:**
-1. **Email address:** `admin@jobmate.web.id` (has reputation!) vs `noreply@jobmate.web.id` (brand new)
+1. **Email address:** `admin@infolokerjombang.id` (has reputation!) vs `noreply@infolokerjombang.id` (brand new)
 2. **From name:** "Jobmate x Infolokerjombang" vs "JobMate"
 
 ---
 
-## ✅ Solution: Use admin@jobmate.web.id
+## ✅ Solution: Use admin@infolokerjombang.id
 
 ### Why admin@ Works Better:
 
@@ -54,11 +54,11 @@ Result: Goes to inbox ✅
 
 ```
 FROM:
-  Sender Email: noreply@jobmate.web.id
+  Sender Email: noreply@infolokerjombang.id
   Sender Name: JobMate
 
 TO:
-  Sender Email: admin@jobmate.web.id
+  Sender Email: admin@infolokerjombang.id
   Sender Name: Jobmate x Infolokerjombang
 
 (Keep everything else the same:
@@ -77,7 +77,7 @@ TO:
 ### Current Setup (Spam):
 ```typescript
 // Supabase SMTP
-from: 'JobMate <noreply@jobmate.web.id>'
+from: 'JobMate <noreply@infolokerjombang.id>'
 
 Status: ❌ New address, no reputation
 Result: Spam folder
@@ -86,7 +86,7 @@ Result: Spam folder
 ### Working Setup (Inbox):
 ```typescript
 // Invoice & Account emails
-from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>'
+from: 'Jobmate x Infolokerjombang <admin@infolokerjombang.id>'
 
 Status: ✅ Established address, has reputation
 Result: Inbox ✅
@@ -99,14 +99,14 @@ Result: Inbox ✅
 ### Sender Reputation by Email:
 
 ```
-admin@jobmate.web.id:
+admin@infolokerjombang.id:
   ✅ Sent invoice emails → delivered
   ✅ Sent account approval emails → delivered
   ✅ Recipients opened and interacted
   ✅ No spam complaints
   ✅ Good reputation score
 
-noreply@jobmate.web.id:
+noreply@infolokerjombang.id:
   ❌ Just created
   ❌ No sending history
   ❌ Zero opens/clicks
@@ -141,11 +141,11 @@ Success rate: 80-90%+ inbox delivery
 All Supabase auth emails will now match your other emails:
 
 ```
-Invoice emails:           admin@jobmate.web.id ✅
-Account approval emails:  admin@jobmate.web.id ✅
-Reset password emails:    admin@jobmate.web.id ✅ (NEW)
-Signup verification:      admin@jobmate.web.id ✅ (NEW)
-Magic link:               admin@jobmate.web.id ✅ (NEW)
+Invoice emails:           admin@infolokerjombang.id ✅
+Account approval emails:  admin@infolokerjombang.id ✅
+Reset password emails:    admin@infolokerjombang.id ✅ (NEW)
+Signup verification:      admin@infolokerjombang.id ✅ (NEW)
+Magic link:               admin@infolokerjombang.id ✅ (NEW)
 ```
 
 **Consistent branding!** 🎨
@@ -171,10 +171,10 @@ Jobmate x Infolokerjombang
 
 **Consider this structure:**
 ```
-admin@jobmate.web.id       - Transactional (invoices, auth)
-support@jobmate.web.id     - Support replies
-noreply@jobmate.web.id     - Marketing (after warming up)
-team@jobmate.web.id        - Team communications
+admin@infolokerjombang.id       - Transactional (invoices, auth)
+support@infolokerjombang.id     - Support replies
+noreply@infolokerjombang.id     - Marketing (after warming up)
+team@infolokerjombang.id        - Team communications
 ```
 
 **For now:** Use `admin@` for everything transactional
@@ -186,7 +186,7 @@ team@jobmate.web.id        - Team communications
 ```
 [ ] Go to Supabase Dashboard
 [ ] Settings → Authentication → SMTP
-[ ] Change Sender Email: admin@jobmate.web.id
+[ ] Change Sender Email: admin@infolokerjombang.id
 [ ] Change Sender Name: Jobmate x Infolokerjombang
 [ ] Click Save
 [ ] Test: Send reset password email
@@ -206,7 +206,7 @@ team@jobmate.web.id        - Team communications
 
 ### 2. Verify Email Headers
 ```
-From: Jobmate x Infolokerjombang <admin@jobmate.web.id>
+From: Jobmate x Infolokerjombang <admin@infolokerjombang.id>
 Authentication-Results: PASS
 ```
 
@@ -243,7 +243,7 @@ User experience: Good (inbox)
 ## 🎉 Why This is the Solution
 
 **Logic:**
-1. ✅ `admin@jobmate.web.id` already has good reputation
+1. ✅ `admin@infolokerjombang.id` already has good reputation
 2. ✅ Used successfully for invoice emails
 3. ✅ Used successfully for account emails
 4. ✅ Recipients already trust this address
@@ -264,26 +264,26 @@ User experience: Good (inbox)
 **Invoice email:**
 ```typescript
 // lib/send-invoice-email.tsx
-from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>'
+from: 'Jobmate x Infolokerjombang <admin@infolokerjombang.id>'
 Status: ✅ Works perfectly, inbox delivery
 ```
 
 **Account approval email:**
 ```typescript
 // lib/email-notifications.ts
-from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>'
+from: 'Jobmate x Infolokerjombang <admin@infolokerjombang.id>'
 Status: ✅ Works perfectly, inbox delivery
 ```
 
 **Reset password (current):**
 ```
-from: 'JobMate <noreply@jobmate.web.id>'
+from: 'JobMate <noreply@infolokerjombang.id>'
 Status: ❌ Goes to spam
 ```
 
 **Reset password (after fix):**
 ```
-from: 'Jobmate x Infolokerjombang <admin@jobmate.web.id>'
+from: 'Jobmate x Infolokerjombang <admin@infolokerjombang.id>'
 Status: ✅ Should match invoice/account emails
 ```
 
@@ -313,7 +313,7 @@ Status: ✅ Should match invoice/account emails
 
 1. Open Supabase Dashboard
 2. Go to SMTP Settings
-3. Change to: `admin@jobmate.web.id`
+3. Change to: `admin@infolokerjombang.id`
 4. Save
 5. Test
 6. Report: Inbox or spam?
@@ -327,7 +327,7 @@ Status: ✅ Should match invoice/account emails
 **After update, test email should:**
 ```
 ✅ Arrive in inbox (not spam)
-✅ From: Jobmate x Infolokerjombang <admin@jobmate.web.id>
+✅ From: Jobmate x Infolokerjombang <admin@infolokerjombang.id>
 ✅ Same as invoice emails
 ✅ Good deliverability
 ✅ Consistent branding
@@ -340,4 +340,4 @@ Status: ✅ Should match invoice/account emails
 
 ---
 
-**Update Supabase NOW dengan admin@jobmate.web.id dan test lagi!** 🚀
+**Update Supabase NOW dengan admin@infolokerjombang.id dan test lagi!** 🚀

@@ -114,7 +114,7 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 await resend.emails.send({
-  from: 'noreply@jobmate.web.id',
+  from: 'noreply@infolokerjombang.id',
   to: user.email,
   subject: 'Password Changed Successfully',
   html: '<p>Your password was changed...</p>'
@@ -330,7 +330,7 @@ If using Resend: Need Pro ($20/month) for 50,000/month
 ### When to Upgrade:
 
 #### Use Custom SMTP (Resend/SendGrid) when:
-- ✅ Want custom email domain (@jobmate.web.id)
+- ✅ Want custom email domain (@infolokerjombang.id)
 - ✅ Need custom notification emails (password changed, etc.)
 - ✅ Want better analytics/tracking
 - ✅ Need higher delivery rate

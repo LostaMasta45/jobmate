@@ -323,12 +323,12 @@ export const InvoiceEmailPreview: React.FC<InvoiceEmailPreviewProps> = ({
 
         {/* Footer */}
         <motion.div className="bg-gray-50 p-8 text-center" variants={itemVariants}>
-          <div className="font-semibold text-gray-900 mb-1">Jobmate x Infolokerjombang</div>
+          <div className="font-semibold text-gray-900 mb-1">InfoLokerJombang</div>
           <div className="text-gray-600 text-sm mb-1">Platform Karir Terpercaya</div>
           <div className="text-gray-600 text-sm mb-3">
             Butuh bantuan? Hubungi{' '}
-            <a href="mailto:admin@jobmate.web.id" className="text-blue-600 hover:underline">
-              admin@jobmate.web.id
+            <a href="mailto:admin@infolokerjombang.id" className="text-blue-600 hover:underline">
+              admin@infolokerjombang.id
             </a>
           </div>
           <div className="text-gray-500 text-xs mt-3">© 2025 JOBMATE. All rights reserved.</div>

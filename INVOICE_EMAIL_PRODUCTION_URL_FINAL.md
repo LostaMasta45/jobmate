@@ -5,8 +5,8 @@
 ### 1. Update Email Template
 File: `emails/InvoiceEmailTable.tsx`
 - ✅ Ganti CID attachments dengan production URL
-- ✅ Logo header: `https://jobmate.web.id/Logo/logopanjang.png`
-- ✅ Logo footer: `https://jobmate.web.id/Logo/logokecil.png`
+- ✅ Logo header: `https://infolokerjombang.id/Logo/logopanjang.png`
+- ✅ Logo footer: `https://infolokerjombang.id/Logo/logokecil.png`
 - ✅ No more attachments!
 
 ### 2. Update Test Script
@@ -30,8 +30,8 @@ File: `lib/send-invoice-email.tsx`
 
 ### Cek 1: Logo Accessible?
 Buka di browser:
-- https://jobmate.web.id/Logo/logopanjang.png
-- https://jobmate.web.id/Logo/logokecil.png
+- https://infolokerjombang.id/Logo/logopanjang.png
+- https://infolokerjombang.id/Logo/logokecil.png
 
 **Expected**: Logo PNG harus terlihat
 

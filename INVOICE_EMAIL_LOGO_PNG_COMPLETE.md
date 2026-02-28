@@ -17,7 +17,7 @@
 
 ### 3. **URL Logo**
 - ✅ Menggunakan environment variable: `${process.env.NEXT_PUBLIC_SITE_URL}/Logo/logopanjang.png`
-- ✅ Fallback ke: `https://jobmate.web.id/Logo/logopanjang.png`
+- ✅ Fallback ke: `https://infolokerjombang.id/Logo/logopanjang.png`
 - ✅ Logo akan di-load dari domain production
 
 ## 🎯 Fitur Baru
@@ -25,7 +25,7 @@
 ### Logo Header:
 ```tsx
 <img 
-  src={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://jobmate.web.id'}/Logo/logopanjang.png`}
+  src={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://infolokerjombang.id'}/Logo/logopanjang.png`}
   alt="JOBMATE x Infolokerjombang"
   width="280"
   height="70"
@@ -42,7 +42,7 @@
 ### Logo Footer:
 ```tsx
 <img 
-  src={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://jobmate.web.id'}/Logo/logokecil.png`}
+  src={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://infolokerjombang.id'}/Logo/logokecil.png`}
   alt="JOBMATE Logo"
   width="48"
   height="48"
@@ -82,7 +82,7 @@
 ║                                       ║
 ║   ┌─────────────────────────────┐     ║
 ║   │  💬 Butuh bantuan?          │     ║
-║   │  admin@jobmate.web.id       │     ║
+║   │  admin@infolokerjombang.id       │     ║
 ║   └─────────────────────────────┘     ║
 ║                                       ║
 ║   © 2025 JOBMATE                      ║
@@ -158,7 +158,7 @@ npx tsx scripts/test-invoice-table.ts your@email.com
 
 2. **URL Structure**:
    ```
-   Production: https://jobmate.web.id/Logo/logopanjang.png
+   Production: https://infolokerjombang.id/Logo/logopanjang.png
    Development: http://localhost:3000/Logo/logopanjang.png
    ```
 

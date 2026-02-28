@@ -128,7 +128,7 @@ const colors = {
 1. **Option 1 - Verify Domain** (Recommended)
    ```
    1. Go to: https://resend.com/domains
-   2. Add domain: jobmate.web.id
+   2. Add domain: infolokerjombang.id
    3. Add DNS records (TXT, MX, CNAME)
    4. Wait for verification
    5. Update FROM_EMAIL in lib/resend.ts
@@ -258,8 +258,8 @@ Check your inbox at **reza.nur.h45@gmail.com** to see:
 - [ ] Interactive elements (countdown timer)
 
 ### Production:
-- [ ] Verify domain jobmate.web.id di Resend
-- [ ] Update FROM_EMAIL ke admin@jobmate.web.id
+- [ ] Verify domain infolokerjombang.id di Resend
+- [ ] Update FROM_EMAIL ke admin@infolokerjombang.id
 - [ ] Enable sending to all users
 - [ ] Monitor email delivery rates
 

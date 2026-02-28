@@ -86,7 +86,7 @@ GET /api/payment/check-status?external_id=jobmate-basic-1761112019187
 
 **Solution:** Create payment baru
 
-1. **Go to:** https://jobmate.web.id/payment
+1. **Go to:** https://infolokerjombang.id/payment
 
 2. **Fill form:**
    ```
@@ -163,7 +163,7 @@ Sometimes webhook has delay:
 
 1. Go to: **Settings** → **Webhooks**
 2. Toggle: **Test Mode**
-3. Find webhook: `https://jobmate.web.id/api/webhooks/xendit`
+3. Find webhook: `https://infolokerjombang.id/api/webhooks/xendit`
 4. Click **"Logs"** or **"Recent Deliveries"**
 5. Check status:
    ```
@@ -276,7 +276,7 @@ INSERT INTO payments (
 
 1. **Create new payment:**
    ```
-   https://jobmate.web.id/payment
+   https://infolokerjombang.id/payment
    Fill form → Submit
    ```
 
@@ -295,7 +295,7 @@ INSERT INTO payments (
 
 5. **Go to success page:**
    ```
-   https://jobmate.web.id/payment/success?external_id=jobmate-basic-[timestamp]
+   https://infolokerjombang.id/payment/success?external_id=jobmate-basic-[timestamp]
    ```
 
 6. **Expected result:**
@@ -331,7 +331,7 @@ INSERT INTO payments (
 
 **Solutions:**
 1. Check webhook URL in Xendit settings
-2. Should be: `https://jobmate.web.id/api/webhooks/xendit`
+2. Should be: `https://infolokerjombang.id/api/webhooks/xendit`
 3. Check `XENDIT_WEBHOOK_VERIFICATION_TOKEN` in Vercel
 4. Check Vercel logs for webhook errors
 5. Manually trigger webhook from Xendit dashboard

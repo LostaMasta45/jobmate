@@ -59,7 +59,7 @@ SMTP Password: [Your API Key from step 1.1]
 │    (Your Resend API Key)                       │
 │                                                │
 │ Sender Email:                                  │
-│ └─ noreply@jobmate.web.id                     │
+│ └─ noreply@infolokerjombang.id                     │
 │                                                │
 │ Sender Name:                                   │
 │ └─ JobMate                                    │
@@ -77,7 +77,7 @@ SMTP Password: [Your API Key from step 1.1]
 | **SMTP Port** | `587` |
 | **SMTP Username** | `resend` |
 | **SMTP Password** | `re_xxxxx...` (API Key) |
-| **Sender Email** | `noreply@jobmate.web.id` |
+| **Sender Email** | `noreply@infolokerjombang.id` |
 | **Sender Name** | `JobMate` |
 
 ### 2.4 Click "Save"
@@ -97,7 +97,7 @@ Wait for confirmation message: ✅ "Settings saved successfully"
 
 **Expected Result:**
 ```
-From: JobMate <noreply@jobmate.web.id> ✅
+From: JobMate <noreply@infolokerjombang.id> ✅
 Subject: Reset Your Password
 Body: [Your elegant template]
 ```
@@ -106,9 +106,9 @@ Body: [Your elegant template]
 
 Check email headers (in Gmail: Show Original):
 ```
-From: JobMate <noreply@jobmate.web.id>
+From: JobMate <noreply@infolokerjombang.id>
 To: your-email@gmail.com
-Return-Path: noreply@jobmate.web.id
+Return-Path: noreply@infolokerjombang.id
 Authentication-Results: PASS (DKIM, SPF)
 ```
 
@@ -163,18 +163,18 @@ Configuration:
 [ ] SMTP port: 587
 [ ] Username: resend
 [ ] Password: Valid Resend API key
-[ ] Sender email: noreply@jobmate.web.id
+[ ] Sender email: noreply@infolokerjombang.id
 [ ] Sender name: JobMate
 
 Domain:
-[ ] jobmate.web.id verified in Resend
+[ ] infolokerjombang.id verified in Resend
 [ ] DNS records properly configured
 [ ] SPF, DKIM, DMARC records active
 
 Testing:
 [ ] Reset password email sends successfully
 [ ] Email arrives in inbox (not spam)
-[ ] From address shows: noreply@jobmate.web.id
+[ ] From address shows: noreply@infolokerjombang.id
 [ ] Email template looks elegant
 [ ] Links in email work correctly
 ```
@@ -196,7 +196,7 @@ Example changes:
 <a href="https://supabase.com">Website</a>
 
 <!-- After -->
-<a href="https://jobmate.web.id">Website</a>
+<a href="https://infolokerjombang.id">Website</a>
 ```
 
 ---
@@ -225,7 +225,7 @@ Example changes:
 Resend Free Tier:
 ✅ 3,000 emails/month
 ✅ 100 emails/day
-✅ 1 verified domain (jobmate.web.id)
+✅ 1 verified domain (infolokerjombang.id)
 ✅ SMTP access
 ✅ Email analytics
 Cost: $0/month
@@ -256,10 +256,10 @@ Status: Well within free tier (3,000/month) ✅
 
 After domain verified, you can use:
 ```
-noreply@jobmate.web.id   - Automated emails
-support@jobmate.web.id   - Support replies
-team@jobmate.web.id      - Team notifications
-hello@jobmate.web.id     - Marketing emails
+noreply@infolokerjombang.id   - Automated emails
+support@infolokerjombang.id   - Support replies
+team@infolokerjombang.id      - Team notifications
+hello@infolokerjombang.id     - Marketing emails
 ```
 
 **Setup:**
@@ -270,8 +270,8 @@ hello@jobmate.web.id     - Marketing emails
 
 Set reply-to for user responses:
 ```
-Sender Email: noreply@jobmate.web.id
-Reply-To: support@jobmate.web.id (in template)
+Sender Email: noreply@infolokerjombang.id
+Reply-To: support@infolokerjombang.id (in template)
 ```
 
 ### 3. Track Email Opens/Clicks
@@ -298,13 +298,13 @@ Connects to: smtp.resend.com
     ↓
 Sends via: Resend infrastructure
     ↓
-From: noreply@jobmate.web.id ✅
+From: noreply@infolokerjombang.id ✅
     ↓
 User receives professional email
 ```
 
 **Benefits:**
-- ✅ Professional sender address (@jobmate.web.id)
+- ✅ Professional sender address (@infolokerjombang.id)
 - ✅ Better deliverability (verified domain)
 - ✅ Email analytics/tracking
 - ✅ Brand consistency
@@ -324,7 +324,7 @@ User receives professional email
 │ Port:     587                           │
 │ User:     resend                        │
 │ Pass:     re_xxxxx (API Key)            │
-│ From:     noreply@jobmate.web.id        │
+│ From:     noreply@infolokerjombang.id        │
 │ Name:     JobMate                       │
 └─────────────────────────────────────────┘
 
@@ -345,7 +345,7 @@ You'll know it's working when:
 
 1. ✅ Supabase saves SMTP settings without error
 2. ✅ Test email sends successfully
-3. ✅ Email arrives with: `From: JobMate <noreply@jobmate.web.id>`
+3. ✅ Email arrives with: `From: JobMate <noreply@infolokerjombang.id>`
 4. ✅ Email is NOT in spam folder
 5. ✅ Links in email work correctly
 6. ✅ Resend dashboard shows delivery success
@@ -357,7 +357,7 @@ You'll know it's working when:
 
 **Email system upgraded:**
 - ❌ Before: `no-reply@mail.app.supabase.io`
-- ✅ After: `noreply@jobmate.web.id` 
+- ✅ After: `noreply@infolokerjombang.id` 
 
 **Professional, branded, and FREE!** 🚀
 

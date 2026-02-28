@@ -5,7 +5,7 @@
 Email **HANYA** bisa dikirim ke: `reza.nur.h45@gmail.com`
 
 Untuk kirim ke email lain (termasuk `updatesumobito@gmail.com`), perlu:
-**✅ Verify domain `jobmate.web.id` di Resend**
+**✅ Verify domain `infolokerjombang.id` di Resend**
 
 ---
 
@@ -18,7 +18,7 @@ https://resend.com/domains
 
 ### 2. Check Domain Status
 
-Cari: `jobmate.web.id`
+Cari: `infolokerjombang.id`
 
 **Jika status = ⏳ Pending:**
 - DNS records belum ditambahkan
@@ -39,7 +39,7 @@ Di Resend dashboard, akan ada 3 records:
 
 **Cloudflare** (paling common):
 1. https://dash.cloudflare.com
-2. Select `jobmate.web.id`
+2. Select `infolokerjombang.id`
 3. DNS → Records → Add record
 4. Add 3 records
 5. **PENTING**: Proxy = DNS only (abu-abu)
