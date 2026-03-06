@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { notifyNewInvoice } from '@/lib/telegram';
 
 // MY PG (klikqris.com) Configuration - from environment variables
 const MYPG_API_KEY = process.env.MYPG_API_KEY || 'WGyyEYlAiGwbHeiwHbcuJlyDlx9xCOsxJ2kPAI1X';
@@ -139,6 +140,27 @@ export async function POST(request: NextRequest) {
             console.log('[MY PG] Invoice email sent to:', email);
         } catch (emailError) {
             console.error('[MY PG] Failed to send invoice email:', emailError);
+        }
+
+        // Send Telegram Notification for New Invoice
+        try {
+            const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+            const invoiceUrl = `${origin}/test-mypg/pay?order_id=${orderId}&amount=${selectedPlan.amount}`;
+
+            await notifyNewInvoice({
+                customerName: fullName,
+                customerEmail: email,
+                customerPhone: whatsapp,
+                planType: plan as 'basic' | 'premium',
+                amount: mypgData.data?.total_amount ? parseFloat(mypgData.data.total_amount) : selectedPlan.amount,
+                invoiceUrl: invoiceUrl,
+                orderId: orderId,
+                paymentGateway: 'klikqris',
+                expiresAt: mypgData.data?.expired_at,
+            });
+            console.log('[MY PG] Telegram invoice notification sent');
+        } catch (telegramError) {
+            console.error('[MY PG] Failed to send Telegram notification:', telegramError);
         }
 
         // Resolve QRIS data: some API versions use qris_data, others use qris_url

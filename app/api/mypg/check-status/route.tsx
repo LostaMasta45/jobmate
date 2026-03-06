@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { resend, FROM_EMAIL } from '@/lib/resend';
 import { PaymentSuccessEmail, PaymentSuccessEmailText } from '@/emails/PaymentSuccessEmail';
 import { render } from '@react-email/render';
+import { notifyPaymentSuccess } from '@/lib/telegram';
 
 // Force dynamic - prevent Next.js from caching this API route
 export const dynamic = 'force-dynamic';
@@ -121,6 +122,23 @@ export async function GET(request: NextRequest) {
                 console.log('[MY PG Check Status] ✅ Success email sent to:', dbTransaction.email);
             } catch (emailError) {
                 console.error('[MY PG Check Status] Failed to send email:', emailError);
+            }
+
+            // Send Telegram Notification
+            try {
+                await notifyPaymentSuccess({
+                    customerName: dbTransaction.full_name || 'User',
+                    customerEmail: dbTransaction.email,
+                    customerPhone: dbTransaction.whatsapp || undefined,
+                    planType: dbTransaction.plan_type || 'basic',
+                    amount: parseInt(dbTransaction.amount) || data.data?.amount_paid || 0,
+                    paymentMethod: data.data?.payment_method || 'QRIS',
+                    paymentGateway: 'klikqris',
+                    orderId: orderId,
+                });
+                console.log('[MY PG Check Status] ✅ Telegram success notification sent');
+            } catch (telegramError) {
+                console.error('[MY PG Check Status] Failed to send Telegram notification:', telegramError);
             }
         }
 

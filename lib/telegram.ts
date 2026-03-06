@@ -845,13 +845,13 @@ export async function notifyPaymentSuccess(data: {
   planType: 'basic' | 'premium';
   amount: number;
   paymentMethod: string;
-  paymentGateway: 'midtrans' | 'xendit';
+  paymentGateway: 'midtrans' | 'xendit' | 'klikqris';
   orderId: string;
 }): Promise<boolean> {
   try {
     const planEmoji = data.planType === 'premium' ? '👑' : '⭐';
     const planLabel = data.planType === 'premium' ? 'VIP PREMIUM' : 'VIP BASIC';
-    const gatewayLabel = data.paymentGateway === 'midtrans' ? 'Midtrans' : 'Xendit';
+    const gatewayLabel = data.paymentGateway === 'midtrans' ? 'Midtrans' : data.paymentGateway === 'klikqris' ? 'KlikQRIS' : 'Xendit';
 
     // Format amount
     const formattedAmount = new Intl.NumberFormat('id-ID', {
@@ -910,13 +910,13 @@ export async function notifyNewInvoice(data: {
   amount: number;
   invoiceUrl: string;
   orderId: string;
-  paymentGateway: 'midtrans' | 'xendit';
+  paymentGateway: 'midtrans' | 'xendit' | 'klikqris';
   expiresAt?: string;
 }): Promise<boolean> {
   try {
     const planEmoji = data.planType === 'premium' ? '👑' : '⭐';
     const planLabel = data.planType === 'premium' ? 'VIP PREMIUM' : 'VIP BASIC';
-    const gatewayLabel = data.paymentGateway === 'midtrans' ? 'Midtrans' : 'Xendit';
+    const gatewayLabel = data.paymentGateway === 'midtrans' ? 'Midtrans' : data.paymentGateway === 'klikqris' ? 'KlikQRIS' : 'Xendit';
 
     // Format amount
     const formattedAmount = new Intl.NumberFormat('id-ID', {
@@ -982,11 +982,11 @@ export async function notifyPaymentExpired(data: {
   planType: 'basic' | 'premium';
   amount: number;
   orderId: string;
-  paymentGateway: 'midtrans' | 'xendit';
+  paymentGateway: 'midtrans' | 'xendit' | 'klikqris';
 }): Promise<boolean> {
   try {
     const planLabel = data.planType === 'premium' ? 'VIP PREMIUM' : 'VIP BASIC';
-    const gatewayLabel = data.paymentGateway === 'midtrans' ? 'Midtrans' : 'Xendit';
+    const gatewayLabel = data.paymentGateway === 'midtrans' ? 'Midtrans' : data.paymentGateway === 'klikqris' ? 'KlikQRIS' : 'Xendit';
 
     // Format amount
     const formattedAmount = new Intl.NumberFormat('id-ID', {
@@ -1038,12 +1038,12 @@ export async function notifyPaymentFailed(data: {
   planType: 'basic' | 'premium';
   amount: number;
   orderId: string;
-  paymentGateway: 'midtrans' | 'xendit';
+  paymentGateway: 'midtrans' | 'xendit' | 'klikqris';
   failureReason?: string;
 }): Promise<boolean> {
   try {
     const planLabel = data.planType === 'premium' ? 'VIP PREMIUM' : 'VIP BASIC';
-    const gatewayLabel = data.paymentGateway === 'midtrans' ? 'Midtrans' : 'Xendit';
+    const gatewayLabel = data.paymentGateway === 'midtrans' ? 'Midtrans' : data.paymentGateway === 'klikqris' ? 'KlikQRIS' : 'Xendit';
 
     // Format amount
     const formattedAmount = new Intl.NumberFormat('id-ID', {
