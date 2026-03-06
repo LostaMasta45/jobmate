@@ -560,7 +560,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                             <p style={{ margin: '0 0 16px', color: '#78350f', fontSize: '15px', lineHeight: '1.6' }}>
                               Dapatkan akses ke <strong>6 Tools JOBMATE</strong> untuk maksimalkan peluang diterima kerja!
                             </p>
-                            <a href="https://t.me/jobmate_support" style={{
+                            <a href="https://t.me/infolokerjombang_support" style={{
                               display: 'inline-block',
                               background: '#f59e0b',
                               color: '#ffffff',
@@ -643,12 +643,12 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                       fontSize: '13px',
                     }}>
                       💬 Butuh bantuan? Hubungi:{' '}
-                      <a href="https://t.me/jobmate_support" style={{
+                      <a href="https://t.me/infolokerjombang_support" style={{
                         color: colors.purpleHeart,
                         textDecoration: 'none',
                         fontWeight: '600',
                       }}>
-                        @jobmate_support
+                        @infolokerjombang_support
                       </a>
                     </p>
                     
@@ -719,7 +719,7 @@ ${isPremium ? `
 ` : `
 👑 MAU UPGRADE KE PREMIUM?
 Dapatkan akses ke 6 Tools JOBMATE untuk maksimalkan peluang diterima!
-Info: https://t.me/jobmate_support
+Info: https://t.me/infolokerjombang_support
 `}
 
 Selamat menikmati fitur ${membershipName}!
@@ -727,7 +727,7 @@ Semoga segera mendapatkan pekerjaan impian Anda. 🎯💼
 
 ---
 Email ini dikirim secara otomatis oleh sistem JOBMATE
-Butuh bantuan? Hubungi: @jobmate_support
+Butuh bantuan? Hubungi: @infolokerjombang_support
 © 2025 JOBMATE - Platform Pencarian Kerja Terpercaya
 `;
 };

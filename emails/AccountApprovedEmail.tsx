@@ -396,7 +396,7 @@ export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
                           }}>
                             Dapatkan akses ke <strong>Tools JOBMATE</strong> untuk membuat CV ATS, Surat Lamaran AI, dan banyak lagi!
                           </p>
-                          <a href="https://t.me/jobmate_support" style={{
+                          <a href="https://t.me/infolokerjombang_support" style={{
                             display: 'inline-block',
                             background: '#f59e0b',
                             color: '#ffffff',
@@ -478,12 +478,12 @@ export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
                       fontSize: '13px',
                     }}>
                       💬 Butuh bantuan? Hubungi:{' '}
-                      <a href="https://t.me/jobmate_support" style={{
+                      <a href="https://t.me/infolokerjombang_support" style={{
                         color: '#5547d0',
                         textDecoration: 'none',
                         fontWeight: '600',
                       }}>
-                        @jobmate_support
+                        @infolokerjombang_support
                       </a>
                     </p>
                     
@@ -540,13 +540,13 @@ Fitur yang Bisa Anda Akses:
 
 ⭐ UPGRADE KE PREMIUM?
 Dapatkan akses ke Tools JOBMATE: CV ATS, Surat Lamaran AI, dll
-Info: https://t.me/jobmate_support
+Info: https://t.me/infolokerjombang_support
 
 Selamat bergabung di JOBMATE!
 Kami siap membantu Anda menemukan pekerjaan impian. 💪
 
 ---
 Email ini dikirim secara otomatis oleh sistem JOBMATE
-Butuh bantuan? Hubungi: @jobmate_support
+Butuh bantuan? Hubungi: @infolokerjombang_support
 © 2025 JOBMATE - Platform Karir Terpercaya
 `;

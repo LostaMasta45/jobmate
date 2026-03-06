@@ -401,7 +401,7 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                             Ada pertanyaan? Ingin mempercepat proses?<br/>
                             Tim support kami siap membantu Anda! 
                           </p>
-                          <a href="https://t.me/jobmate_support" style={{
+                          <a href="https://t.me/infolokerjombang_support" style={{
                             display: 'inline-block',
                             background: 'linear-gradient(135deg, #5547d0 0%, #3977d3 100%)',
                             color: '#ffffff',
@@ -528,12 +528,12 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                       fontSize: '13px',
                     }}>
                       💬 Butuh bantuan? Hubungi:{' '}
-                      <a href="https://t.me/jobmate_support" style={{
+                      <a href="https://t.me/infolokerjombang_support" style={{
                         color: '#5547d0',
                         textDecoration: 'none',
                         fontWeight: '600',
                       }}>
-                        @jobmate_support
+                        @infolokerjombang_support
                       </a>
                     </p>
                     
@@ -590,7 +590,7 @@ Kami senang Anda tertarik bergabung dengan platform pencarian kerja terpercaya d
 
 💬 BUTUH BANTUAN?
 Ada pertanyaan? Ingin mempercepat proses?
-Hubungi support: https://t.me/jobmate_support
+Hubungi support: https://t.me/infolokerjombang_support
 
 💡 TIPS PENTING:
 - Pastikan email ${email} aktif dan cek folder spam/inbox
@@ -602,6 +602,6 @@ Kami akan segera meninjau pengajuan Anda. 🚀
 
 ---
 Email ini dikirim otomatis dari sistem JOBMATE
-💬 Butuh bantuan? @jobmate_support
+💬 Butuh bantuan? @infolokerjombang_support
 © 2025 JOBMATE - Platform Karir Terpercaya
 `;

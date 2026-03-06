@@ -350,12 +350,12 @@ export const ResetPasswordEmail: React.FC<ResetPasswordEmailProps> = ({
                       fontSize: '13px',
                     }}>
                       💬 Butuh bantuan?{' '}
-                      <a href="https://t.me/jobmate_support" style={{
+                      <a href="https://t.me/infolokerjombang_support" style={{
                         color: '#3b82f6',
                         textDecoration: 'none',
                         fontWeight: '600',
                       }}>
-                        @jobmate_support
+                        @infolokerjombang_support
                       </a>
                     </p>
                     
@@ -407,6 +407,6 @@ Tips Keamanan Password:
 
 ---
 Email ini dikirim secara otomatis oleh sistem JOBMATE
-Butuh bantuan? Hubungi: @jobmate_support
+Butuh bantuan? Hubungi: @infolokerjombang_support
 © 2025 JOBMATE - Platform Karir Terpercaya
 `;
