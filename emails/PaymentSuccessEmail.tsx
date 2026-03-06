@@ -2,8 +2,8 @@
 import React from 'react';
 
 // Logo dari production URL
-const LOGO_PANJANG_URL = 'https://infolokerjombang.id/Logo/logopanjang.png';
-const LOGO_KECIL_URL = 'https://infolokerjombang.id/Logo/logokecil.png';
+const LOGO_PANJANG_URL = 'https://infolokerjombang.id/Logo/x.png';
+const LOGO_KECIL_URL = 'https://infolokerjombang.id/Logo/x.png';
 
 interface PaymentSuccessEmailProps {
     userName: string;

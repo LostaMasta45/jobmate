@@ -85,7 +85,7 @@ function MYPGPaymentDisplayContent() {
                     }
                 } else {
                     // Fetch if not in session
-                    const res = await fetch(`/api/mypg/check-status?order_id=${orderId}`);
+                    const res = await fetch(`/api/mypg/check-status?order_id=${orderId}`, { cache: 'no-store' });
                     const data = await res.json();
 
                     if (data.success && data.transaction) {
@@ -158,7 +158,7 @@ function MYPGPaymentDisplayContent() {
         if (isManual) setIsPolling(true);
 
         try {
-            const response = await fetch(`/api/mypg/check-status?order_id=${orderId}`);
+            const response = await fetch(`/api/mypg/check-status?order_id=${orderId}&t=${Date.now()}`, { cache: 'no-store' });
             const data = await response.json();
 
             setLastChecked(new Date());
@@ -186,7 +186,7 @@ function MYPGPaymentDisplayContent() {
 
         const interval = setInterval(() => {
             checkPaymentStatus(false);
-        }, 5000);
+        }, 3000);
 
         return () => clearInterval(interval);
     }, [orderId, isPaid]);

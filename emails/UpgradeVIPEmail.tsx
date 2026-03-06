@@ -10,8 +10,8 @@ interface UpgradeVIPEmailProps {
 }
 
 // Logo dari production URL - pastikan file ada di public/Logo/x.png
-const LOGO_URL = 'https://infolokerjombang.id/Logo/logopanjang.png';
-const LOGO_KECIL_URL = 'https://infolokerjombang.id/Logo/logokecil.png';
+const LOGO_URL = 'https://infolokerjombang.id/Logo/x.png';
+const LOGO_KECIL_URL = 'https://infolokerjombang.id/Logo/x.png';
 
 export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
   userName,

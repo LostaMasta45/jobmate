@@ -4,6 +4,10 @@ import { resend, FROM_EMAIL } from '@/lib/resend';
 import { PaymentSuccessEmail, PaymentSuccessEmailText } from '@/emails/PaymentSuccessEmail';
 import { render } from '@react-email/render';
 
+// Force dynamic - prevent Next.js from caching this API route
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // MY PG Configuration - from environment variables
 const MYPG_API_KEY = process.env.MYPG_API_KEY || 'WGyyEYlAiGwbHeiwHbcuJlyDlx9xCOsxJ2kPAI1X';
 const MYPG_MERCHANT_ID = process.env.MYPG_MERCHANT_ID || '176930678538';
@@ -98,11 +102,11 @@ export async function GET(request: NextRequest) {
                     dashboardUrl: 'https://infolokerjombang.id/ajukan-akun',
                 };
 
-                const emailHtml = await render(<PaymentSuccessEmail { ...emailProps } />);
+                const emailHtml = await render(<PaymentSuccessEmail {...emailProps} />);
                 const emailText = PaymentSuccessEmailText(emailProps);
 
                 await resend.emails.send({
-                    from: FROM_EMAIL,
+                    from: 'infolokerjombang <admin@infolokerjombang.id>',
                     to: dbTransaction.email,
                     subject: `✅ Pembayaran ${dbTransaction.plan_type === 'premium' ? 'VIP Premium' : dbTransaction.plan_type === 'basic' ? 'VIP Basic' : 'Test'} Berhasil - JOBMATE`,
                     html: emailHtml,

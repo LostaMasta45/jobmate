@@ -58,10 +58,9 @@ export function QRCard({ paymentData, isExpired = false, isPaid = false, classNa
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pl-1">Pembayaran Nasional</p>
                     </div>
 
-                    {/* GPN with Holographic effect */}
-                    <div className="relative h-8 w-14 flex items-center justify-center overflow-hidden rounded-md border border-slate-100 bg-slate-50 shadow-sm">
-                        <span className="text-[#DA251C] font-black italic text-xl z-10">GPN</span>
-                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/80 to-transparent animate-[shimmer_3s_infinite]" />
+                    {/* GPN Badge - Static for html2canvas compatibility */}
+                    <div className="relative h-8 w-14 flex items-center justify-center rounded-md border border-red-100 bg-red-50">
+                        <span className="text-[#DA251C] font-black italic text-xl">GPN</span>
                     </div>
                 </div>
 
