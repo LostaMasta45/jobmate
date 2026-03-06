@@ -38,7 +38,7 @@ export async function sendAccountPendingEmail({
     console.log('[Email Debug] HTML length:', emailHtml?.length || 0);
 
     const { data, error } = await resend.emails.send({
-      from: 'InfoLokerJombang <admin@infolokerjombang.id>',
+      from: 'infolokerjombang <admin@infolokerjombang.id>',
       to: email,
       subject: 'Status Pengajuan Akun Anda - InfoLokerJombang',
       html: String(emailHtml),
@@ -83,7 +83,7 @@ export async function sendAccountApprovedEmail({
     const emailText = AccountApprovedEmailText({ userName, email, approvedAt, loginUrl });
 
     const { data, error } = await resend.emails.send({
-      from: 'InfoLokerJombang <admin@infolokerjombang.id>',
+      from: 'infolokerjombang <admin@infolokerjombang.id>',
       to: email,
       subject: 'Akun Anda Telah Disetujui - InfoLokerJombang',
       html: String(emailHtml),
@@ -134,7 +134,7 @@ export async function sendUpgradeVIPEmail({
     const emailText = UpgradeVIPEmailText({ userName, email, membershipType, upgradedAt, dashboardUrl });
 
     const { data, error } = await resend.emails.send({
-      from: 'InfoLokerJombang <admin@infolokerjombang.id>',
+      from: 'infolokerjombang <admin@infolokerjombang.id>',
       to: email,
       subject: isPremium
         ? '👑 Selamat! Upgrade VIP Premium Berhasil - InfoLokerJombang'

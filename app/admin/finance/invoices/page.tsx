@@ -31,12 +31,15 @@ function StatusBadge({ status }: { status: string }) {
 // Plan badge component
 function PlanBadge({ plan }: { plan: string }) {
     const isPremium = plan === 'premium';
+    const isTest = plan === 'test';
     return (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${isPremium
             ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
-            : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+            : isTest
+                ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+                : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
             }`}>
-            {isPremium ? '👑' : '⭐'} VIP {plan.charAt(0).toUpperCase() + plan.slice(1)}
+            {isPremium ? '👑' : isTest ? '🧪' : '⭐'} {isTest ? 'Test' : `VIP ${plan.charAt(0).toUpperCase() + plan.slice(1)}`}
         </span>
     );
 }
@@ -89,7 +92,7 @@ export default function InvoicesPage() {
 
     // Filters
     const [status, setStatus] = useState<'all' | 'paid' | 'pending' | 'expired' | 'failed'>('all');
-    const [planType, setPlanType] = useState<'all' | 'basic' | 'premium'>('all');
+    const [planType, setPlanType] = useState<'all' | 'basic' | 'premium' | 'test'>('all');
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const limit = 10;
@@ -186,6 +189,7 @@ export default function InvoicesPage() {
                         className="px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
                     >
                         <option value="all">All Plans</option>
+                        <option value="test">🧪 Test</option>
                         <option value="basic">⭐ VIP Basic</option>
                         <option value="premium">👑 VIP Premium</option>
                     </select>

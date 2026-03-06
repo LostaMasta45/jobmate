@@ -216,9 +216,10 @@ function MYPGPaymentDisplayContent() {
             await new Promise(resolve => setTimeout(resolve, 500));
 
             const canvas = await html2canvas(qrCardRef.current, {
-                background: undefined,
-                scale: 2,
+                backgroundColor: '#ffffff',
+                scale: 3,
                 useCORS: true,
+                allowTaint: true,
                 logging: false,
             } as any);
 

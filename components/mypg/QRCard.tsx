@@ -1,7 +1,6 @@
 "use client";
 
-import { Check, ShieldCheck, Wifi } from "lucide-react";
-import Image from "next/image";
+import { Check, ShieldCheck } from "lucide-react";
 import QRCode from "react-qr-code";
 
 interface QRCardProps {
@@ -25,7 +24,11 @@ export function QRCard({ paymentData, isExpired = false, isPaid = false, classNa
     if (!paymentData) return null;
 
     const nmid = "ID1022147265592";
-    const qrValue = paymentData.qrisUrl || paymentData.directUrl || "Invalid QR";
+
+    // Priority: qrisImage (pre-rendered from KlikQRIS) > qrisUrl (QRIS data string for react-qr-code)
+    const qrisImageSrc = paymentData.qrisImage;
+    const qrisDataString = paymentData.qrisUrl;
+    const hasValidQR = !!(qrisImageSrc || qrisDataString);
 
     return (
         <div className={`relative w-full max-w-[340px] mx-auto ${className} perspective-1000 group`}>
@@ -44,11 +47,12 @@ export function QRCard({ paymentData, isExpired = false, isPaid = false, classNa
                 <div className="px-6 pt-8 pb-4 relative z-10 flex items-start justify-between">
                     <div className="flex flex-col gap-1">
                         <div className="relative h-10 w-32 -ml-1">
-                            <Image
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
                                 src="/payment-logos/qris.png"
                                 alt="QRIS"
-                                fill
-                                className="object-contain object-left"
+                                className="h-full w-auto object-contain object-left"
+                                crossOrigin="anonymous"
                             />
                         </div>
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pl-1">Pembayaran Nasional</p>
@@ -80,15 +84,34 @@ export function QRCard({ paymentData, isExpired = false, isPaid = false, classNa
                 {/* QR Code Container - Secure Zone */}
                 <div className="flex justify-center mb-8 relative z-10 px-6">
                     <div className="relative bg-white p-1 rounded-xl">
-                        {/* No mix-blend-multiply to ensure visibility on all screens */}
                         <div className="relative">
-                            <QRCode
-                                value={qrValue}
-                                size={240}
-                                level={"M"}
-                                viewBox={`0 0 256 256`}
-                                className="aspect-square w-full h-full"
-                            />
+                            {/* Priority 1: Use pre-rendered QRIS image from KlikQRIS API */}
+                            {qrisImageSrc ? (
+                                <img
+                                    src={qrisImageSrc}
+                                    alt="QRIS Payment QR Code"
+                                    width={240}
+                                    height={240}
+                                    className="aspect-square w-[240px] h-[240px] object-contain"
+                                    style={{ imageRendering: 'pixelated' }}
+                                />
+                            ) : qrisDataString ? (
+                                /* Priority 2: Generate QR from QRIS data string */
+                                <QRCode
+                                    value={qrisDataString}
+                                    size={240}
+                                    level={"M"}
+                                    viewBox={`0 0 256 256`}
+                                    className="aspect-square w-full h-full"
+                                />
+                            ) : (
+                                /* Fallback: No valid QR data available */
+                                <div className="w-[240px] h-[240px] flex flex-col items-center justify-center bg-slate-50 rounded-lg border-2 border-dashed border-slate-200">
+                                    <span className="text-3xl mb-2">⚠️</span>
+                                    <p className="text-sm font-bold text-slate-500 text-center px-4">QR Code tidak tersedia</p>
+                                    <p className="text-xs text-slate-400 text-center px-4 mt-1">Silakan buat transaksi baru</p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Status Overlays */}

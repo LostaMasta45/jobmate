@@ -8,7 +8,8 @@ interface AccountPendingEmailProps {
 }
 
 // Logo dari production URL - pastikan file ada di public/Logo/x.png
-const LOGO_URL = 'https://infolokerjombang.id/Logo/x.png';
+const LOGO_URL = 'https://infolokerjombang.id/Logo/logopanjang.png';
+const LOGO_KECIL_URL = 'https://infolokerjombang.id/Logo/logokecil.png';
 
 export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
   userName,
@@ -45,7 +46,7 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                 overflow: 'hidden',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
               }}>
-                
+
                 {/* Header with Logo - Brand Colors */}
                 <tr>
                   <td style={{
@@ -66,7 +67,7 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                                 border: '2px solid rgba(255,255,255,0.25)',
                                 boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
                               }}>
-                                <img 
+                                <img
                                   src={LOGO_URL}
                                   alt="InfoLokerJombang"
                                   width="280"
@@ -110,7 +111,7 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                       lineHeight: '1.2',
                       textShadow: '0 2px 4px rgba(0,0,0,0.2)',
                     }}>
-                      Pengajuan Diterima!<br/>Menunggu Verifikasi
+                      Pengajuan Diterima!<br />Menunggu Verifikasi
                     </h1>
 
                     {/* Status Badge */}
@@ -142,7 +143,7 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                 {/* Content */}
                 <tr>
                   <td style={{ padding: '40px 30px' }}>
-                    
+
                     {/* Greeting */}
                     <h2 style={{
                       margin: '0 0 12px',
@@ -158,7 +159,7 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                       fontSize: '16px',
                       lineHeight: '1.6',
                     }}>
-                      Terima kasih telah mendaftar di <strong style={{ color: '#5547d0' }}>JOBMATE</strong>! 🎉 
+                      Terima kasih telah mendaftar di <strong style={{ color: '#5547d0' }}>JOBMATE</strong>! 🎉
                       Kami senang Anda tertarik bergabung dengan platform pencarian kerja terpercaya di Jombang.
                     </p>
 
@@ -181,7 +182,7 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                           }}>
                             📋 Detail Pengajuan Anda
                           </h3>
-                          
+
                           <table cellPadding="0" cellSpacing="0" border={0} width="100%">
                             <tr>
                               <td style={{ padding: '8px 0' }}>
@@ -256,16 +257,16 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                           paddingTop: '4px',
                           verticalAlign: 'top',
                         }}>
-                          <strong style={{ 
-                            color: '#111827', 
+                          <strong style={{
+                            color: '#111827',
                             fontSize: '15px',
                             display: 'block',
                             marginBottom: '4px'
                           }}>
                             1. Pengajuan Diterima ✅
                           </strong>
-                          <span style={{ 
-                            color: '#6b7280', 
+                          <span style={{
+                            color: '#6b7280',
                             fontSize: '14px',
                             lineHeight: '1.5'
                           }}>
@@ -300,16 +301,16 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                           paddingTop: '4px',
                           verticalAlign: 'top',
                         }}>
-                          <strong style={{ 
-                            color: '#111827', 
+                          <strong style={{
+                            color: '#111827',
                             fontSize: '15px',
                             display: 'block',
                             marginBottom: '4px'
                           }}>
                             2. Verifikasi Tim Kami 🔍
                           </strong>
-                          <span style={{ 
-                            color: '#6b7280', 
+                          <span style={{
+                            color: '#6b7280',
                             fontSize: '14px',
                             lineHeight: '1.5'
                           }}>
@@ -343,16 +344,16 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                           paddingTop: '4px',
                           verticalAlign: 'top',
                         }}>
-                          <strong style={{ 
-                            color: '#111827', 
+                          <strong style={{
+                            color: '#111827',
                             fontSize: '15px',
                             display: 'block',
                             marginBottom: '4px'
                           }}>
                             3. Notifikasi Persetujuan 🎉
                           </strong>
-                          <span style={{ 
-                            color: '#6b7280', 
+                          <span style={{
+                            color: '#6b7280',
                             fontSize: '14px',
                             lineHeight: '1.5'
                           }}>
@@ -398,8 +399,8 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                             fontSize: '15px',
                             lineHeight: '1.6',
                           }}>
-                            Ada pertanyaan? Ingin mempercepat proses?<br/>
-                            Tim support kami siap membantu Anda! 
+                            Ada pertanyaan? Ingin mempercepat proses?<br />
+                            Tim support kami siap membantu Anda!
                           </p>
                           <a href="https://t.me/infolokerjombang_support" style={{
                             display: 'inline-block',
@@ -427,8 +428,8 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                     }}>
                       <tr>
                         <td style={{ padding: '20px' }}>
-                          <strong style={{ 
-                            color: '#065f46', 
+                          <strong style={{
+                            color: '#065f46',
                             fontSize: '15px',
                             display: 'block',
                             marginBottom: '8px'
@@ -464,7 +465,7 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                       lineHeight: '1.6',
                       textAlign: 'center',
                     }}>
-                      <strong style={{ color: '#111827' }}>Terima kasih atas kesabaran Anda!</strong><br/>
+                      <strong style={{ color: '#111827' }}>Terima kasih atas kesabaran Anda!</strong><br />
                       Kami akan segera meninjau pengajuan Anda. 🚀
                     </p>
                   </td>
@@ -481,8 +482,8 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                     <table cellPadding="0" cellSpacing="0" border={0} width="100%">
                       <tr>
                         <td align="center" style={{ paddingBottom: '16px' }}>
-                          <img 
-                            src={LOGO_URL}
+                          <img
+                            src={LOGO_KECIL_URL}
                             alt="JOBMATE Logo"
                             width="120"
                             height="30"
@@ -495,7 +496,7 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                         </td>
                       </tr>
                     </table>
-                    
+
                     <p style={{
                       margin: '0 0 8px',
                       fontWeight: '700',
@@ -513,7 +514,7 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                     }}>
                       🎯 Platform Karir Terpercaya
                     </p>
-                    
+
                     {/* Contact Links */}
                     <p style={{
                       margin: '0 0 4px',
@@ -536,7 +537,7 @@ export const AccountPendingEmail: React.FC<AccountPendingEmailProps> = ({
                         @infolokerjombang_support
                       </a>
                     </p>
-                    
+
                     <p style={{
                       margin: '0',
                       color: '#9ca3af',

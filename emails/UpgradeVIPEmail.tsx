@@ -10,7 +10,8 @@ interface UpgradeVIPEmailProps {
 }
 
 // Logo dari production URL - pastikan file ada di public/Logo/x.png
-const LOGO_URL = 'https://infolokerjombang.id/Logo/x.png';
+const LOGO_URL = 'https://infolokerjombang.id/Logo/logopanjang.png';
+const LOGO_KECIL_URL = 'https://infolokerjombang.id/Logo/logokecil.png';
 
 export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
   userName,
@@ -21,7 +22,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
 }) => {
   const isPremium = membershipType === 'vip_premium';
   const membershipName = isPremium ? 'VIP Premium' : 'VIP Basic';
-  
+
   // Color palette from colorpallate.md
   const colors = {
     purpleHeart: '#5547d0',
@@ -33,7 +34,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
     premiumGold: '#f59e0b',
     premiumGoldDark: '#d97706',
   };
-  
+
   return (
     <html>
       <head>
@@ -64,11 +65,11 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                 overflow: 'hidden',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
               }}>
-                
+
                 {/* Header with Logo - Brand Colors */}
                 <tr>
                   <td style={{
-                    background: isPremium 
+                    background: isPremium
                       ? `linear-gradient(135deg, ${colors.premiumGold} 0%, ${colors.premiumGoldDark} 100%)`
                       : `linear-gradient(135deg, ${colors.purpleHeart} 0%, ${colors.mariner} 50%, ${colors.pacificBlue} 100%)`,
                     padding: '40px 30px',
@@ -87,7 +88,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                                 border: '2px solid rgba(255,255,255,0.25)',
                                 boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
                               }}>
-                                <img 
+                                <img
                                   src={LOGO_URL}
                                   alt="InfoLokerJombang"
                                   width="280"
@@ -131,7 +132,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                       lineHeight: '1.2',
                       textShadow: '0 2px 4px rgba(0,0,0,0.2)',
                     }}>
-                      Selamat!<br/>Upgrade ke {membershipName}
+                      Selamat!<br />Upgrade ke {membershipName}
                     </h1>
 
                     {/* Status Badge */}
@@ -140,12 +141,12 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                         <td align="center">
                           <div style={{
                             display: 'inline-block',
-                            background: isPremium 
-                              ? 'rgba(254,243,199,1)' 
+                            background: isPremium
+                              ? 'rgba(254,243,199,1)'
                               : 'rgba(255,255,255,0.2)',
                             padding: '12px 32px',
                             borderRadius: '25px',
-                            border: isPremium 
+                            border: isPremium
                               ? '2px solid rgba(251,191,36,0.5)'
                               : '2px solid rgba(255,255,255,0.3)',
                           }}>
@@ -167,7 +168,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                 {/* Content */}
                 <tr>
                   <td style={{ padding: '40px 30px' }}>
-                    
+
                     {/* Greeting */}
                     <h2 style={{
                       margin: '0 0 12px',
@@ -207,7 +208,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                           }}>
                             📋 Detail Membership
                           </h3>
-                          
+
                           <table cellPadding="0" cellSpacing="0" border={0} width="100%">
                             <tr>
                               <td style={{ padding: '8px 0' }}>
@@ -414,7 +415,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                             <h4 style={{ margin: '0 0 15px 0', color: '#92400e', fontSize: '16px', fontWeight: '700' }}>
                               ⚡ BONUS FITUR PREMIUM:
                             </h4>
-                            
+
                             {/* Premium Feature 1 */}
                             <table cellPadding="0" cellSpacing="0" border={0} width="100%" style={{
                               backgroundColor: '#ffffff',
@@ -586,7 +587,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                       lineHeight: '1.6',
                       textAlign: 'center',
                     }}>
-                      <strong style={{ color: '#111827' }}>Selamat menikmati fitur {membershipName}!</strong><br/>
+                      <strong style={{ color: '#111827' }}>Selamat menikmati fitur {membershipName}!</strong><br />
                       Semoga segera mendapatkan pekerjaan impian Anda. 🎯💼
                     </p>
                   </td>
@@ -603,8 +604,8 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                     <table cellPadding="0" cellSpacing="0" border={0} width="100%">
                       <tr>
                         <td align="center" style={{ paddingBottom: '16px' }}>
-                          <img 
-                            src={LOGO_URL}
+                          <img
+                            src={LOGO_KECIL_URL}
                             alt="JOBMATE Logo"
                             width="120"
                             height="30"
@@ -617,7 +618,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                         </td>
                       </tr>
                     </table>
-                    
+
                     <p style={{
                       margin: '0 0 8px',
                       fontWeight: '700',
@@ -635,7 +636,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                     }}>
                       🎯 Platform Karir Terpercaya
                     </p>
-                    
+
                     {/* Contact Links */}
                     <p style={{
                       margin: '0 0 4px',
@@ -651,7 +652,7 @@ export const UpgradeVIPEmail: React.FC<UpgradeVIPEmailProps> = ({
                         @infolokerjombang_support
                       </a>
                     </p>
-                    
+
                     <p style={{
                       margin: '16px 0 0',
                       color: '#9ca3af',

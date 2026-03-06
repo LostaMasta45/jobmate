@@ -3,8 +3,8 @@ import React from 'react';
 
 // Use Imgur CDN for reliable email logo display
 // Logo dari production URL - pastikan file ada di public/Logo/x.png
-const LOGO_PANJANG_URL = 'https://infolokerjombang.id/Logo/x.png';
-const LOGO_KECIL_URL = 'https://infolokerjombang.id/Logo/x.png';
+const LOGO_PANJANG_URL = 'https://infolokerjombang.id/Logo/logopanjang.png';
+const LOGO_KECIL_URL = 'https://infolokerjombang.id/Logo/logokecil.png';
 
 interface InvoiceEmailProps {
   userName: string;
@@ -61,7 +61,7 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                 overflow: 'hidden',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
               }}>
-                
+
                 {/* Header */}
                 <tr>
                   <td style={{
@@ -83,7 +83,7 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                                 border: '2px solid rgba(255,255,255,0.25)',
                                 boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
                               }}>
-                                <img 
+                                <img
                                   src={LOGO_PANJANG_URL}
                                   alt="InfoLokerJombang"
                                   width="280"
@@ -130,7 +130,7 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                 {/* Content */}
                 <tr>
                   <td style={{ padding: '40px 30px' }}>
-                    
+
                     {/* Greeting */}
                     <h2 style={{
                       margin: '0 0 12px',
@@ -168,7 +168,7 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                           }}>
                             Invoice #{invoiceId}
                           </p>
-                          
+
                           <table cellPadding="0" cellSpacing="0" border={0} width="100%">
                             <tr>
                               <td style={{ padding: '12px 0', borderBottom: '1px solid #f3f4f6' }}>
@@ -280,7 +280,7 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                             <div style={{
                               height: '100%',
                               width: `${progressPercentage}%`,
-                              background: isUrgent 
+                              background: isUrgent
                                 ? 'linear-gradient(90deg, #dc2626 0%, #ef4444 100%)'
                                 : 'linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)',
                             }} />
@@ -407,7 +407,7 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                     <table cellPadding="0" cellSpacing="0" border={0} width="100%">
                       <tr>
                         <td align="center" style={{ paddingBottom: '16px' }}>
-                          <img 
+                          <img
                             src={LOGO_KECIL_URL}
                             alt="JOBMATE Logo"
                             width="48"
@@ -422,7 +422,7 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                         </td>
                       </tr>
                     </table>
-                    
+
                     <p style={{
                       margin: '0 0 8px',
                       fontWeight: '700',
@@ -440,7 +440,7 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                     }}>
                       🎯 Platform Karir Terpercaya
                     </p>
-                    
+
                     {/* Contact Info */}
                     <table cellPadding="0" cellSpacing="0" border={0} width="100%">
                       <tr>
@@ -469,7 +469,7 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                         </td>
                       </tr>
                     </table>
-                    
+
                     <p style={{
                       margin: '16px 0 0',
                       color: '#9ca3af',

@@ -32,12 +32,15 @@ function StatusBadge({ status }: { status: string }) {
 // Plan badge component
 function PlanBadge({ plan }: { plan: string }) {
     const isPremium = plan === 'premium';
+    const isTest = plan === 'test';
     return (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${isPremium
             ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
-            : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+            : isTest
+                ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+                : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
             }`}>
-            {isPremium ? '👑' : '⭐'} VIP {plan.charAt(0).toUpperCase() + plan.slice(1)}
+            {isPremium ? '👑' : isTest ? '🧪' : '⭐'} {isTest ? 'Test' : `VIP ${plan.charAt(0).toUpperCase() + plan.slice(1)}`}
         </span>
     );
 }

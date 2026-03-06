@@ -22,7 +22,7 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams) {
 
     // No attachments needed - logos loaded from production URL (infolokerjombang.id)
     const { data, error } = await resend.emails.send({
-      from: 'InfoLokerJombang <admin@infolokerjombang.id>',
+      from: 'infolokerjombang <admin@infolokerjombang.id>',
       to: params.toEmail,
       subject: `💳 Invoice Pembayaran ${params.description} - InfoLokerJombang`,
       html: emailHtml,

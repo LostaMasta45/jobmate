@@ -9,7 +9,8 @@ interface ResetPasswordEmailProps {
 }
 
 // Logo dari production URL - pastikan file ada di public/Logo/x.png
-const LOGO_URL = 'https://infolokerjombang.id/Logo/x.png';
+const LOGO_URL = 'https://infolokerjombang.id/Logo/logopanjang.png';
+const LOGO_KECIL_URL = 'https://infolokerjombang.id/Logo/logokecil.png';
 
 export const ResetPasswordEmail: React.FC<ResetPasswordEmailProps> = ({
   userName,
@@ -45,7 +46,7 @@ export const ResetPasswordEmail: React.FC<ResetPasswordEmailProps> = ({
                 overflow: 'hidden',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
               }}>
-                
+
                 {/* Header */}
                 <tr>
                   <td style={{
@@ -66,7 +67,7 @@ export const ResetPasswordEmail: React.FC<ResetPasswordEmailProps> = ({
                                 border: '2px solid rgba(255,255,255,0.25)',
                                 boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
                               }}>
-                                <img 
+                                <img
                                   src={LOGO_URL}
                                   alt="InfoLokerJombang"
                                   width="280"
@@ -137,7 +138,7 @@ export const ResetPasswordEmail: React.FC<ResetPasswordEmailProps> = ({
                 {/* Content */}
                 <tr>
                   <td style={{ padding: '40px 30px' }}>
-                    
+
                     {/* Greeting */}
                     <h2 style={{
                       margin: '0 0 12px',
@@ -178,7 +179,7 @@ export const ResetPasswordEmail: React.FC<ResetPasswordEmailProps> = ({
                                   fontSize: '14px',
                                   lineHeight: '1.5',
                                 }}>
-                                  <strong>Link ini akan kedaluwarsa dalam {expiresIn}.</strong><br/>
+                                  <strong>Link ini akan kedaluwarsa dalam {expiresIn}.</strong><br />
                                   Jika Anda tidak meminta reset password, abaikan email ini.
                                 </p>
                               </td>
@@ -316,8 +317,8 @@ export const ResetPasswordEmail: React.FC<ResetPasswordEmailProps> = ({
                     padding: '30px',
                     textAlign: 'center',
                   }}>
-                    <img 
-                      src={LOGO_URL}
+                    <img
+                      src={LOGO_KECIL_URL}
                       alt="JOBMATE Logo"
                       width="120"
                       height="30"
@@ -327,7 +328,7 @@ export const ResetPasswordEmail: React.FC<ResetPasswordEmailProps> = ({
                         opacity: 0.7,
                       }}
                     />
-                    
+
                     <p style={{
                       margin: '0 0 8px',
                       fontWeight: '700',
@@ -343,7 +344,7 @@ export const ResetPasswordEmail: React.FC<ResetPasswordEmailProps> = ({
                     }}>
                       🎯 Platform Karir Terpercaya
                     </p>
-                    
+
                     <p style={{
                       margin: '0 0 4px',
                       color: '#9ca3af',
@@ -358,7 +359,7 @@ export const ResetPasswordEmail: React.FC<ResetPasswordEmailProps> = ({
                         @infolokerjombang_support
                       </a>
                     </p>
-                    
+
                     <p style={{
                       margin: '16px 0 0',
                       color: '#9ca3af',

@@ -9,7 +9,8 @@ interface AccountApprovedEmailProps {
 }
 
 // Logo dari production URL - pastikan file ada di public/Logo/x.png
-const LOGO_URL = 'https://infolokerjombang.id/Logo/x.png';
+const LOGO_URL = 'https://infolokerjombang.id/Logo/logopanjang.png';
+const LOGO_KECIL_URL = 'https://infolokerjombang.id/Logo/logokecil.png';
 
 export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
   userName,
@@ -47,7 +48,7 @@ export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
                 overflow: 'hidden',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
               }}>
-                
+
                 {/* Header with Logo */}
                 <tr>
                   <td style={{
@@ -68,7 +69,7 @@ export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
                                 border: '2px solid rgba(255,255,255,0.25)',
                                 boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
                               }}>
-                                <img 
+                                <img
                                   src={LOGO_URL}
                                   alt="InfoLokerJombang"
                                   width="280"
@@ -112,7 +113,7 @@ export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
                       lineHeight: '1.2',
                       textShadow: '0 2px 4px rgba(0,0,0,0.2)',
                     }}>
-                      Selamat!<br/>Akun Anda Disetujui
+                      Selamat!<br />Akun Anda Disetujui
                     </h1>
 
                     {/* Status Badge */}
@@ -144,7 +145,7 @@ export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
                 {/* Content */}
                 <tr>
                   <td style={{ padding: '40px 30px' }}>
-                    
+
                     {/* Greeting */}
                     <h2 style={{
                       margin: '0 0 12px',
@@ -160,7 +161,7 @@ export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
                       fontSize: '16px',
                       lineHeight: '1.6',
                     }}>
-                      Kabar gembira! 🎊 Pengajuan akun Anda telah <strong style={{ color: '#3977d3' }}>disetujui</strong> oleh tim kami. 
+                      Kabar gembira! 🎊 Pengajuan akun Anda telah <strong style={{ color: '#3977d3' }}>disetujui</strong> oleh tim kami.
                       Sekarang Anda dapat mengakses semua fitur JOBMATE untuk mendukung pencarian kerja Anda.
                     </p>
 
@@ -183,7 +184,7 @@ export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
                           }}>
                             📋 Informasi Akun
                           </h3>
-                          
+
                           <table cellPadding="0" cellSpacing="0" border={0} width="100%">
                             <tr>
                               <td style={{ padding: '8px 0' }}>
@@ -421,7 +422,7 @@ export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
                       lineHeight: '1.6',
                       textAlign: 'center',
                     }}>
-                      <strong style={{ color: '#111827' }}>Selamat bergabung di JOBMATE!</strong><br/>
+                      <strong style={{ color: '#111827' }}>Selamat bergabung di JOBMATE!</strong><br />
                       Kami siap membantu Anda menemukan pekerjaan impian. 💪
                     </p>
                   </td>
@@ -438,8 +439,8 @@ export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
                     <table cellPadding="0" cellSpacing="0" border={0} width="100%">
                       <tr>
                         <td align="center" style={{ paddingBottom: '16px' }}>
-                          <img 
-                            src={LOGO_URL}
+                          <img
+                            src={LOGO_KECIL_URL}
                             alt="JOBMATE Logo"
                             width="120"
                             height="30"
@@ -452,7 +453,7 @@ export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
                         </td>
                       </tr>
                     </table>
-                    
+
                     <p style={{
                       margin: '0 0 8px',
                       fontWeight: '700',
@@ -470,7 +471,7 @@ export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
                     }}>
                       🎯 Platform Karir Terpercaya
                     </p>
-                    
+
                     {/* Contact Links */}
                     <p style={{
                       margin: '0 0 4px',
@@ -486,7 +487,7 @@ export const AccountApprovedEmail: React.FC<AccountApprovedEmailProps> = ({
                         @infolokerjombang_support
                       </a>
                     </p>
-                    
+
                     <p style={{
                       margin: '16px 0 0',
                       color: '#9ca3af',

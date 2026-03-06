@@ -23,7 +23,7 @@ export interface PaymentRecord {
     user_email: string;
     user_name: string;
     user_whatsapp: string | null;
-    plan_type: 'basic' | 'premium';
+    plan_type: 'basic' | 'premium' | 'test';
     amount: number;
     status: 'pending' | 'paid' | 'expired' | 'failed';
     payment_method: string | null;
@@ -37,7 +37,7 @@ export interface PaymentRecord {
 
 export interface InvoiceFilters {
     status?: 'all' | 'paid' | 'pending' | 'expired' | 'failed';
-    planType?: 'all' | 'basic' | 'premium';
+    planType?: 'all' | 'basic' | 'premium' | 'test';
     search?: string;
     startDate?: string;
     endDate?: string;
@@ -172,23 +172,58 @@ export async function getRevenueOverview(): Promise<RevenueOverview> {
     }
 }
 
-// Get Recent Payments
+// Get Recent Payments (includes both payments and mypg_transactions)
 export async function getRecentPayments(limit = 10): Promise<PaymentRecord[]> {
     const supabase = createAdminClient();
 
     try {
-        const { data: payments, error } = await supabase
-            .from("payments")
-            .select("*")
-            .order("created_at", { ascending: false })
-            .limit(limit);
+        // Fetch from both tables in parallel
+        const [paymentsResult, mypgResult] = await Promise.all([
+            supabase
+                .from("payments")
+                .select("*")
+                .order("created_at", { ascending: false })
+                .limit(limit),
+            supabase
+                .from("mypg_transactions")
+                .select("*")
+                .order("created_at", { ascending: false })
+                .limit(limit),
+        ]);
 
-        if (error) {
-            console.error("Error fetching recent payments:", error);
-            return [];
+        if (paymentsResult.error) {
+            console.error("Error fetching payments:", paymentsResult.error);
+        }
+        if (mypgResult.error) {
+            console.error("Error fetching mypg_transactions:", mypgResult.error);
         }
 
-        return payments || [];
+        // Normalize mypg_transactions to PaymentRecord format
+        const normalizedMypg: PaymentRecord[] = (mypgResult.data || []).map((tx: any) => ({
+            id: tx.id,
+            external_id: tx.order_id,
+            invoice_id: null,
+            user_email: tx.email || '',
+            user_name: tx.full_name || '',
+            user_whatsapp: tx.whatsapp || null,
+            plan_type: tx.plan_type || 'basic',
+            amount: parseInt(tx.amount) || 0,
+            status: (tx.status || 'PENDING').toLowerCase() as any,
+            payment_method: 'QRIS (MY PG)',
+            payment_gateway: 'mypg-klikqris',
+            invoice_url: tx.qris_url || null,
+            paid_at: tx.paid_at || null,
+            expired_at: tx.expired_at || null,
+            created_at: tx.created_at,
+            updated_at: tx.updated_at || null,
+        }));
+
+        // Merge and sort by created_at descending, take top N
+        const allPayments = [...(paymentsResult.data || []), ...normalizedMypg]
+            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            .slice(0, limit);
+
+        return allPayments;
     } catch (error) {
         console.error("Error fetching recent payments:", error);
         return [];

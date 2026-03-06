@@ -90,7 +90,17 @@ export async function POST(request: NextRequest) {
         }
 
         const mypgData = await mypgResponse.json();
-        console.log('[MY PG] Transaction created:', mypgData);
+
+        // Detailed logging to debug KlikQRIS API response
+        console.log('[MY PG] Transaction created - Full Response:', JSON.stringify(mypgData, null, 2));
+        console.log('[MY PG] QRIS fields check:', {
+            qris_image: mypgData.data?.qris_image ? `present (${typeof mypgData.data.qris_image}, length: ${String(mypgData.data.qris_image).length})` : 'MISSING',
+            qris_url: mypgData.data?.qris_url ? `present (${String(mypgData.data.qris_url).substring(0, 80)}...)` : 'MISSING',
+            qris_data: mypgData.data?.qris_data ? `present (${String(mypgData.data.qris_data).substring(0, 80)}...)` : 'MISSING',
+            direct_url: mypgData.data?.direct_url || 'MISSING',
+            expired_at: mypgData.data?.expired_at || 'MISSING',
+            total_amount: mypgData.data?.total_amount || 'MISSING',
+        });
 
         // Store transaction in database
         try {
@@ -131,13 +141,16 @@ export async function POST(request: NextRequest) {
             console.error('[MY PG] Failed to send invoice email:', emailError);
         }
 
+        // Resolve QRIS data: some API versions use qris_data, others use qris_url
+        const resolvedQrisUrl = mypgData.data?.qris_data || mypgData.data?.qris_url;
+
         return NextResponse.json({
             success: true,
             orderId: orderId,
             amount: selectedPlan.amount,
             totalAmount: mypgData.data?.total_amount,
             qrisImage: mypgData.data?.qris_image,
-            qrisUrl: mypgData.data?.qris_url,
+            qrisUrl: resolvedQrisUrl,
             directUrl: mypgData.data?.direct_url,
             expiredAt: mypgData.data?.expired_at,
             customerData: {
