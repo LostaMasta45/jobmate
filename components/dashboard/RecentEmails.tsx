@@ -39,7 +39,7 @@ export function RecentEmails() {
     try {
       const { listEmailDrafts } = await import("@/actions/email/list");
       const result = await listEmailDrafts();
-      
+
       if (result.error) {
         console.error("Error fetching email drafts:", result.error);
         setEmails([]);
@@ -97,9 +97,9 @@ export function RecentEmails() {
         {emails.map((email) => {
           const config = EMAIL_TYPE_CONFIG[email.email_type] || EMAIL_TYPE_CONFIG.application;
           return (
-            <Link 
-              key={email.id} 
-              href={`/tools/email-generator`}
+            <Link
+              key={email.id}
+              href={`/tools/email-generator/history`}
               className="block group"
             >
               <div className="p-2.5 rounded-lg border hover:border-blue-300 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition-all">

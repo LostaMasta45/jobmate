@@ -22,12 +22,14 @@ export const InvoiceEmail: React.FC<InvoiceEmailProps> = ({
   // Calculate time remaining
   const now = new Date();
   const expiry = new Date(expiryDate);
-  const hoursRemaining = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60 * 60));
-  const isUrgent = hoursRemaining < 6;
-  
+  const totalMinutes = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60));
+  const hoursRemaining = Math.floor(totalMinutes / 60);
+  const minutesRemaining = totalMinutes % 60;
+  const isUrgent = totalMinutes < 60;
+
   // Generate invoice ID from timestamp
   const invoiceId = `INV-${new Date().getTime().toString().slice(-9)}`;
-  
+
   return (
     <html>
       <head>
@@ -159,7 +161,7 @@ export const InvoiceEmail: React.FC<InvoiceEmailProps> = ({
           
           @keyframes progressFill {
             from { width: 0%; }
-            to { width: ${Math.max(10, Math.min(100, (hoursRemaining / 24) * 100))}%; }
+            to { width: ${Math.max(10, Math.min(100, (totalMinutes / (24 * 60)) * 100))}%; }
           }
           
           /* Header dengan gradient dan logo */
@@ -336,7 +338,7 @@ export const InvoiceEmail: React.FC<InvoiceEmailProps> = ({
           .progress-bar-fill {
             background: ${isUrgent ? 'linear-gradient(90deg, #dc2626 0%, #ef4444 100%)' : 'linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)'};
             height: 100%;
-            width: ${Math.max(10, Math.min(100, (hoursRemaining / 24) * 100))}%;
+            width: ${Math.max(10, Math.min(100, (totalMinutes / (24 * 60)) * 100))}%;
             animation: progressFill 1s ease-out 0.5s both;
             box-shadow: 0 0 10px ${isUrgent ? 'rgba(220, 38, 38, 0.5)' : 'rgba(37, 99, 235, 0.5)'};
           }
@@ -613,46 +615,46 @@ export const InvoiceEmail: React.FC<InvoiceEmailProps> = ({
             <div className="logo">JOBMATE</div>
             <div className="header-subtitle">Invoice Pembayaran</div>
           </div>
-          
+
           <div className="content">
             {/* Greeting */}
             <div className="greeting">Halo {userName},</div>
             <div className="intro-text">
               Terima kasih telah memilih layanan kami. Berikut adalah detail invoice pembayaran Anda.
             </div>
-            
+
             {/* Invoice card */}
             <div className="invoice-card">
               <div className="invoice-id">Invoice #{invoiceId}</div>
-              
+
               <div className="invoice-item">
                 <span className="invoice-label">Deskripsi</span>
                 <span className="invoice-value">{description}</span>
               </div>
-              
+
               <div className="invoice-item">
                 <span className="invoice-label">Status</span>
                 <span className="invoice-value" style={{ color: '#f59e0b' }}>⏳ Menunggu Pembayaran</span>
               </div>
-              
+
               <div className="invoice-item" style={{ borderBottom: 'none' }}>
                 <span className="invoice-label">Berlaku Hingga</span>
-                <span className="invoice-value">{new Date(expiryDate).toLocaleDateString('id-ID', { 
-                  day: 'numeric', 
-                  month: 'long', 
+                <span className="invoice-value">{new Date(expiryDate).toLocaleDateString('id-ID', {
+                  day: 'numeric',
+                  month: 'long',
                   year: 'numeric',
                   hour: '2-digit',
                   minute: '2-digit'
                 })}</span>
               </div>
             </div>
-            
+
             {/* Amount box */}
             <div className="amount-box">
               <div className="amount-label">Total Pembayaran</div>
               <div className="amount-value">{currency} {amount.toLocaleString('id-ID')}</div>
             </div>
-            
+
             {/* Countdown */}
             <div className="countdown-section">
               <div className="countdown-header">
@@ -660,14 +662,16 @@ export const InvoiceEmail: React.FC<InvoiceEmailProps> = ({
                   {isUrgent ? '⚠️ Segera Bayar' : '⏰ Waktu Tersisa'}
                 </span>
                 <span className="countdown-time">
-                  {hoursRemaining > 0 ? `${hoursRemaining} jam lagi` : 'Segera berakhir!'}
+                  {hoursRemaining > 0
+                    ? `${hoursRemaining} jam ${minutesRemaining > 0 ? `${minutesRemaining} menit ` : ''}lagi`
+                    : totalMinutes > 0 ? `${minutesRemaining} menit lagi` : 'Segera berakhir!'}
                 </span>
               </div>
               <div className="progress-bar-bg">
                 <div className="progress-bar-fill"></div>
               </div>
             </div>
-            
+
             {/* CTA Button */}
             <div className="cta-section">
               <a href={invoiceUrl} className="cta-button">
@@ -677,7 +681,7 @@ export const InvoiceEmail: React.FC<InvoiceEmailProps> = ({
                 Lihat Detail Invoice →
               </a>
             </div>
-            
+
             {/* Payment methods */}
             <div className="payment-methods">
               <div className="payment-methods-title">Metode Pembayaran Tersedia:</div>
@@ -689,7 +693,7 @@ export const InvoiceEmail: React.FC<InvoiceEmailProps> = ({
                 <span className="payment-badge">🏬 Indomaret</span>
               </div>
             </div>
-            
+
             {/* Trust badge */}
             <div className="trust-badge">
               <div className="trust-badge-text">
@@ -697,16 +701,16 @@ export const InvoiceEmail: React.FC<InvoiceEmailProps> = ({
                 Pembayaran Aman - Dienkripsi dengan SSL 256-bit
               </div>
             </div>
-            
+
             {/* Warning */}
             <div className="warning-box">
               <div className="warning-text">
-                ⚡ <strong>Penting:</strong> Link pembayaran ini akan kedaluwarsa pada {new Date(expiryDate).toLocaleString('id-ID')}. 
+                ⚡ <strong>Penting:</strong> Link pembayaran ini akan kedaluwarsa pada {new Date(expiryDate).toLocaleString('id-ID')}.
                 Segera lakukan pembayaran untuk menghindari pembatalan otomatis.
               </div>
             </div>
           </div>
-          
+
           {/* Footer */}
           <div className="footer">
             <div className="footer-brand">InfoLokerJombang</div>

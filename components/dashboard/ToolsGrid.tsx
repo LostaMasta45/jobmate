@@ -1,8 +1,17 @@
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { FileText, Target, User, Mail, MessageSquare, Briefcase, FileStack, ArrowRight, Sparkles } from "lucide-react";
+import { FileText, Target, User, Mail, MessageSquare, Briefcase, FileStack, ArrowRight, Sparkles, Rocket } from "lucide-react";
 
 const tools = [
+  {
+    title: "10 Hari Dapat Kerjaan",
+    description: "Panduan melamar kerja step-by-step",
+    icon: Rocket,
+    href: "/tools/job-wizard",
+    gradient: "from-emerald-500/10 to-brand/5",
+    iconBg: "bg-emerald-500/10",
+    iconColor: "text-emerald-600",
+  },
   {
     title: "Surat Lamaran",
     description: "Buat surat lamaran profesional",

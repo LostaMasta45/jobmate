@@ -22,10 +22,12 @@ export const InvoiceEmailPreview: React.FC<InvoiceEmailPreviewProps> = ({
 }) => {
   const now = new Date();
   const expiry = new Date(expiryDate);
-  const hoursRemaining = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60 * 60));
-  const isUrgent = hoursRemaining < 6;
+  const totalMinutes = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60));
+  const hoursRemaining = Math.floor(totalMinutes / 60);
+  const minutesRemaining = totalMinutes % 60;
+  const isUrgent = totalMinutes < 60;
   const invoiceId = `INV-${new Date().getTime().toString().slice(-9)}`;
-  const progressPercentage = Math.max(10, Math.min(100, (hoursRemaining / 24) * 100));
+  const progressPercentage = Math.max(10, Math.min(100, (totalMinutes / (24 * 60)) * 100));
 
   const containerVariants = {
     hidden: { opacity: 0, y: 50, scale: 0.95 },
@@ -207,9 +209,8 @@ export const InvoiceEmailPreview: React.FC<InvoiceEmailPreviewProps> = ({
 
           {/* Countdown */}
           <motion.div
-            className={`${
-              isUrgent ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'
-            } border-2 rounded-xl p-5 mb-6`}
+            className={`${isUrgent ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'
+              } border-2 rounded-xl p-5 mb-6`}
             variants={itemVariants}
             animate={isUrgent ? { scale: [1, 1.02, 1] } : {}}
             transition={isUrgent ? { duration: 1.5, repeat: Infinity } : {}}
@@ -223,14 +224,15 @@ export const InvoiceEmailPreview: React.FC<InvoiceEmailPreviewProps> = ({
                 animate={isUrgent ? { scale: [1, 1.1, 1] } : {}}
                 transition={isUrgent ? { duration: 1, repeat: Infinity } : {}}
               >
-                {hoursRemaining > 0 ? `${hoursRemaining} jam lagi` : 'Segera berakhir!'}
+                {hoursRemaining > 0
+                  ? `${hoursRemaining} jam ${minutesRemaining > 0 ? `${minutesRemaining} menit ` : ''}lagi`
+                  : totalMinutes > 0 ? `${minutesRemaining} menit lagi` : 'Segera berakhir!'}
               </motion.span>
             </div>
             <div className={`${isUrgent ? 'bg-red-100' : 'bg-blue-100'} h-2 rounded-full overflow-hidden`}>
               <motion.div
-                className={`h-full ${
-                  isUrgent ? 'bg-gradient-to-r from-red-600 to-red-400' : 'bg-gradient-to-r from-blue-600 to-blue-400'
-                } shadow-lg`}
+                className={`h-full ${isUrgent ? 'bg-gradient-to-r from-red-600 to-red-400' : 'bg-gradient-to-r from-blue-600 to-blue-400'
+                  } shadow-lg`}
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercentage}%` }}
                 transition={{ duration: 1, delay: 0.5, ease: 'easeOut' }}

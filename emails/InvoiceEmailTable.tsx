@@ -26,10 +26,12 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
 }) => {
   const now = new Date();
   const expiry = new Date(expiryDate);
-  const hoursRemaining = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60 * 60));
-  const isUrgent = hoursRemaining < 6;
+  const totalMinutes = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60));
+  const hoursRemaining = Math.floor(totalMinutes / 60);
+  const minutesRemaining = totalMinutes % 60;
+  const isUrgent = totalMinutes < 60; // Less than 1 hour is urgent
   const invoiceId = `INV-${new Date().getTime().toString().slice(-9)}`;
-  const progressPercentage = Math.max(10, Math.min(100, (hoursRemaining / 24) * 100));
+  const progressPercentage = Math.max(10, Math.min(100, (totalMinutes / (24 * 60)) * 100));
 
   return (
     <html>
@@ -265,7 +267,9 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                                   fontSize: '16px',
                                   fontWeight: 'bold',
                                 }}>
-                                  {hoursRemaining > 0 ? `${hoursRemaining} jam lagi` : 'Segera berakhir!'}
+                                  {hoursRemaining > 0
+                                    ? `${hoursRemaining} jam ${minutesRemaining > 0 ? `${minutesRemaining} menit ` : ''}lagi`
+                                    : totalMinutes > 0 ? `${minutesRemaining} menit lagi` : 'Segera berakhir!'}
                                 </span>
                               </td>
                             </tr>
@@ -403,26 +407,6 @@ export const InvoiceEmailTable: React.FC<InvoiceEmailProps> = ({
                     padding: '30px',
                     textAlign: 'center',
                   }}>
-                    {/* Footer Logo */}
-                    <table cellPadding="0" cellSpacing="0" border={0} width="100%">
-                      <tr>
-                        <td align="center" style={{ paddingBottom: '16px' }}>
-                          <img
-                            src={LOGO_KECIL_URL}
-                            alt="JOBMATE Logo"
-                            width="48"
-                            height="48"
-                            style={{
-                              display: 'block',
-                              margin: '0 auto',
-                              borderRadius: '12px',
-                              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                            }}
-                          />
-                        </td>
-                      </tr>
-                    </table>
-
                     <p style={{
                       margin: '0 0 8px',
                       fontWeight: '700',

@@ -101,11 +101,11 @@ export function RecentWhatsAppMessages() {
       <div className="space-y-2.5">
         {messages.map((msg) => {
           const config = MESSAGE_TYPE_CONFIG[msg.message_type] || MESSAGE_TYPE_CONFIG.application;
-          
+
           return (
-            <Link 
-              key={msg.id} 
-              href="/tools/wa-generator"
+            <Link
+              key={msg.id}
+              href="/tools/wa-generator/history"
               className="block group"
             >
               <div className="p-2.5 rounded-lg border hover:border-teal-300 hover:bg-teal-50/50 dark:hover:bg-teal-950/20 transition-all">

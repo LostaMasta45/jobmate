@@ -13,21 +13,27 @@ export default function InvoiceAnimatedPreview() {
 
   const [invoiceId, setInvoiceId] = useState('INV-123456789');
   const [expiryDate, setExpiryDate] = useState(new Date());
-  const [hoursRemaining, setHoursRemaining] = useState(24);
-  const [isUrgent, setIsUrgent] = useState(false);
+  const [hoursRemaining, setHoursRemaining] = useState(0);
+  const [minutesRemaining, setMinutesRemaining] = useState(30);
+  const [totalMinutes, setTotalMinutes] = useState(30);
+  const [isUrgent, setIsUrgent] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     const expiry = new Date();
-    expiry.setDate(expiry.getDate() + 1);
+    expiry.setMinutes(expiry.getMinutes() + 30);
     const now = new Date();
-    const hours = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60 * 60));
+    const totalMins = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60));
+    const hours = Math.floor(totalMins / 60);
+    const minutes = totalMins % 60;
 
     setInvoiceId(`INV-${Date.now().toString().slice(-9)}`);
     setExpiryDate(expiry);
     setHoursRemaining(hours);
-    setIsUrgent(hours < 6);
+    setMinutesRemaining(minutes);
+    setTotalMinutes(totalMins);
+    setIsUrgent(totalMins < 60);
     setMounted(true);
 
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -35,7 +41,7 @@ export default function InvoiceAnimatedPreview() {
     }
   }, []);
 
-  const progressPercentage = Math.max(10, Math.min(100, (hoursRemaining / 24) * 100));
+  const progressPercentage = Math.max(10, Math.min(100, (totalMinutes / (24 * 60)) * 100));
 
   const colors = {
     primary: {
@@ -396,15 +402,14 @@ export default function InvoiceAnimatedPreview() {
                 : darkMode
                   ? '#1e3a8a'
                   : '#f0f9ff',
-              border: `2px solid ${
-                isUrgent
+              border: `2px solid ${isUrgent
                   ? darkMode
                     ? '#991b1b'
                     : '#fecaca'
                   : darkMode
                     ? '#1e40af'
                     : '#bfdbfe'
-              }`,
+                }`,
               borderRadius: '16px',
               padding: '20px',
               margin: '24px 0',
@@ -429,7 +434,9 @@ export default function InvoiceAnimatedPreview() {
                   fontWeight: 'bold',
                 }}
               >
-                {hoursRemaining > 0 ? `${hoursRemaining} jam lagi` : 'Segera berakhir!'}
+                {hoursRemaining > 0
+                  ? `${hoursRemaining} jam ${minutesRemaining > 0 ? `${minutesRemaining} menit ` : ''}lagi`
+                  : totalMinutes > 0 ? `${minutesRemaining} menit lagi` : 'Segera berakhir!'}
               </motion.span>
             </div>
             <div

@@ -300,10 +300,10 @@ export default function SignInPage() {
         {/* === LEFT SIDE: FORM === */}
         <div className="relative flex w-full flex-col justify-center px-8 sm:px-12 lg:w-[50%] xl:w-[40%] h-screen border-r border-border/40 shadow-xl z-20 bg-background/80 backdrop-blur-md overflow-y-auto scrollbar-hide">
 
-          {/* Brand Logo */}
-          <div className="absolute top-8 left-8 sm:left-12 z-50">
+          {/* Brand Logo - Changed from absolute to relative flow to prevent overlapping */}
+          <div className="pt-8 pb-4 z-50 flex-shrink-0">
             <Link href="/" className="block group">
-              <div className="relative h-24 w-24 sm:h-32 sm:w-32 transition-transform group-hover:scale-105">
+              <div className="relative h-20 w-20 sm:h-24 sm:w-24 transition-transform group-hover:scale-105">
                 <Image
                   src="/Logo/x.png"
                   alt="JobMate Logo"
@@ -315,7 +315,7 @@ export default function SignInPage() {
             </Link>
           </div>
 
-          <div className="mx-auto w-full max-w-sm space-y-8 py-12">
+          <div className="mx-auto w-full max-w-sm space-y-8 py-4 flex-1 flex flex-col justify-center">
             {/* Header - Changes based on saved accounts state */}
             <div className="space-y-2">
               {savedAccounts.length > 0 && !selectedAccount ? (

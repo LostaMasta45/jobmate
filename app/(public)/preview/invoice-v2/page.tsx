@@ -8,31 +8,37 @@ export default function InvoicePreviewV2() {
   const amount = 50000;
   const currency = 'Rp';
   const description = 'VIP Basic - 1 Bulan';
-  
+
   const [invoiceId, setInvoiceId] = useState('INV-123456789');
   const [expiryDate, setExpiryDate] = useState(new Date());
-  const [hoursRemaining, setHoursRemaining] = useState(24);
-  const [isUrgent, setIsUrgent] = useState(false);
+  const [hoursRemaining, setHoursRemaining] = useState(0);
+  const [minutesRemaining, setMinutesRemaining] = useState(30);
+  const [totalMinutes, setTotalMinutes] = useState(30);
+  const [isUrgent, setIsUrgent] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  
+
   useEffect(() => {
     const expiry = new Date();
-    expiry.setDate(expiry.getDate() + 1);
+    expiry.setMinutes(expiry.getMinutes() + 30);
     const now = new Date();
-    const hours = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60 * 60));
-    
+    const totalMins = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60));
+    const hours = Math.floor(totalMins / 60);
+    const minutes = totalMins % 60;
+
     setInvoiceId(`INV-${Date.now().toString().slice(-9)}`);
     setExpiryDate(expiry);
     setHoursRemaining(hours);
-    setIsUrgent(hours < 6);
+    setMinutesRemaining(minutes);
+    setTotalMinutes(totalMins);
+    setIsUrgent(totalMins < 60);
     setMounted(true);
-    
+
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       setDarkMode(true);
     }
   }, []);
-  
+
   // Color palette from colorpallate.md
   const colors = {
     primary: {
@@ -62,11 +68,11 @@ export default function InvoicePreviewV2() {
       borderLight: '#64748b',
     }
   };
-  
+
   const theme = darkMode ? colors.dark : colors.light;
 
   return (
-    <div style={{ 
+    <div style={{
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif',
       backgroundColor: theme.bgSecondary,
       minHeight: '100vh',
@@ -87,9 +93,9 @@ export default function InvoicePreviewV2() {
         transition: 'all 0.3s ease'
       }}>
         <div>
-          <h1 style={{ 
-            margin: 0, 
-            fontSize: '18px', 
+          <h1 style={{
+            margin: 0,
+            fontSize: '18px',
             fontWeight: 700,
             color: theme.text,
             display: 'flex',
@@ -99,10 +105,10 @@ export default function InvoicePreviewV2() {
             <span style={{ fontSize: '24px' }}>📧</span>
             Invoice Email Preview
           </h1>
-          <p style={{ 
-            margin: '4px 0 0', 
-            fontSize: '13px', 
-            color: theme.textSecondary 
+          <p style={{
+            margin: '4px 0 0',
+            fontSize: '13px',
+            color: theme.textSecondary
           }}>
             Preview tanpa kirim email • Hemat limit Resend
           </p>
@@ -173,24 +179,24 @@ export default function InvoicePreviewV2() {
             background: 'rgba(255, 255, 255, 0.1)',
             filter: 'blur(40px)'
           }} />
-          
+
           {/* Logo */}
           <div style={{
             position: 'relative',
             zIndex: 1
           }}>
-            <svg 
-              width="48" 
-              height="48" 
-              viewBox="0 0 48 48" 
-              fill="none" 
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 48 48"
+              fill="none"
               xmlns="http://www.w3.org/2000/svg"
               style={{ marginBottom: '12px' }}
             >
-              <rect width="48" height="48" rx="12" fill="white" fillOpacity="0.2"/>
-              <path d="M24 12L32 18V30L24 36L16 30V18L24 12Z" fill="white"/>
-              <path d="M24 18L28 21V27L24 30L20 27V21L24 18Z" fill={colors.primary.purpleHeart}/>
-              <circle cx="24" cy="24" r="3" fill={colors.primary.robinsEggBlue}/>
+              <rect width="48" height="48" rx="12" fill="white" fillOpacity="0.2" />
+              <path d="M24 12L32 18V30L24 36L16 30V18L24 12Z" fill="white" />
+              <path d="M24 18L28 21V27L24 30L20 27V21L24 18Z" fill={colors.primary.purpleHeart} />
+              <circle cx="24" cy="24" r="3" fill={colors.primary.robinsEggBlue} />
             </svg>
             <div style={{
               fontSize: '32px',
@@ -258,8 +264,8 @@ export default function InvoicePreviewV2() {
             {[
               { label: 'Deskripsi', value: description },
               { label: 'Status', value: '⏳ Menunggu Pembayaran', color: '#f59e0b' },
-              { 
-                label: 'Berlaku Hingga', 
+              {
+                label: 'Berlaku Hingga',
                 value: mounted ? expiryDate.toLocaleDateString('id-ID', {
                   day: 'numeric',
                   month: 'long',
@@ -275,16 +281,16 @@ export default function InvoicePreviewV2() {
                 padding: '14px 0',
                 borderBottom: idx < 2 ? `1px solid ${theme.borderLight}` : 'none'
               }}>
-                <span style={{ 
-                  color: theme.textSecondary, 
+                <span style={{
+                  color: theme.textSecondary,
                   fontSize: '14px',
                   fontWeight: 500
                 }}>
                   {item.label}
                 </span>
-                <span style={{ 
-                  color: item.color || theme.text, 
-                  fontWeight: 600, 
+                <span style={{
+                  color: item.color || theme.text,
+                  fontWeight: 600,
                   fontSize: '14px',
                   textAlign: 'right'
                 }}>
@@ -301,7 +307,7 @@ export default function InvoicePreviewV2() {
             padding: '32px',
             textAlign: 'center',
             margin: '24px 0',
-            boxShadow: darkMode 
+            boxShadow: darkMode
               ? `0 8px 32px ${colors.primary.purpleHeart}40`
               : `0 8px 32px ${colors.primary.purpleHeart}30`,
             position: 'relative',
@@ -340,11 +346,11 @@ export default function InvoicePreviewV2() {
 
           {/* Countdown */}
           <div style={{
-            background: isUrgent 
-              ? (darkMode ? '#7f1d1d' : '#fef2f2') 
+            background: isUrgent
+              ? (darkMode ? '#7f1d1d' : '#fef2f2')
               : (darkMode ? '#1e3a8a' : '#eff6ff'),
-            border: `2px solid ${isUrgent 
-              ? (darkMode ? '#991b1b' : '#fecaca') 
+            border: `2px solid ${isUrgent
+              ? (darkMode ? '#991b1b' : '#fecaca')
               : (darkMode ? '#1e40af' : '#bfdbfe')}`,
             borderRadius: '16px',
             padding: '20px',
@@ -357,7 +363,7 @@ export default function InvoicePreviewV2() {
               marginBottom: '12px'
             }}>
               <span style={{
-                color: isUrgent 
+                color: isUrgent
                   ? (darkMode ? '#fca5a5' : '#991b1b')
                   : (darkMode ? '#93c5fd' : '#1e40af'),
                 fontSize: '14px',
@@ -366,17 +372,19 @@ export default function InvoicePreviewV2() {
                 {isUrgent ? '⚠️ Segera Bayar!' : '⏰ Waktu Tersisa'}
               </span>
               <span style={{
-                color: isUrgent 
+                color: isUrgent
                   ? (darkMode ? '#fee2e2' : '#dc2626')
                   : (darkMode ? '#dbeafe' : '#2563eb'),
                 fontSize: '16px',
                 fontWeight: 800
               }}>
-                {hoursRemaining > 0 ? `${hoursRemaining} jam` : 'Segera berakhir!'}
+                {hoursRemaining > 0
+                  ? `${hoursRemaining} jam ${minutesRemaining > 0 ? `${minutesRemaining} menit` : ''}`
+                  : totalMinutes > 0 ? `${minutesRemaining} menit lagi` : 'Segera berakhir!'}
               </span>
             </div>
             <div style={{
-              background: isUrgent 
+              background: isUrgent
                 ? (darkMode ? '#450a0a' : '#fee2e2')
                 : (darkMode ? '#1e3a8a' : '#dbeafe'),
               height: '10px',
@@ -384,11 +392,11 @@ export default function InvoicePreviewV2() {
               overflow: 'hidden'
             }}>
               <div style={{
-                background: isUrgent 
+                background: isUrgent
                   ? `linear-gradient(90deg, #dc2626 0%, #ef4444 100%)`
                   : `linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)`,
                 height: '100%',
-                width: `${Math.max(10, Math.min(100, (hoursRemaining / 24) * 100))}%`,
+                width: `${Math.max(10, Math.min(100, (totalMinutes / (24 * 60)) * 100))}%`,
                 transition: 'width 0.3s ease',
                 borderRadius: '6px'
               }} />
@@ -408,7 +416,7 @@ export default function InvoicePreviewV2() {
                 borderRadius: '16px',
                 fontWeight: 700,
                 fontSize: '16px',
-                boxShadow: darkMode 
+                boxShadow: darkMode
                   ? `0 8px 32px ${colors.primary.purpleHeart}40`
                   : `0 8px 32px ${colors.primary.purpleHeart}30`,
                 transition: 'all 0.2s ease'
@@ -541,10 +549,10 @@ export default function InvoicePreviewV2() {
             margin: '6px 0'
           }}>
             Butuh bantuan?{' '}
-            <a 
-              href="mailto:admin@infolokerjombang.id" 
-              style={{ 
-                color: colors.primary.mariner, 
+            <a
+              href="mailto:admin@infolokerjombang.id"
+              style={{
+                color: colors.primary.mariner,
                 textDecoration: 'none',
                 fontWeight: 600
               }}
@@ -572,9 +580,9 @@ export default function InvoicePreviewV2() {
         borderRadius: '16px',
         boxShadow: darkMode ? '0 4px 6px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.1)'
       }}>
-        <h3 style={{ 
-          margin: '0 0 12px', 
-          fontSize: '15px', 
+        <h3 style={{
+          margin: '0 0 12px',
+          fontSize: '15px',
           color: theme.text,
           fontWeight: 700
         }}>
@@ -587,9 +595,9 @@ export default function InvoicePreviewV2() {
           <p style={{ margin: '6px 0' }}>✅ Logo JOBMATE dengan SVG custom</p>
           <p style={{ margin: '6px 0', marginTop: '12px', paddingTop: '12px', borderTop: `1px solid ${theme.border}` }}>
             <strong style={{ color: theme.text }}>URL:</strong>{' '}
-            <code style={{ 
+            <code style={{
               background: darkMode ? theme.bgSecondary : theme.bgTertiary,
-              padding: '4px 8px', 
+              padding: '4px 8px',
               borderRadius: '6px',
               fontFamily: 'monospace',
               fontSize: '12px'

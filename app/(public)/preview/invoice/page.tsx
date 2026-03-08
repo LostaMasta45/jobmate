@@ -9,35 +9,41 @@ export default function InvoicePreviewPage() {
   const amount = 50000;
   const currency = 'Rp';
   const description = 'VIP Basic - 1 Bulan';
-  
+
   // State for dynamic values (prevents hydration mismatch)
   const [invoiceId, setInvoiceId] = useState('INV-123456789');
   const [expiryDate, setExpiryDate] = useState(new Date());
-  const [hoursRemaining, setHoursRemaining] = useState(24);
-  const [isUrgent, setIsUrgent] = useState(false);
+  const [hoursRemaining, setHoursRemaining] = useState(0);
+  const [minutesRemaining, setMinutesRemaining] = useState(30);
+  const [totalMinutes, setTotalMinutes] = useState(30);
+  const [isUrgent, setIsUrgent] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  
+
   // Initialize dynamic values on client-side only
   useEffect(() => {
     const expiry = new Date();
-    expiry.setDate(expiry.getDate() + 1); // 24 hours from now
-    
+    expiry.setMinutes(expiry.getMinutes() + 30); // 30 minutes from now
+
     const now = new Date();
-    const hours = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60 * 60));
-    
+    const totalMins = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60));
+    const hours = Math.floor(totalMins / 60);
+    const minutes = totalMins % 60;
+
     setInvoiceId(`INV-${Date.now().toString().slice(-9)}`);
     setExpiryDate(expiry);
     setHoursRemaining(hours);
-    setIsUrgent(hours < 6);
+    setMinutesRemaining(minutes);
+    setTotalMinutes(totalMins);
+    setIsUrgent(totalMins < 60);
     setMounted(true);
-    
+
     // Check system dark mode preference
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       setDarkMode(true);
     }
   }, []);
-  
+
   // Color palette from colorpallate.md
   const colors = {
     primary: {
@@ -65,11 +71,11 @@ export default function InvoicePreviewPage() {
       borderLight: '#475569',
     }
   };
-  
+
   const theme = darkMode ? colors.dark : colors.light;
 
   return (
-    <div style={{ 
+    <div style={{
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif',
       lineHeight: 1.6,
       color: '#1f2937',
@@ -259,7 +265,9 @@ export default function InvoicePreviewPage() {
                 fontSize: '16px',
                 fontWeight: 'bold'
               }}>
-                {hoursRemaining > 0 ? `${hoursRemaining} jam lagi` : 'Segera berakhir!'}
+                {hoursRemaining > 0
+                  ? `${hoursRemaining} jam ${minutesRemaining > 0 ? `${minutesRemaining} menit ` : ''}lagi`
+                  : totalMinutes > 0 ? `${minutesRemaining} menit lagi` : 'Segera berakhir!'}
               </span>
             </div>
             <div style={{
@@ -271,7 +279,7 @@ export default function InvoicePreviewPage() {
               <div style={{
                 background: isUrgent ? 'linear-gradient(90deg, #dc2626 0%, #ef4444 100%)' : 'linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)',
                 height: '100%',
-                width: `${Math.max(10, Math.min(100, (hoursRemaining / 24) * 100))}%`,
+                width: `${Math.max(10, Math.min(100, (totalMinutes / (24 * 60)) * 100))}%`,
                 transition: 'width 0.3s ease'
               }} />
             </div>

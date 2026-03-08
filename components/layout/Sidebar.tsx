@@ -31,6 +31,7 @@ import {
   BookOpen,
   GraduationCap,
   Palette,
+  Rocket,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -88,6 +89,12 @@ const navGroups: NavGroup[] = [
   {
     label: "Productivity Tools",
     items: [
+      {
+        title: "10 Hari Dpt Kerja",
+        href: "/tools/job-wizard",
+        icon: Rocket,
+        premiumOnly: true,
+      },
       {
         title: "Surat Lamaran",
         href: "/surat-lamaran-sederhana",
