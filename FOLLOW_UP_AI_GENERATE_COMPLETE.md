@@ -228,7 +228,7 @@ const response = await openai.chat.completions.create({
 
 ### **Environment Variables (Already Set):**
 ```bash
-OPENAI_API_KEY=sk-9BP58d9_lcqSNmTvKX1k4w
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY_HERE
 OPENAI_BASE_URL=https://ai.sumopod.com/v1
 ```
 
@@ -413,3 +413,4 @@ OPENAI_BASE_URL=https://ai.sumopod.com/v1
 **Model:** GPT-4o Mini via SumoPod  
 **Languages:** 4 (ID Casual, ID Formal, EN Casual, EN Formal)  
 **Channels:** 2 (Email, WhatsApp)
+

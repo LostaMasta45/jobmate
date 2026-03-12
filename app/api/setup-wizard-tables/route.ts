@@ -1,17 +1,49 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 import { Client } from "pg";
 
 export async function GET() {
+    // ============================================
+    // SECURITY: Require admin authentication
+    // ============================================
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return NextResponse.json(
+            { error: "Authentication required" },
+            { status: 401 }
+        );
+    }
+
+    const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+    if (profile?.role !== "admin") {
+        return NextResponse.json(
+            { error: "Admin access required" },
+            { status: 403 }
+        );
+    }
+
     const password = process.env.DB_PASSWORD;
     if (!password) {
         return NextResponse.json({ error: "DB_PASSWORD not set in env" }, { status: 500 });
+    }
+
+    const supabaseRef = process.env.NEXT_PUBLIC_SUPABASE_URL?.match(/https:\/\/(.+?)\.supabase\.co/)?.[1];
+    if (!supabaseRef) {
+        return NextResponse.json({ error: "Could not determine Supabase project reference" }, { status: 500 });
     }
 
     // Try multiple connection patterns
     const configs = [
         {
             name: "db.PROJECT.supabase.co:5432",
-            host: "db.gyamsjmrrntwwcqljene.supabase.co",
+            host: `db.${supabaseRef}.supabase.co`,
             port: 5432,
             database: "postgres",
             user: "postgres",
@@ -23,7 +55,7 @@ export async function GET() {
             host: "aws-0-ap-southeast-1.pooler.supabase.com",
             port: 5432,
             database: "postgres",
-            user: "postgres.gyamsjmrrntwwcqljene",
+            user: `postgres.${supabaseRef}`,
             password,
             ssl: { rejectUnauthorized: false },
         },
@@ -32,7 +64,7 @@ export async function GET() {
             host: "aws-0-ap-southeast-1.pooler.supabase.com",
             port: 6543,
             database: "postgres",
-            user: "postgres.gyamsjmrrntwwcqljene",
+            user: `postgres.${supabaseRef}`,
             password,
             ssl: { rejectUnauthorized: false },
         },

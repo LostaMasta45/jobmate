@@ -101,7 +101,7 @@ OpenAI Error details: {
 **Solution:**
 ```env
 # Check .env.local
-OPENAI_API_KEY=sk-9BP58d9_lcqSNmTvKX1k4w
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY_HERE
 OPENAI_BASE_URL=https://ai.sumopod.com/v1
 ```
 - Restart dev server
@@ -254,3 +254,4 @@ WHERE user_id = 'your-user-id';
 **Status:** ✅ ERROR HANDLING IMPROVED
 **Action:** Restart server → Test again
 **Fallback:** Works without database migration (with warnings)
+

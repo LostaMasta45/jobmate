@@ -136,7 +136,7 @@ npm run dev
 
 ### SUMAPOD Configuration
 ```env
-OPENAI_API_KEY=sk-9BP58d9_lcqSNmTvKX1k4w
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY_HERE
 OPENAI_BASE_URL=https://ai.sumopod.com/v1
 ```
 
@@ -418,3 +418,4 @@ RLS Policies:
 **Estimated Time to Production:** 1-2 days (after testing)
 
 **Good luck! 🚀**
+

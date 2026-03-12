@@ -22,9 +22,9 @@ export async function POST(req: Request) {
   try {
     // Security: Verify cron secret (recommended for production)
     const authHeader = req.headers.get("authorization");
-    const cronSecret = process.env.CRON_SECRET || "your-secret-here";
+    const cronSecret = process.env.CRON_SECRET;
     
-    if (authHeader !== `Bearer ${cronSecret}`) {
+    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
       console.warn("[Cron] Unauthorized access attempt to daily summary");
       return NextResponse.json(
         { error: "Unauthorized" },

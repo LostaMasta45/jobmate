@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { resend, FROM_EMAIL } from '@/lib/resend';
 import { PaymentSuccessEmail, PaymentSuccessEmailText } from '@/emails/PaymentSuccessEmail';
 import { render } from '@react-email/render';
@@ -9,25 +9,35 @@ import { notifyPaymentSuccess } from '@/lib/telegram';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-// MY PG Configuration - from environment variables
-const MYPG_API_KEY = process.env.MYPG_API_KEY || 'WGyyEYlAiGwbHeiwHbcuJlyDlx9xCOsxJ2kPAI1X';
-const MYPG_MERCHANT_ID = process.env.MYPG_MERCHANT_ID || '176930678538';
+// MY PG Configuration - from environment variables ONLY (no hardcoded fallbacks)
+const MYPG_API_KEY = process.env.MYPG_API_KEY!;
+const MYPG_MERCHANT_ID = process.env.MYPG_MERCHANT_ID!;
 const MYPG_BASE_URL = process.env.MYPG_BASE_URL || 'https://klikqris.com/api/qrisv2';
-
-// Supabase client
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export async function GET(request: NextRequest) {
     try {
+        // Validate env vars are set
+        if (!MYPG_API_KEY || !MYPG_MERCHANT_ID) {
+            return NextResponse.json(
+                { error: 'Payment gateway not configured' },
+                { status: 500 }
+            );
+        }
+
         const { searchParams } = new URL(request.url);
         const orderId = searchParams.get('order_id');
 
         if (!orderId) {
             return NextResponse.json(
                 { error: 'Order ID is required' },
+                { status: 400 }
+            );
+        }
+
+        // Basic input validation for order_id
+        if (!/^MYPG-[A-Z]+-\d+$/.test(orderId)) {
+            return NextResponse.json(
+                { error: 'Invalid order ID format' },
                 { status: 400 }
             );
         }
@@ -53,7 +63,7 @@ export async function GET(request: NextRequest) {
             });
 
             return NextResponse.json(
-                { error: 'Failed to check status', details: errorText },
+                { error: 'Failed to check status' },
                 { status: response.status }
             );
         }
@@ -63,6 +73,9 @@ export async function GET(request: NextRequest) {
             order_id: data.data?.order_id,
             status: data.data?.status,
         });
+
+        // Use admin client inside handler, not module scope
+        const supabase = createAdminClient();
 
         // Get current database status
         const { data: dbTransaction } = await supabase
@@ -100,14 +113,14 @@ export async function GET(request: NextRequest) {
                     amount: parseInt(dbTransaction.amount) || data.data?.amount_paid || 0,
                     transactionDate: new Date().toISOString(),
                     planType: dbTransaction.plan_type || 'basic',
-                    dashboardUrl: 'https://infolokerjombang.id/ajukan-akun',
+                    dashboardUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://infolokerjombang.id'}/ajukan-akun`,
                 };
 
                 const emailHtml = await render(<PaymentSuccessEmail {...emailProps} />);
                 const emailText = PaymentSuccessEmailText(emailProps);
 
                 await resend.emails.send({
-                    from: 'infolokerjombang <admin@infolokerjombang.id>',
+                    from: FROM_EMAIL,
                     to: dbTransaction.email,
                     subject: `✅ Pembayaran ${dbTransaction.plan_type === 'premium' ? 'VIP Premium' : dbTransaction.plan_type === 'basic' ? 'VIP Basic' : 'Test'} Berhasil - JOBMATE`,
                     html: emailHtml,
@@ -153,7 +166,7 @@ export async function GET(request: NextRequest) {
     } catch (error: any) {
         console.error('[MY PG Check Status] Error:', error);
         return NextResponse.json(
-            { error: 'Failed to check status', message: error.message },
+            { error: 'Failed to check status' },
             { status: 500 }
         );
     }

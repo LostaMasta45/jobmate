@@ -62,7 +62,7 @@ WHERE id = 1;
 INSERT INTO public.admin_settings (id, telegram_bot_token, telegram_admin_chat_id)
 VALUES (
   1,
-  '7974285481:AAGyTCCKGXWohPprzhMkZU-KWMX38S7Ecw4',
+  'YOUR_TELEGRAM_BOT_TOKEN_HERE',
   '474127500'
 )
 ON CONFLICT (id) DO UPDATE SET
@@ -94,3 +94,4 @@ WHERE email = 'admin@jobmate.com';
 -- 4. Should redirect to: /admin/applications
 -- 5. Dashboard admin should appear
 -- =====================================================
+

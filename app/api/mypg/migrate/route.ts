@@ -1,22 +1,48 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-// Supabase client with service role
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
  * API to run MY PG database migration
  * GET /api/mypg/migrate - Creates the mypg_transactions table
+ * 
+ * SECURITY: Requires admin authentication
  */
 export async function GET() {
-    console.log('[MY PG Migrate] Starting migration...');
+    // ============================================
+    // SECURITY: Require admin authentication
+    // ============================================
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return NextResponse.json(
+            { error: 'Authentication required' },
+            { status: 401 }
+        );
+    }
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+    if (profile?.role !== 'admin') {
+        return NextResponse.json(
+            { error: 'Admin access required' },
+            { status: 403 }
+        );
+    }
+
+    console.log('[MY PG Migrate] Starting migration (admin:', user.email, ')...');
 
     try {
-        // First, test if table already exists by trying to insert and rollback
-        const { data: existingTable, error: checkError } = await supabase
+        // Use admin client (service role) only inside handler, not module scope
+        const adminSupabase = createAdminClient();
+
+        // Test if table already exists
+        const { data: existingTable, error: checkError } = await adminSupabase
             .from('mypg_transactions')
             .select('id')
             .limit(1);
@@ -31,15 +57,14 @@ export async function GET() {
         }
 
         // If table doesn't exist, we need to create it via Supabase Dashboard
-        // Since Supabase JS client cannot run raw DDL SQL
         if (checkError.code === 'PGRST205' || checkError.message.includes('does not exist')) {
             console.log('[MY PG Migrate] Table does not exist, need manual creation');
 
             return NextResponse.json({
                 success: false,
-                message: 'Table mypg_transactions does not exist. Please run migration manually.',
+                message: 'Table mypg_transactions does not exist. Please run migration manually via Supabase Dashboard SQL Editor.',
                 instructions: [
-                    '1. Go to Supabase Dashboard: https://supabase.com/dashboard/project/gyamsjmrrntwwcqljene/sql',
+                    '1. Go to Supabase Dashboard > SQL Editor',
                     '2. Copy and paste SQL from: supabase/migrations/mypg_transactions.sql',
                     '3. Click "Run" to execute',
                     '4. Refresh this endpoint to verify',

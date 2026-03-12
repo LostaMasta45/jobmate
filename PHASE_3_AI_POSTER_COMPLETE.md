@@ -67,7 +67,7 @@ db/setup-vip-posters-storage.sql
 API key Sumpod sudah ada di `.env.local`:
 
 ```bash
-OPENAI_API_KEY=sk-9BP58d9_lcqSNmTvKX1k4w
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY_HERE
 OPENAI_BASE_URL=https://ai.sumopod.com/v1
 ```
 
@@ -306,3 +306,4 @@ Upload poster pertama dan lihat magic AI parsing! ✨
 
 **Questions?**
 Check `PHASE_3_ADMIN_VIP_REVISED.md` untuk detail spec lengkap.
+

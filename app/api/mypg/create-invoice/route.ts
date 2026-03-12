@@ -1,26 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { notifyNewInvoice } from '@/lib/telegram';
 
-// MY PG (klikqris.com) Configuration - from environment variables
-const MYPG_API_KEY = process.env.MYPG_API_KEY || 'WGyyEYlAiGwbHeiwHbcuJlyDlx9xCOsxJ2kPAI1X';
-const MYPG_MERCHANT_ID = process.env.MYPG_MERCHANT_ID || '176930678538';
+// MY PG (klikqris.com) Configuration - from environment variables ONLY (no hardcoded fallbacks)
+const MYPG_API_KEY = process.env.MYPG_API_KEY!;
+const MYPG_MERCHANT_ID = process.env.MYPG_MERCHANT_ID!;
 const MYPG_BASE_URL = process.env.MYPG_BASE_URL || 'https://klikqris.com/api/qrisv2';
-
-// Supabase client for storing transactions
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export async function POST(request: NextRequest) {
     try {
+        // Validate env vars are set
+        if (!MYPG_API_KEY || !MYPG_MERCHANT_ID) {
+            console.error('[MY PG] Missing required environment variables');
+            return NextResponse.json(
+                { error: 'Payment gateway not configured' },
+                { status: 500 }
+            );
+        }
+
         const { plan, email, fullName, whatsapp } = await request.json();
 
         // Validate input
         if (!plan || !email || !fullName) {
             return NextResponse.json(
                 { error: 'Missing required fields' },
+                { status: 400 }
+            );
+        }
+
+        // Basic input validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return NextResponse.json(
+                { error: 'Invalid email format' },
+                { status: 400 }
+            );
+        }
+
+        if (fullName.length > 100 || fullName.length < 2) {
+            return NextResponse.json(
+                { error: 'Name must be between 2-100 characters' },
                 { status: 400 }
             );
         }
@@ -85,26 +104,18 @@ export async function POST(request: NextRequest) {
                 error: errorText,
             });
             return NextResponse.json(
-                { error: 'Failed to create QRIS transaction', details: errorText },
+                { error: 'Failed to create QRIS transaction' },
                 { status: mypgResponse.status }
             );
         }
 
         const mypgData = await mypgResponse.json();
 
-        // Detailed logging to debug KlikQRIS API response
-        console.log('[MY PG] Transaction created - Full Response:', JSON.stringify(mypgData, null, 2));
-        console.log('[MY PG] QRIS fields check:', {
-            qris_image: mypgData.data?.qris_image ? `present (${typeof mypgData.data.qris_image}, length: ${String(mypgData.data.qris_image).length})` : 'MISSING',
-            qris_url: mypgData.data?.qris_url ? `present (${String(mypgData.data.qris_url).substring(0, 80)}...)` : 'MISSING',
-            qris_data: mypgData.data?.qris_data ? `present (${String(mypgData.data.qris_data).substring(0, 80)}...)` : 'MISSING',
-            direct_url: mypgData.data?.direct_url || 'MISSING',
-            expired_at: mypgData.data?.expired_at || 'MISSING',
-            total_amount: mypgData.data?.total_amount || 'MISSING',
-        });
+        console.log('[MY PG] Transaction created successfully:', orderId);
 
-        // Store transaction in database
+        // Store transaction in database (using admin client inside handler)
         try {
+            const supabase = createAdminClient();
             await supabase.from('mypg_transactions').insert({
                 order_id: orderId,
                 amount: selectedPlan.amount,
@@ -186,19 +197,19 @@ export async function POST(request: NextRequest) {
     } catch (error: any) {
         console.error('[MY PG] Error:', error);
         return NextResponse.json(
-            { error: 'Failed to create transaction', message: error.message },
+            { error: 'Failed to create transaction' },
             { status: 500 }
         );
     }
 }
 
-// GET endpoint to check API connection
+// GET endpoint to check API connection — remove sensitive info
 export async function GET() {
     return NextResponse.json({
         status: 'MY PG API Ready',
         gateway: 'klikqris.com',
-        merchantId: MYPG_MERCHANT_ID,
-        apiKeyConfigured: !!MYPG_API_KEY,
+        apiKeyConfigured: !!process.env.MYPG_API_KEY,
+        merchantConfigured: !!process.env.MYPG_MERCHANT_ID,
         timestamp: new Date().toISOString(),
     });
 }

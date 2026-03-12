@@ -116,7 +116,7 @@ ON CONFLICT (id) DO UPDATE SET
 INSERT INTO public.admin_settings (id, telegram_bot_token, telegram_admin_chat_id, created_at, updated_at)
 VALUES (
   1,
-  '7974285481:AAGyTCCKGXWohPprzhMkZU-KWMX38S7Ecw4',
+  'YOUR_TELEGRAM_BOT_TOKEN_HERE',
   '474127500',
   NOW(),
   NOW()
@@ -336,7 +336,7 @@ Go to your Telegram (chat with bot):
 
 ### Issue: "Telegram notification not sent"
 **Solution**:
-- Check bot token correct: `7974285481:AAGyTCCKGXWohPprzhMkZU-KWMX38S7Ecw4`
+- Check bot token correct: `YOUR_TELEGRAM_BOT_TOKEN_HERE`
 - Check chat ID correct: `474127500`
 - Check internet connection
 - Check .env.local has correct values
@@ -405,7 +405,7 @@ After setup complete:
 - demo2@jobmate.com / Demo123456!
 
 **Telegram:**
-- Bot Token: 7974285481:AAGyTCCKGXWohPprzhMkZU-KWMX38S7Ecw4
+- Bot Token: YOUR_TELEGRAM_BOT_TOKEN_HERE
 - Admin Chat ID: 474127500
 
 **Test URLs:**
@@ -418,3 +418,4 @@ After setup complete:
 **Created**: 2025-01-10  
 **Status**: Ready for Testing  
 **Estimated Time**: 20-30 minutes total
+

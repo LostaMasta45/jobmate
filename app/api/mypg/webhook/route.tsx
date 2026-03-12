@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { resend, FROM_EMAIL } from '@/lib/resend';
 import { PaymentSuccessEmail, PaymentSuccessEmailText } from '@/emails/PaymentSuccessEmail';
 import { render } from '@react-email/render';
-
-// Supabase client
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 /**
  * MY PG Webhook Handler
@@ -39,6 +33,9 @@ export async function POST(request: NextRequest) {
         const orderId = body.data.order_id;
         const status = body.status === 'success' ? 'PAID' : body.data?.status || 'UNKNOWN';
 
+        // Use admin client inside handler, not module scope
+        const supabase = createAdminClient();
+
         // Check if payment is successful
         if (body.status === 'success' && body.data.status === 'PAID') {
             console.log('[MY PG Webhook] Payment SUCCESS:', orderId);
@@ -67,7 +64,7 @@ export async function POST(request: NextRequest) {
                             amount: body.data.amount_paid || transaction.total_amount || transaction.amount,
                             transactionDate: body.data.payment_date || new Date().toISOString(),
                             planType: transaction.plan_type || 'basic',
-                            dashboardUrl: 'https://infolokerjombang.id/ajukan-akun',
+                            dashboardUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://infolokerjombang.id'}/ajukan-akun`,
                         };
 
                         const emailHtml = await render(<PaymentSuccessEmail {...emailProps} />);
@@ -108,7 +105,7 @@ export async function POST(request: NextRequest) {
         // Still return 200 to prevent webhook retry spam
         return NextResponse.json({
             success: false,
-            error: error.message,
+            error: 'Internal error processing webhook',
         });
     }
 }
@@ -119,7 +116,6 @@ export async function GET() {
         status: 'MY PG Webhook endpoint ready',
         endpoint: '/api/mypg/webhook',
         method: 'POST',
-        note: 'Set this URL in KlikQRIS Android app settings',
         timestamp: new Date().toISOString(),
     });
 }

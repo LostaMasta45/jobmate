@@ -17,7 +17,7 @@ WHERE id = 'e77fdb64-ce63-4ddd-9eb7-1bd5a2e0e96f';
 INSERT INTO public.admin_settings (id, telegram_bot_token, telegram_admin_chat_id, created_at, updated_at)
 VALUES (
   1,
-  '7974285481:AAGyTCCKGXWohPprzhMkZU-KWMX38S7Ecw4',
+  'YOUR_TELEGRAM_BOT_TOKEN_HERE',
   '474127500',
   NOW(),
   NOW()
@@ -56,3 +56,4 @@ WHERE id = 1;
 -- ✅ Telegram settings inserted
 -- ✅ Ready to test login
 -- =====================================================
+

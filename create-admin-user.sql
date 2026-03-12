@@ -64,7 +64,7 @@ WHERE email = 'admin@jobmate.com';
 INSERT INTO public.admin_settings (id, telegram_bot_token, telegram_admin_chat_id, created_at, updated_at)
 VALUES (
   1,
-  '7974285481:AAGyTCCKGXWohPprzhMkZU-KWMX38S7Ecw4',
+  'YOUR_TELEGRAM_BOT_TOKEN_HERE',
   '474127500',
   NOW(),
   NOW()
@@ -120,7 +120,7 @@ BEGIN
   INSERT INTO public.admin_settings (id, telegram_bot_token, telegram_admin_chat_id, created_at, updated_at)
   VALUES (
     1,
-    '7974285481:AAGyTCCKGXWohPprzhMkZU-KWMX38S7Ecw4',
+    'YOUR_TELEGRAM_BOT_TOKEN_HERE',
     '474127500',
     NOW(),
     NOW()
@@ -190,6 +190,7 @@ END $$;
 --   Password: Admin123456!
 --
 -- Telegram:
---   Bot Token: 7974285481:AAGyTCCKGXWohPprzhMkZU-KWMX38S7Ecw4
+--   Bot Token: YOUR_TELEGRAM_BOT_TOKEN_HERE
 --   Admin Chat ID: 474127500
 -- =====================================================
+

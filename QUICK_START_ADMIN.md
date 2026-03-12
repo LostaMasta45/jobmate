@@ -60,7 +60,7 @@ VALUES (
 INSERT INTO public.admin_settings (id, telegram_bot_token, telegram_admin_chat_id)
 VALUES (
   1,
-  '7974285481:AAGyTCCKGXWohPprzhMkZU-KWMX38S7Ecw4',
+  'YOUR_TELEGRAM_BOT_TOKEN_HERE',
   '474127500'
 )
 ON CONFLICT (id) DO UPDATE SET
@@ -139,7 +139,7 @@ ON CONFLICT (id) DO UPDATE SET
 
 **Test Telegram manually:**
 ```bash
-curl "https://api.telegram.org/bot7974285481:AAGyTCCKGXWohPprzhMkZU-KWMX38S7Ecw4/sendMessage?chat_id=474127500&text=Test"
+curl "https://api.telegram.org/botYOUR_TELEGRAM_BOT_TOKEN_HERE/sendMessage?chat_id=474127500&text=Test"
 ```
 
 **Check admin role:**
@@ -153,3 +153,4 @@ SELECT role FROM profiles WHERE email = 'admin@jobmate.com';
 **For detailed guide, see**: `ADMIN_SETUP_GUIDE.md`
 
 **Status**: Ready to Test! 🚀
+

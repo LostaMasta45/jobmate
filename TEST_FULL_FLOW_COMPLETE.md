@@ -245,7 +245,7 @@ Look for logs after submit:
 
 Open browser, paste this URL:
 ```
-https://api.telegram.org/bot7974285481:AAGyTCCKGXWohPprzhMkZU-KWMX38S7Ecw4/sendMessage?chat_id=474127500&text=TestManual
+https://api.telegram.org/botYOUR_TELEGRAM_BOT_TOKEN_HERE/sendMessage?chat_id=474127500&text=TestManual
 ```
 
 **Expected:** JSON response with `"ok": true`
@@ -289,3 +289,4 @@ testfinal@gmail.com / Test123456!
 ---
 
 **RESTART SERVER & TEST SEKARANG!** 🚀
+

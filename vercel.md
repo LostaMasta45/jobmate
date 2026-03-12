@@ -243,7 +243,7 @@ Environment: Production, Preview, Development (pilih semua)
 
 **OPENAI_API_KEY**
 ```
-Value: sk-9BP58d9_lcqSNmTvKX1k4w
+Value: YOUR_OPENAI_API_KEY_HERE
 Environment: Production, Preview, Development (pilih semua)
 ```
 
@@ -281,7 +281,7 @@ Environment: Production, Preview, Development (pilih semua)
 
 **TELEGRAM_BOT_TOKEN**
 ```
-Value: 7974285481:AAGyTCCKGXWohPprzhMkZU-KWMX38S7Ecw4
+Value: YOUR_TELEGRAM_BOT_TOKEN_HERE
 Environment: Production, Preview, Development (pilih semua)
 ```
 
@@ -867,3 +867,4 @@ git push origin main
 **Selamat! JobMate sudah live di internet! 🎉**
 
 Jangan lupa update webhook URLs di services external (Xendit, Telegram) dengan Vercel URL yang baru.
+

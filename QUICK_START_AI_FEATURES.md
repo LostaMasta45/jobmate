@@ -5,7 +5,7 @@
 ### 1. API Key (Already Configured) ✅
 ```env
 # .env.local (ALREADY SET)
-OPENAI_API_KEY=sk-9BP58d9_lcqSNmTvKX1k4w
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY_HERE
 OPENAI_BASE_URL=https://ai.sumopod.com/v1
 ```
 **Status:** ✅ Using SUMAPOD GPT-4o - Same as other tools
@@ -207,7 +207,7 @@ npm run dev
 ### Issue 1: "OpenAI API key not configured"
 **Cause:** API key not found in environment
 **Solution:** 
-- Check `.env.local` has `OPENAI_API_KEY=sk-9BP58d9_lcqSNmTvKX1k4w`
+- Check `.env.local` has `OPENAI_API_KEY=YOUR_OPENAI_API_KEY_HERE`
 - Restart dev server
 
 ### Issue 2: "Failed to generate message"
@@ -378,3 +378,4 @@ curl -X POST http://localhost:3005/api/ai/generate-cover-letter \
 **Last Updated:** October 24, 2025
 **API:** SUMAPOD GPT-4o (Same as other tools)
 **Database:** Migration SQL ready to run
+
