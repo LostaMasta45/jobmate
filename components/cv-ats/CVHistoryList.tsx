@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Resume } from "@/lib/schemas/cv-ats";
 import { deleteResume } from "@/actions/cv-ats";
-import { downloadResumeAsPDF, downloadResumeAsText, downloadResumeAsWord } from "@/lib/cv-download";
+import { downloadResumeAsPDF, downloadResumeAsText, downloadResumeAsWord, downloadResumeAsPNG } from "@/lib/cv-download";
 import { CVPreview } from "./CVPreview";
 import { TemplateThumbnail } from "./TemplateThumbnail";
 import { ATSTemplateId } from "@/lib/ats-templates";
@@ -74,11 +74,19 @@ export function CVHistoryList({ resumes, onEdit, onRefresh, onBack }: CVHistoryL
     }
   };
 
-  const handleDownloadPDF = (resume: Resume) => {
+  const handleDownloadPDF = async (resume: Resume) => {
     try {
-      downloadResumeAsPDF(resume);
+      await downloadResumeAsPDF(resume);
     } catch (error) {
       alert("Gagal download PDF: " + (error as Error).message);
+    }
+  };
+
+  const handleDownloadPNG = async (resume: Resume) => {
+    try {
+      await downloadResumeAsPNG(resume);
+    } catch (error) {
+      alert("Gagal download PNG: " + (error as Error).message);
     }
   };
 

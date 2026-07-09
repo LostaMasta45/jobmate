@@ -5,6 +5,9 @@ import jsPDF from "jspdf";
 import { Document, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle, ShadingType } from "docx";
 import { saveAs } from "file-saver";
 import { Packer } from "docx";
+import React from "react";
+import { createRoot } from "react-dom/client";
+import html2canvas from "html2canvas";
 
 // Generate plain text from resume
 export function generatePlainTextResume(resume: Resume): string {
@@ -106,288 +109,187 @@ export function downloadResumeAsText(resume: Resume): void {
 }
 
 // Download resume as PDF (real PDF using jsPDF)
-export function downloadResumeAsPDF(resume: Resume): void {
-  const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 20;
-  const maxWidth = pageWidth - 2 * margin;
-  let yPos = margin;
+const A4_WIDTH_PX = 794;
+const A4_HEIGHT_PX = 1123;
 
-  // Helper to add text with word wrap
-  const addText = (
-    text: string,
-    fontSize: number,
-    isBold: boolean = false,
-    indent: number = 0
-  ) => {
-    doc.setFontSize(fontSize);
-    doc.setFont("helvetica", isBold ? "bold" : "normal");
-    
-    const lines = doc.splitTextToSize(text, maxWidth - indent);
-    
-    // Check if need new page
-    if (yPos + lines.length * (fontSize / 2) > pageHeight - margin) {
-      doc.addPage();
-      yPos = margin;
-    }
-    
-    lines.forEach((line: string) => {
-      doc.text(line, margin + indent, yPos);
-      yPos += fontSize / 2;
-    });
-  };
+async function renderTemplateToDOM(resume: Resume): Promise<HTMLDivElement> {
+  const [
+    { TemplateClassic },
+    { TemplateModern },
+    { TemplateExecutive },
+    { TemplateMinimalist },
+    { TemplateCorporate },
+    { TemplateElegant },
+    { TemplateFunctional },
+    { TemplateSidebar }
+  ] = await Promise.all([
+    import("@/components/cv-ats/templates/TemplateClassic"),
+    import("@/components/cv-ats/templates/TemplateModern"),
+    import("@/components/cv-ats/templates/TemplateExecutive"),
+    import("@/components/cv-ats/templates/TemplateMinimalist"),
+    import("@/components/cv-ats/templates/TemplateCorporate"),
+    import("@/components/cv-ats/templates/TemplateElegant"),
+    import("@/components/cv-ats/templates/TemplateFunctional"),
+    import("@/components/cv-ats/templates/TemplateSidebar"),
+  ]);
 
-  const addSpace = (space: number = 5) => {
-    yPos += space;
-  };
-
-  const addLine = () => {
-    doc.setLineWidth(0.5);
-    doc.line(margin, yPos, pageWidth - margin, yPos);
-    yPos += 3;
-  };
-
-  // Header - Name (ATS-Friendly: Large, Bold, Top)
-  doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.text(
-    `${resume.basics.firstName} ${resume.basics.lastName}`.toUpperCase(),
-    margin,
-    yPos
-  );
-  yPos += 7;
-
-  // Headline (ATS-Friendly: Clear, Professional)
-  if (resume.basics.headline) {
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    doc.text(resume.basics.headline, margin, yPos);
-    yPos += 6;
+  let TemplateComponent = TemplateClassic;
+  switch (resume.templateId) {
+    case "modern": TemplateComponent = TemplateModern; break;
+    case "executive": TemplateComponent = TemplateExecutive; break;
+    case "minimalist": TemplateComponent = TemplateMinimalist; break;
+    case "corporate": TemplateComponent = TemplateCorporate; break;
+    case "elegant": TemplateComponent = TemplateElegant; break;
+    case "functional": TemplateComponent = TemplateFunctional; break;
+    case "sidebar": TemplateComponent = TemplateSidebar; break;
   }
 
-  // Extra space before line
-  addSpace(3);
+  const container = document.createElement("div");
+  container.style.position = "absolute";
+  container.style.top = "-9999px";
+  container.style.left = "-9999px";
+  container.style.width = `${A4_WIDTH_PX}px`;
+  container.style.minHeight = `${A4_HEIGHT_PX}px`;
+  container.style.backgroundColor = "white";
+  document.body.appendChild(container);
 
-  // Separator line
-  doc.setLineWidth(0.3);
-  doc.line(margin, yPos, pageWidth - margin, yPos);
-  yPos += 5; // More space after line
-
-  // Contact Information (ATS-Friendly: Simple, Clear)
-  doc.setFontSize(9);
-  doc.setFont("helvetica", "normal");
+  const root = createRoot(container);
   
-  // Contact line 1
-  const contacts: string[] = [];
-  if (resume.basics.email) contacts.push(`Email: ${resume.basics.email}`);
-  if (resume.basics.phone) contacts.push(`Phone: ${resume.basics.phone}`);
-  if (resume.basics.city) contacts.push(`Location: ${resume.basics.city}`);
-  
-  if (contacts.length > 0) {
-    doc.text(contacts.join(" | "), margin, yPos);
-    yPos += 4;
-  }
+  return new Promise((resolve) => {
+    root.render(
+      React.createElement(
+        "div", 
+        { 
+          className: "relative bg-white shrink-0 cv-template-container", 
+          style: { width: A4_WIDTH_PX, minHeight: A4_HEIGHT_PX },
+          ref: (el) => {
+            if (el) {
+              setTimeout(() => {
+                // Apply DOM Pagination to prevent text cut-off
+                const pageHeight = A4_HEIGHT_PX;
+                const topMargin = 40;
+                const bottomMargin = 40;
 
-  // Contact line 2 (Links)
-  if (resume.basics.website || resume.basics.linkedin) {
-    const links: string[] = [];
-    if (resume.basics.website) links.push(resume.basics.website);
-    if (resume.basics.linkedin) links.push(resume.basics.linkedin);
-    doc.text(links.join(" | "), margin, yPos);
-    yPos += 4;
-  }
+                const checkElements = el.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, hr, .resume-section');
+                
+                for (let i = 0; i < checkElements.length; i++) {
+                  const checkEl = checkElements[i] as HTMLElement;
+                  const rect = checkEl.getBoundingClientRect();
+                  const containerRect = el.getBoundingClientRect();
+                  
+                  // No scaling in off-screen render, scale = 1
+                  const top = rect.top - containerRect.top;
+                  const bottom = top + checkEl.offsetHeight;
+                  
+                  const pageNum = Math.floor(top / pageHeight);
+                  const pageBottomBoundary = (pageNum + 1) * pageHeight - bottomMargin;
+                  
+                  if (bottom > pageBottomBoundary && checkEl.offsetHeight < (pageHeight - topMargin - bottomMargin)) {
+                    const nextPageTop = (pageNum + 1) * pageHeight + topMargin;
+                    const shift = nextPageTop - top;
+                    checkEl.style.marginTop = `${shift}px`;
+                  }
+                }
+                
+                // Fix html2canvas native bullet alignment bug by using pseudo-elements
+                const bulletFixStyle = document.createElement('style');
+                bulletFixStyle.innerHTML = `
+                  .cv-template-container ul.list-disc {
+                    list-style-type: none !important;
+                  }
+                  .cv-template-container ul.list-disc > li {
+                    position: relative !important;
+                  }
+                  .cv-template-container ul.list-disc > li::before {
+                    content: '\\2022' !important;
+                    position: absolute !important;
+                    left: -1.2em !important;
+                    top: 0 !important;
+                    color: inherit;
+                  }
+                `;
+                el.appendChild(bulletFixStyle);
 
-  // More space after contact section
-  addSpace(8);
-
-  // Summary
-  if (resume.summary && resume.summary.trim()) {
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("SUMMARY", margin, yPos);
-    yPos += 6;
-
-    addText(resume.summary, 10, false);
-    addSpace(8);
-  }
-
-  // Professional Experience
-  if (resume.experiences && resume.experiences.length > 0) {
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("PROFESSIONAL EXPERIENCE", margin, yPos);
-    yPos += 6;
-
-    resume.experiences.forEach((exp, idx) => {
-      // Check if need new page for experience header
-      if (yPos > pageHeight - 40) {
-        doc.addPage();
-        yPos = margin;
-      }
-
-      // Job title and company
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text(`${exp.title} | ${exp.company}`, margin, yPos);
-      yPos += 5;
-
-      // Date and location
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      const dateStr = `${exp.startDate} - ${exp.isCurrent ? "Present" : exp.endDate || ""}`;
-      const locStr = exp.city ? ` | ${exp.city}` : "";
-      doc.text(dateStr + locStr, margin, yPos);
-      yPos += 5;
-
-      // Bullets
-      exp.bullets.forEach((bullet) => {
-        if (bullet.trim()) {
-          // Check page break
-          if (yPos > pageHeight - 20) {
-            doc.addPage();
-            yPos = margin;
-          }
-
-          doc.setFontSize(10);
-          doc.setFont("helvetica", "normal");
-          
-          // Add bullet point
-          doc.text("•", margin, yPos);
-          
-          // Word wrap bullet text
-          const bulletLines = doc.splitTextToSize(bullet, maxWidth - 5);
-          bulletLines.forEach((line: string, lineIdx: number) => {
-            doc.text(line, margin + 5, yPos);
-            if (lineIdx < bulletLines.length - 1) {
-              yPos += 4;
+                resolve(container);
+              }, 800); // 800ms buffer for external fonts/images 
             }
-          });
-          yPos += 5;
-        }
-      });
-
-      addSpace(5);
-    });
-
-    addSpace(3);
-  }
-
-  // Education
-  if (resume.education && resume.education.length > 0) {
-    // Check if need new page
-    if (yPos > pageHeight - 40) {
-      doc.addPage();
-      yPos = margin;
-    }
-
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("EDUCATION", margin, yPos);
-    yPos += 6;
-
-    resume.education.forEach((edu) => {
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text(edu.school, margin, yPos);
-      yPos += 5;
-
-      if (edu.degree || edu.field) {
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        const degreeText = `${edu.degree || ""} ${edu.field || ""}`.trim();
-        doc.text(degreeText, margin, yPos);
-        yPos += 5;
-      }
-
-      if (edu.startDate || edu.endDate) {
-        doc.setFontSize(9);
-        const dateText = `${edu.startDate || ""} - ${edu.endDate || ""}`.trim();
-        doc.text(dateText, margin, yPos);
-        yPos += 5;
-      }
-
-      if (edu.description) {
-        doc.setFontSize(9);
-        const descLines = doc.splitTextToSize(edu.description, maxWidth);
-        descLines.forEach((line: string) => {
-          doc.text(line, margin, yPos);
-          yPos += 4;
-        });
-      }
-
-      addSpace(5);
-    });
-
-    addSpace(3);
-  }
-
-  // Skills
-  if (resume.skills && resume.skills.length > 0) {
-    if (yPos > pageHeight - 30) {
-      doc.addPage();
-      yPos = margin;
-    }
-
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("SKILLS", margin, yPos);
-    yPos += 6;
-
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    const skillsText = resume.skills.join(", ");
-    const skillLines = doc.splitTextToSize(skillsText, maxWidth);
-    skillLines.forEach((line: string) => {
-      doc.text(line, margin, yPos);
-      yPos += 5;
-    });
-
-    addSpace(3);
-  }
-
-  // Custom Sections
-  if (resume.customSections && resume.customSections.length > 0) {
-    resume.customSections.forEach((section) => {
-      if (yPos > pageHeight - 40) {
-        doc.addPage();
-        yPos = margin;
-      }
-
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text(section.title.toUpperCase(), margin, yPos);
-      yPos += 6;
-
-      section.items.forEach((item) => {
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "bold");
-        doc.text(item.label, margin, yPos);
-        yPos += 5;
-
-        if (item.description) {
-          doc.setFontSize(9);
-          doc.setFont("helvetica", "normal");
-          const descLines = doc.splitTextToSize(item.description, maxWidth);
-          descLines.forEach((line: string) => {
-            doc.text(line, margin, yPos);
-            yPos += 4;
-          });
-        }
-
-        addSpace(3);
-      });
-
-      addSpace(3);
-    });
-  }
-
-  // Save PDF
-  const filename = `${resume.title || "CV"}.pdf`;
-  doc.save(filename);
+          }
+        },
+        React.createElement(TemplateComponent, { resume })
+      )
+    );
+  });
 }
 
-// Download resume as Word document (.docx)
+export async function downloadResumeAsPDF(resume: Resume): Promise<void> {
+  try {
+    const container = await renderTemplateToDOM(resume);
+    
+    const canvas = await html2canvas(container, {
+      scale: 3,
+      useCORS: true,
+      logging: false,
+      windowWidth: A4_WIDTH_PX,
+    });
+    
+    document.body.removeChild(container);
+
+    const imgData = canvas.toDataURL("image/png"); 
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    // Calculate the height of the full canvas in PDF mm units
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    
+    let heightLeft = pdfHeight;
+    let position = 0;
+    
+    // The A4 page height in mm is 297
+    const pageHeightMM = pdf.internal.pageSize.getHeight();
+    
+    // Add first page
+    pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
+    heightLeft -= pageHeightMM;
+    
+    // Add subsequent pages if content overflows
+    // We add a tiny buffer (1mm) to prevent tiny rounding errors from creating an empty extra page
+    while (heightLeft > 1) {
+      position -= pageHeightMM; // Shift the image up by exactly one page height
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pageHeightMM;
+    }
+    
+    pdf.save(`${resume.title || "CV"}.pdf`);
+  } catch (error) {
+    console.error("Failed to generate PDF:", error);
+    alert("Gagal mengunduh PDF. Silakan coba lagi.");
+  }
+}
+
+export async function downloadResumeAsPNG(resume: Resume): Promise<void> {
+  try {
+    const container = await renderTemplateToDOM(resume);
+    const canvas = await html2canvas(container, {
+      scale: 4, // scale 4 for ultra crisp Full HD +
+      useCORS: true,
+      logging: false,
+    });
+    
+    document.body.removeChild(container);
+
+    const imgData = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = imgData;
+    a.download = `${resume.title || "CV"}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error("Failed to generate PNG:", error);
+    alert("Gagal mengunduh PNG. Silakan coba lagi.");
+  }
+}
+
 export async function downloadResumeAsWord(resume: Resume): Promise<void> {
   try {
     const children: any[] = [];

@@ -102,6 +102,56 @@ export function CVPreview({ resume, scale: initialScale = 1, templateId, onTempl
     };
   }, [isAutoFit]);
 
+  
+  // DOM Pagination to prevent text cut-off and add margins
+  useEffect(() => {
+    const paginate = () => {
+      const pageHeight = A4_HEIGHT_PX;
+      const topMargin = 40;
+      const bottomMargin = 40;
+
+      const containers = document.querySelectorAll('.cv-template-container');
+      
+      containers.forEach(container => {
+        // Reset previous margins
+        const elements = container.querySelectorAll('.paginated-margin');
+        elements.forEach(el => {
+          (el as HTMLElement).style.marginTop = '';
+          el.classList.remove('paginated-margin');
+        });
+
+        // Elements to check for page break
+        const checkElements = container.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, hr, .resume-section');
+        
+        for (let i = 0; i < checkElements.length; i++) {
+          const el = checkElements[i] as HTMLElement;
+          // Get position relative to the container
+          const rect = el.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          
+          // Unscale the coordinates since getBoundingClientRect returns scaled values
+          const top = (rect.top - containerRect.top) / scale;
+          const bottom = top + el.offsetHeight;
+          
+          const pageNum = Math.floor(top / pageHeight);
+          const pageBottomBoundary = (pageNum + 1) * pageHeight - bottomMargin;
+          
+          // If element crosses the bottom boundary and isn't bigger than a page itself
+          if (bottom > pageBottomBoundary && el.offsetHeight < (pageHeight - topMargin - bottomMargin)) {
+            const nextPageTop = (pageNum + 1) * pageHeight + topMargin;
+            const shift = nextPageTop - top;
+            el.style.marginTop = `${shift}px`;
+            el.classList.add('paginated-margin');
+          }
+        }
+      });
+    };
+
+    // Run after DOM settles
+    const timeout = setTimeout(paginate, 150);
+    return () => clearTimeout(timeout);
+  }, [resume, effectiveTemplateId, scale]);
+
   const handleZoomIn = () => {
     setIsAutoFit(false);
     setScale(prev => Math.min(prev + 0.1, 2.0));
@@ -216,26 +266,62 @@ export function CVPreview({ resume, scale: initialScale = 1, templateId, onTempl
         ref={containerRef} 
         className="flex-1 overflow-y-auto overflow-x-hidden bg-slate-200/80 p-4 sm:p-8 flex items-start justify-center custom-scrollbar"
       >
-        {/* The A4 Paper */}
+        {/* The Wrapper for Scale */}
         <div
-          ref={contentRef}
           style={{
             width: A4_WIDTH_PX,
-            minHeight: A4_HEIGHT_PX,
             transform: `scale(${scale})`,
             transformOrigin: "top center",
             // Center the paper horizontally after scaling
-            marginBottom: -(contentHeight * (1 - scale)) + 40, // Add 40px bottom buffer
+            marginBottom: -(Math.max(1, Math.ceil(contentHeight / A4_HEIGHT_PX)) * A4_HEIGHT_PX * (1 - scale)) + 40,
             marginRight: scale < 1 ? -(A4_WIDTH_PX * (1 - scale)) / 2 : 0,
             marginLeft: scale < 1 ? -(A4_WIDTH_PX * (1 - scale)) / 2 : 0,
           }}
-          className="relative bg-white shadow-[0_4px_24px_rgba(0,0,0,0.12)] ring-1 ring-slate-900/5 shrink-0 transition-transform duration-200 ease-out"
+          className="relative shrink-0 transition-transform duration-200 ease-out"
         >
-          {/* Dynamic Template Render */}
-          {renderTemplate()}
+          {/* Hidden reference for measuring */}
+          <div
+            ref={contentRef}
+            style={{ 
+              width: A4_WIDTH_PX, 
+              minHeight: A4_HEIGHT_PX, 
+              position: 'absolute', 
+              visibility: 'hidden', 
+              zIndex: -10 
+            }}
+          >
+            <div className="cv-template-container w-full">{renderTemplate()}</div>
+          </div>
+
+          {/* Render visual pages */}
+          {Array.from({ length: Math.max(1, Math.ceil(contentHeight / A4_HEIGHT_PX)) }).map((_, i) => {
+            const numPages = Math.max(1, Math.ceil(contentHeight / A4_HEIGHT_PX));
+            return (
+              <div
+                key={i}
+                style={{
+                  width: A4_WIDTH_PX,
+                  height: A4_HEIGHT_PX,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  marginBottom: i < numPages - 1 ? '40px' : '0' // Gap between pages
+                }}
+                className="bg-white shadow-[0_4px_24px_rgba(0,0,0,0.12)] ring-1 ring-slate-900/5"
+              >
+                {/* Page number indicator (optional but helpful) */}
+                <div className="absolute bottom-2 right-4 text-[10px] text-slate-300 z-10 pointer-events-none">
+                  Page {i + 1}
+                </div>
+                
+                {/* The offset content */}
+                <div style={{ position: 'absolute', top: -(i * A4_HEIGHT_PX), width: A4_WIDTH_PX }}>
+                  <div className="cv-template-container w-full">{renderTemplate()}</div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
   );
 }
-

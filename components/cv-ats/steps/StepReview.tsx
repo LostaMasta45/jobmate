@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { analyzeATSScore, saveResumeToDatabase, extractJobDescFromPoster } from "@/actions/cv-ats";
 import { ATSAnalysis } from "@/types/cv-ats";
-import { downloadResumeAsPDF, downloadResumeAsWord } from "@/lib/cv-download";
+import { downloadResumeAsPDF, downloadResumeAsWord, downloadResumeAsPNG } from "@/lib/cv-download";
 
 interface StepReviewProps {
   resume: Resume;
@@ -214,7 +214,7 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
 
     setExporting("ats");
     try {
-      downloadResumeAsPDF(resume);
+      await downloadResumeAsPDF(resume);
       alert(`✅ PDF berhasil diunduh`);
 
       // Track tool usage on PDF download
@@ -224,6 +224,29 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
       } catch (e) { console.error("[Tracking] Failed:", e); }
     } catch (error) {
       alert("Gagal export PDF: " + (error as Error).message);
+    } finally {
+      setExporting(null);
+    }
+  };
+
+  
+  const handleExportPNG = async () => {
+    if (validationErrors.length > 0) {
+      alert("Perbaiki error validasi terlebih dahulu");
+      return;
+    }
+
+    setExporting("png");
+    try {
+      await downloadResumeAsPNG(resume);
+      alert(`✅ PNG berhasil diunduh`);
+
+      try {
+        const { logToolUsageWithNotification } = await import("@/lib/telegram-monitoring");
+        await logToolUsageWithNotification("CV ATS Download PNG", resume.title || "Untitled CV");
+      } catch (e) { console.error("[Tracking] Failed:", e); }
+    } catch (error) {
+      alert("Gagal export PNG: " + (error as Error).message);
     } finally {
       setExporting(null);
     }
@@ -689,7 +712,7 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
       <Card className="p-6">
         <h3 className="mb-4 text-lg font-semibold">Export & Simpan</h3>
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
           <Button
             variant="outline"
             onClick={handleCopyText}
@@ -722,6 +745,24 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
               <>
                 <FileDown className="mr-2 h-4 w-4" />
                 Unduh PDF
+              </>
+            )}
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={handleExportPNG}
+            disabled={validationErrors.length > 0 || exporting === "png"}
+          >
+            {exporting === "png" ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Exporting...
+              </>
+            ) : (
+              <>
+                <FileDown className="mr-2 h-4 w-4" />
+                Unduh PNG
               </>
             )}
           </Button>
@@ -765,6 +806,7 @@ export function StepReview({ resume, setResume, onSaveSuccess }: StepReviewProps
         <div className="mt-4 space-y-2 text-xs text-muted-foreground">
           <p>• <strong>Salin sebagai Teks:</strong> Copy ke clipboard untuk paste manual</p>
           <p>• <strong>Unduh PDF:</strong> Format PDF ATS-friendly dengan professional styling</p>
+          <p>• <strong>Unduh PNG:</strong> Format Gambar Resolusi Tinggi (Sama dengan preview)</p>
           <p>• <strong>Unduh Word:</strong> Format .docx yang bisa diedit di Microsoft Word</p>
           <p>• <strong>Simpan CV:</strong> Simpan ke database untuk digunakan nanti</p>
         </div>

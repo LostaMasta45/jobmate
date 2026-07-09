@@ -85,7 +85,7 @@ export function CVPreview({ cv, showControls = false, simple = false }: CVPrevie
     );
   }
 
-  // Measure content height
+  // Measure content height (Wait for images/fonts if possible)
   useEffect(() => {
     if (contentRef.current) {
       const observer = new ResizeObserver((entries) => {
@@ -96,7 +96,7 @@ export function CVPreview({ cv, showControls = false, simple = false }: CVPrevie
       observer.observe(contentRef.current);
       return () => observer.disconnect();
     }
-  }, [cv.templateId]);
+  }, [cv.templateId, scale]); // Recalculate if scale changes
 
   // Auto-scale logic with ResizeObserver
   useEffect(() => {
@@ -105,10 +105,6 @@ export function CVPreview({ cv, showControls = false, simple = false }: CVPrevie
     const calculateScale = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.clientWidth;
-        
-        // Add breathing room (margin) around the paper
-        // Mobile: 24px total margin
-        // Desktop: 64px total margin
         const isMobile = window.innerWidth < 640;
         const marginX = isMobile ? 24 : 64;
 
@@ -132,6 +128,52 @@ export function CVPreview({ cv, showControls = false, simple = false }: CVPrevie
     };
   }, [isAutoFit]);
 
+  // DOM Pagination to prevent text cut-off and add margins
+  useEffect(() => {
+    const paginate = () => {
+      const pageHeight = A4_HEIGHT_PX;
+      const topMargin = 40;
+      const bottomMargin = 40;
+
+      const containers = document.querySelectorAll('.cv-template-container');
+      
+      containers.forEach(container => {
+        // Reset previous margins
+        const elements = container.querySelectorAll('.paginated-margin');
+        elements.forEach(el => {
+          (el as HTMLElement).style.marginTop = '';
+          el.classList.remove('paginated-margin');
+        });
+
+        // Elements to check for page break
+        const checkElements = container.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, hr, .resume-section, .cv-section, [data-section]');
+        
+        for (let i = 0; i < checkElements.length; i++) {
+          const el = checkElements[i] as HTMLElement;
+          const rect = el.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          
+          // Unscale the coordinates
+          const top = (rect.top - containerRect.top) / scale;
+          const bottom = top + el.offsetHeight;
+          
+          const pageNum = Math.floor(top / pageHeight);
+          const pageBottomBoundary = (pageNum + 1) * pageHeight - bottomMargin;
+          
+          if (bottom > pageBottomBoundary && el.offsetHeight < (pageHeight - topMargin - bottomMargin)) {
+            const nextPageTop = (pageNum + 1) * pageHeight + topMargin;
+            const shift = nextPageTop - top;
+            el.style.marginTop = `${shift}px`;
+            el.classList.add('paginated-margin');
+          }
+        }
+      });
+    };
+
+    const timeout = setTimeout(paginate, 150);
+    return () => clearTimeout(timeout);
+  }, [cv, scale]);
+
   const handleZoomIn = () => {
     setIsAutoFit(false);
     setScale(prev => Math.min(prev + 0.1, 2.0));
@@ -145,6 +187,9 @@ export function CVPreview({ cv, showControls = false, simple = false }: CVPrevie
   const handleFitWidth = () => {
     setIsAutoFit(true);
   };
+
+  // Calculate number of pages based on actual measured content height
+  const numPages = Math.max(1, Math.ceil(contentHeight / A4_HEIGHT_PX));
 
   return (
     <div className="flex flex-col h-full w-full relative group bg-slate-100/50 dark:bg-slate-900/50">
@@ -193,23 +238,54 @@ export function CVPreview({ cv, showControls = false, simple = false }: CVPrevie
         ref={containerRef} 
         className="flex-1 overflow-y-auto overflow-x-hidden bg-slate-200/80 dark:bg-slate-800/80 p-4 sm:p-8 flex items-start justify-center custom-scrollbar"
       >
-        {/* The A4 Paper */}
-        <div
-          ref={contentRef}
+        {/* Hidden measurement container */}
+        <div className="absolute opacity-0 pointer-events-none" style={{ zIndex: -100, visibility: 'hidden' }}>
+          <div
+            ref={contentRef}
+            style={{ width: A4_WIDTH_PX, minHeight: A4_HEIGHT_PX }}
+            className="relative bg-white cv-template-container"
+          >
+            {renderTemplateContent(cv)}
+          </div>
+        </div>
+
+        {/* Visual Pages */}
+        <div 
+          className="flex flex-col items-center justify-start transition-transform duration-200 ease-out"
           style={{
-            width: A4_WIDTH_PX,
-            minHeight: A4_HEIGHT_PX,
             transform: `scale(${scale})`,
             transformOrigin: "top center",
-            marginBottom: -(contentHeight * (1 - scale)) + 40,
             marginRight: scale < 1 ? -(A4_WIDTH_PX * (1 - scale)) / 2 : 0,
             marginLeft: scale < 1 ? -(A4_WIDTH_PX * (1 - scale)) / 2 : 0,
           }}
-          className="relative bg-white shadow-[0_4px_24px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4)] ring-1 ring-slate-900/5 dark:ring-slate-100/10 shrink-0 transition-transform duration-200 ease-out"
         >
-          <div id="cv-preview-content" className="cv-creative-page">
-            {renderTemplateContent(cv)}
-          </div>
+          {Array.from({ length: numPages }).map((_, i) => (
+            <div 
+              key={i}
+              className="relative bg-white shadow-[0_4px_24px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4)] ring-1 ring-slate-900/5 dark:ring-slate-100/10 shrink-0 mb-10 last:mb-0 overflow-hidden print-page-container"
+              style={{
+                width: A4_WIDTH_PX,
+                height: A4_HEIGHT_PX,
+              }}
+            >
+              {/* The offset content */}
+              <div 
+                className="cv-template-container w-full"
+                style={{ 
+                  position: 'absolute', 
+                  top: -(i * A4_HEIGHT_PX), 
+                  width: A4_WIDTH_PX 
+                }}
+              >
+                {renderTemplateContent(cv)}
+              </div>
+              
+              {/* Page Number Indicator */}
+              <div className="absolute bottom-4 right-4 text-xs text-slate-400 bg-white/80 px-2 py-1 rounded">
+                {i + 1} / {numPages}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
